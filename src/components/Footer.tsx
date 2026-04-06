@@ -10,24 +10,18 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <img src={withBase("img/logo.png")} alt="ALPS" className="h-6 w-auto opacity-80" />
-            <span className="text-base text-white/90 font-medium">
-              &copy; 2026 ALPS Foundation
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-base text-white/80 font-medium">
-            Made with <Heart className="w-4 h-4 text-support-light mx-0.5" /> in Switzerland
-          </div>
-
-          <div className="flex items-center gap-6">
             <a
               href="https://alps-foundation.ch"
               target="_blank"
               rel="noopener noreferrer"
               className="text-base text-white/90 font-medium hover:text-white transition-colors"
             >
-              ALPS Foundation
+              &copy; 2026 ALPS Foundation
             </a>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-base text-white/80 font-medium">
+            Made with <Heart className="w-4 h-4 text-support-light mx-0.5" /> in Switzerland
           </div>
         </div>
       </div>

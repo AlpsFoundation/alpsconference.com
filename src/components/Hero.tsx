@@ -118,11 +118,13 @@ export default function Hero() {
           className="w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl px-2 opacity-0 will-change-transform"
           style={{ transformOrigin: "center center" }}
         >
-          <img
-            src={withBase("img/bones.png")}
-            alt=""
-            className="w-full h-auto object-contain opacity-95 mix-blend-screen drop-shadow-[0_0_3rem_rgba(5,8,22,0.45)]"
-          />
+          <div className="origin-center scale-[2] sm:scale-100">
+            <img
+              src={withBase("img/bones.png")}
+              alt=""
+              className="w-full h-auto object-contain opacity-100 mix-blend-screen drop-shadow-[0_0_3rem_rgba(5,8,22,0.45)]"
+            />
+          </div>
         </div>
       </div>
 
@@ -131,7 +133,7 @@ export default function Hero() {
         <div className="flex-[1_1_0] flex flex-col items-center justify-start min-h-0">
           <h1
             data-animate
-            className="opacity-0 text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-4 sm:mb-6 max-w-5xl mx-auto bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent] [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
+            className="opacity-0 text-4xl sm:max-md:text-7xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-4 sm:mb-6 max-w-5xl mx-auto bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent] [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
           >
             ALPS RESEARCH{" "}
             <span className="whitespace-nowrap">CONFERENCE 2026</span>

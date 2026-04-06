@@ -40,9 +40,9 @@ export default function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 [will-change:backdrop-filter] transition-[background-color,box-shadow] duration-500 ${
           scrolled
-            ? "bg-neutral-dark/90 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-primary/10"
+            ? "bg-neutral-dark/80 backdrop-blur-xl shadow-2xl shadow-primary/10"
             : "bg-transparent"
         }`}
       >
