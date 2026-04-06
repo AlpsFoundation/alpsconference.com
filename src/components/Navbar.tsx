@@ -4,10 +4,10 @@ import { Menu, X, ChevronDown } from "lucide-react";
 const NAV_ITEMS = [
   { label: "Conference", href: "#conference" },
   { label: "Location", href: "#location" },
-  { label: "Speakers", href: "#speakers" },
-  { label: "Experiences", href: "#experiences" },
-  { label: "Research Poster", href: "#research" },
-  { label: "Sponsoring", href: "#sponsoring" },
+  // { label: "Speakers", href: "#speakers" },
+  // { label: "Experiences", href: "#experiences" },
+  // { label: "Research Poster", href: "#research" },
+  // { label: "Sponsoring", href: "#sponsoring" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -46,23 +46,23 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-18">
+          <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <a href="#" className="flex items-center gap-3 shrink-0">
               <img
                 src="/img/logo.png"
                 alt="ALPS Research Conference"
-                className="h-8 w-auto"
+                className="h-8 lg:h-10 w-auto"
               />
             </a>
 
             {/* Desktop nav */}
-            <div className="hidden lg:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-2">
               {NAV_ITEMS.map((item) => (
                 <a
                   key={item.href}
                   href={item.href}
-                  className="px-3 py-2 text-sm font-medium text-secondary/80 hover:text-white transition-colors duration-200"
+                  className="px-4 py-2 text-base font-medium text-white/90 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5"
                 >
                   {item.label}
                 </a>
@@ -74,19 +74,19 @@ export default function Navbar() {
                 onMouseEnter={() => setPastEditionsOpen(true)}
                 onMouseLeave={() => setPastEditionsOpen(false)}
               >
-                <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-secondary/80 hover:text-white transition-colors duration-200">
+                <button className="flex items-center gap-1 px-4 py-2 text-base font-medium text-white/90 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5 cursor-pointer">
                   Past Editions
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${pastEditionsOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${pastEditionsOpen ? "rotate-180" : ""}`} />
                 </button>
                 {pastEditionsOpen && (
-                  <div className="absolute top-full right-0 mt-1 w-40 bg-neutral-dark/95 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl overflow-hidden">
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-neutral-dark/95 backdrop-blur-xl border border-white/10 rounded-sm shadow-2xl overflow-hidden py-2">
                     {PAST_EDITIONS.map((ed) => (
                       <a
                         key={ed.label}
                         href={ed.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block px-4 py-2.5 text-sm text-secondary/80 hover:text-white hover:bg-white/5 transition-colors"
+                        className="block px-5 py-2.5 text-base font-medium text-white/90 hover:text-white hover:bg-white/5 transition-colors"
                       >
                         ALPS {ed.label}
                       </a>
@@ -99,7 +99,7 @@ export default function Navbar() {
                 href="https://alps-foundation.ch"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-2 px-4 py-2 text-sm font-medium text-accent hover:text-accent-light transition-colors duration-200"
+                className="ml-4 px-5 py-2.5 text-base font-medium text-white bg-support/20 hover:bg-support/30 border border-support/30 rounded-sm transition-colors duration-200"
               >
                 ALPS Foundation
               </a>
@@ -108,7 +108,7 @@ export default function Navbar() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 text-secondary/80 hover:text-white transition-colors"
+              className="lg:hidden p-2 text-white/90 hover:text-white transition-colors cursor-pointer rounded-sm hover:bg-white/5"
               aria-label="Toggle menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -129,13 +129,13 @@ export default function Navbar() {
             isOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          <div className="flex flex-col pt-20 px-6">
+          <div className="flex flex-col pt-24 px-6">
             {NAV_ITEMS.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className="py-3 text-lg font-medium text-secondary/80 hover:text-white border-b border-white/5 transition-colors"
+                className="py-4 text-xl font-medium text-white/90 hover:text-white border-b border-white/5 transition-colors"
               >
                 {item.label}
               </a>
@@ -144,20 +144,20 @@ export default function Navbar() {
             {/* Mobile past editions */}
             <button
               onClick={() => setMobilePastOpen(!mobilePastOpen)}
-              className="flex items-center justify-between py-3 text-lg font-medium text-secondary/80 hover:text-white border-b border-white/5 transition-colors"
+              className="flex items-center justify-between py-4 text-xl font-medium text-white/90 hover:text-white border-b border-white/5 transition-colors cursor-pointer"
             >
               Past Editions
-              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobilePastOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${mobilePastOpen ? "rotate-180" : ""}`} />
             </button>
             {mobilePastOpen && (
-              <div className="pl-4 border-b border-white/5">
+              <div className="pl-4 border-b border-white/5 py-2 bg-white/[0.02] rounded-b-sm">
                 {PAST_EDITIONS.map((ed) => (
                   <a
                     key={ed.label}
                     href={ed.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block py-2 text-base text-secondary/60 hover:text-white transition-colors"
+                    className="block py-2.5 text-base font-medium text-white/80 hover:text-white transition-colors"
                   >
                     ALPS {ed.label}
                   </a>
@@ -169,9 +169,9 @@ export default function Navbar() {
               href="https://alps-foundation.ch"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 px-5 py-3 text-center text-sm font-medium text-accent border border-accent/30 rounded-lg hover:bg-accent/10 transition-colors"
+              className="mt-8 px-6 py-3.5 text-center text-base font-medium text-white bg-support/20 hover:bg-support/30 border border-support/30 rounded-sm transition-colors"
             >
-              ALPS Foundation Website
+              ALPS Foundation
             </a>
           </div>
         </div>

@@ -53,10 +53,10 @@ export default function Conference() {
     <section ref={sectionRef} id="conference" className="relative py-24 sm:py-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div data-fade-up className="opacity-0 text-center mb-16">
-          <p className="text-sm tracking-[0.2em] uppercase text-accent font-medium mb-3">
+          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
             Come discover
           </p>
-          <h2 className="text-3xl sm:text-4xl font-semibold text-white text-glow">
+          <h2 className="text-3xl font-semibold text-white">
             What awaits you
           </h2>
         </div>
@@ -66,22 +66,22 @@ export default function Conference() {
             <div
               key={item.title}
               data-fade-up
-              className="opacity-0 group relative p-6 sm:p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-accent/20 hover:bg-white/[0.05] transition-all duration-500"
+              className="opacity-0 group relative p-6 sm:p-8 rounded-sm bg-white/[0.03] border border-white/[0.06] hover:border-support/30 hover:bg-white/[0.05] transition-all duration-500"
             >
-              <div className="w-12 h-12 rounded-xl bg-support/10 flex items-center justify-center mb-5 group-hover:bg-support/20 transition-colors duration-300">
-                <item.icon className="w-6 h-6 text-support" />
+              <div className="w-12 h-12 rounded-sm bg-support/10 flex items-center justify-center mb-5 group-hover:bg-support/20 transition-colors duration-300">
+                <item.icon className="w-6 h-6 text-support-light" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-              <p className="text-sm text-secondary/60 leading-relaxed">{item.desc}</p>
+              <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
+              <p className="text-base text-white/80 leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
 
         {/* Credits badge */}
         <div data-fade-up className="opacity-0 flex justify-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-accent/10 border border-accent/20">
-            <Award className="w-5 h-5 text-accent" />
-            <span className="text-sm font-medium text-accent">
+          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-sm bg-support/10 border border-support/20">
+            <Award className="w-5 h-5 text-support-light" />
+            <span className="text-base font-medium text-support-light">
               Receive up to 14 credits
             </span>
           </div>

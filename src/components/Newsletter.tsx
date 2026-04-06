@@ -34,13 +34,13 @@ export default function Newsletter() {
     <section ref={sectionRef} id="newsletter" className="relative py-24 sm:py-32">
       <div className="max-w-xl mx-auto px-4 sm:px-6 text-center">
         <div data-fade-up className="opacity-0">
-          <p className="text-sm tracking-[0.2em] uppercase text-accent font-medium mb-3">
+          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
             Stay informed
           </p>
-          <h2 className="text-3xl sm:text-4xl font-semibold text-white text-glow mb-4">
+          <h2 className="text-3xl font-semibold text-white mb-4">
             Newsletter
           </h2>
-          <p className="text-secondary/60 mb-8">
+          <p className="text-white/90 mb-8 text-base">
             Be the first to know about speakers, schedule updates, and ticket sales.
           </p>
         </div>
@@ -61,13 +61,13 @@ export default function Newsletter() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
-            className="flex-1 px-5 py-3.5 bg-white/[0.05] border border-white/10 rounded-lg text-white placeholder:text-secondary/30 focus:outline-none focus:border-support/50 focus:ring-1 focus:ring-support/30 transition-all"
+            className="flex-1 px-5 py-3.5 bg-white/[0.05] border border-white/10 rounded-sm text-white placeholder:text-white/60 focus:outline-none focus:border-support/50 focus:ring-1 focus:ring-support/30 transition-all text-base"
           />
           <button
             type="submit"
-            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-accent hover:bg-accent-light text-neutral-dark font-medium rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 cursor-pointer"
+            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-support hover:bg-support-light text-white font-medium rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/20 cursor-pointer text-base"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-5 h-5" />
             Subscribe
           </button>
         </form>

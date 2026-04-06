@@ -12,21 +12,24 @@ interface Particle {
   pulseSpeed: number;
 }
 
-const COLORS = [
+const PINK_COLORS = [
+  "rgba(243, 143, 191, 0.8)",
+  "rgba(247, 179, 212, 0.6)",
+  "rgba(255, 130, 184, 0.7)",
+];
+
+const BASE_COLORS = [
   "rgba(46, 124, 199, 0.6)",
-  "rgba(243, 143, 191, 0.5)",
   "rgba(196, 204, 212, 0.3)",
-  "rgba(11, 60, 93, 0.7)",
   "rgba(255, 255, 255, 0.15)",
 ];
 
-export default function ParticlesCanvas() {
+export default function ParticlesCanvas({ variant }: { variant: "hero" | "footer" }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -37,23 +40,42 @@ export default function ParticlesCanvas() {
     let particles: Particle[] = [];
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const parent = canvas.parentElement;
+      if (parent) {
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+      }
     };
 
     const createParticles = () => {
-      const count = Math.min(60, Math.floor((canvas.width * canvas.height) / 15000));
-      particles = Array.from({ length: count }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3 - 0.1,
-        radius: Math.random() * 2.5 + 0.5,
-        opacity: Math.random() * 0.5 + 0.1,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: Math.random() * 0.02 + 0.005,
-      }));
+      const count = variant === "hero" ? 80 : 30;
+      particles = Array.from({ length: count }, (_, i) => {
+        const isPinkCenter = variant === "hero" && i < 40; // 40 pink particles in center
+        const isLarge = i % 5 === 0; // some large particles
+
+        let x = Math.random() * canvas.width;
+        let y = Math.random() * canvas.height;
+
+        if (isPinkCenter) {
+          // Cluster in the center
+          x = canvas.width / 2 + (Math.random() - 0.5) * 400;
+          y = canvas.height / 2 + (Math.random() - 0.5) * 400;
+        }
+
+        return {
+          x,
+          y,
+          vx: (Math.random() - 0.5) * (isPinkCenter ? 0.1 : 0.3),
+          vy: (Math.random() - 0.5) * (isPinkCenter ? 0.1 : 0.3) - 0.05,
+          radius: isLarge ? Math.random() * 4 + 3 : Math.random() * 2 + 0.5,
+          opacity: isPinkCenter ? Math.random() * 0.6 + 0.4 : Math.random() * 0.4 + 0.1,
+          color: isPinkCenter
+            ? PINK_COLORS[Math.floor(Math.random() * PINK_COLORS.length)]
+            : BASE_COLORS[Math.floor(Math.random() * BASE_COLORS.length)],
+          pulse: Math.random() * Math.PI * 2,
+          pulseSpeed: Math.random() * 0.02 + 0.005,
+        };
+      });
     };
 
     const drawParticle = (p: Particle) => {
@@ -66,36 +88,15 @@ export default function ParticlesCanvas() {
       ctx.globalAlpha = p.opacity * (0.7 + Math.sin(p.pulse) * 0.3);
       ctx.fill();
 
-      // Glow
-      if (r > 1.5) {
+      if (r > 2) {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, r * 3, 0, Math.PI * 2);
-        const grad = ctx.createRadialGradient(p.x, p.y, r * 0.5, p.x, p.y, r * 3);
+        ctx.arc(p.x, p.y, r * 2.5, 0, Math.PI * 2);
+        const grad = ctx.createRadialGradient(p.x, p.y, r * 0.5, p.x, p.y, r * 2.5);
         grad.addColorStop(0, p.color);
         grad.addColorStop(1, "transparent");
         ctx.fillStyle = grad;
-        ctx.globalAlpha = p.opacity * 0.2;
+        ctx.globalAlpha = p.opacity * 0.3;
         ctx.fill();
-      }
-    };
-
-    const drawConnections = () => {
-      const maxDist = 120;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < maxDist) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = "rgba(46, 124, 199, 0.08)";
-            ctx.globalAlpha = 1 - dist / maxDist;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
       }
     };
 
@@ -103,23 +104,19 @@ export default function ParticlesCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.globalAlpha = 1;
 
-      drawConnections();
-
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
         p.pulse += p.pulseSpeed;
 
-        // Wrap around
-        if (p.x < -10) p.x = canvas.width + 10;
-        if (p.x > canvas.width + 10) p.x = -10;
-        if (p.y < -10) p.y = canvas.height + 10;
-        if (p.y > canvas.height + 10) p.y = -10;
+        if (p.x < -20) p.x = canvas.width + 20;
+        if (p.x > canvas.width + 20) p.x = -20;
+        if (p.y < -20) p.y = canvas.height + 20;
+        if (p.y > canvas.height + 20) p.y = -20;
 
         drawParticle(p);
       }
 
-      ctx.globalAlpha = 1;
       animationId = requestAnimationFrame(animate);
     };
 
@@ -133,12 +130,12 @@ export default function ParticlesCanvas() {
     });
 
     return () => cancelAnimationFrame(animationId);
-  }, []);
+  }, [variant]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
+      className="absolute inset-0 pointer-events-none z-0"
       aria-hidden="true"
     />
   );

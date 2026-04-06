@@ -36,19 +36,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Text glow utilities */
-.text-glow {
-  text-shadow: 0 0 40px rgba(46, 124, 199, 0.3), 0 0 80px rgba(46, 124, 199, 0.1);
-}
-
-.text-glow-accent {
-  text-shadow: 0 0 30px rgba(243, 143, 191, 0.4), 0 0 60px rgba(243, 143, 191, 0.15);
-}
-
-.text-glow-subtle {
-  text-shadow: 0 0 20px rgba(196, 204, 212, 0.15);
-}
-
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
@@ -58,11 +45,11 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-primary);
-  border-radius: 3px;
+  border-radius: 0px;
 }
 
 /* Selection */
 ::selection {
-  background-color: rgba(46, 124, 199, 0.3);
+  background-color: var(--color-support);
   color: white;
 }
