@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { withBase } from "../lib/withBase";
 
 const NAV_ITEMS = [
   { label: "Conference", href: "#conference" },
@@ -7,16 +8,16 @@ const NAV_ITEMS = [
   // { label: "Speakers", href: "#speakers" },
   // { label: "Experiences", href: "#experiences" },
   // { label: "Research Poster", href: "#research" },
-  // { label: "Sponsoring", href: "#sponsoring" },
+  { label: "Sponsoring", href: "#sponsoring" },
   { label: "FAQ", href: "#faq" },
 ];
 
 const PAST_EDITIONS = [
-  { label: "2025", href: "https://alps2025.alpsconference.com" },
-  { label: "2024", href: "https://alps2024.alpsconference.com" },
-  { label: "2023", href: "https://alps2023.alpsconference.com" },
-  { label: "2022", href: "https://alps2022.alpsconference.com" },
-  { label: "2021", href: "https://alps2021.alpsconference.com" },
+  { label: "2025", href: "https://sites.google.com/view/alps-conference-2025" },
+  { label: "2024", href: "https://sites.google.com/view/alps-conference-2024" },
+  { label: "2023", href: "https://sites.google.com/view/alps-conference-2023" },
+  { label: "2022", href: "https://sites.google.com/view/alpsconference2022/home" },
+  { label: "2021", href: "https://sites.google.com/view/pala-psychedelics-congress/home" },
 ];
 
 export default function Navbar() {
@@ -50,7 +51,7 @@ export default function Navbar() {
             {/* Logo */}
             <a href="#" className="flex items-center gap-3 shrink-0">
               <img
-                src="/img/logo.png"
+                src={withBase("img/logo.png")}
                 alt="ALPS Research Conference"
                 className="h-8 lg:h-10 w-auto"
               />
@@ -74,23 +75,30 @@ export default function Navbar() {
                 onMouseEnter={() => setPastEditionsOpen(true)}
                 onMouseLeave={() => setPastEditionsOpen(false)}
               >
-                <button className="flex items-center gap-1 px-4 py-2 text-base font-medium text-white/90 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5 cursor-pointer">
+                <button
+                  type="button"
+                  aria-expanded={pastEditionsOpen}
+                  onClick={() => setPastEditionsOpen((open) => !open)}
+                  className="flex items-center gap-1 px-4 py-2 text-base font-medium text-white/90 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5 cursor-pointer"
+                >
                   Past Editions
                   <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${pastEditionsOpen ? "rotate-180" : ""}`} />
                 </button>
                 {pastEditionsOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-neutral-dark/95 backdrop-blur-xl border border-white/10 rounded-sm shadow-2xl overflow-hidden py-2">
-                    {PAST_EDITIONS.map((ed) => (
-                      <a
-                        key={ed.label}
-                        href={ed.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block px-5 py-2.5 text-base font-medium text-white/90 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        ALPS {ed.label}
-                      </a>
-                    ))}
+                  <div className="absolute top-full right-0 pt-2">
+                    <div className="w-48 bg-neutral-dark/95 backdrop-blur-xl border border-white/10 rounded-sm shadow-2xl overflow-hidden py-2">
+                      {PAST_EDITIONS.map((ed) => (
+                        <a
+                          key={ed.label}
+                          href={ed.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block px-5 py-2.5 text-base font-medium text-white/90 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          ALPS {ed.label}
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -107,6 +115,7 @@ export default function Navbar() {
 
             {/* Mobile menu button */}
             <button
+              type="button"
               onClick={() => setIsOpen(!isOpen)}
               className="lg:hidden p-2 text-white/90 hover:text-white transition-colors cursor-pointer rounded-sm hover:bg-white/5"
               aria-label="Toggle menu"
@@ -143,6 +152,7 @@ export default function Navbar() {
 
             {/* Mobile past editions */}
             <button
+              type="button"
               onClick={() => setMobilePastOpen(!mobilePastOpen)}
               className="flex items-center justify-between py-4 text-xl font-medium text-white/90 hover:text-white border-b border-white/5 transition-colors cursor-pointer"
             >

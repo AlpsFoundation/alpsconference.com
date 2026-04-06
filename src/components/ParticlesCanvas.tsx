@@ -36,10 +36,12 @@ export default function ParticlesCanvas({ variant }: { variant: "hero" | "footer
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) return;
 
-    let animationId: number;
+    let animationId = 0;
     let particles: Particle[] = [];
+    /** Used to ignore iOS Safari resize storms when only the dynamic chrome changes height. */
+    let lastInnerWidth = window.innerWidth;
 
-    const resize = () => {
+    const resizeCanvas = () => {
       const parent = canvas.parentElement;
       if (parent) {
         canvas.width = parent.clientWidth;
@@ -120,16 +122,42 @@ export default function ParticlesCanvas({ variant }: { variant: "hero" | "footer
       animationId = requestAnimationFrame(animate);
     };
 
-    resize();
+    const handleResize = () => {
+      const prevW = canvas.width;
+      const prevH = canvas.height;
+      resizeCanvas();
+      const nextW = canvas.width;
+      const nextH = canvas.height;
+
+      const innerW = window.innerWidth;
+      const widthChanged = innerW !== lastInnerWidth;
+      lastInnerWidth = innerW;
+
+      if (widthChanged) {
+        createParticles();
+        return;
+      }
+
+      if (prevW > 0 && prevH > 0 && (prevW !== nextW || prevH !== nextH)) {
+        const sx = nextW / prevW;
+        const sy = nextH / prevH;
+        for (const p of particles) {
+          p.x *= sx;
+          p.y *= sy;
+        }
+      }
+    };
+
+    resizeCanvas();
     createParticles();
     animate();
 
-    window.addEventListener("resize", () => {
-      resize();
-      createParticles();
-    });
+    window.addEventListener("resize", handleResize, { passive: true });
 
-    return () => cancelAnimationFrame(animationId);
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener("resize", handleResize);
+    };
   }, [variant]);
 
   return (

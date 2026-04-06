@@ -1,6 +1,19 @@
 ---
 import "../styles/app.css";
 import App from "../components/App";
+import { withBase } from "../lib/withBase";
+
+const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const ogImagePath = withBase("img/opengraph.jpg");
+const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
+
+const fontFaceCss = `@font-face {
+  font-family: "Switzer";
+  src: url("${switzerFont}") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}`;
 ---
 
 <!doctype html>
@@ -21,17 +34,19 @@ import App from "../components/App";
       property="og:description"
       content="Awareness Lectures on Psychedelics in Switzerland. 9-10 October 2026, Aarau."
     />
-    <meta property="og:image" content="/img/opengraph.jpg" />
+    <meta property="og:image" content={ogImageUrl} />
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Theme -->
     <meta name="theme-color" content="#0B3C5D" />
 
     <!-- Fonts -->
-    <link rel="preload" href="/fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/img/logo.png" />
+    <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
+
+    <style is:global set:html={fontFaceCss}></style>
   </head>
   <body>
     <App client:load />

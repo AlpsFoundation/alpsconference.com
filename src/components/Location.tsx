@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
 import { MapPin, Train, Building2, Utensils } from "lucide-react";
+import { withBase } from "../lib/withBase";
 
 const FEATURES = [
   { icon: Building2, text: "1000m\u00B2 of flexible event space" },
@@ -8,6 +9,9 @@ const FEATURES = [
   { icon: Train, text: "Steps from Aarau train station" },
   { icon: Utensils, text: "Surrounded by dining & leisure options" },
 ];
+
+const venueInteriorImage = withBase("img/kuk-inside.jpg");
+const venueExteriorImage = withBase("img/kuk-outside.jpg");
 
 export default function Location() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -37,7 +41,12 @@ export default function Location() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="location" className="relative py-24 sm:py-32">
+    <section
+      ref={sectionRef}
+      id="location"
+      className="relative overflow-hidden py-24 sm:py-32"
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-20 -z-10 h-72 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div data-fade-up className="opacity-0 text-center mb-14">
           <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
@@ -48,42 +57,96 @@ export default function Location() {
           </h2>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-10 items-center">
-          {/* Map embed */}
-          <div data-fade-up className="opacity-0 aspect-video rounded-sm overflow-hidden border border-white/[0.06] shadow-2xl">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2715.5!2d8.0461!3d47.3925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47903be85ee8f3d9%3A0x1b5f1e8b1e0e1e0e!2sKultur+%26+Kongresshaus+Aarau!5e0!3m2!1sen!2sch!4v1"
-              width="100%"
-              height="100%"
-              style={{ border: 0, filter: "invert(0.9) hue-rotate(180deg) saturate(0.3) brightness(0.8)" }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Kultur & Kongresshaus Aarau location"
-            />
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start">
+          <div data-fade-up className="order-2 opacity-0 lg:order-1">
+            <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.03] shadow-[0_24px_80px_rgba(3,8,24,0.45)]">
+              <div className="aspect-[4/2.35] sm:aspect-[4/3] bg-neutral-dark/60">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2715.5!2d8.0461!3d47.3925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47903be85ee8f3d9%3A0x1b5f1e8b1e0e1e0e!2sKultur+%26+Kongresshaus+Aarau!5e0!3m2!1sen!2sch!4v1"
+                  width="100%"
+                  height="100%"
+                  style={{
+                    border: 0,
+                    filter: "invert(0.9) hue-rotate(180deg) saturate(0.3) brightness(0.8)",
+                  }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Kultur & Kongresshaus Aarau location"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-white/70">
+                <MapPin className="h-4 w-4 text-support-light" />
+                <span>Schlossplatz, Aarau</span>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-white/70">
+                <Train className="h-4 w-4 text-support-light" />
+                <span>Short walk from the station</span>
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[1.5rem] bg-[linear-gradient(145deg,rgba(74,154,224,0.4),rgba(255,255,255,0.12)_42%,rgba(11,60,93,0.24))] p-px shadow-[0_20px_56px_rgba(3,8,24,0.35)]">
+                <div className="overflow-hidden rounded-[calc(1.5rem-1px)] bg-white/[0.03]">
+                  <div className="aspect-[4/3]">
+                    <img
+                      src={venueInteriorImage}
+                      alt="Interior of Kultur & Kongresshaus Aarau prepared for a conference session"
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-[1.5rem] bg-[linear-gradient(145deg,rgba(74,154,224,0.4),rgba(255,255,255,0.12)_42%,rgba(11,60,93,0.24))] p-px shadow-[0_20px_56px_rgba(3,8,24,0.35)]">
+                <div className="overflow-hidden rounded-[calc(1.5rem-1px)] bg-white/[0.03]">
+                  <div className="aspect-[4/3]">
+                    <img
+                      src={venueExteriorImage}
+                      alt="Exterior of Kultur & Kongresshaus Aarau at dusk"
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Info */}
-          <div className="space-y-6">
-            <p data-fade-up className="opacity-0 text-white/90 leading-relaxed text-base">
+          <div className="order-1 space-y-6 lg:order-2 lg:pt-4">
+            <div
+              data-fade-up
+              className="opacity-0 inline-flex items-center rounded-full border border-support/20 bg-support/10 px-4 py-2 text-[0.72rem] font-medium uppercase tracking-[0.2em] text-support-light/90"
+            >
+              Designed for gathering, learning, and exchange
+            </div>
+
+            <p data-fade-up className="opacity-0 text-white/90 leading-relaxed text-base sm:text-[1.05rem]">
               The Kultur & Kongresshaus Aarau, located at Schlossplatz in Aarau, combines
               architectural elegance with modern functionality. The facility boasts high ceilings
               on the ground floor providing a sense of openness and grandeur, with advanced
               event technology ensuring all technical needs are seamlessly met.
             </p>
-            <p data-fade-up className="opacity-0 text-white/90 leading-relaxed text-base">
+            <p data-fade-up className="opacity-0 text-white/90 leading-relaxed text-base sm:text-[1.05rem]">
               A spacious foyer serves as a welcoming area and exhibition space. Located near
-              the heart of Aarau's historic center, surrounded by dining and leisure options,
-              it's a prime spot for local and international attendees alike.
+              the heart of Aarau&apos;s historic center, surrounded by dining and leisure options,
+              it&apos;s a prime spot for local and international attendees alike.
             </p>
 
-            <div data-fade-up className="opacity-0 grid grid-cols-2 gap-4 pt-4">
+            <div data-fade-up className="opacity-0 grid gap-3 pt-3 sm:grid-cols-2">
               {FEATURES.map((f) => (
-                <div key={f.text} className="flex items-start gap-3 text-base">
-                  <div className="w-8 h-8 rounded-sm bg-support/10 flex items-center justify-center shrink-0">
-                    <f.icon className="w-4 h-4 text-support-light" />
+                <div
+                  key={f.text}
+                  className="flex items-start gap-3 rounded-[1.25rem] border border-white/[0.08] bg-white/[0.03] px-4 py-4 text-base shadow-[0_16px_40px_rgba(3,8,24,0.2)]"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-support/12">
+                    <f.icon className="h-4 w-4 text-support-light" />
                   </div>
-                  <span className="text-white/80 mt-1">{f.text}</span>
+                  <span className="text-white/78 leading-relaxed">{f.text}</span>
                 </div>
               ))}
             </div>

@@ -1,8 +1,8 @@
+![ALPS Research Conference 2026](public/img/opengraph.jpg)
+
 # ALPS Research Conference
 
-![Open Graph social preview](public/img/opengraph.jpg)
-
-Standalone Astro project for the ALPS Research Conference landing page. The same asset is served at `/img/opengraph.jpg`.
+Standalone Astro project for the ALPS Research Conference 2026 landing page. 
 
 ## Commands
 

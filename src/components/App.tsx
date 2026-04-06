@@ -2,6 +2,7 @@ import Navbar from "./Navbar";
 import Hero from "./Hero";
 import Conference from "./Conference";
 import Experiences from "./Experiences";
+import About from "./About";
 import Location from "./Location";
 import Newsletter from "./Newsletter";
 import Partners from "./Partners";
@@ -16,10 +17,11 @@ export default function App() {
         <Hero />
         {/* <Conference /> */}
         {/* <Experiences /> */}
+        <About />
         <Location />
         <FAQ />
-        {/* <Partners /> */}
         <Newsletter />
+        <Partners />
       </main>
       <Footer />
     </>
