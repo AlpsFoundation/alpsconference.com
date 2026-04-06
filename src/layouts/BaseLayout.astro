@@ -1,0 +1,47 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description,
+  ogTitle = title,
+  ogDescription = description,
+  ogImage = "/img/opengraph.jpg"
+} = Astro.props;
+
+const ogImageUrl = Astro.site ? new URL(ogImage, Astro.site).toString() : ogImage;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#123e67" />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:type" content="website" />
+    <link rel="preload" href="/fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Switzer-VariableItalic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/img/background.jpg" as="image" />
+    <link rel="preload" href="/img/bones.png" as="image" />
+    <link rel="preload" href="/img/logo.png" as="image" />
+    <link rel="preload" href="/img/partners.jpg" as="image" />
+    <slot name="head" />
+  </head>
+  <body class="layout-lock">
+    <slot />
+    <script src="/scripts.js" defer></script>
+  </body>
+</html>

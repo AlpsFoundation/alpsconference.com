@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@theme {
+  --color-primary: #0B3C5D;
+  --color-primary-light: #0e4d78;
+  --color-secondary: #C4CCD4;
+  --color-accent: #F38FBF;
+  --color-accent-light: #f7b3d4;
+  --color-support: #2E7CC7;
+  --color-support-light: #4a9ae0;
+  --color-neutral-dark: #050816;
+  --color-neutral-light: #E5E7EB;
+  --color-neutral-mid: #4B5563;
+  --font-sans: "Switzer", system-ui, -apple-system, sans-serif;
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-neutral-dark);
+  color: var(--color-neutral-light);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Text glow utilities */
+.text-glow {
+  text-shadow: 0 0 40px rgba(46, 124, 199, 0.3), 0 0 80px rgba(46, 124, 199, 0.1);
+}
+
+.text-glow-accent {
+  text-shadow: 0 0 30px rgba(243, 143, 191, 0.4), 0 0 60px rgba(243, 143, 191, 0.15);
+}
+
+.text-glow-subtle {
+  text-shadow: 0 0 20px rgba(196, 204, 212, 0.15);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-neutral-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 3px;
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(46, 124, 199, 0.3);
+  color: white;
+}

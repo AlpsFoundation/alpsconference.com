@@ -1,0 +1,39 @@
+---
+import "../styles/app.css";
+import App from "../components/App";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALPS Research Conference 2026 | Awareness Lectures on Psychedelics in Switzerland</title>
+    <meta
+      name="description"
+      content="ALPS Research Conference 2026 - 9-10 October, Kultur & Kongresshaus Aarau, Switzerland. National & international speakers, research posters, panel discussions, workshops, and immersive experiences."
+    />
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ALPS Research Conference 2026" />
+    <meta
+      property="og:description"
+      content="Awareness Lectures on Psychedelics in Switzerland. 9-10 October 2026, Aarau."
+    />
+    <meta property="og:image" content="/img/opengraph.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#0B3C5D" />
+
+    <!-- Fonts -->
+    <link rel="preload" href="/fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/img/logo.png" />
+  </head>
+  <body>
+    <App client:load />
+  </body>
+</html>
