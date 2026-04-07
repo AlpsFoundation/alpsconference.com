@@ -7,6 +7,10 @@ const FAQS = [
     category: "Before the Event",
     items: [
       {
+        q: "When will tickets go on sale?",
+        a: "Tickets will go on sale on April 19, 2026 at 3pm."
+      },
+      {
         q: "Can my ticket be refunded?",
         a: "We have a no-refund policy. However, you can transfer your ticket to another person before the conference. Please note that the ALPS Foundation is a non-profit organization, operated entirely by unpaid volunteers and sustained through donations. Additionally, our ticketing partner Infomaniak offers a cancellation insurance in partnership Allianz; please refer to their terms and conditions."
       },
@@ -17,10 +21,6 @@ const FAQS = [
       {
         q: "I only want to attend one day of the conference, is that possible?",
         a: "Tickets are only available for the full length of the conference, two days."
-      },
-      {
-        q: "When will tickets go on sale?",
-        a: "Ticket sales dates will be announced on our website and social media channels. Follow us on Instagram and sign up for our newsletter to be notified when tickets become available."
       }
     ]
   },
