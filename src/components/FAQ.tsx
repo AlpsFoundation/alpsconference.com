@@ -37,7 +37,7 @@ const FAQS = [
       },
       {
         q: "Where can I find information about the location?",
-        a: "The conference will be held at Kultur & Kongresshaus Aarau. For more information, visit: https://www.kulturundkongresshaus.ch/"
+        a: "The conference will be held at Kultur & Kongresshaus Aarau. For more information, visit: https://www.kuk-aarau.ch/"
       },
       {
         q: "Will the event be streamed live?",
