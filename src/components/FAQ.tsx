@@ -7,6 +7,10 @@ const FAQS = [
     category: "Before the Event",
     items: [
       {
+        q: "When will tickets go on sale?",
+        a: "Tickets will go on sale on April 19, 2026 at 3pm."
+      },
+      {
         q: "Can my ticket be refunded?",
         a: "We have a no-refund policy. However, you can transfer your ticket to another person before the conference. Please note that the ALPS Foundation is a non-profit organization, operated entirely by unpaid volunteers and sustained through donations. Additionally, our ticketing partner Infomaniak offers a cancellation insurance in partnership Allianz; please refer to their terms and conditions."
       },
@@ -33,7 +37,7 @@ const FAQS = [
       },
       {
         q: "Where can I find information about the location?",
-        a: "Check out the official website: https://campusbiotech.ch/"
+        a: "The conference will be held at Kultur & Kongresshaus Aarau. For more information, visit: https://www.kuk-aarau.ch/"
       },
       {
         q: "Will the event be streamed live?",
@@ -53,7 +57,7 @@ const FAQS = [
       },
       {
         q: "What services are available for participants with special needs?",
-        a: "Campus Bioetch is wheelchair accessible. Please reach out to us if you have any special needs."
+        a: "Kultur & Kongresshaus Aarau is wheelchair accessible. Please reach out to us if you have any special needs."
       },
       {
         q: "Will there be photo and video recording at the event?",
