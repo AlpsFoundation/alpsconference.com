@@ -117,7 +117,10 @@ if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     ]);
 }
 
-$payload = ['email' => $email];
+$payload = [
+    'email' => $email,
+    'source' => 'alps-conf-website-2026',
+];
 if ($groupsRaw !== '') {
     $groups = [];
     foreach (array_map('trim', explode(',', $groupsRaw)) as $g) {
