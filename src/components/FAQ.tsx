@@ -17,6 +17,10 @@ const FAQS = [
       {
         q: "I only want to attend one day of the conference, is that possible?",
         a: "Tickets are only available for the full length of the conference, two days."
+      },
+      {
+        q: "When will tickets go on sale?",
+        a: "Ticket sales dates will be announced on our website and social media channels. Follow us on Instagram and sign up for our newsletter to be notified when tickets become available."
       }
     ]
   },
@@ -33,7 +37,7 @@ const FAQS = [
       },
       {
         q: "Where can I find information about the location?",
-        a: "Check out the official website: https://campusbiotech.ch/"
+        a: "The conference will be held at Kultur & Kongresshaus Aarau. For more information, visit: https://www.kulturundkongresshaus.ch/"
       },
       {
         q: "Will the event be streamed live?",
@@ -53,7 +57,7 @@ const FAQS = [
       },
       {
         q: "What services are available for participants with special needs?",
-        a: "Campus Bioetch is wheelchair accessible. Please reach out to us if you have any special needs."
+        a: "Kultur & Kongresshaus Aarau is wheelchair accessible. Please reach out to us if you have any special needs."
       },
       {
         q: "Will there be photo and video recording at the event?",
