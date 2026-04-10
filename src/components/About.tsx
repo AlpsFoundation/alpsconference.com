@@ -48,7 +48,7 @@ export default function About() {
             Join us for two full days of cutting-edge science, meaningful dialogue, and community building. This year's conference will feature distinguished speakers and interactive panels, providing deep insights into the latest advancements in psychedelic research and therapy. The conference will be held in English.
           </p>
           <p data-fade-up className="opacity-0">
-            Your conference experience includes comprehensive catering with breakfast, morning and afternoon breaks, lunch, and dinner, ensuring a comfortable and enriching environment. Throughout the event, take advantage of the networking breaks to connect with fellow enthusiasts, researchers, and practitioners over apéros, and join us for our traditional After Party on Saturday night.
+            Your conference experience includes comprehensive catering with breakfast, morning and afternoon breaks, lunch, and Saturday-evening Apero, ensuring a comfortable and enriching environment. For Friday evening, an optional networking dinner will be available. Throughout the event, take advantage of the networking breaks to connect with fellow enthusiasts, researchers, and practitioners over apéros, and join us for our traditional After Party on Saturday night.
           </p>
           <p data-fade-up className="opacity-0">
             Attendees will have the opportunity to earn up to 14 continuing education credits, accredited by FSP and SGPP for psychologists and medical professionals. We look forward to hosting an engaging and enlightening conference that promises to expand knowledge and foster significant discussions.
