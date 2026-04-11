@@ -1,0 +1,13 @@
+# Copy to `.dev.vars` for local Cloudflare runtime secrets.
+
+# Infomaniak API token (Manager → API / OAuth; newsletter scope)
+INFOMANIAK_TOKEN=
+
+# Newsletter domain ID (positive integer from Infomaniak Manager → Newsletter)
+INFOMANIAK_NEWSLETTER_DOMAIN=
+
+# Optional comma-separated group IDs and/or group names
+# INFOMANIAK_NEWSLETTER_GROUPS=1234,ALPS 2026
+
+# Optional debug payloads on API errors
+# NEWSLETTER_DEBUG=1

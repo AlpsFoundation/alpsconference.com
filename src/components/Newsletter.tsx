@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
 import { AlertCircle, CheckCircle2, Loader2, Send } from "lucide-react";
+import { withBase } from "../lib/withBase";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
-const apiUrl = import.meta.env.PUBLIC_NEWSLETTER_API_URL?.trim() ?? "";
+const apiUrl = withBase("api/newsletter-subscribe");
 
 export default function Newsletter() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -48,8 +49,6 @@ export default function Newsletter() {
       easing: "easeOutCubic",
     });
   }, [status]);
-
-  const configured = apiUrl.length > 0;
 
   return (
     <section ref={sectionRef} id="newsletter" className="relative py-24 sm:py-32">
@@ -101,7 +100,7 @@ export default function Newsletter() {
             className="opacity-0 flex flex-col gap-3"
             onSubmit={async (e) => {
               e.preventDefault();
-              if (!configured || status === "loading") return;
+              if (status === "loading") return;
 
               setStatus("loading");
               setErrorMessage("");
@@ -141,18 +140,21 @@ export default function Newsletter() {
               <input
                 type="email"
                 required
-                disabled={!configured || status === "loading"}
+                disabled={status === "loading"}
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (status === "error") setStatus("idle");
+                  if (status === "error") {
+                    setStatus("idle");
+                    setErrorMessage("");
+                  }
                 }}
                 placeholder="your@email.com"
                 className="flex-1 px-5 py-3.5 bg-white/[0.05] border border-white/10 rounded-sm text-white placeholder:text-white/60 focus:outline-none focus:border-support/50 focus:ring-1 focus:ring-support/30 transition-all text-base disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
                 type="submit"
-                disabled={!configured || status === "loading"}
+                disabled={status === "loading"}
                 className="flex items-center justify-center gap-2 px-6 py-3.5 bg-support hover:bg-support-light disabled:hover:bg-support text-white font-medium rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/20 cursor-pointer text-base disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none min-w-[140px]"
               >
                 {status === "loading" ? (
@@ -183,16 +185,6 @@ export default function Newsletter() {
                 />
                 <span>{errorMessage}</span>
               </div>
-            )}
-
-            {!configured && (
-              <p className="text-white/50 text-sm text-left">
-                Newsletter signup is not configured for this build (set{" "}
-                <code className="text-white/70 text-xs">
-                  PUBLIC_NEWSLETTER_API_URL
-                </code>
-                ).
-              </p>
             )}
           </form>
         )}

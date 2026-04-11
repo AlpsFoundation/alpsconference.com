@@ -18,8 +18,17 @@ function normalizeBase(raw) {
 const base = normalizeBase(process.env.BASE_PATH);
 
 export default defineConfig({
-  output: "hybrid",
-  adapter: cloudflare(),
+  output: "static",
+  adapter: cloudflare({
+    imageService: "passthrough",
+    prerenderEnvironment: "node",
+    sessionKVBindingName: false,
+  }),
+  session: {
+    driver: {
+      entrypoint: "unstorage/drivers/null",
+    },
+  },
   site,
   base,
   integrations: [react(), sitemap()],

@@ -8,6 +8,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "test:newsletter": "bun test tests/newsletter-signup.test.ts",
     "generate-types": "wrangler types",
     "deploy": "wrangler deploy",
     "deploy:preview": "wrangler versions upload"
