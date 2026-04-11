@@ -59,4 +59,10 @@ When you consider the coding work complete (build succeeds locally if you ran it
 
 Automation can then correlate the PR with Slack via the commit message and notify the requester when Cloudflare posts deployment links on the PR.
 
-Repository automation: `.github/workflows/slack-notify-cloudflare-preview.yml` runs on new PR comments from bots that contain Cloudflare’s “Deployment successful” table, parses the preview URLs, reads the Slack permalink from the **PR head** commit message, and posts a short reply in that Slack thread. Configure a GitHub Actions secret **`SLACK_BOT_TOKEN`** (a Slack bot user token with `chat:write` for the workspace) and ensure the bot is invited to channels where threads should receive replies.
+Repository automation:
+
+- **`scripts/slack-github-notifications.mjs`** — Shared Node entrypoint used by the Slack workflows (`cloudflare-pr-preview` and `main-merge` commands).
+- **`.github/workflows/slack-notify-cloudflare-preview.yml`** — On new PR comments from bots that contain Cloudflare’s “Deployment successful” table, parses the preview URLs, reads the Slack permalink from the **PR head** commit message, and posts a short reply in that Slack thread.
+- **`.github/workflows/slack-notify-main-merge.yml`** — On every push to `main`, posts a human-readable merge summary to the **`bots`** Slack channel (configurable) with a **Visit** button to the production site.
+
+Configure a GitHub Actions secret **`SLACK_BOT_TOKEN`** (a Slack bot user token with `chat:write` for the workspace). Invite the bot to channels where it should post (`bots` for merge summaries; any channel used in Slack permalinks for preview replies). Optional repository **variables**: `PRODUCTION_SITE_URL` (defaults to `https://alpsconference.com`), `SLACK_BOTS_CHANNEL` (defaults to `bots`; use a channel ID if `#name` resolution fails).

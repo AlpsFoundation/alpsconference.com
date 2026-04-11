@@ -1,0 +1,32 @@
+# After merges to main, post a short summary to the #bots channel with a Visit button.
+#
+# Secrets: SLACK_BOT_TOKEN (chat:write; invite the bot to #bots or use a channel ID).
+# Optional vars (repo Settings → Variables → Actions):
+#   PRODUCTION_SITE_URL — defaults to https://alpsconference.com
+#   SLACK_BOTS_CHANNEL — channel name (e.g. bots) or ID; defaults to bots
+
+name: Slack notify — main merge
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  notify-bots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Post merge summary to Slack
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PRODUCTION_SITE_URL: ${{ vars.PRODUCTION_SITE_URL }}
+          SLACK_BOTS_CHANNEL: ${{ vars.SLACK_BOTS_CHANNEL }}
+        run: node scripts/slack-github-notifications.mjs main-merge
