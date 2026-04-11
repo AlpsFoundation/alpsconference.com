@@ -9,6 +9,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "postinstall": "pnpm run generate-types",
     "test:newsletter": "vitest run tests/newsletter-signup.test.ts",
     "generate-types": "wrangler types",
     "deploy": "wrangler deploy",

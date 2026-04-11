@@ -11,7 +11,7 @@ Static landing page for the ALPS Research Conference (9-10 October 2026, Aarau, 
 Uses pnpm as package manager:
 
 ```bash
-pnpm install         # Install dependencies
+pnpm install         # Install dependencies (also regenerates worker-configuration.d.ts)
 pnpm dev             # Development server with hot reload
 pnpm build           # Production build to dist/
 pnpm preview         # Preview production build locally

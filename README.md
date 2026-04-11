@@ -14,9 +14,11 @@ The site remains prerendered/static for the public landing page, while the newsl
 pnpm install
 ```
 
+`pnpm install` also regenerates the local Cloudflare Worker type file automatically.
+
 ### Generate Cloudflare runtime types
 
-Run this once after install, and again any time `wrangler.jsonc` changes.
+This is run automatically on install. Re-run it manually any time `wrangler.jsonc` changes and you want to refresh local types immediately.
 
 ```bash
 pnpm run generate-types
@@ -53,7 +55,7 @@ pnpm preview
 pnpm dev                # local development with Cloudflare runtime
 pnpm build              # production build
 pnpm preview            # preview the built Worker locally
-pnpm run generate-types # regenerate worker-configuration.d.ts from wrangler.jsonc
+pnpm run generate-types # regenerate local worker-configuration.d.ts from wrangler.jsonc
 pnpm run deploy         # deploy to Cloudflare Workers
 pnpm run deploy:preview # upload a non-production Worker version
 ```
