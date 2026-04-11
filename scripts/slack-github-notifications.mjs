@@ -258,9 +258,9 @@ async function runMainMerge() {
     process.env.PRODUCTION_SITE_URL?.trim() || "https://alpsconference.com";
   const channel = process.env.SLACK_BOTS_CHANNEL?.trim() || "#bots";
 
-  let summaryBody = "*ALPS Conference was updated.*\n\n*Changes*\n";
+  let summaryBody = "*ALPS Conference was updated.*\n\n";
   if (!shown.length) {
-    summaryBody += "_No change list for this deploy._\n";
+    summaryBody += "_No changes._\n";
   } else {
     summaryBody += bullets;
     if (omitted > 0) summaryBody += `\n_…and ${omitted} more._`;
