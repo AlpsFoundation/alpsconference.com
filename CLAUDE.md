@@ -36,3 +36,27 @@ This is a minimal Astro static site (`output: "static"`) with a single page:
 - **`reference/`** — Historical 2024/2025 versions for design reference; not part of the build.
 
 The site has no server-side logic, no external JS dependencies, and no build-time data fetching.
+
+## Slack-driven changes (traceability and previews)
+
+When work is started from a Slack request, keep automation and humans aligned without extra databases.
+
+### Commit messages
+
+Every commit that implements a Slack-driven change must end with a line that points back to the originating Slack thread (or message), using one of these forms (copy the permalink from Slack so `thread_ts` is preserved when the UI provides it):
+
+- `Related Slack thread: <full Slack permalink URL>`
+- `Fixes issue reported in Slack: <full Slack permalink URL>`
+
+Use the exact permalink from Slack (including `thread_ts` and `cid` query parameters when Slack adds them). This lets CI read the link from `git log` / GitHub’s commit API and post follow-ups in the correct thread.
+
+### Finishing the task
+
+When you consider the coding work complete (build succeeds locally if you ran it, changes are coherent, and you are ready for review):
+
+1. Push your branch to `origin`.
+2. Open a pull request on GitHub (do not leave the branch-only unless the user explicitly asked for that). Use a clear title and description summarizing the change.
+
+Automation can then correlate the PR with Slack via the commit message and notify the requester when Cloudflare posts deployment links on the PR.
+
+Repository automation: `.github/workflows/slack-notify-cloudflare-preview.yml` runs on new PR comments from bots that contain Cloudflare’s “Deployment successful” table, parses the preview URLs, reads the Slack permalink from the **PR head** commit message, and posts a short reply in that Slack thread. Configure a GitHub Actions secret **`SLACK_BOT_TOKEN`** (a Slack bot user token with `chat:write` for the workspace) and ensure the bot is invited to channels where threads should receive replies.

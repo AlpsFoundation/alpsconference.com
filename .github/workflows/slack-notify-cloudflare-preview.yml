@@ -1,0 +1,127 @@
+# When Cloudflare’s GitHub integration comments on a PR with deployment status,
+# post the preview URLs back to the Slack thread linked from the PR head commit message.
+#
+# Required repository secret: SLACK_BOT_TOKEN — a bot token with chat:write (and channels:read
+# if the bot is not already in the channel). The permalink in the commit must be readable
+# by that workspace.
+
+name: Slack notify — Cloudflare preview
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  notify-slack:
+    if: >
+      github.event.issue.pull_request &&
+      github.event.comment.user.type == 'Bot' &&
+      contains(github.event.comment.body, 'Commit Preview URL') &&
+      contains(github.event.comment.body, 'Deployment successful')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post preview links to Slack
+        uses: actions/github-script@v7
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+          script: |
+            const token = process.env.SLACK_BOT_TOKEN;
+            if (!token) {
+              core.setFailed('Missing SLACK_BOT_TOKEN secret');
+              return;
+            }
+
+            const body = context.payload.comment.body;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = context.payload.issue.number;
+
+            const commitHref = [...body.matchAll(/href=(['"])(https?:\/\/[^'"]+)\1[^>]*>\s*Commit Preview URL/gi)];
+            const branchHref = [...body.matchAll(/href=(['"])(https?:\/\/[^'"]+)\1[^>]*>\s*Branch Preview URL/gi)];
+            const commitPreview = commitHref.length ? commitHref[commitHref.length - 1][2] : null;
+            const branchPreview = branchHref.length ? branchHref[branchHref.length - 1][2] : null;
+            if (!commitPreview && !branchPreview) {
+              core.info('No preview URLs found in comment; skipping');
+              return;
+            }
+
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            const sha = pr.head.sha;
+            const { data: commitRes } = await github.rest.repos.getCommit({ owner, repo, ref: sha });
+            const message = commitRes.commit.message || '';
+
+            const slackUrlCandidates = [
+              ...message.matchAll(/https:\/\/[\w-]+\.slack\.com\/archives\/[A-Z0-9]+\/[^\s)>'"]+/gi),
+            ].map((m) => m[0]);
+            const slackUrl =
+              slackUrlCandidates.find((u) => u.includes('thread_ts=')) ||
+              slackUrlCandidates.find((u) => u.includes('/p')) ||
+              slackUrlCandidates[slackUrlCandidates.length - 1];
+            if (!slackUrl) {
+              core.setFailed(
+                'No Slack permalink found in head commit message; add a line: Related Slack thread: <permalink> (or Fixes issue reported in Slack: …)',
+              );
+              return;
+            }
+            const slackUrlTrimmed = slackUrl.replace(/[),.;]+$/, '');
+
+            const channelMatch = slackUrlTrimmed.match(/\/archives\/([A-Z0-9]+)\//i);
+            if (!channelMatch) {
+              core.setFailed(`Could not parse Slack channel from URL: ${slackUrlTrimmed}`);
+              return;
+            }
+            const channel = channelMatch[1];
+
+            let thread_ts = null;
+            const tsParam = slackUrlTrimmed.match(/[?&]thread_ts=([^&]+)/);
+            if (tsParam) {
+              thread_ts = decodeURIComponent(tsParam[1]);
+            } else {
+              const pMatch = slackUrlTrimmed.match(/\/p(\d+)/);
+              if (pMatch) {
+                const digits = pMatch[1];
+                if (digits.length >= 7) {
+                  thread_ts = `${digits.slice(0, -6)}.${digits.slice(-6)}`;
+                }
+              }
+            }
+            if (!thread_ts) {
+              core.setFailed(
+                `Could not derive thread_ts from Slack URL (use a permalink that includes thread_ts= or a /p… message link): ${slackUrlTrimmed}`,
+              );
+              return;
+            }
+
+            const lines = [
+              '*Cloudflare preview is ready*',
+              pr.html_url ? `PR: ${pr.html_url}` : null,
+              commitPreview ? `Commit preview: ${commitPreview}` : null,
+              branchPreview ? `Branch preview: ${branchPreview}` : null,
+            ].filter(Boolean);
+            const text = lines.join('\n');
+
+            const res = await fetch('https://slack.com/api/chat.postMessage', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json; charset=utf-8',
+              },
+              body: JSON.stringify({
+                channel,
+                thread_ts,
+                text,
+                unfurl_links: true,
+                unfurl_media: false,
+              }),
+            });
+            const json = await res.json();
+            if (!json.ok) {
+              core.setFailed(`Slack API error: ${json.error || res.status}`);
+              return;
+            }
+            core.info(`Posted to Slack channel ${channel} thread ${thread_ts}`);
