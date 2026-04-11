@@ -5,6 +5,10 @@
  * Commands (set GITHUB_EVENT_PATH, GITHUB_REPOSITORY, GITHUB_TOKEN, SLACK_BOT_TOKEN):
  *   node scripts/slack-github-notifications.mjs cloudflare-pr-preview
  *   node scripts/slack-github-notifications.mjs main-merge
+ *
+ * main-merge expects a completed check_run payload from GitHub Actions (Cloudflare Workers &
+ * Pages app on branch main). Optional env: PRODUCTION_SITE_URL, SLACK_BOTS_CHANNEL,
+ * CLOUDFLARE_CHECK_NAME_SUBSTR (substring of the check run name; default "Workers Builds").
  */
 
 import { readFile } from "node:fs/promises";
@@ -160,86 +164,109 @@ async function runCloudflarePrPreview() {
 
   const { channel, thread_ts } = slackChannelAndThreadTs(slackUrl);
 
-  const lines = [
-    "*Cloudflare preview is ready*",
-    pr.html_url ? `PR: ${pr.html_url}` : null,
-    commitPreview ? `Commit preview: ${commitPreview}` : null,
-    branchPreview ? `Branch preview: ${branchPreview}` : null,
+  const previewLink = commitPreview || branchPreview;
+  const mrkdwnLines = [
+    "*Preview is ready*",
+    pr.html_url ? `<${pr.html_url}|Pull request>` : null,
+    previewLink ? `<${previewLink}|Open preview>` : null,
+    branchPreview && commitPreview && branchPreview !== commitPreview
+      ? `<${branchPreview}|Branch preview>`
+      : null,
   ].filter(Boolean);
-  const text = lines.join("\n");
 
   await slackPostMessage({
     channel,
     thread_ts,
-    text,
-    unfurl_links: true,
+    text: previewLink ? `Preview is ready — ${previewLink}` : "Preview is ready",
+    blocks: [
+      {
+        type: "section",
+        text: { type: "mrkdwn", text: mrkdwnLines.join("\n") },
+      },
+    ],
+    unfurl_links: false,
     unfurl_media: false,
   });
   console.log(`Posted preview links to Slack channel ${channel} thread ${thread_ts}`);
 }
 
 function firstLine(msg) {
-  return (msg || "").split("\n")[0].trim() || "(no message)";
+  return (msg || "").split("\n")[0].trim() || "";
+}
+
+function isMergeNoise(line) {
+  return /^Merge\b/i.test(line.trim());
+}
+
+async function commitsReachableSinceParent(owner, repo, headSha, token) {
+  const head = await githubApi(`/repos/${owner}/${repo}/commits/${headSha}`, token);
+  const parents = head.parents || [];
+  if (!parents.length) return [head];
+
+  const compare = await githubApi(
+    `/repos/${owner}/${repo}/compare/${parents[0].sha}...${headSha}`,
+    token,
+  );
+  const list = compare.commits || [];
+  return list.length ? list : [head];
 }
 
 async function runMainMerge() {
   const token = requireEnv("GITHUB_TOKEN");
   const event = await loadEvent();
-  if (event.ref !== "refs/heads/main") {
-    console.log(`Skipping: ref is ${event.ref}`);
+  const checkRun = event.check_run;
+  if (!checkRun?.head_sha) {
+    console.error("Expected check_run payload with head_sha");
+    process.exit(1);
+  }
+
+  const suiteBranch = checkRun.check_suite?.head_branch;
+  if (suiteBranch && suiteBranch !== "main") {
+    console.log(`Skipping: suite branch is ${suiteBranch}`);
+    return;
+  }
+
+  const appSlug = checkRun.app?.slug || "";
+  const allowedApps = new Set(["cloudflare-workers-and-pages", "cloudflare-pages"]);
+  if (!allowedApps.has(appSlug)) {
+    console.log(`Skipping: app slug is ${appSlug || "(missing)"}`);
+    return;
+  }
+
+  const nameSub =
+    process.env.CLOUDFLARE_CHECK_NAME_SUBSTR?.trim() || "Workers Builds";
+  if (!String(checkRun.name || "").includes(nameSub)) {
+    console.log(`Skipping: check name does not include "${nameSub}"`);
     return;
   }
 
   const [owner, repo] = requireEnv("GITHUB_REPOSITORY").split("/");
-  const before = event.before;
-  const after = event.after;
-  if (!after) {
-    console.error("Missing after SHA");
-    process.exit(1);
-  }
+  const headSha = checkRun.head_sha;
+  const rawCommits = await commitsReachableSinceParent(owner, repo, headSha, token);
 
-  let commits = [];
-  if (before && /^0+$/.test(before)) {
-    const c = await githubApi(`/repos/${owner}/${repo}/commits?sha=${after}&per_page=20`, token);
-    commits = Array.isArray(c) ? c : [];
-  } else if (before) {
-    const compare = await githubApi(
-      `/repos/${owner}/${repo}/compare/${before}...${after}`,
-      token,
-    );
-    commits = compare.commits || [];
-  } else {
-    const single = await githubApi(`/repos/${owner}/${repo}/commits/${after}`, token);
-    commits = single ? [single] : [];
-  }
+  const lines = rawCommits
+    .map((c) => firstLine(c.commit?.message))
+    .filter((line) => line && !isMergeNoise(line));
+
+  const maxBullets = 12;
+  const shown = lines.slice(-maxBullets);
+  const omitted = lines.length - shown.length;
+
+  const bullets = shown.map((line) => `• ${line}`).join("\n");
 
   const siteUrl =
     process.env.PRODUCTION_SITE_URL?.trim() || "https://alpsconference.com";
   const channel = process.env.SLACK_BOTS_CHANNEL?.trim() || "#bots";
 
-  const maxBullets = 12;
-  const shown = commits.slice(-maxBullets);
-  const omitted = commits.length - shown.length;
-  const bullets = shown
-    .map((c) => {
-      const line = firstLine(c.commit?.message);
-      const shaShort = (c.sha || "").slice(0, 7);
-      return `• \`${shaShort}\` ${line}`;
-    })
-    .join("\n");
-
-  let summaryBody =
-    `*ALPS Conference site*\nMerged to \`main\` — production should update shortly.\n\n*What shipped*\n`;
-  if (commits.length === 0) {
-    summaryBody += "_No commits listed for this push._\n";
+  let summaryBody = "*ALPS Conference was updated.*\n\n*Changes*\n";
+  if (!shown.length) {
+    summaryBody += "_No change list for this deploy._\n";
   } else {
-    summaryBody += bullets || "_No commit messages._\n";
-    if (omitted > 0) {
-      summaryBody += `\n_…and ${omitted} more commit(s)._`;
-    }
+    summaryBody += bullets;
+    if (omitted > 0) summaryBody += `\n_…and ${omitted} more._`;
   }
 
-  const textFallback = `ALPS Conference: merged to main. Visit ${siteUrl}`;
+  const textFallback = `ALPS Conference was updated. ${siteUrl}`;
 
   await slackPostMessage({
     channel,
@@ -256,6 +283,7 @@ async function runMainMerge() {
             type: "button",
             text: { type: "plain_text", text: "Visit", emoji: true },
             url: siteUrl,
+            style: "primary",
             action_id: "visit_production_site",
           },
         ],

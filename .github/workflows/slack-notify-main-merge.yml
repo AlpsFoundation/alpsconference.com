@@ -1,25 +1,30 @@
-# After merges to main, post a short summary to the #bots channel with a Visit button.
+# Posts to #bots after Cloudflare’s production build for main succeeds (GitHub check_run).
+# Not tied to git push timing, so Slack only fires when Cloudflare reports success.
 #
 # Secrets: SLACK_BOT_TOKEN (chat:write; invite the bot to #bots or use a channel ID).
-# Optional vars (repo Settings → Variables → Actions):
-#   PRODUCTION_SITE_URL — defaults to https://alpsconference.com
-#   SLACK_BOTS_CHANNEL — channel name (e.g. bots) or ID; defaults to bots
+# Optional vars: PRODUCTION_SITE_URL, SLACK_BOTS_CHANNEL, CLOUDFLARE_CHECK_NAME_SUBSTR
+#   (substring of the Cloudflare check run name; default "Workers Builds" — set for Pages-only names).
 
 name: Slack notify — main merge
 
 on:
-  push:
-    branches:
-      - main
+  check_run:
+    types: [completed]
 
 permissions:
   contents: read
 
 jobs:
   notify-bots:
+    if: >
+      github.event.check_run.status == 'completed' &&
+      github.event.check_run.conclusion == 'success' &&
+      github.event.check_run.check_suite.head_branch == 'main' &&
+      (github.event.check_run.app.slug == 'cloudflare-workers-and-pages' ||
+       github.event.check_run.app.slug == 'cloudflare-pages')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Post merge summary to Slack
         env:
@@ -29,4 +34,5 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           PRODUCTION_SITE_URL: ${{ vars.PRODUCTION_SITE_URL }}
           SLACK_BOTS_CHANNEL: ${{ vars.SLACK_BOTS_CHANNEL }}
+          CLOUDFLARE_CHECK_NAME_SUBSTR: ${{ vars.CLOUDFLARE_CHECK_NAME_SUBSTR }}
         run: node scripts/slack-github-notifications.mjs main-merge
