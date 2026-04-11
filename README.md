@@ -2,32 +2,130 @@
 
 # ALPS Research Conference
 
-Standalone Astro project for the ALPS Research Conference 2026 landing page. 
+Astro 6 landing page for the ALPS Research Conference 2026, now prepared for deployment on **Cloudflare Workers**.
 
-## Commands
+The site remains prerendered/static for the public landing page, while the newsletter signup runs as a single on-demand Cloudflare-backed API route at `/api/newsletter-subscribe`.
+
+## Local development
+
+### Install dependencies
 
 ```bash
-bun install
-bun run dev
-bun run build
-bun run preview
+pnpm install
 ```
 
-The production-ready static site is generated in `dist/`.
+`pnpm install` also regenerates the local Cloudflare Worker type file automatically.
+
+### Generate Cloudflare runtime types
+
+This is run automatically on install. Re-run it manually any time `wrangler.jsonc` changes and you want to refresh local types immediately.
+
+```bash
+pnpm run generate-types
+```
+
+### Configure local newsletter secrets
+
+Copy the example file and fill in your Infomaniak credentials:
+
+```bash
+cp .dev.vars.example .dev.vars
+```
+
+These variables are read by the Cloudflare Workers runtime during `astro dev` and `astro preview`.
+
+### Start the development server
+
+```bash
+pnpm dev
+```
+
+Astro now runs with the Cloudflare Workers runtime locally, so the newsletter form can submit directly to the local `/api/newsletter-subscribe` endpoint without a separate PHP server.
+
+### Preview the production build locally
+
+```bash
+pnpm build
+pnpm preview
+```
+
+## Scripts
+
+```bash
+pnpm dev                # local development with Cloudflare runtime
+pnpm build              # production build
+pnpm preview            # preview the built Worker locally
+pnpm run generate-types # regenerate local worker-configuration.d.ts from wrangler.jsonc
+pnpm run deploy         # deploy to Cloudflare Workers
+pnpm run deploy:preview # upload a non-production Worker version
+```
 
 ## Environment variables
 
-Copy `.env.example` to `.env` for local development. Values are read by Vite/Astro (prefixed `PUBLIC_*`), by `astro.config.mjs` at build time, and by `api/newsletter-subscribe.php` when the newsletter endpoint is deployed.
+### Build-time variables
+
+Copy `.env.example` to `.env` if you want local build-time overrides:
+
+```bash
+cp .env.example .env
+```
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `SITE_URL` | No | Absolute origin for the site (e.g. `https://alpsconference.com`). Passed to Astro’s `site` option so metadata (including `og:image`) can be absolute URLs. Typically set in the shell for CI: `SITE_URL=https://… bun run build`. |
-| `BASE_PATH` | No | Subfolder base path for static hosting (e.g. `/conference/`). Leading/trailing slashes optional; Astro normalizes to a trailing slash. Default `/`. |
-| `PUBLIC_NEWSLETTER_API_URL` | No | URL the browser uses to POST newsletter signups. Empty disables the client-side call. |
-| `INFOMANIAK_TOKEN` | Yes† | Infomaniak API token (Manager → API / OAuth; newsletter scope). Used only by the PHP newsletter handler. |
-| `INFOMANIAK_NEWSLETTER_DOMAIN` | Yes† | Newsletter domain ID (positive integer from Infomaniak Manager → Newsletter). |
-| `INFOMANIAK_NEWSLETTER_GROUPS` | No | Optional comma-separated group IDs and/or group names (Infomaniak API `groups` body parameter). |
-| `ALLOWED_ORIGINS` | Yes† | Comma-separated browser `Origin` values allowed for CORS on the newsletter API (exact scheme, host, and port). |
-| `NEWSLETTER_DEBUG` | No | Set to `1` to enable extra logging and JSON `debug` fields on errors from the PHP handler. |
+| `SITE_URL` | No | Canonical deployed site URL used for metadata and sitemap generation. Defaults to `https://alpsconference.com`. |
+| `BASE_PATH` | No | Optional subfolder base path (for example `/conference/`). Leading/trailing slashes are normalized automatically. |
 
-† Required only when deploying and using `api/newsletter-subscribe.php`. Not needed for a purely static preview of the landing page.
+### Runtime secrets for local development
+
+Configure these in `.dev.vars`:
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `INFOMANIAK_TOKEN` | Yes* | Infomaniak API token with newsletter access. |
+| `INFOMANIAK_NEWSLETTER_DOMAIN` | Yes* | Infomaniak newsletter domain ID. Must be a positive integer. |
+| `INFOMANIAK_NEWSLETTER_GROUPS` | No | Optional comma-separated group IDs and/or group names to assign new subscribers to. |
+| `NEWSLETTER_DEBUG` | No | Set to `1` to include extra `debug` details in API error responses during local troubleshooting. |
+
+\* Required when you want to test the newsletter signup route. The static landing page itself does not require them.
+
+### Runtime secrets in Cloudflare
+
+Set the same newsletter secrets in Cloudflare for production/preview deployments, for example with Wrangler:
+
+```bash
+wrangler secret put INFOMANIAK_TOKEN
+wrangler secret put INFOMANIAK_NEWSLETTER_DOMAIN
+wrangler secret put INFOMANIAK_NEWSLETTER_GROUPS
+wrangler secret put NEWSLETTER_DEBUG
+```
+
+## Deployment
+
+This repository is configured for **Cloudflare Workers**, not Pages.
+
+- Static assets are served from the Astro build output.
+- The newsletter signup endpoint is handled by the generated Worker.
+- `@astrojs/sitemap` generates `sitemap-index.xml` and `sitemap-0.xml` during the build.
+
+### Manual deployment
+
+For a manual deployment from your local machine or CI environment, provide:
+
+| Value | Required | Description |
+| --- | --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Yes | API token with permission to deploy the Worker. |
+| `CLOUDFLARE_ACCOUNT_ID` | Yes | Cloudflare account ID for the target Worker. |
+
+Then run:
+
+```bash
+pnpm run deploy
+```
+
+## Output structure
+
+After `pnpm build`, the Cloudflare-ready artifacts are generated in `dist/`:
+
+- `dist/client/` — prerendered static assets
+- `dist/server/` — Worker entry and generated Wrangler deployment config
+- `dist/client/sitemap-index.xml` and `dist/client/sitemap-0.xml` — generated sitemap files

@@ -1,9 +1,8 @@
 /// <reference types="astro/client" />
 
-interface ImportMetaEnv {
-  readonly PUBLIC_NEWSLETTER_API_URL?: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
+interface Env {
+  INFOMANIAK_TOKEN: string;
+  INFOMANIAK_NEWSLETTER_DOMAIN: string;
+  INFOMANIAK_NEWSLETTER_GROUPS?: string;
+  NEWSLETTER_DEBUG?: string;
 }
