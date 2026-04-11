@@ -3,28 +3,28 @@ import { animate } from "animejs";
 
 const PARTNERS = {
   "Academic Partners": [
-    "/img/partners/academic-01.png",
-    "/img/partners/academic-02.png",
-    "/img/partners/academic-03.png",
-    "/img/partners/academic-04.png",
-    "/img/partners/academic-05.png"
+    { src: "/img/partners/hug.png", alt: "Hôpitaux Universitaires de Genève (HUG)", url: "https://www.hug.ch/" },
+    { src: "/img/partners/unige.png", alt: "Université de Genève (UNIGE)", url: "https://www.unige.ch/" },
+    { src: "/img/partners/unibas.png", alt: "University of Basel (Uni Basel)", url: "https://www.unibas.ch/" },
+    { src: "/img/partners/unifr.png", alt: "Université de Fribourg (Uni FR)", url: "https://www.unifr.ch/" },
+    { src: "/img/partners/uzh.png", alt: "Universität Zürich (UZH)", url: "https://www.uzh.ch/" }
   ],
   "Swiss Professional Associations": [
-    "/img/partners/associations-01.png",
-    "/img/partners/associations-02.png",
-    "/img/partners/associations-03.png",
-    "/img/partners/associations-04.png",
-    "/img/partners/associations-05.png"
+    { src: "/img/partners/aspt.png", alt: "Psychédéliques en thérapie (ASPT)", url: "https://www.aspt-association.ch/" },
+    { src: "/img/partners/fondazione-alaya.png", alt: "Fondazione Alaya", url: "https://www.fondazionealaya.ch/" },
+    { src: "/img/partners/psychedelos.png", alt: "Association Psychédelos", url: "https://psychedelos.ch/" },
+    { src: "/img/partners/saept.png", alt: "SÄPT (Schweizerische Ärztegesellschaft für Psycholytische Therapie)", url: "https://saept.ch/" },
+    { src: "/img/partners/sspm.png", alt: "Swiss Society for Psychedelic Medicine (SSPM)", url: "https://swisspsychedelic.ch/" }
   ],
   "Media Partners": [
-    "/img/partners/media-01.png",
-    "/img/partners/media-02.png",
-    "/img/partners/media-03.png",
-    "/img/partners/media-04.png",
-    "/img/partners/media-05.png",
-    "/img/partners/media-06.png",
-    "/img/partners/media-07.png",
-    "/img/partners/media-08.png"
+    { src: "/img/partners/maps.png", alt: "MAPS (Multidisciplinary Association for Psychedelic Studies)", url: "https://maps.org/" },
+    { src: "/img/partners/open-foundation.png", alt: "OPEN Foundation", url: "https://open-foundation.org/" },
+    { src: "/img/partners/ciis.png", alt: "California Institute of Integral Studies (CIIS)", url: "https://www.ciis.edu/" },
+    { src: "/img/partners/cannatrade.png", alt: "CannaTrade", url: "https://www.cannatrade.ch/" },
+    { src: "/img/partners/psychedelics-today.png", alt: "Psychedelics Today", url: "https://psychedelicstoday.com/" },
+    { src: "/img/partners/blossom.png", alt: "Blossom", url: "https://blossomanalysis.com/" },
+    { src: "/img/partners/simepsi.png", alt: "SIMEPSI (Società Italiana Medicina Psichedelica)", url: "https://simepsi.it/" },
+    { src: "/img/partners/psbe.png", alt: "PSBE (Psychedelic Society Belgium)", url: "https://psychedelicsocietybelgium.org/" }
   ]
 };
 
@@ -81,18 +81,25 @@ export default function Partners() {
                 className="flex flex-wrap justify-center items-center gap-x-6 gap-y-8 sm:gap-x-10 sm:gap-y-10 md:gap-x-12 md:gap-y-12 list-none p-0 m-0"
                 aria-label={category}
               >
-                {logos.map((logo, idx) => (
+                {logos.map((partner, idx) => (
                   <li
                     key={idx}
                     className="flex items-center justify-center px-3 py-2 sm:px-4 sm:py-3"
                   >
-                    <img
-                      src={logo}
-                      alt={`${category}: logo ${idx + 1}`}
-                      className="max-h-[6.75rem] sm:max-h-[7.5rem] md:max-h-[8.25rem] w-auto max-w-[min(100%,18rem)] sm:max-w-[20rem] object-contain object-center opacity-[0.88] hover:opacity-100 transition-opacity duration-200"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <a
+                      href={partner.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <img
+                        src={partner.src}
+                        alt={partner.alt}
+                        className="max-h-[6.75rem] sm:max-h-[7.5rem] md:max-h-[8.25rem] w-auto max-w-[min(100%,18rem)] sm:max-w-[20rem] object-contain object-center opacity-[0.88] hover:opacity-100 transition-opacity duration-200"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </a>
                   </li>
                 ))}
               </ul>
