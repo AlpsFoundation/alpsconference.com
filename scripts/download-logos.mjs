@@ -3,7 +3,7 @@
  * Downloads partner logos from Google Sites CDN and saves them locally.
  * Updates src/components/Partners.tsx to use local paths.
  *
- * Usage: bun run scripts/download-logos.mjs
+ * Usage: pnpm exec node scripts/download-logos.mjs
  */
 
 import { mkdir, writeFile, readFile } from "fs/promises";

@@ -11,7 +11,7 @@ The site remains prerendered/static for the public landing page, while the newsl
 ### Install dependencies
 
 ```bash
-bun install
+pnpm install
 ```
 
 ### Generate Cloudflare runtime types
@@ -19,7 +19,7 @@ bun install
 Run this once after install, and again any time `wrangler.jsonc` changes.
 
 ```bash
-bun run generate-types
+pnpm run generate-types
 ```
 
 ### Configure local newsletter secrets
@@ -35,7 +35,7 @@ These variables are read by the Cloudflare Workers runtime during `astro dev` an
 ### Start the development server
 
 ```bash
-bun run dev
+pnpm dev
 ```
 
 Astro now runs with the Cloudflare Workers runtime locally, so the newsletter form can submit directly to the local `/api/newsletter-subscribe` endpoint without a separate PHP server.
@@ -43,19 +43,19 @@ Astro now runs with the Cloudflare Workers runtime locally, so the newsletter fo
 ### Preview the production build locally
 
 ```bash
-bun run build
-bun run preview
+pnpm build
+pnpm preview
 ```
 
 ## Scripts
 
 ```bash
-bun run dev             # local development with Cloudflare runtime
-bun run build           # production build
-bun run preview         # preview the built Worker locally
-bun run generate-types  # regenerate worker-configuration.d.ts from wrangler.jsonc
-bun run deploy          # deploy to Cloudflare Workers
-bun run deploy:preview  # upload a non-production Worker version
+pnpm dev                # local development with Cloudflare runtime
+pnpm build              # production build
+pnpm preview            # preview the built Worker locally
+pnpm run generate-types # regenerate worker-configuration.d.ts from wrangler.jsonc
+pnpm run deploy         # deploy to Cloudflare Workers
+pnpm run deploy:preview # upload a non-production Worker version
 ```
 
 ## Environment variables
@@ -121,7 +121,7 @@ Add these GitHub repository secrets:
 
 ## Output structure
 
-After `bun run build`, the Cloudflare-ready artifacts are generated in `dist/`:
+After `pnpm build`, the Cloudflare-ready artifacts are generated in `dist/`:
 
 - `dist/client/` — prerendered static assets
 - `dist/server/` — Worker entry and generated Wrangler deployment config

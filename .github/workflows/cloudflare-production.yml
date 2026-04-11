@@ -20,22 +20,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
         with:
-          bun-version: latest
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Cloudflare types
-        run: bun run generate-types
+        run: pnpm run generate-types
 
       - name: Run newsletter tests
-        run: bun run test:newsletter
+        run: pnpm run test:newsletter
 
       - name: Build site
-        run: bun run build
+        run: pnpm run build
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3

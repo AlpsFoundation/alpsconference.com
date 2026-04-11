@@ -8,18 +8,18 @@ Static landing page for the ALPS Research Conference (9-10 October 2026, Aarau, 
 
 ## Commands
 
-Uses Bun as package manager:
+Uses pnpm as package manager:
 
 ```bash
-bun install          # Install dependencies
-bun run dev          # Development server with hot reload
-bun run build        # Production build to dist/
-bun run preview      # Preview production build locally
+pnpm install         # Install dependencies
+pnpm dev             # Development server with hot reload
+pnpm build           # Production build to dist/
+pnpm preview         # Preview production build locally
 ```
 
 For production builds with absolute metadata URLs:
 ```bash
-SITE_URL=https://alpsconference.com bun run build
+SITE_URL=https://alpsconference.com pnpm build
 ```
 
 No lint, test, or formatting scripts are configured.
