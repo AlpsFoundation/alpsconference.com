@@ -107,19 +107,20 @@ This repository is configured for **Cloudflare Workers**, not Pages.
 - The newsletter signup endpoint is handled by the generated Worker.
 - `@astrojs/sitemap` generates `sitemap-index.xml` and `sitemap-0.xml` during the build.
 
-### GitHub Actions
+### Manual deployment
 
-Two workflows are expected:
+For a manual deployment from your local machine or CI environment, provide:
 
-- **Production deployment** on pushes to `main`
-- **Preview deployment** on pull requests only
-
-Add these GitHub repository secrets:
-
-| Secret | Required | Description |
+| Value | Required | Description |
 | --- | --- | --- |
 | `CLOUDFLARE_API_TOKEN` | Yes | API token with permission to deploy the Worker. |
 | `CLOUDFLARE_ACCOUNT_ID` | Yes | Cloudflare account ID for the target Worker. |
+
+Then run:
+
+```bash
+pnpm run deploy
+```
 
 ## Output structure
 
