@@ -54,8 +54,10 @@ Use the exact permalink from Slack (including `thread_ts` and `cid` query parame
 
 When you consider the coding work complete (build succeeds locally if you ran it, changes are coherent, and you are ready for review):
 
-1. Push your branch to `origin`.
-2. Open a pull request on GitHub (do not leave the branch-only unless the user explicitly asked for that). Use a clear title and description summarizing the change.
+1. **Check for an existing PR first.** Before creating a new PR, search GitHub for open pull requests whose head commit message contains the Slack permalink for this thread. If one exists, push your new commits to that branch and reply in Slack with a **"View PR"** button linking to the existing PR — do not open a second PR.
+2. If no PR exists for this thread, push your branch to `origin` and open a new pull request. Use a clear title and description summarizing the change.
+
+Do not leave a branch-only state unless the user explicitly asked for that.
 
 Automation can then correlate the PR with Slack via the commit message and notify the requester when Cloudflare posts deployment links on the PR.
 
@@ -68,3 +70,13 @@ Repository automation:
 Configure a GitHub Actions secret **`SLACK_BOT_TOKEN`** (a Slack bot user token with `chat:write` for the workspace). Invite the bot to channels where it should post (`bots` for merge summaries; any channel used in Slack permalinks for preview replies). Optional repository **variables**: `PRODUCTION_SITE_URL` (defaults to `https://alpsconference.com`), `SLACK_BOTS_CHANNEL` (defaults to `#bots`; use a channel ID if name resolution fails).
 
 Workflows use **`actions/checkout@v6`** so composite actions run on the supported Node runtime (avoids the Node 20 deprecation warning from older checkout releases).
+
+## Response metadata
+
+At the end of every response, print a one-line metadata footer:
+
+```
+Model: <model-id> | Input: <input tokens> | Output: <output tokens> | Cost: ~$<cost USD>
+```
+
+Use the model ID from the environment (e.g. `claude-sonnet-4-6`). Estimate token counts from the response length if exact figures are unavailable. Use Anthropic's published per-token pricing to compute the cost estimate.
