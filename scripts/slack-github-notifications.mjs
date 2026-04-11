@@ -134,6 +134,7 @@ async function slackPostMessage(payload) {
 
 async function runCloudflarePrPreview() {
   const token = requireEnv("GITHUB_TOKEN");
+  const slackToken = requireEnv("SLACK_BOT_TOKEN");
   const event = await loadEvent();
   const body = event.comment?.body || "";
   const { commitPreview, branchPreview } = extractPreviewUrls(body);
@@ -164,26 +165,26 @@ async function runCloudflarePrPreview() {
 
   const { channel, thread_ts } = slackChannelAndThreadTs(slackUrl);
 
+  // Fetch the original Slack message to get the author
+  const historyRes = await fetch(
+    `https://slack.com/api/conversations.history?channel=${channel}&latest=${thread_ts}&limit=1&inclusive=true`,
+    {
+      headers: {
+        Authorization: `Bearer ${slackToken}`,
+      },
+    },
+  );
+  const historyData = await historyRes.json();
+  const author = historyData.messages?.[0]?.user;
+
   const previewLink = commitPreview || branchPreview;
-  const mrkdwnLines = [
-    "*Preview is ready*",
-    pr.html_url ? `<${pr.html_url}|Pull request>` : null,
-    previewLink ? `<${previewLink}|Open preview>` : null,
-    branchPreview && commitPreview && branchPreview !== commitPreview
-      ? `<${branchPreview}|Branch preview>`
-      : null,
-  ].filter(Boolean);
+  const mention = author ? `<@${author}> ` : "";
+  const messageText = `${mention}${previewLink}`;
 
   await slackPostMessage({
     channel,
     thread_ts,
-    text: previewLink ? `Preview is ready — ${previewLink}` : "Preview is ready",
-    blocks: [
-      {
-        type: "section",
-        text: { type: "mrkdwn", text: mrkdwnLines.join("\n") },
-      },
-    ],
+    text: messageText,
     unfurl_links: false,
     unfurl_media: false,
   });
