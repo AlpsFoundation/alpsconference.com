@@ -5,6 +5,7 @@ import { withBase } from "../lib/withBase";
 const NAV_ITEMS = [
   { label: "Conference", href: "#conference" },
   { label: "Location", href: "#location" },
+  { label: "Get Tickets", href: "#tickets" },
   // { label: "Speakers", href: "#speakers" },
   // { label: "Experiences", href: "#experiences" },
   // { label: "Research Poster", href: "#research" },
