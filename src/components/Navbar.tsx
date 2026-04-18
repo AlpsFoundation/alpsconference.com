@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   // { label: "Research Poster", href: "#research" },
   { label: "Sponsoring", href: "#sponsoring" },
   { label: "FAQ", href: "#faq" },
+  { label: "Get Tickets", href: "#tickets", highlight: true },
 ];
 
 const PAST_EDITIONS = [
@@ -63,7 +64,11 @@ export default function Navbar() {
                 <a
                   key={item.href}
                   href={item.href}
-                  className="px-4 py-2 text-base font-medium text-white/90 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5"
+                  className={
+                    item.highlight
+                      ? "px-5 py-2.5 text-base font-medium text-white bg-primary/20 hover:bg-primary/30 border border-primary/30 rounded-sm transition-colors duration-200"
+                      : "px-4 py-2 text-base font-medium text-white/90 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5"
+                  }
                 >
                   {item.label}
                 </a>
@@ -144,7 +149,11 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className="py-4 text-xl font-medium text-white/90 hover:text-white border-b border-white/5 transition-colors"
+                className={
+                  item.highlight
+                    ? "py-4 text-xl font-medium text-white border-b border-white/5 transition-colors bg-primary/10 px-4 rounded-sm"
+                    : "py-4 text-xl font-medium text-white/90 hover:text-white border-b border-white/5 transition-colors"
+                }
               >
                 {item.label}
               </a>
