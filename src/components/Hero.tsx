@@ -78,7 +78,7 @@ export default function Hero() {
       "BEGIN:VEVENT",
       "DTSTART:20261009T090000Z",
       "DTEND:20261010T180000Z",
-      "SUMMARY:ALPS Research Conference 2026",
+      "SUMMARY:ALPS Conference 2026",
       "LOCATION:Kultur & Kongresshaus Aarau, Schlossplatz, Aarau, Switzerland",
       "DESCRIPTION:Awareness Lectures on Psychedelics in Switzerland - Research Conference",
       "END:VEVENT",
@@ -135,7 +135,7 @@ export default function Hero() {
             data-animate
             className="opacity-0 text-4xl sm:max-md:text-7xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-4 sm:mb-6 max-w-5xl mx-auto bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent] [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
           >
-            ALPS RESEARCH{" "}
+            ALPS{" "}
             <span className="whitespace-nowrap">CONFERENCE 2026</span>
           </h1>
         </div>
@@ -200,7 +200,7 @@ export default function Hero() {
                     : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
                 }`}
               >
-                Sales start on Bicycle Day, April 19
+                Sales start on Bicycle Day, April 19 at 8pm CET
               </div>
             </div>
 

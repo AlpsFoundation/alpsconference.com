@@ -8,7 +8,7 @@ const FAQS = [
     items: [
       {
         q: "When will tickets go on sale?",
-        a: "Tickets will go on sale on April 19, 2026 at 3pm."
+        a: "Tickets will go on sale on April 19, 2026 at 8pm CET."
       },
       {
         q: "Can my ticket be refunded?",
