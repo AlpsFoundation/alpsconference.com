@@ -60,6 +60,10 @@ const FAQS = [
         a: "Kultur & Kongresshaus Aarau is wheelchair accessible. Please reach out to us if you have any special needs."
       },
       {
+        q: "Is childcare available during the conference?",
+        a: "Yes, we offer on-site childcare for children aged 18 months to 10 years (split into two groups: 18 months\u20134.5 years and 4.5\u201310 years). A one-day childcare ticket costs 150 CHF and includes food, drinks, and snacks.\n\nPlease note that the childcare service requires a minimum of 8 children per age group and day to run. Ticketholders will be updated on registration numbers by mid-September, and groups/days will be confirmed at that point. If the minimum is not reached, your childcare ticket will be fully refunded."
+      },
+      {
         q: "Will there be photo and video recording at the event?",
         a: "The ALPS Foundation shoots video and pictures of the event for educational and promotional purposes. By entering the event premises and by participation in this event, you consent to the use of your photograph, likeness, or video or audio recording in whole or in part without restriction or limitation for any educational, promotional, or any purpose for distribution online and in printed publications or publication in other media.\n\nYou release the ALPS Foundation, their volunteers, and each and all persons involved from any liability connected with the taking, recording, digitisation, or publication of interviews, photographs, computer images, or video and/or sound recordings.\n\nWe are however happy to remove your image from any digital property over which we have control upon your request."
       }

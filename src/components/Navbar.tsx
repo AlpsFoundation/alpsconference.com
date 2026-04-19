@@ -3,13 +3,14 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { withBase } from "../lib/withBase";
 
 const NAV_ITEMS = [
-  { label: "Conference", href: "#conference" },
+  { label: "Tickets", href: "#tickets" },
+  { label: "Conference", href: "#about" },
   { label: "Location", href: "#location" },
   // { label: "Speakers", href: "#speakers" },
   // { label: "Experiences", href: "#experiences" },
   // { label: "Research Poster", href: "#research" },
-  { label: "Sponsoring", href: "#sponsoring" },
   { label: "FAQ", href: "#faq" },
+  { label: "Partners", href: "#partners" },
 ];
 
 const PAST_EDITIONS = [

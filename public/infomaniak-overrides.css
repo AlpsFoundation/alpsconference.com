@@ -1,0 +1,8 @@
+ike-navbar {
+  display: none !important;
+}
+
+ike-event-tariffs {
+  --white: oklab(0.575894 -0.045212 -0.130352 / 0.3);
+  --gray-whitish: oklab(0.575894 -0.045212 -0.130352 / 0.3);
+}

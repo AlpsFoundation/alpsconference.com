@@ -14,7 +14,7 @@ const PARTNERS = {
     { src: "/img/partners/fondazione-alaya.png", alt: "Fondazione Alaya", url: "https://www.fondazionealaya.ch/" },
     { src: "/img/partners/psychedelos.png", alt: "Association Psychédelos", url: "https://psychedelos.ch/" },
     { src: "/img/partners/saept.png", alt: "SÄPT (Schweizerische Ärztegesellschaft für Psycholytische Therapie)", url: "https://saept.ch/" },
-    { src: "/img/partners/sspm.png", alt: "Swiss Society for Psychedelic Medicine (SSPM)", url: "https://swisspsychedelic.ch/" }
+    { src: "/img/partners/sspm.png", alt: "Swiss Society for Psychedelic Medicine (SSPM)", url: "https://swisspsychedelic.ch/", scale: 0.8 }
   ],
   "Media Partners": [
     { src: "/img/partners/maps.png", alt: "MAPS (Multidisciplinary Association for Psychedelic Studies)", url: "https://maps.org/" },
@@ -58,7 +58,7 @@ export default function Partners() {
   return (
     <section
       ref={sectionRef}
-      id="sponsoring"
+      id="partners"
       className="relative border-t border-white/10 py-14 sm:py-16 pb-16 sm:pb-20"
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -95,6 +95,7 @@ export default function Partners() {
                       <img
                         src={partner.src}
                         alt={partner.alt}
+                        style={partner.scale != null ? { transform: `scale(${partner.scale})` } : undefined}
                         className="max-h-[6.75rem] sm:max-h-[7.5rem] md:max-h-[8.25rem] w-auto max-w-[min(100%,18rem)] sm:max-w-[20rem] object-contain object-center opacity-[0.88] hover:opacity-100 transition-opacity duration-200"
                         loading="lazy"
                         decoding="async"

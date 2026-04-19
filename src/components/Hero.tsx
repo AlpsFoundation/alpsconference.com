@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Calendar, Ticket, Mail, MapPin, Clock } from "lucide-react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
@@ -7,8 +7,6 @@ import ParticlesCanvas from "./ParticlesCanvas";
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const bonesRef = useRef<HTMLDivElement>(null);
-  const ticketTooltipRef = useRef<HTMLDivElement>(null);
-  const [ticketTooltipOpen, setTicketTooltipOpen] = useState(false);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -46,30 +44,6 @@ export default function Hero() {
       }
     }
   }, []);
-
-  useEffect(() => {
-    if (!ticketTooltipOpen) return;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!ticketTooltipRef.current?.contains(event.target as Node)) {
-        setTicketTooltipOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setTicketTooltipOpen(false);
-      }
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [ticketTooltipOpen]);
 
   const handleCalendar = () => {
     const icsContent = [
@@ -176,33 +150,14 @@ export default function Hero() {
               <span className="whitespace-nowrap">Save the Date</span>
             </button>
 
-            <div
-              ref={ticketTooltipRef}
+            <a
               data-animate-scale
-              className="opacity-0 relative group flex flex-1 sm:flex-initial min-w-0"
+              href="#tickets"
+              className="opacity-0 flex flex-1 sm:flex-initial min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
             >
-              <button
-                type="button"
-                aria-describedby="ticket-sales-tooltip"
-                aria-expanded={ticketTooltipOpen}
-                onClick={() => setTicketTooltipOpen((open) => !open)}
-                className="flex w-full min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-white/5 hover:bg-white/[0.08] text-white/70 hover:text-white/90 text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm border border-white/10 cursor-help transition-colors duration-200 leading-tight"
-              >
-                <Ticket className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-                <span className="whitespace-nowrap">Buy Tickets</span>
-              </button>
-              <div
-                id="ticket-sales-tooltip"
-                role="tooltip"
-                className={`absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1.5 bg-neutral-dark/95 border border-white/10 rounded-sm text-sm text-white/90 pointer-events-none transition-all duration-200 ${
-                  ticketTooltipOpen
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
-                }`}
-              >
-                Sales start on Bicycle Day, April 19 at 8pm CET
-              </div>
-            </div>
+              <Ticket className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="whitespace-nowrap">Buy Tickets</span>
+            </a>
 
             <a
               data-animate-scale

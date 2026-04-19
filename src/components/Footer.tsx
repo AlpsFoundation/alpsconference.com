@@ -1,11 +1,9 @@
 import { Heart } from "lucide-react";
 import { withBase } from "../lib/withBase";
-import ParticlesCanvas from "./ParticlesCanvas";
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-white/10 py-10 overflow-hidden">
-      <ParticlesCanvas variant="footer" />
+    <footer className="relative border-t border-white/10 py-10">
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">

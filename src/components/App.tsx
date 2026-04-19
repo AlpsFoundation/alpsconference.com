@@ -5,9 +5,11 @@ import Experiences from "./Experiences";
 import About from "./About";
 import Location from "./Location";
 import Newsletter from "./Newsletter";
+import Tickets from "./Tickets";
 import Partners from "./Partners";
 import FAQ from "./FAQ";
 import Footer from "./Footer";
+import ParticlesCanvas from "./ParticlesCanvas";
 
 export default function App() {
   return (
@@ -15,15 +17,19 @@ export default function App() {
       <Navbar />
       <main>
         <Hero />
+        <Tickets />
         {/* <Conference /> */}
         {/* <Experiences /> */}
         <About />
         <Location />
         <FAQ />
         <Newsletter />
-        <Partners />
       </main>
-      <Footer />
+      <div className="relative overflow-hidden">
+        <ParticlesCanvas variant="footer" />
+        <Partners />
+        <Footer />
+      </div>
     </>
   );
 }
