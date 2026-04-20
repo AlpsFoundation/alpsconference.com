@@ -72,27 +72,28 @@ const PRICING_TIERS = [
   {
     name: "Early Bird",
     price: 120,
-    description: "Limited availability",
-    deadline: "Until July 31, 2026",
-    features: ["Full workshop access", "Conference materials", "Networking lunch", "Certificate of attendance"],
-    highlighted: false,
+    endsAt: new Date("2026-07-31T23:59:59+02:00"),
+    dateLabel: "Through 31 July 2026",
   },
   {
     name: "Standard",
     price: 150,
-    description: "Regular price",
-    deadline: "August 1 – September 15",
-    features: ["Full workshop access", "Conference materials", "Networking lunch", "Certificate of attendance"],
-    highlighted: true,
+    endsAt: new Date("2026-09-15T23:59:59+02:00"),
+    dateLabel: "1 August – 15 September 2026",
   },
   {
     name: "Last Call",
     price: 175,
-    description: "Final tickets",
-    deadline: "September 16 onwards",
-    features: ["Full workshop access", "Conference materials", "Networking lunch", "Certificate of attendance"],
-    highlighted: false,
+    endsAt: new Date("2026-10-07T23:59:59+02:00"),
+    dateLabel: "From 16 September 2026",
   },
+];
+
+const TICKET_INCLUDES = [
+  "Full-day workshop in your chosen language",
+  "All conference materials",
+  "Networking lunch & refreshments",
+  "Certificate of attendance",
 ];
 
 const SCHEDULE = [
@@ -321,65 +322,106 @@ function Schedule() {
 }
 
 function Pricing() {
+  const now = new Date();
+  const activeIndex = PRICING_TIERS.findIndex((t) => now <= t.endsAt);
+  const currentIndex = activeIndex === -1 ? PRICING_TIERS.length - 1 : activeIndex;
+  const active = PRICING_TIERS[currentIndex];
+
   return (
     <section id="tickets" className="py-20 sm:py-28 bg-neutral-dark">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent [-webkit-text-fill-color:transparent]">
             Tickets
           </h2>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            Secure your spot at the ALPS Workshop Day. Early registration is recommended as spaces are limited.
+            One ticket, full access. The price rises in stages as we approach the event.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {PRICING_TIERS.map((tier, index) => (
-            <div
-              key={index}
-              className={`relative bg-white/[0.02] border rounded-sm p-6 sm:p-8 transition-all duration-300 ${
-                tier.highlighted
-                  ? "border-accent/50 bg-accent/5 scale-[1.02] shadow-xl shadow-accent/10"
-                  : "border-white/10 hover:border-white/20"
-              }`}
-            >
-              {tier.highlighted && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-accent text-white text-xs font-semibold uppercase tracking-wide rounded-sm">
-                  Most Popular
-                </div>
-              )}
+        <div className="relative bg-gradient-to-br from-accent/10 via-support/5 to-transparent border border-accent/30 rounded-sm p-6 sm:p-10 mb-6 overflow-hidden">
+          <div className="absolute top-0 right-0 px-4 py-1.5 bg-accent text-white text-xs font-semibold uppercase tracking-wide">
+            Current price
+          </div>
 
-              <h3 className="text-xl font-bold text-white mb-2">{tier.name}</h3>
-              <p className="text-sm text-white/60 mb-4">{tier.deadline}</p>
-
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl sm:text-5xl font-bold text-white">CHF {tier.price}</span>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8 mt-4 sm:mt-0">
+            <div>
+              <p className="text-sm text-accent-light font-semibold uppercase tracking-wide mb-2">{active.name}</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl sm:text-6xl font-bold text-white">CHF {active.price}</span>
               </div>
-
-              <ul className="space-y-3 mb-8">
-                {tier.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-white/80">
-                    <Check className="w-4 h-4 text-support-light shrink-0" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <a
-                href="#register"
-                className={`block w-full py-3 text-center font-medium rounded-sm transition-all duration-300 ${
-                  tier.highlighted
-                    ? "bg-accent hover:bg-accent-light text-white"
-                    : "bg-white/10 hover:bg-white/15 text-white border border-white/10"
-                }`}
-              >
-                Select Ticket
-              </a>
+              <p className="text-sm text-white/60 mt-2">{active.dateLabel}</p>
             </div>
-          ))}
+            <a
+              href="#register"
+              className="shrink-0 px-6 sm:px-8 py-3 sm:py-4 bg-accent hover:bg-accent-light text-white text-base font-medium rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-accent/25 text-center"
+            >
+              Register now
+            </a>
+          </div>
+
+          <div className="pt-6 border-t border-white/10">
+            <p className="text-sm font-semibold text-white/90 uppercase tracking-wide mb-4">What's included</p>
+            <ul className="grid gap-2.5 sm:grid-cols-2">
+              {TICKET_INCLUDES.map((item) => (
+                <li key={item} className="flex items-center gap-2 text-sm text-white/80">
+                  <Check className="w-4 h-4 text-support-light shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        <p className="text-center text-sm text-white/50 mt-8">
+        <div className="bg-white/[0.02] border border-white/10 rounded-sm p-6">
+          <p className="text-sm font-semibold text-white/90 uppercase tracking-wide mb-4">Pricing schedule</p>
+          <ol className="space-y-3">
+            {PRICING_TIERS.map((tier, i) => {
+              const past = i < currentIndex;
+              const current = i === currentIndex;
+              return (
+                <li key={tier.name} className="flex items-center gap-4">
+                  <span
+                    className={`flex items-center justify-center w-7 h-7 rounded-full shrink-0 text-xs font-bold ${
+                      current
+                        ? "bg-accent text-white"
+                        : past
+                          ? "bg-white/5 text-white/40"
+                          : "bg-white/5 text-white/60 border border-white/10"
+                    }`}
+                  >
+                    {past ? <Check className="w-3.5 h-3.5" /> : i + 1}
+                  </span>
+                  <div className="flex-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                    <div className="flex-1 min-w-0">
+                      <span
+                        className={`font-medium ${past ? "text-white/40 line-through" : current ? "text-white" : "text-white/80"}`}
+                      >
+                        {tier.name}
+                      </span>
+                      <span className={`ml-2 text-sm ${past ? "text-white/30" : "text-white/50"}`}>
+                        {tier.dateLabel}
+                      </span>
+                    </div>
+                    <span
+                      className={`font-mono text-base ${
+                        past
+                          ? "text-white/30 line-through"
+                          : current
+                            ? "text-accent-light font-semibold"
+                            : "text-white/70"
+                      }`}
+                    >
+                      CHF {tier.price}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+
+        <p className="text-center text-sm text-white/50 mt-6">
           All prices include VAT. Ticket sales will open soon.
         </p>
       </div>
