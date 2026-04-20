@@ -1,0 +1,54 @@
+---
+import "../styles/app.css";
+import Workshop from "../components/Workshop";
+import { withBase } from "../lib/withBase";
+
+const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const ogImagePath = withBase("img/opengraph.jpg");
+const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
+
+const fontFaceCss = `@font-face {
+  font-family: "Switzer";
+  src: url("${switzerFont}") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALPS Workshop Day 2026 | Psychedelic-Assisted Psychotherapy</title>
+    <meta
+      name="description"
+      content="ALPS Workshop Day 2026 - October 8, Aarau, Switzerland. Four parallel workshops on Psychedelic-Assisted Psychotherapy in German, French, Italian, and English."
+    />
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ALPS Workshop Day 2026" />
+    <meta
+      property="og:description"
+      content="Pre-conference workshops on Psychedelic-Assisted Psychotherapy. October 8, 2026, Aarau."
+    />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#0B3C5D" />
+
+    <!-- Fonts -->
+    <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
+
+    <style is:global set:html={fontFaceCss}></style>
+  </head>
+  <body>
+    <Workshop client:load />
+  </body>
+</html>
