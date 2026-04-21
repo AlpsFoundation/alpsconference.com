@@ -77,36 +77,33 @@ const PRICING_TIERS = [
   },
   {
     name: "Standard",
-    price: 150,
+    price: 160,
     endsAt: new Date("2026-09-15T23:59:59+02:00"),
     dateLabel: "1 August – 15 September 2026",
   },
   {
     name: "Last Call",
-    price: 175,
+    price: 200,
     endsAt: new Date("2026-10-07T23:59:59+02:00"),
     dateLabel: "From 16 September 2026",
   },
 ];
 
 const TICKET_INCLUDES = [
-  "Full-day workshop in your chosen language",
+  "Half-day workshop in your chosen language",
   "All conference materials",
   "Networking lunch & refreshments",
   "Certificate of attendance",
 ];
 
 const SCHEDULE = [
-  { time: "08:30 – 09:00", event: "Registration & Welcome Coffee" },
-  { time: "09:00 – 09:15", event: "Opening Remarks" },
-  { time: "09:15 – 10:45", event: "Workshop Session I" },
-  { time: "10:45 – 11:15", event: "Coffee Break & Networking" },
-  { time: "11:15 – 12:45", event: "Workshop Session II" },
-  { time: "12:45 – 14:00", event: "Networking Lunch" },
-  { time: "14:00 – 15:30", event: "Workshop Session III" },
-  { time: "15:30 – 16:00", event: "Coffee Break" },
-  { time: "16:00 – 17:00", event: "Panel Discussion & Q&A" },
-  { time: "17:00 – 17:30", event: "Closing Ceremony" },
+  { time: "12:00 – 12:30", event: "Registration & Welcome" },
+  { time: "12:30 – 12:45", event: "Opening Remarks" },
+  { time: "12:45 – 14:15", event: "Workshop Session I" },
+  { time: "14:15 – 14:45", event: "Coffee Break & Networking" },
+  { time: "14:45 – 16:15", event: "Workshop Session II" },
+  { time: "16:15 – 16:45", event: "Panel Discussion & Q&A" },
+  { time: "16:45 – 17:00", event: "Closing Remarks" },
 ];
 
 function WorkshopNavbar() {
@@ -151,8 +148,8 @@ function WorkshopHero() {
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
       "BEGIN:VEVENT",
-      "DTSTART:20261008T083000Z",
-      "DTEND:20261008T173000Z",
+      "DTSTART:20261008T120000Z",
+      "DTEND:20261008T170000Z",
       "SUMMARY:ALPS Workshop Day 2026",
       "LOCATION:Kultur & Kongresshaus Aarau, Schlossplatz, Aarau, Switzerland",
       "DESCRIPTION:Pre-conference workshops in Psychedelic-Assisted Psychotherapy",
