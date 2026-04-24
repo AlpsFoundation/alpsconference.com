@@ -92,18 +92,18 @@ const PRICING_TIERS = [
 const TICKET_INCLUDES = [
   "Half-day workshop in your chosen language",
   "All conference materials",
-  "Networking lunch & refreshments",
+  "Snacks & refreshments",
   "Certificate of attendance",
 ];
 
 const SCHEDULE = [
-  { time: "12:00 – 12:30", event: "Registration & Welcome" },
-  { time: "12:30 – 12:45", event: "Opening Remarks" },
-  { time: "12:45 – 14:15", event: "Workshop Session I" },
-  { time: "14:15 – 14:45", event: "Coffee Break & Networking" },
-  { time: "14:45 – 16:15", event: "Workshop Session II" },
-  { time: "16:15 – 16:45", event: "Panel Discussion & Q&A" },
-  { time: "16:45 – 17:00", event: "Closing Remarks" },
+  { time: "13:00 – 13:15", event: "Registration & Welcome" },
+  { time: "13:15 – 13:30", event: "Opening Remarks" },
+  { time: "13:30 – 14:45", event: "Workshop Session I" },
+  { time: "14:45 – 15:15", event: "Snacks & Networking" },
+  { time: "15:15 – 16:30", event: "Workshop Session II" },
+  { time: "16:30 – 16:50", event: "Panel Discussion & Q&A" },
+  { time: "16:50 – 17:00", event: "Closing Remarks" },
 ];
 
 function WorkshopNavbar() {
@@ -148,7 +148,7 @@ function WorkshopHero() {
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
       "BEGIN:VEVENT",
-      "DTSTART:20261008T120000Z",
+      "DTSTART:20261008T130000Z",
       "DTEND:20261008T170000Z",
       "SUMMARY:ALPS Workshop Day 2026",
       "LOCATION:Kultur & Kongresshaus Aarau, Schlossplatz, Aarau, Switzerland",
@@ -244,6 +244,10 @@ function WorkshopSessions() {
             Choose from four parallel workshops delivered in different languages. Each session covers cutting-edge
             topics in Psychedelic-Assisted Psychotherapy.
           </p>
+          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-support/20 border border-support/30 rounded-sm text-support-light text-sm font-medium">
+            <Calendar className="w-4 h-4" />
+            Full workshop details available from 8 May 2026
+          </div>
         </div>
 
         <div className="grid gap-8 md:grid-cols-2">
