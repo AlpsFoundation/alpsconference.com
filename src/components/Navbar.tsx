@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   // { label: "Research Poster", href: "#research" },
   { label: "FAQ", href: "#faq" },
   { label: "Partners", href: "#partners" },
+  { label: "Call for Speakers", href: "/call-for-speakers" },
 ];
 
 const PAST_EDITIONS = [
