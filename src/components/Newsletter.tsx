@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
 import { AlertCircle, CheckCircle2, Loader2, Send } from "lucide-react";
 import { withBase } from "../lib/withBase";
+import { useTranslation } from "../lib/i18n";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
 const apiUrl = withBase("api/newsletter-subscribe");
 
 export default function Newsletter() {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
@@ -55,13 +57,13 @@ export default function Newsletter() {
       <div className="max-w-xl mx-auto px-4 sm:px-6 text-center">
         <div data-fade-up className="opacity-0">
           <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
-            Stay informed
+            {t.newsletter.eyebrow}
           </p>
           <h2 className="text-3xl font-semibold text-white mb-4">
-            Register for the ALPS Newsletter
+            {t.newsletter.heading}
           </h2>
           <p className="text-white/90 mb-8 text-base">
-            Be the first to know about speakers, schedule updates, and ticket sales.
+            {t.newsletter.subheading}
           </p>
         </div>
 
@@ -77,10 +79,10 @@ export default function Newsletter() {
             />
             <div>
               <p className="text-white font-medium text-lg mb-1">
-                You&apos;re on the list
+                {t.newsletter.successTitle}
               </p>
               <p className="text-white/80 text-sm">
-                We&apos;ll email you when there&apos;s news about ALPS 2026.
+                {t.newsletter.successBody}
               </p>
             </div>
             <button
@@ -91,7 +93,7 @@ export default function Newsletter() {
               }}
               className="text-support-light hover:text-white text-sm font-medium underline underline-offset-4 transition-colors"
             >
-              Subscribe another address
+              {t.newsletter.subscribeAnother}
             </button>
           </div>
         ) : (
@@ -118,8 +120,7 @@ export default function Newsletter() {
 
                 if (!res.ok || !payload?.ok) {
                   setErrorMessage(
-                    payload?.error?.trim() ||
-                      "Something went wrong. Please try again."
+                    payload?.error?.trim() || t.newsletter.errorGeneric
                   );
                   setStatus("error");
                   return;
@@ -128,9 +129,7 @@ export default function Newsletter() {
                 setEmail("");
                 setStatus("success");
               } catch {
-                setErrorMessage(
-                  "Network error. Check your connection and try again."
-                );
+                setErrorMessage(t.newsletter.errorNetwork);
                 setStatus("error");
               }
             }}
@@ -149,7 +148,7 @@ export default function Newsletter() {
                     setErrorMessage("");
                   }
                 }}
-                placeholder="your@email.com"
+                placeholder={t.newsletter.placeholder}
                 className="flex-1 px-5 py-3.5 bg-white/[0.05] border border-white/10 rounded-sm text-white placeholder:text-white/60 focus:outline-none focus:border-support/50 focus:ring-1 focus:ring-support/30 transition-all text-base disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
@@ -159,16 +158,13 @@ export default function Newsletter() {
               >
                 {status === "loading" ? (
                   <>
-                    <Loader2
-                      className="w-5 h-5 animate-spin"
-                      aria-hidden
-                    />
-                    <span>Sending…</span>
+                    <Loader2 className="w-5 h-5 animate-spin" aria-hidden />
+                    <span>{t.newsletter.sending}</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-5 h-5" aria-hidden />
-                    Subscribe
+                    {t.newsletter.subscribe}
                   </>
                 )}
               </button>

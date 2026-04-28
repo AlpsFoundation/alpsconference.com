@@ -2,20 +2,22 @@ import { useEffect, useRef } from "react";
 import { animate } from "animejs";
 import { MapPin, Train, Building2, Utensils } from "lucide-react";
 import { withBase } from "../lib/withBase";
-
-const FEATURES = [
-  { icon: Building2, text: "1000m\u00B2 of flexible event space" },
-  { icon: MapPin, text: "Historic Schlossplatz, heart of Aarau" },
-  { icon: Train, text: "Steps from Aarau train station" },
-  { icon: Utensils, text: "Surrounded by dining & leisure options" },
-];
+import { useTranslation } from "../lib/i18n";
 
 const venueInteriorImage = withBase("img/kuk-inside.jpg");
 const venueExteriorImage = withBase("img/kuk-outside.jpg");
 
 export default function Location() {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
   const hasAnimated = useRef(false);
+
+  const FEATURES = [
+    { icon: Building2, text: t.location.features.space },
+    { icon: MapPin, text: t.location.features.square },
+    { icon: Train, text: t.location.features.train },
+    { icon: Utensils, text: t.location.features.dining },
+  ];
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -50,10 +52,10 @@ export default function Location() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div data-fade-up className="opacity-0 text-center mb-14">
           <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
-            The Venue
+            {t.location.eyebrow}
           </p>
           <h2 className="text-3xl font-semibold text-white">
-            Kultur & Kongresshaus Aarau
+            {t.location.heading}
           </h2>
         </div>
 
@@ -72,7 +74,7 @@ export default function Location() {
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Kultur & Kongresshaus Aarau location"
+                  title={t.location.mapTitle}
                 />
               </div>
             </div>
@@ -84,7 +86,7 @@ export default function Location() {
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-white/70">
                 <Train className="h-4 w-4 text-support-light" />
-                <span>Short walk from the station</span>
+                <span>{t.location.shortWalk}</span>
               </div>
             </div>
 
@@ -94,7 +96,7 @@ export default function Location() {
                   <div className="aspect-[4/3]">
                     <img
                       src={venueInteriorImage}
-                      alt="Interior of Kultur & Kongresshaus Aarau prepared for a conference session"
+                      alt={t.location.imgAltInterior}
                       className="h-full w-full object-cover"
                       loading="lazy"
                     />
@@ -107,7 +109,7 @@ export default function Location() {
                   <div className="aspect-[4/3]">
                     <img
                       src={venueExteriorImage}
-                      alt="Exterior of Kultur & Kongresshaus Aarau at dusk"
+                      alt={t.location.imgAltExterior}
                       className="h-full w-full object-cover"
                       loading="lazy"
                     />
@@ -122,19 +124,14 @@ export default function Location() {
               data-fade-up
               className="opacity-0 inline-flex items-center rounded-full border border-support/20 bg-support/10 px-4 py-2 text-[0.72rem] font-medium uppercase tracking-[0.2em] text-support-light/90"
             >
-              Designed for gathering, learning, and exchange
+              {t.location.badge}
             </div>
 
             <p data-fade-up className="opacity-0 text-white/90 leading-relaxed text-base sm:text-[1.05rem]">
-              The Kultur & Kongresshaus Aarau, located at Schlossplatz in Aarau, combines
-              architectural elegance with modern functionality. The facility boasts high ceilings
-              on the ground floor providing a sense of openness and grandeur, with advanced
-              event technology ensuring all technical needs are seamlessly met.
+              {t.location.p1}
             </p>
             <p data-fade-up className="opacity-0 text-white/90 leading-relaxed text-base sm:text-[1.05rem]">
-              A spacious foyer serves as a welcoming area and exhibition space. Located near
-              the heart of Aarau&apos;s historic center, surrounded by dining and leisure options,
-              it&apos;s a prime spot for local and international attendees alike.
+              {t.location.p2}
             </p>
 
             <div data-fade-up className="opacity-0 grid gap-3 pt-3 sm:grid-cols-2">
