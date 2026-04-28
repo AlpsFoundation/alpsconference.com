@@ -1,0 +1,54 @@
+---
+import "../styles/app.css";
+import CallForSpeakers from "../components/CallForSpeakers";
+import { withBase } from "../lib/withBase";
+
+const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const ogImagePath = withBase("img/opengraph.jpg");
+const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
+
+const fontFaceCss = `@font-face {
+  font-family: "Switzer";
+  src: url("${switzerFont}") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Call for Speakers | ALPS Conference 2026</title>
+    <meta
+      name="description"
+      content="Submit your speaker proposal for ALPS Conference 2026 – 9-10 October, Kultur & Kongresshaus Aarau, Switzerland."
+    />
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Call for Speakers – ALPS Conference 2026" />
+    <meta
+      property="og:description"
+      content="Share your research or practice at the leading Swiss forum on psychedelic science and medicine. Submissions open now."
+    />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#0B3C5D" />
+
+    <!-- Fonts -->
+    <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
+
+    <style is:global set:html={fontFaceCss}></style>
+  </head>
+  <body>
+    <CallForSpeakers client:load />
+  </body>
+</html>
