@@ -10,10 +10,11 @@ import Partners from "./Partners";
 import FAQ from "./FAQ";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
+import { I18nProvider } from "../lib/i18n";
 
 export default function App() {
   return (
-    <>
+    <I18nProvider>
       <Navbar />
       <main>
         <Hero />
@@ -30,6 +31,6 @@ export default function App() {
         <Partners />
         <Footer />
       </div>
-    </>
+    </I18nProvider>
   );
 }

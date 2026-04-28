@@ -3,8 +3,10 @@ import { Calendar, Ticket, Mail, MapPin, Clock } from "lucide-react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
+import { useTranslation } from "../lib/i18n";
 
 export default function Hero() {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
   const bonesRef = useRef<HTMLDivElement>(null);
 
@@ -124,20 +126,20 @@ export default function Hero() {
             <div className="flex shrink-0 items-center gap-1.5 min-[380px]:gap-2 text-white">
               <Clock className="w-5 h-5 text-support-light" />
               <span className="whitespace-nowrap text-[13px] min-[380px]:text-[15px] min-[430px]:text-base sm:text-xl font-semibold">
-                9-10 October 2026
+                {t.hero.date}
               </span>
             </div>
             <span className="hidden sm:block w-px h-5 shrink-0 bg-white/20" />
             <div className="flex shrink-0 items-center gap-1.5 min-[380px]:gap-2 text-white">
               <MapPin className="w-5 h-5 text-support-light" />
               <span className="whitespace-nowrap text-[13px] min-[380px]:text-[15px] min-[430px]:text-base sm:text-xl font-semibold">
-                Aarau, Switzerland
+                {t.hero.location}
               </span>
             </div>
           </div>
 
           <p data-animate className="opacity-0 text-base text-white/80">
-            Kultur & Kongresshaus Aarau
+            {t.hero.venue}
           </p>
 
           <div className="flex flex-row flex-nowrap items-stretch justify-center gap-1 min-[400px]:gap-2 sm:gap-4 w-full max-w-full">
@@ -147,7 +149,7 @@ export default function Hero() {
               className="opacity-0 group flex flex-1 sm:flex-initial min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-support hover:bg-support-light text-white text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/25 cursor-pointer leading-tight"
             >
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-              <span className="whitespace-nowrap">Save the Date</span>
+              <span className="whitespace-nowrap">{t.hero.saveDate}</span>
             </button>
 
             <a
@@ -156,7 +158,7 @@ export default function Hero() {
               className="opacity-0 flex flex-1 sm:flex-initial min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
             >
               <Ticket className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-              <span className="whitespace-nowrap">Buy Tickets</span>
+              <span className="whitespace-nowrap">{t.hero.buyTickets}</span>
             </a>
 
             <a
@@ -165,7 +167,7 @@ export default function Hero() {
               className="opacity-0 flex flex-1 sm:flex-initial min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-white/10 hover:bg-white/15 text-white text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
             >
               <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-              <span className="whitespace-nowrap">Stay in Touch</span>
+              <span className="whitespace-nowrap">{t.hero.stayInTouch}</span>
             </a>
           </div>
         </div>

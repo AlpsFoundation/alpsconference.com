@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
+import { useTranslation } from "../lib/i18n";
 
 export default function About() {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
   const hasAnimated = useRef(false);
 
@@ -33,26 +35,18 @@ export default function About() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div data-fade-up className="opacity-0 text-center mb-14">
           <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
-            About the Conference
+            {t.about.eyebrow}
           </p>
           <h2 className="text-3xl font-semibold text-white">
-            Welcome to ALPS 2026
+            {t.about.heading}
           </h2>
         </div>
 
         <div className="space-y-6 text-lg text-white/80 leading-relaxed text-center">
-          <p data-fade-up className="opacity-0">
-            The ALPS Foundation is delighted to invite you to the sixth edition of the ALPS Awareness Lectures on Psychedelic Science, taking place on <strong>Friday and Saturday, October 9–10, 2026</strong>, in the scenic city of <strong>Aarau, Switzerland</strong>.
-          </p>
-          <p data-fade-up className="opacity-0">
-            Join us for two full days of cutting-edge science, meaningful dialogue, and community building. This year's conference will feature distinguished speakers and interactive panels, providing deep insights into the latest advancements in psychedelic research and therapy. The conference will be held in English.
-          </p>
-          <p data-fade-up className="opacity-0">
-            Your conference experience includes comprehensive catering with breakfast, morning and afternoon breaks, lunch, and Saturday-evening Apero, ensuring a comfortable and enriching environment. For Friday evening, an optional networking dinner will be available. Throughout the event, take advantage of the networking breaks to connect with fellow enthusiasts, researchers, and practitioners over apéros, and join us for our traditional After Party on Saturday night.
-          </p>
-          <p data-fade-up className="opacity-0">
-            Attendees will have the opportunity to earn up to 14 continuing education credits, accredited by FSP and SGPP for psychologists and medical professionals. We look forward to hosting an engaging and enlightening conference that promises to expand knowledge and foster significant discussions.
-          </p>
+          <p data-fade-up className="opacity-0" dangerouslySetInnerHTML={{ __html: t.about.p1 }} />
+          <p data-fade-up className="opacity-0">{t.about.p2}</p>
+          <p data-fade-up className="opacity-0">{t.about.p3}</p>
+          <p data-fade-up className="opacity-0">{t.about.p4}</p>
         </div>
       </div>
     </section>

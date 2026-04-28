@@ -1,17 +1,7 @@
 import { useState, useEffect } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Globe } from "lucide-react";
 import { withBase } from "../lib/withBase";
-
-const NAV_ITEMS = [
-  { label: "Tickets", href: "#tickets" },
-  { label: "Conference", href: "#about" },
-  { label: "Location", href: "#location" },
-  // { label: "Speakers", href: "#speakers" },
-  // { label: "Experiences", href: "#experiences" },
-  // { label: "Research Poster", href: "#research" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Partners", href: "#partners" },
-];
+import { useTranslation, type Lang } from "../lib/i18n";
 
 const PAST_EDITIONS = [
   { label: "2025", href: "https://sites.google.com/view/alps-conference-2025" },
@@ -21,11 +11,27 @@ const PAST_EDITIONS = [
   { label: "2021", href: "https://sites.google.com/view/pala-psychedelics-congress/home" },
 ];
 
+const LANGS: { code: Lang; label: string }[] = [
+  { code: "en", label: "EN" },
+  { code: "de", label: "DE" },
+  { code: "fr", label: "FR" },
+];
+
 export default function Navbar() {
+  const { t, lang, setLang } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [pastEditionsOpen, setPastEditionsOpen] = useState(false);
   const [mobilePastOpen, setMobilePastOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+
+  const NAV_ITEMS = [
+    { label: t.nav.tickets, href: "#tickets" },
+    { label: t.nav.conference, href: "#about" },
+    { label: t.nav.location, href: "#location" },
+    { label: t.nav.faq, href: "#faq" },
+    { label: t.nav.partners, href: "#partners" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -82,7 +88,7 @@ export default function Navbar() {
                   onClick={() => setPastEditionsOpen((open) => !open)}
                   className="flex items-center gap-1 px-4 py-2 text-base font-medium text-white/90 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5 cursor-pointer"
                 >
-                  Past Editions
+                  {t.nav.pastEditions}
                   <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${pastEditionsOpen ? "rotate-180" : ""}`} />
                 </button>
                 {pastEditionsOpen && (
@@ -104,25 +110,83 @@ export default function Navbar() {
                 )}
               </div>
 
+              {/* Language switcher */}
+              <div
+                className="relative"
+                onMouseEnter={() => setLangOpen(true)}
+                onMouseLeave={() => setLangOpen(false)}
+              >
+                <button
+                  type="button"
+                  aria-expanded={langOpen}
+                  aria-label="Select language"
+                  onClick={() => setLangOpen((o) => !o)}
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5 cursor-pointer"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span>{lang.toUpperCase()}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${langOpen ? "rotate-180" : ""}`} />
+                </button>
+                {langOpen && (
+                  <div className="absolute top-full right-0 pt-2">
+                    <div className="w-28 bg-neutral-dark/95 backdrop-blur-xl border border-white/10 rounded-sm shadow-2xl overflow-hidden py-2">
+                      {LANGS.map((l) => (
+                        <button
+                          key={l.code}
+                          type="button"
+                          onClick={() => { setLang(l.code); setLangOpen(false); }}
+                          className={`w-full text-left px-5 py-2.5 text-base font-medium transition-colors ${
+                            lang === l.code
+                              ? "text-support-light bg-white/5"
+                              : "text-white/90 hover:text-white hover:bg-white/5"
+                          }`}
+                        >
+                          {l.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <a
                 href="https://alps-foundation.ch"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-4 px-5 py-2.5 text-base font-medium text-white bg-support/20 hover:bg-support/30 border border-support/30 rounded-sm transition-colors duration-200"
+                className="ml-2 px-5 py-2.5 text-base font-medium text-white bg-support/20 hover:bg-support/30 border border-support/30 rounded-sm transition-colors duration-200"
               >
-                ALPS Foundation
+                {t.nav.alpsFoundation}
               </a>
             </div>
 
-            {/* Mobile menu button */}
-            <button
-              type="button"
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 text-white/90 hover:text-white transition-colors cursor-pointer rounded-sm hover:bg-white/5"
-              aria-label="Toggle menu"
-            >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            {/* Mobile: language + hamburger */}
+            <div className="lg:hidden flex items-center gap-2">
+              {/* Inline lang pills on mobile */}
+              <div className="flex items-center gap-0.5">
+                {LANGS.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => setLang(l.code)}
+                    className={`px-2 py-1 text-xs font-semibold rounded-sm transition-colors ${
+                      lang === l.code
+                        ? "text-white bg-support/30 border border-support/40"
+                        : "text-white/60 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-2 text-white/90 hover:text-white transition-colors cursor-pointer rounded-sm hover:bg-white/5"
+                aria-label={t.nav.toggleMenu}
+              >
+                {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -157,7 +221,7 @@ export default function Navbar() {
               onClick={() => setMobilePastOpen(!mobilePastOpen)}
               className="flex items-center justify-between py-4 text-xl font-medium text-white/90 hover:text-white border-b border-white/5 transition-colors cursor-pointer"
             >
-              Past Editions
+              {t.nav.pastEditions}
               <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${mobilePastOpen ? "rotate-180" : ""}`} />
             </button>
             {mobilePastOpen && (
@@ -182,7 +246,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               className="mt-8 px-6 py-3.5 text-center text-base font-medium text-white bg-support/20 hover:bg-support/30 border border-support/30 rounded-sm transition-colors"
             >
-              ALPS Foundation
+              {t.nav.alpsFoundation}
             </a>
           </div>
         </div>
