@@ -135,7 +135,7 @@ export default function PosterPage() {
             </h1>
             <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed mb-10">
               Present your psychedelic science research at the sixth edition of the ALPS
-              Conference — 9–10 October 2026, Aarau, Switzerland.
+              Conference, 9–10 October 2026, Aarau, Switzerland.
             </p>
             <a
               data-fade-up
@@ -179,7 +179,7 @@ export default function PosterPage() {
                 <BulletList items={[
                   "Posters must be relevant to the field of psychedelic science.",
                   "The paper title, all authors, and affiliations must be displayed at the top of the poster.",
-                  "Posters should include a brief introduction, goals, methodological details (when applicable), conclusions, and references — presented in a logical and clear sequence.",
+                  "Posters should include a brief introduction, goals, methodological details (when applicable), conclusions, and references, presented in a logical and clear sequence.",
                   "The research presented must be conducted ethically, with the safety and well-being of participants in mind.",
                   "Original research is highly encouraged. We also accept methodological perspectives, meta-analyses, reviews, case reports, and other topics relevant to psychedelic science.",
                 ]} />
@@ -188,7 +188,7 @@ export default function PosterPage() {
               {/* Format */}
               <Section icon={Printer} title="Poster Format">
                 <BulletList items={[
-                  "Size: A0 portrait format — 84.1 cm × 118.9 cm (33.1 × 46.8 in).",
+                  "Size: A0 portrait format, 84.1 cm × 118.9 cm (33.1 × 46.8 in).",
                   "Orientation: Portrait only. There will be no possibility for horizontal display.",
                   "Presenters are responsible for printing their own poster. ALPS does not print posters.",
                 ]} />
@@ -207,7 +207,7 @@ export default function PosterPage() {
               <Section icon={CheckCircle} title="Presenting Your Poster">
                 <BulletList items={[
                   "Each poster presenter is responsible for printing their poster and bringing it to the conference.",
-                  "The poster must be printed in vertical (portrait) format — horizontal display is not possible.",
+                  "The poster must be printed in vertical (portrait) format. Horizontal display is not possible.",
                   "Prepare a short tour of your poster that you can present to visitors.",
                   "Presenters are encouraged to stand by their posters during breaks to engage with attendees and answer questions.",
                   "Presenters must remove their printed posters before the end of the conference.",
