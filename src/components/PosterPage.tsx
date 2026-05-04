@@ -252,9 +252,9 @@ export default function PosterPage() {
             </div>
 
             <p data-fade-up className="opacity-0 mt-8 text-white/50 text-sm text-center">
-              Questions? Write to us at{" "}
-              <a href="mailto:info@alps.foundation" className="text-support-light hover:text-white transition-colors">
-                info@alps.foundation
+              Any questions? Contact{" "}
+              <a href="mailto:cyril.petignat@alps.foundation" className="text-support-light hover:text-white transition-colors">
+                cyril.petignat@alps.foundation
               </a>
             </p>
           </div>
