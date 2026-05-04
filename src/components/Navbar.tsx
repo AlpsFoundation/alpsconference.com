@@ -3,14 +3,14 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { withBase } from "../lib/withBase";
 
 const NAV_ITEMS = [
-  { label: "Tickets", href: "#tickets" },
-  { label: "Conference", href: "#about" },
-  { label: "Location", href: "#location" },
-  // { label: "Speakers", href: "#speakers" },
-  // { label: "Experiences", href: "#experiences" },
-  // { label: "Research Poster", href: "#research" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Partners", href: "#partners" },
+  { label: "Tickets", href: "/#tickets" },
+  { label: "Conference", href: "/#about" },
+  { label: "Location", href: "/#location" },
+  // { label: "Speakers", href: "/#speakers" },
+  // { label: "Experiences", href: "/#experiences" },
+  { label: "Research Poster", href: "/poster" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "Partners", href: "/#partners" },
 ];
 
 const PAST_EDITIONS = [
@@ -50,7 +50,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <a href="#" className="flex items-center gap-3 shrink-0">
+            <a href="/" className="flex items-center gap-3 shrink-0">
               <img
                 src={withBase("img/logo.png")}
                 alt="ALPS Research Conference"
