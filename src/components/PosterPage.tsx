@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
-import { Calendar, FileText, CheckCircle, Users, Printer, ImageIcon } from "lucide-react";
+import { Calendar, FileText, CheckCircle, Printer, ImageIcon } from "lucide-react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
@@ -28,11 +28,6 @@ const TIMELINE = [
   },
 ];
 
-const COMMITTEE = [
-  { name: "Abigail Calder", role: "PhD Candidate" },
-  { name: "Federico Seragnoli", role: "PhD Candidate" },
-  { name: "Cyril Petignat", role: "PhD Candidate" },
-];
 
 function TimelineItem({ date, label, done }: { date: string; label: string; done: boolean }) {
   return (
@@ -77,8 +72,8 @@ function BulletList({ items }: { items: string[] }) {
   return (
     <ul className="space-y-3">
       {items.map((item, i) => (
-        <li key={i} className="flex gap-3 text-white/75 text-base leading-relaxed">
-          <span className="text-support-light mt-1.5 shrink-0">—</span>
+        <li key={i} className="flex gap-2.5 text-white/75 text-base leading-relaxed">
+          <span className="w-1.5 h-1.5 rounded-full bg-support-light/60 shrink-0 mt-2.5" />
           {item}
         </li>
       ))}
@@ -197,21 +192,6 @@ export default function PosterPage() {
                   "Orientation: Portrait only. There will be no possibility for horizontal display.",
                   "Presenters are responsible for printing their own poster. ALPS does not print posters.",
                 ]} />
-              </Section>
-
-              {/* Review committee */}
-              <Section icon={Users} title="Review Committee">
-                <p className="text-white/65 text-base mb-5 leading-relaxed">
-                  A committee of experts evaluates all applications:
-                </p>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {COMMITTEE.map((person) => (
-                    <div key={person.name} className="bg-white/[0.03] border border-white/[0.05] rounded-sm px-4 py-3">
-                      <p className="text-white font-medium text-base">{person.name}</p>
-                      <p className="text-white/50 text-sm mt-0.5">{person.role}</p>
-                    </div>
-                  ))}
-                </div>
               </Section>
 
               {/* Setting up */}
