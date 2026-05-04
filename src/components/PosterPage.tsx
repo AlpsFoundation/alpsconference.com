@@ -198,7 +198,7 @@ export default function PosterPage() {
               <Section icon={Calendar} title="Setting Up Your Poster">
                 <BulletList items={[
                   "In order to present your poster at the conference, you must hold a valid conference ticket.",
-                  "All presenters are encouraged to put up their posters at the beginning of the conference on Friday, 9 October 2026 at 12:00.",
+                  "All presenters are encouraged to put up their posters at the beginning of the conference on Friday, 9 October 2026 at 9:00 if possible.",
                   "ALPS will provide push pins, tape, or Velcro for hanging posters.",
                 ]} />
               </Section>
