@@ -9,7 +9,7 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             <img src={withBase("img/logo.png")} alt="ALPS" className="h-6 w-auto opacity-80" />
             <a
-              href="https://alps-foundation.ch"
+              href="https://www.alps.foundation/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-base text-white/90 font-medium hover:text-white transition-colors"
