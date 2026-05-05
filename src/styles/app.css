@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0B3C5D;
+  --color-primary: #377BC3;
   --color-primary-light: #0e4d78;
   --color-secondary: #C4CCD4;
   --color-accent: #F38FBF;
   --color-accent-light: #f7b3d4;
   --color-support: #2E7CC7;
   --color-support-light: #4a9ae0;
-  --color-neutral-dark: #050816;
+  --color-neutral-dark: #377BC3;
   --color-neutral-light: #E5E7EB;
   --color-neutral-mid: #4B5563;
   --font-sans: "Switzer", system-ui, -apple-system, sans-serif;
