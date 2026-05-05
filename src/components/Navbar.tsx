@@ -105,7 +105,7 @@ export default function Navbar() {
               </div>
 
               <a
-                href="https://alps-foundation.ch"
+                href="https://www.alps.foundation/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="ml-4 px-5 py-2.5 text-base font-medium text-white bg-support/20 hover:bg-support/30 border border-support/30 rounded-sm transition-colors duration-200"
