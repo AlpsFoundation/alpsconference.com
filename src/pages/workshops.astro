@@ -1,6 +1,6 @@
 ---
 import "../styles/app.css";
-import App from "../components/App";
+import WorkshopPage from "../components/WorkshopPage";
 import { withBase } from "../lib/withBase";
 
 const switzerFont = withBase("fonts/Switzer-Variable.woff2");
@@ -21,18 +21,18 @@ const fontFaceCss = `@font-face {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ALPS Conference 2026 | Awareness Lectures on Psychedelics in Switzerland</title>
+    <title>Workshop Day | ALPS Conference 2026</title>
     <meta
       name="description"
-      content="ALPS Conference 2026 - 9-10 October, Kultur & Kongresshaus Aarau, Switzerland, with a new pre-conference Workshop Day on October 8th. National & international speakers, research posters, panel discussions, and immersive experiences."
+      content="Join the ALPS 2026 pre-conference Workshop Day on Thursday, October 8th, 2026. Four parallel Psychedelic-Assisted Therapy training tracks across Switzerland's linguistic regions."
     />
 
     <!-- OpenGraph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="ALPS Conference 2026" />
+    <meta property="og:title" content="Workshop Day — ALPS Conference 2026" />
     <meta
       property="og:description"
-      content="Awareness Lectures on Psychedelics in Switzerland. Workshop Day on 8 October; conference on 9-10 October 2026, Aarau."
+      content="Four parallel Psychedelic-Assisted Therapy training tracks on Thursday, October 8th, 2026."
     />
     <meta property="og:image" content={ogImageUrl} />
     <meta name="twitter:card" content="summary_large_image" />
@@ -49,6 +49,6 @@ const fontFaceCss = `@font-face {
     <style is:global set:html={fontFaceCss}></style>
   </head>
   <body>
-    <App client:load />
+    <WorkshopPage client:load />
   </body>
 </html>

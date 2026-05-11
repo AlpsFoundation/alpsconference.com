@@ -8,18 +8,20 @@ type NavLink = {
   label: string;
   href: string;
   description?: string;
+  badge?: string;
   external?: boolean;
 };
 
 const CONFERENCE_LINKS: NavLink[] = [
   { label: "Tickets", href: "/#tickets", description: "Reserve your place" },
-  { label: "Conference", href: "/#about", description: "Theme, dates, and overview" },
+  { label: "Overview", href: "/#about", description: "Theme, dates, and conference details" },
   { label: "Location", href: "/#location", description: "Venue and travel details" },
   { label: "FAQ", href: "/#faq", description: "Practical information" },
   { label: "Partners", href: "/#partners", description: "Sponsors and collaborators" },
 ];
 
 const PARTICIPATE_LINKS: NavLink[] = [
+  { label: "Workshop Day", href: "/workshops", description: "Pre-conference PAT training", badge: "New" },
   { label: "Call for Speakers", href: "/speaker", description: "Apply to present a talk" },
   { label: "Research Poster", href: "/poster", description: "Submit a poster proposal" },
 ];
@@ -48,7 +50,7 @@ function DesktopDropdown({
   align = "left",
 }: {
   label: string;
-  eyebrow: string;
+  eyebrow?: string;
   menuKey: MenuKey;
   items: NavLink[];
   openMenu: MenuKey | null;
@@ -75,9 +77,11 @@ function DesktopDropdown({
       {isOpen && (
         <div className={`absolute top-full ${align === "right" ? "right-0" : "left-0"} pt-3`}>
           <div className="w-72 bg-neutral-dark/95 backdrop-blur-xl border border-white/10 rounded-sm shadow-2xl overflow-hidden p-2">
-            <p className="px-3 pt-2 pb-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-support-light/80">
-              {eyebrow}
-            </p>
+            {eyebrow && (
+              <p className="px-3 pt-2 pb-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-support-light/80">
+                {eyebrow}
+              </p>
+            )}
             {items.map((item) => (
               <a
                 key={item.href}
@@ -87,7 +91,14 @@ function DesktopDropdown({
                 className="group flex items-start justify-between gap-3 rounded-sm px-3 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors"
               >
                 <span>
-                  <span className="block text-base font-medium">{item.label}</span>
+                  <span className="flex items-center gap-2 text-base font-medium">
+                    {item.label}
+                    {item.badge && (
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-neutral-dark">
+                        {item.badge}
+                      </span>
+                    )}
+                  </span>
                   {item.description && (
                     <span className="block mt-0.5 text-sm font-normal leading-snug text-white/50 group-hover:text-white/65">
                       {item.description}
@@ -109,15 +120,17 @@ function MobileLinkGroup({
   items,
   onNavigate,
 }: {
-  title: string;
+  title?: string;
   items: NavLink[];
   onNavigate: () => void;
 }) {
   return (
     <div>
-      <p className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-support-light/80">
-        {title}
-      </p>
+      {title && (
+        <p className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-support-light/80">
+          {title}
+        </p>
+      )}
       <div className="divide-y divide-white/5 border-y border-white/5">
         {items.map((item) => (
           <a
@@ -129,7 +142,14 @@ function MobileLinkGroup({
             className="group flex items-center justify-between gap-3 py-3.5 text-white/90 hover:text-white transition-colors"
           >
             <span>
-              <span className="block text-lg font-medium">{item.label}</span>
+              <span className="flex items-center gap-2 text-lg font-medium">
+                {item.label}
+                {item.badge && (
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-neutral-dark">
+                    {item.badge}
+                  </span>
+                )}
+              </span>
               {item.description && <span className="block text-sm text-white/50">{item.description}</span>}
             </span>
             {item.external && <ArrowUpRight className="h-4 w-4 shrink-0 text-white/40 group-hover:text-white/70" />}
@@ -191,7 +211,6 @@ export default function Navbar() {
             <div className="hidden lg:flex items-center gap-2">
               <DesktopDropdown
                 label="Conference"
-                eyebrow="Home sections"
                 menuKey="conference"
                 items={CONFERENCE_LINKS}
                 openMenu={openMenu}
@@ -199,7 +218,6 @@ export default function Navbar() {
               />
               <DesktopDropdown
                 label="Participate"
-                eyebrow="Separate pages"
                 menuKey="participate"
                 items={PARTICIPATE_LINKS}
                 openMenu={openMenu}
@@ -252,8 +270,8 @@ export default function Navbar() {
           }`}
         >
           <div className="flex h-full flex-col gap-8 overflow-y-auto pt-24 px-6 pb-8">
-            <MobileLinkGroup title="Home sections" items={CONFERENCE_LINKS} onNavigate={() => setIsOpen(false)} />
-            <MobileLinkGroup title="Separate pages" items={PARTICIPATE_LINKS} onNavigate={() => setIsOpen(false)} />
+            <MobileLinkGroup title="Conference" items={CONFERENCE_LINKS} onNavigate={() => setIsOpen(false)} />
+            <MobileLinkGroup title="Participate" items={PARTICIPATE_LINKS} onNavigate={() => setIsOpen(false)} />
             <MobileLinkGroup title="Archive" items={PAST_EDITIONS} onNavigate={() => setIsOpen(false)} />
 
             <a
