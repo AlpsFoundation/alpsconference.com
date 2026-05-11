@@ -231,7 +231,7 @@ export default function SpeakerPage() {
                   "Selected speakers will present a 45-minute talk followed by a 10-minute Q&A session.",
                   "Talks should present original research, clinical findings, theoretical perspectives, or methodological advances relevant to psychedelic science.",
                   "Presentations must be delivered in English.",
-                  "Travel costs are reimbursed at a fixed rate based on the speaker's country of origin. Details will be communicated upon selection.",
+                  "Travel costs and accommodation are reimbursed at a fixed rate based on the speaker's country of origin. Details will be communicated upon selection.",
                 ]} />
               </Section>
 
