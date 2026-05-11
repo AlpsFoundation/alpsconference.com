@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
-import { Mic, Calendar, Users, FileText, CheckCircle, Award } from "lucide-react";
+import { Mic, Calendar, Users, CheckCircle, Award } from "lucide-react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
@@ -228,25 +228,9 @@ export default function SpeakerPage() {
 
               <Section icon={Mic} title="Talk Format">
                 <BulletList items={[
-                  "Selected speakers will present a 45-minute talk followed by a 15-minute Q&A session.",
+                  "Selected speakers will present a 45-minute talk followed by a 10-minute Q&A session.",
                   "Talks should present original research, clinical findings, theoretical perspectives, or methodological advances relevant to psychedelic science.",
                   "Presentations must be delivered in English.",
-                  "Speakers are responsible for their own travel and accommodation arrangements. ALPS does not cover travel costs unless explicitly agreed in writing.",
-                ]} />
-              </Section>
-
-              <Section icon={FileText} title="What to Prepare for Your Application">
-                <p className="text-white/65 text-base mb-4 leading-relaxed">
-                  The application form will ask you for:
-                </p>
-                <BulletList items={[
-                  "Full name, email address, and affiliation (university or institution).",
-                  "Country and professional level.",
-                  "Field of research.",
-                  "Biography (max 300 words).",
-                  "Abstract of your proposed talk (max 400 words).",
-                  "Up to 3 relevant key publications.",
-                  "Optional: a link to a past presentation video (YouTube, Vimeo, etc.).",
                 ]} />
               </Section>
 
@@ -254,7 +238,6 @@ export default function SpeakerPage() {
                 <BulletList items={[
                   "Submitted work must be relevant to psychedelic science.",
                   "Research presented must meet ethical standards, with the safety and well-being of participants prioritized.",
-                  "Speakers must hold a valid conference ticket to present.",
                   "By applying and being selected, speakers agree to allow their name, affiliation, abstract, and biography to be published on the ALPS 2026 website and conference materials.",
                 ]} />
               </Section>
