@@ -43,7 +43,7 @@ body {
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #123e67;
+  background: #1c6ab8;
   color: rgba(248, 250, 255, 0.96);
 }
 
@@ -76,7 +76,7 @@ p {
   height: 100svh;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(8, 32, 55, 0.14), rgba(8, 28, 48, 0.42)),
+    linear-gradient(180deg, rgba(12, 48, 90, 0.06), rgba(10, 40, 80, 0.22)),
     url("/img/background.jpg") center center / cover no-repeat;
 }
 
@@ -93,10 +93,10 @@ p {
   background:
     radial-gradient(
       ellipse 42% 34% at var(--hero-center-x) var(--hero-center-y),
-      rgba(255, 130, 184, 0.18) 0%,
-      rgba(207, 173, 255, 0.2) 22%,
-      rgba(132, 195, 255, 0.19) 47%,
-      rgba(132, 195, 255, 0.07) 63%,
+      rgba(255, 130, 184, 0.22) 0%,
+      rgba(207, 173, 255, 0.24) 22%,
+      rgba(132, 195, 255, 0.24) 47%,
+      rgba(132, 195, 255, 0.1) 63%,
       transparent 78%
     );
   mix-blend-mode: screen;
@@ -464,9 +464,9 @@ p {
     background:
       radial-gradient(
         ellipse 54% 34% at var(--hero-center-x) var(--hero-center-y),
-        rgba(255, 129, 183, 0.18) 0%,
-        rgba(207, 173, 255, 0.19) 24%,
-        rgba(132, 195, 255, 0.18) 50%,
+        rgba(255, 129, 183, 0.22) 0%,
+        rgba(207, 173, 255, 0.23) 24%,
+        rgba(132, 195, 255, 0.22) 50%,
         transparent 80%
       );
   }
