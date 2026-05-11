@@ -52,6 +52,7 @@ export default function Newsletter() {
 
   return (
     <section ref={sectionRef} id="newsletter" className="relative py-24 sm:py-32">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
       <div className="max-w-xl mx-auto px-4 sm:px-6 text-center">
         <div data-fade-up className="opacity-0">
           <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">

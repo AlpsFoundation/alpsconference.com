@@ -1,6 +1,7 @@
 export default function Tickets() {
   return (
-    <section id="tickets" className="py-20 sm:py-28">
+    <section id="tickets" className="relative py-20 sm:py-28">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-12 bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent [-webkit-text-fill-color:transparent]">
           Tickets
