@@ -76,7 +76,7 @@ p {
   height: 100svh;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(12, 48, 90, 0.06), rgba(10, 40, 80, 0.22)),
+    linear-gradient(180deg, transparent 0%, rgba(8, 24, 50, 0.38) 100%),
     url("/img/background.jpg") center center / cover no-repeat;
 }
 

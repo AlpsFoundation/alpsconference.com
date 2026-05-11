@@ -4,6 +4,7 @@ import { Calendar, FileText, CheckCircle, Printer, ImageIcon } from "lucide-reac
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
+import { withBase } from "../lib/withBase";
 
 const TIMELINE = [
   {
@@ -126,6 +127,14 @@ export default function PosterPage() {
       <main>
         {/* ── Hero ── */}
         <section ref={heroRef} className="relative pt-40 pb-24 sm:pt-48 sm:pb-32 overflow-hidden">
+          <div className="absolute inset-0">
+            <img
+              src={withBase("img/background.jpg")}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neutral-dark/20 to-neutral-dark" />
+          </div>
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
             <p data-fade-up className="opacity-0 text-base tracking-[0.2em] uppercase text-support-light font-medium mb-4">
               ALPS Conference 2026
