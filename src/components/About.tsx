@@ -30,7 +30,7 @@ export default function About() {
 
   return (
     <section ref={sectionRef} id="about" className="relative py-24 sm:py-32 bg-white/[0.02]">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.22),transparent_45%)] blur-3xl" />
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div data-fade-up className="opacity-0 text-center mb-14">
           <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
