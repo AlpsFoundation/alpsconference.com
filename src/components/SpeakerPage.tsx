@@ -298,7 +298,6 @@ export default function SpeakerPage() {
               <h2 className="text-3xl font-semibold text-white mb-4">Submit Your Speaker Application</h2>
               <p className="text-white/60 text-base max-w-xl mx-auto">
                 Applications are open until <strong className="text-white/80">30 June 2026</strong>.
-                The application takes approximately 10–15 minutes to complete.
               </p>
             </div>
 
