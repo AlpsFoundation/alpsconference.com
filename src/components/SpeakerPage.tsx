@@ -259,7 +259,7 @@ export default function SpeakerPage() {
               <Section icon={Award} title="How Speakers Are Selected">
                 <div className="space-y-4 text-white/75 text-base leading-relaxed">
                   <p>
-                    All applications are reviewed by the ALPS Scientific Committee, composed of researchers
+                    All applications are reviewed by the ALPS Conference Program Committee, composed of researchers
                     and clinicians active in the field of psychedelic science.
                   </p>
                   <p>Applications are evaluated based on:</p>
