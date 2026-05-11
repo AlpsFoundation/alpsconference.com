@@ -170,7 +170,7 @@ export default function SpeakerPage() {
 
         {/* ── About the Conference ── */}
         <section ref={aboutRef} className="relative py-24 sm:py-32 bg-white/[0.02]">
-          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div data-fade-up className="opacity-0 mb-10">
               <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">About</p>
@@ -204,7 +204,7 @@ export default function SpeakerPage() {
 
         {/* ── Timeline ── */}
         <section ref={timelineRef} className="relative py-24 sm:py-32">
-          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div data-fade-up className="opacity-0 mb-14">
               <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">Key dates</p>
@@ -220,7 +220,7 @@ export default function SpeakerPage() {
 
         {/* ── Guidelines ── */}
         <section ref={guidelinesRef} className="relative py-24 sm:py-32 bg-white/[0.02]">
-          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div data-fade-up className="opacity-0 mb-14">
               <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">Requirements</p>
@@ -260,7 +260,7 @@ export default function SpeakerPage() {
 
         {/* ── Decision Procedure ── */}
         <section ref={decisionRef} className="relative py-24 sm:py-32">
-          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div data-fade-up className="opacity-0 mb-14">
               <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">Selection</p>
@@ -302,7 +302,7 @@ export default function SpeakerPage() {
 
         {/* ── Form CTA ── */}
         <section ref={formRef} className="relative py-24 sm:py-32 bg-white/[0.02]">
-          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div data-fade-up className="opacity-0 text-center mb-12">
               <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
