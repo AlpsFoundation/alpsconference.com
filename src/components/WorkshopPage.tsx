@@ -84,7 +84,7 @@ const WORKSHOP_TRACKS: WorkshopTrack[] = [
     language: "Italian",
     flag: "🇮🇹",
     presenters: "Dr Claudia Ariemma and Simona Porta",
-    title: "Psychedelic-Assisted Therapy for Eating Disorders in Ticino",
+    title: "Beyond the Symptom: PAT and the Treatment of Eating Disorders in Ticino",
     abstract: [
       "We will present the structure, case history, and working methods of the only Ticino Center for the treatment of eating disorders. We will explore the reasons behind the decision to apply PAT to patients with eating disorders, present clinical cases for discussion, and show the results obtained since December 2024.",
       "Throughout the session, experiential exercises will invite participants to reflect on and embody the themes emerging from the group work. We will outline future projects, particularly the launch of a Certificate of Advanced Studies in Psychedelic-Assisted Therapy at SUPSI, the first Italian-language CAS on this clinical practice, and a SUPSI research project based on the clinical cases treated.",
