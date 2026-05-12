@@ -5,6 +5,7 @@ import {
   CalendarDays,
   Clock,
   HeartHandshake,
+  Hourglass,
   Rows3,
   Utensils,
 } from "lucide-react";
@@ -83,6 +84,30 @@ const WORKSHOP_TRACKS: WorkshopTrack[] = [
     ],
   },
   {
+    language: "German",
+    flag: "🇩🇪",
+    presenters: "Helena Aicher und Stephanie Buschner",
+    places: 18,
+    title: "Therapeutische Haltung und Atem-Selbsterfahrung - Erfahrungsorientierter Workshop zu relevanten Aspekten der PAT",
+    abstract: [
+      "Dieser Pre-Conference Workshop lädt dazu ein, ausgewählte Aspekte der Psychedelika-assistierten Therapie in einem erfahrungsorientierten Rahmen kennenzulernen. Kurze theoretische Inputs werden mit praktischen Übungen, gemeinsamer Reflexion und Austausch verbunden.",
+      "Teil des Workshops ist eine angeleitete Breathwork-Sequenz im Rundatemstil, die einen geschützten Raum für persönliche Selbsterfahrung schafft. Darüber hinaus widmen wir uns zentralen Aspekten therapeutischer Haltung und Beziehungsgestaltung - darunter Präsenz, ein bewusster Umgang mit Nähe und Distanz sowie eine offene und wertschätzende Haltung.",
+      "Der Workshop richtet sich an Therapeut:innen und Fachpersonen aus psychosozialen Arbeits- und Studienfeldern, die Interesse an Psychedelika-assistierter Therapie und erfahrungsorientierten Zugängen haben. Vorkenntnisse sind nicht erforderlich.",
+    ],
+    speakers: [
+      {
+        name: "Helena Aicher",
+        image: "helena-aicher.jpg",
+        bio: "Helena Aicher, PhD, ist Wissenschaftlerin an den Universitäten Zürich und Basel sowie Psychotherapeutin mit einem Schwerpunkt in PAT. Sie ist in der Weiterbildung im Bereich der psychedelischen Forschung und Therapie tätig sowie beratend für verschiedene Institutionen und Organisationen auf diesem Gebiet.",
+      },
+      {
+        name: "Stephanie Buschner",
+        image: "stephanie-buschner.jpg",
+        bio: "Stephanie Buschner, MSc., ist Oberpsychologin an der Psychiatrischen Universitätsklinik Zürich im Zentrum für Abhängigkeitserkrankungen und arbeitet zudem als Psychotherapeutin mit Schwerpunkt auf PAT in eigener Praxis. Darüber hinaus konzipiert und begleitet sie Weiterbildungsformate im Bereich PAT und setzt sich vertieft mit Fragen therapeutischer Haltung im Spannungsfeld von PAT und Psychotherapie auseinander.",
+      },
+    ],
+  },
+  {
     language: "Italian",
     flag: "🇮🇹",
     presenters: "Dr Claudia Ariemma and Simona Porta",
@@ -135,30 +160,6 @@ const WORKSHOP_TRACKS: WorkshopTrack[] = [
       {
         name: "Hervé Duffour",
         bio: "With 40 years' experience in personal development and medical technology, Hervé Duffour combines technical training at EPFL with business studies at HEC Lausanne. Since 2018, he has focused on personal support, therapeutic volunteering, and coaching in medical practices, adopting a holistic approach inspired by systems theory.",
-      },
-    ],
-  },
-  {
-    language: "German",
-    flag: "🇩🇪",
-    presenters: "Helena Aicher und Stephanie Buschner",
-    places: 18,
-    title: "Therapeutische Haltung und Atem-Selbsterfahrung - Erfahrungsorientierter Workshop zu relevanten Aspekten der PAT",
-    abstract: [
-      "Dieser Pre-Conference Workshop lädt dazu ein, ausgewählte Aspekte der Psychedelika-assistierten Therapie in einem erfahrungsorientierten Rahmen kennenzulernen. Kurze theoretische Inputs werden mit praktischen Übungen, gemeinsamer Reflexion und Austausch verbunden.",
-      "Teil des Workshops ist eine angeleitete Breathwork-Sequenz im Rundatemstil, die einen geschützten Raum für persönliche Selbsterfahrung schafft. Darüber hinaus widmen wir uns zentralen Aspekten therapeutischer Haltung und Beziehungsgestaltung - darunter Präsenz, ein bewusster Umgang mit Nähe und Distanz sowie eine offene und wertschätzende Haltung.",
-      "Der Workshop richtet sich an Therapeut:innen und Fachpersonen aus psychosozialen Arbeits- und Studienfeldern, die Interesse an Psychedelika-assistierter Therapie und erfahrungsorientierten Zugängen haben. Vorkenntnisse sind nicht erforderlich.",
-    ],
-    speakers: [
-      {
-        name: "Helena Aicher",
-        image: "helena-aicher.jpg",
-        bio: "Helena Aicher, PhD, ist Wissenschaftlerin an den Universitäten Zürich und Basel sowie Psychotherapeutin mit einem Schwerpunkt in PAT. Sie ist in der Weiterbildung im Bereich der psychedelischen Forschung und Therapie tätig sowie beratend für verschiedene Institutionen und Organisationen auf diesem Gebiet.",
-      },
-      {
-        name: "Stephanie Buschner",
-        image: "stephanie-buschner.jpg",
-        bio: "Stephanie Buschner, MSc., ist Oberpsychologin an der Psychiatrischen Universitätsklinik Zürich im Zentrum für Abhängigkeitserkrankungen und arbeitet zudem als Psychotherapeutin mit Schwerpunkt auf PAT in eigener Praxis. Darüber hinaus konzipiert und begleitet sie Weiterbildungsformate im Bereich PAT und setzt sich vertieft mit Fragen therapeutischer Haltung im Spannungsfeld von PAT und Psychotherapie auseinander.",
       },
     ],
   },
@@ -372,6 +373,12 @@ export default function WorkshopPage() {
                     The workshops are open to everyone — clinicians, researchers, students, and anyone
                     with an interest in psychedelic-assisted therapy.
                   </p>
+                  <div className="mt-4 flex items-center gap-3 rounded-sm border border-white/10 bg-white/5 px-4 py-3">
+                    <Hourglass className="h-5 w-5 shrink-0 text-support-light" />
+                    <p className="text-sm text-white/70">
+                      We are currently applying for continuing education credits for medical professionals and psychologists.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
