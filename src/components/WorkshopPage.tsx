@@ -351,8 +351,7 @@ export default function WorkshopPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <SectionIntro eyebrow="Program concept & logistics" title="One Afternoon, Four Parallel Tracks">
               <p>
-                The workshop series is open to clinicians, researchers, students, and anyone interested in
-                PAT — reflecting Switzerland's multilingual clinical landscape. No prior experience required.
+                Four parallel clinical training tracks reflecting Switzerland's multilingual landscape. No prior experience required.
               </p>
             </SectionIntro>
 
@@ -370,6 +369,8 @@ export default function WorkshopPage() {
                   <p className="text-white/70 text-base leading-relaxed">
                     Each track combines focused theoretical input with experiential structures, giving
                     participants a clinically grounded setting for reflection, practice, and exchange.
+                    The workshops are open to everyone — clinicians, researchers, students, and anyone
+                    with an interest in psychedelic-assisted therapy.
                   </p>
                 </div>
               </div>
