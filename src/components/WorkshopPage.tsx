@@ -24,6 +24,7 @@ type WorkshopTrack = {
   flag: string;
   presenters: string;
   title: string;
+  places: number;
   abstract: string[];
   bullets?: string[];
   sharedImage?: {
@@ -62,6 +63,7 @@ const WORKSHOP_TRACKS: WorkshopTrack[] = [
     language: "English",
     flag: "🇬🇧",
     presenters: "Lea Stocker and Robert Fischer",
+    places: 18,
     title: "Let's talk about sex (in PAT) - how to integrate a vulnerable subject in a vulnerable setting",
     abstract: [
       "Sexuality is widely still a taboo subject in therapy, and probably in PAT even more so, given the vulnerable setting. We will introduce a basic literacy to therapeutic approaches of sexual topics in general and in connection with PAT.",
@@ -84,6 +86,7 @@ const WORKSHOP_TRACKS: WorkshopTrack[] = [
     language: "Italian",
     flag: "🇮🇹",
     presenters: "Dr Claudia Ariemma and Simona Porta",
+    places: 12,
     title: "Beyond the Symptom: PAT and the Treatment of Eating Disorders in Ticino",
     abstract: [
       "We will present the structure, case history, and working methods of the only Ticino Center for the treatment of eating disorders. We will explore the reasons behind the decision to apply PAT to patients with eating disorders, present clinical cases for discussion, and show the results obtained since December 2024.",
@@ -106,6 +109,7 @@ const WORKSHOP_TRACKS: WorkshopTrack[] = [
     language: "French",
     flag: "🇫🇷",
     presenters: "Catherine Duffour and Hervé Duffour",
+    places: 12,
     title: "Therapeutic relationship and dynamics of the therapeutic couple in Psychedelic-Assisted Psychotherapy (PAP)",
     abstract: [
       "This workshop offers a clinical, experiential, and systemic exploration of modified states of consciousness within the context of psychedelic-assisted psychotherapy and non-pharmacological approaches such as meditation, hypnosis, and music.",
@@ -138,6 +142,7 @@ const WORKSHOP_TRACKS: WorkshopTrack[] = [
     language: "German",
     flag: "🇩🇪",
     presenters: "Helena Aicher und Stephanie Buschner",
+    places: 18,
     title: "Therapeutische Haltung und Atem-Selbsterfahrung - Erfahrungsorientierter Workshop zu relevanten Aspekten der PAT",
     abstract: [
       "Dieser Pre-Conference Workshop lädt dazu ein, ausgewählte Aspekte der Psychedelika-assistierten Therapie in einem erfahrungsorientierten Rahmen kennenzulernen. Kurze theoretische Inputs werden mit praktischen Übungen, gemeinsamer Reflexion und Austausch verbunden.",
@@ -247,6 +252,7 @@ function TrackCard({ track }: { track: WorkshopTrack }) {
               </span>
               {track.language}
             </span>
+            <span className="text-sm text-white/45">{track.places} places</span>
           </div>
           <h3 className="text-2xl font-semibold text-white leading-tight">{track.title}</h3>
         </div>
@@ -311,8 +317,8 @@ export default function WorkshopPage() {
       <Navbar />
 
       <main>
-        <section ref={heroRef} className="relative pt-40 pb-24 sm:pt-48 sm:pb-32 overflow-hidden">
-          <ParticlesCanvas variant="footer" />
+        <section ref={heroRef} className="workshop-hero relative pt-40 pb-24 sm:pt-48 sm:pb-32 overflow-hidden">
+          <ParticlesCanvas variant="workshopHero" />
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
             <p data-fade-up className="opacity-0 text-base tracking-[0.2em] uppercase text-support-light font-medium mb-4">
               Pre-Conference Workshop Day
@@ -341,12 +347,12 @@ export default function WorkshopPage() {
           </div>
         </section>
 
-        <section ref={conceptRef} className="relative py-24 sm:py-32 bg-white/[0.02]">
+        <section ref={conceptRef} className="relative pt-24 pb-12 sm:pt-32 sm:pb-16 bg-white/[0.02]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <SectionIntro eyebrow="Program concept & logistics" title="One Afternoon, Four Parallel Tracks">
               <p>
-                The workshop series is designed for clinicians and psychosocial professionals interested in
-                PAT training that reflects Switzerland's multilingual clinical landscape.
+                The workshop series is open to clinicians, researchers, students, and anyone interested in
+                PAT — reflecting Switzerland's multilingual clinical landscape. No prior experience required.
               </p>
             </SectionIntro>
 
@@ -376,6 +382,20 @@ export default function WorkshopPage() {
             <SectionIntro eyebrow="Tickets" title="Buy Workshop Tickets">
               <p>Seats are limited across the four parallel tracks. Prices are listed in Swiss francs.</p>
             </SectionIntro>
+            <div data-fade-up className="opacity-0 grid gap-3 sm:grid-cols-2 mb-4">
+              {WORKSHOP_TRACKS.map((track) => (
+                <div key={track.language} className="flex items-center justify-between rounded-sm border border-white/[0.07] bg-white/[0.03] px-4 py-3">
+                  <span className="flex items-center gap-2 text-white/80 text-sm font-medium">
+                    <span aria-hidden="true">{track.flag}</span>
+                    {track.language}
+                  </span>
+                  <span className="text-sm text-white/45">{track.places} places</span>
+                </div>
+              ))}
+            </div>
+            <p data-fade-up className="opacity-0 text-sm text-white/55 mb-10">
+              When purchasing, please indicate your preferred workshop track in the order notes so we can plan accordingly.
+            </p>
             <div
               dangerouslySetInnerHTML={{
                 __html: '<script id="etickets" src="https://infomaniak.events/scripts/shop/NWT3HX6EG2"></script>',
