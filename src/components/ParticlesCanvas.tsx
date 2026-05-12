@@ -19,12 +19,14 @@ const PINK_COLORS = [
 ];
 
 const BASE_COLORS = [
-  "rgba(46, 124, 199, 0.6)",
-  "rgba(196, 204, 212, 0.3)",
-  "rgba(255, 255, 255, 0.15)",
+  "rgba(46, 124, 199, 0.64)",
+  "rgba(196, 204, 212, 0.36)",
+  "rgba(255, 255, 255, 0.18)",
 ];
 
-export default function ParticlesCanvas({ variant }: { variant: "hero" | "footer" }) {
+type ParticleVariant = "hero" | "footer" | "workshopHero";
+
+export default function ParticlesCanvas({ variant }: { variant: ParticleVariant }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -50,27 +52,37 @@ export default function ParticlesCanvas({ variant }: { variant: "hero" | "footer
     };
 
     const createParticles = () => {
-      const count = variant === "hero" ? 80 : 30;
+      const count = variant === "hero" ? 80 : variant === "workshopHero" ? 68 : 30;
+      const centerCount = variant === "hero" ? 40 : variant === "workshopHero" ? 28 : 0;
       particles = Array.from({ length: count }, (_, i) => {
-        const isPinkCenter = variant === "hero" && i < 40; // 40 pink particles in center
-        const isLarge = i % 5 === 0; // some large particles
+        const isPinkCenter = i < centerCount;
+        const isWorkshopAmbient = variant === "workshopHero" && !isPinkCenter;
+        const isLarge = i % (variant === "workshopHero" ? 6 : 5) === 0;
 
         let x = Math.random() * canvas.width;
         let y = Math.random() * canvas.height;
 
         if (isPinkCenter) {
-          // Cluster in the center
-          x = canvas.width / 2 + (Math.random() - 0.5) * 400;
-          y = canvas.height / 2 + (Math.random() - 0.5) * 400;
+          const clusterWidth = variant === "workshopHero" ? Math.min(canvas.width * 0.56, 520) : 400;
+          const clusterHeight = variant === "workshopHero" ? Math.min(canvas.height * 0.7, 360) : 400;
+          x = canvas.width / 2 + (Math.random() - 0.5) * clusterWidth;
+          y = canvas.height * (variant === "workshopHero" ? 0.46 : 0.5) + (Math.random() - 0.5) * clusterHeight;
+        } else if (isWorkshopAmbient) {
+          x = canvas.width * (0.08 + Math.random() * 0.84);
+          y = canvas.height * (0.08 + Math.random() * 0.76);
         }
 
         return {
           x,
           y,
-          vx: (Math.random() - 0.5) * (isPinkCenter ? 0.1 : 0.3),
-          vy: (Math.random() - 0.5) * (isPinkCenter ? 0.1 : 0.3) - 0.05,
-          radius: isLarge ? Math.random() * 4 + 3 : Math.random() * 2 + 0.5,
-          opacity: isPinkCenter ? Math.random() * 0.6 + 0.4 : Math.random() * 0.4 + 0.1,
+          vx: (Math.random() - 0.5) * (isPinkCenter ? 0.1 : variant === "workshopHero" ? 0.22 : 0.3),
+          vy: (Math.random() - 0.5) * (isPinkCenter ? 0.1 : variant === "workshopHero" ? 0.22 : 0.3) - 0.05,
+          radius: isLarge ? Math.random() * 4 + 3 : Math.random() * 2.1 + 0.65,
+          opacity: isPinkCenter
+            ? Math.random() * 0.55 + 0.36
+            : variant === "workshopHero"
+              ? Math.random() * 0.42 + 0.18
+              : Math.random() * 0.4 + 0.1,
           color: isPinkCenter
             ? PINK_COLORS[Math.floor(Math.random() * PINK_COLORS.length)]
             : BASE_COLORS[Math.floor(Math.random() * BASE_COLORS.length)],

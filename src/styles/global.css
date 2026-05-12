@@ -43,7 +43,7 @@ body {
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #123e67;
+  background: #0B3C5D;
   color: rgba(248, 250, 255, 0.96);
 }
 
@@ -76,7 +76,8 @@ p {
   height: 100svh;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(8, 32, 55, 0.14), rgba(8, 28, 48, 0.42)),
+    radial-gradient(circle at 51% 42%, rgba(46, 124, 199, 0.24), transparent 33rem),
+    linear-gradient(180deg, rgba(11, 60, 93, 0.08), rgba(8, 47, 74, 0.38)),
     url("/img/background.jpg") center center / cover no-repeat;
 }
 
@@ -103,13 +104,17 @@ p {
 }
 
 .page-shell::after {
-  z-index: 0;
-  opacity: 0.8;
+  z-index: 35;
+  opacity: 0.48;
+  mix-blend-mode: overlay;
+  filter: saturate(1.35) contrast(1.08);
   background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.48' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='1.55'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23grain)' opacity='0.78'/%3E%3C/svg%3E"),
     radial-gradient(circle at 11% 28%, rgba(255, 255, 255, 0.05) 0 0.12rem, transparent 0.3rem),
     radial-gradient(circle at 81% 18%, rgba(255, 255, 255, 0.04) 0 0.11rem, transparent 0.24rem),
     radial-gradient(circle at 21% 82%, rgba(255, 255, 255, 0.05) 0 0.12rem, transparent 0.28rem),
     radial-gradient(circle at 88% 64%, rgba(255, 255, 255, 0.04) 0 0.11rem, transparent 0.24rem);
+  background-size: 260px 260px, auto, auto, auto, auto;
 }
 
 .poster-main {

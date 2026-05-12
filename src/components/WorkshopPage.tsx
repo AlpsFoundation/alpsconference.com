@@ -382,7 +382,15 @@ export default function WorkshopPage() {
             <SectionIntro eyebrow="Tickets" title="Buy Workshop Tickets">
               <p>Seats are limited across the four parallel tracks. Prices are listed in Swiss francs.</p>
             </SectionIntro>
-            <div data-fade-up className="opacity-0 grid gap-3 sm:grid-cols-2 mb-4">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: '<script id="etickets" src="https://infomaniak.events/scripts/shop/NWT3HX6EG2"></script>',
+              }}
+            />
+            <p data-fade-up className="opacity-0 text-sm text-white/55 mt-8 mb-3">
+              When purchasing, please indicate your preferred workshop track in the order notes so we can plan accordingly.
+            </p>
+            <div data-fade-up className="opacity-0 grid gap-3 grid-cols-2 lg:grid-cols-4">
               {WORKSHOP_TRACKS.map((track) => (
                 <div key={track.language} className="flex items-center justify-between rounded-sm border border-white/[0.07] bg-white/[0.03] px-4 py-3">
                   <span className="flex items-center gap-2 text-white/80 text-sm font-medium">
@@ -393,14 +401,6 @@ export default function WorkshopPage() {
                 </div>
               ))}
             </div>
-            <p data-fade-up className="opacity-0 text-sm text-white/55 mb-10">
-              When purchasing, please indicate your preferred workshop track in the order notes so we can plan accordingly.
-            </p>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: '<script id="etickets" src="https://infomaniak.events/scripts/shop/NWT3HX6EG2"></script>',
-              }}
-            />
           </div>
         </section>
 
