@@ -161,7 +161,7 @@ function SpeakerPhoto({ src, alt, initials: init }: { src: string; alt: string; 
     <img
       src={src}
       alt={alt}
-      className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
+      className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500"
       onError={() => setErrored(true)}
     />
   );
