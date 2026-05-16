@@ -7,9 +7,9 @@ type Speaker = {
   title: string;
   institution: string;
   role: string;
-  talkTitle: string;
-  abstract: string;
-  bio: string;
+  talkTitle?: string;
+  abstract?: string;
+  bio?: string;
   image?: string;
   tbd?: false;
 };
@@ -21,9 +21,35 @@ type TbdSpeaker = {
 type SpeakerEntry = Speaker | TbdSpeaker;
 
 const SPEAKERS: SpeakerEntry[] = [
-  { tbd: true },
-  { tbd: true },
-  { tbd: true },
+  {
+    name: "Dr. Max Wolff",
+    title: "Dr.",
+    institution: "Humboldt-Universität zu Berlin",
+    role: "Clinician-Scientist",
+    image: "max-wolff.jpg",
+    talkTitle: "The Role of Experiential Avoidance and Acceptance in Psilocybin Therapy for Depression",
+    abstract:
+      "Quantitative and qualitative findings from clinical studies suggest that the effectiveness of psychedelic therapies is linked to the reduction of dysfunctional avoidance tendencies and the promotion of acceptance toward unpleasant emotions such as fear, grief, and anger. But how can these effects be explained? From a psychotherapeutic perspective, it seems plausible that psychedelic experiences can under favorable circumstances initiate learning processes that reduce avoidance and promote acceptance. Conversely, it is also conceivable that under unfavorable conditions the opposite occurs and avoidance tendencies are reinforced. The EPIsoDE trial (a phase 2b trial testing psilocybin therapy in 144 depression patients), is the first clinical study that quantified avoidance- and acceptance-related experiences during psychedelic dosing sessions and examined their relationship to treatment outcomes. This talk presents the findings, situates them within a theoretical framework, and discusses implications for research and clinical practice.",
+    bio: "Max Wolff is a psychologist, psychotherapist and clinician-scientist at Humboldt-Universität zu Berlin, Germany. His research bridges psychedelic and psychotherapy research and explores psychological change processes associated with altered states of consciousness. He has contributed as a researcher and therapist to several clinical trials in the field and is committed to advancing professional training programs such as the MIND Foundation's Augmented Psychotherapy Training (APT), which he directed until 2025, and the OPEN Foundation's Advanced Education in Psychedelic Therapy (ADEPT) whose self-experience curriculum he supports.",
+  },
+  {
+    name: "Dr. Lydia Belinger",
+    title: "Dr. phil.",
+    institution: "University of Zurich, Switzerland",
+    role: "Postdoc",
+    image: "lydia-belinger.jpg",
+    talkTitle: "Serotonin System Stimulation and Social Cognition: Differential Effects of Psilocybin, MDMA, and Methylphenidate",
+    abstract:
+      "Changes in social cognition are discussed as a potential mechanism of action underlying the therapeutic effects of psychedelics and MDMA, which is particularly relevant given the central role of impaired social functioning in various psychiatric disorders. Both psilocybin and MDMA have shown to acutely influence social perception and behavior, with the serotonin (5-hydroxytryptamine, 5-HT) system playing an important role in these effects. However, little is known about whether such changes persist beyond the acute phase or how they differ across pharmacological compounds. This talk will present findings from a comparative study investigating the sustained effects of psilocybin and MDMA in comparison with the non-serotonergic active control compound methylphenidate across multiple domains of social cognition, highlighting differential, time-dependent effects across substances and social cognitive processes.",
+    bio: "Lydia Belinger studied psychology with a focus on neuropsychology and neuroscience at the University of Zurich, Switzerland. During her PhD and subsequent postdoctoral research, she investigates the sustained effects of psychedelics and MDMA on prosocial behavior. She is affiliated with the research groups Addictive Disorders (PD Dr. M. Herdener) and Pharmaco-Neuroimaging and Cognitive-Emotional Processing (PD Dr. K. Preller) at the Department of Adult Psychiatry and Psychotherapy, University Hospital of Psychiatry Zurich and the University of Zurich.",
+  },
+  {
+    name: "Prof. Dr. Eric Vermetten",
+    title: "MD, PhD",
+    institution: "Leiden University Medical Center",
+    role: "Professor of Psychiatry",
+    image: "eric-vermetten.jpg",
+  },
   { tbd: true },
   { tbd: true },
   { tbd: true },
@@ -91,18 +117,24 @@ function AbstractModal({
         </div>
 
         <div className="space-y-5">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-support-light/70 mb-2">Talk</p>
-            <p className="text-base font-medium text-white/90 leading-snug">{speaker.talkTitle}</p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-support-light/70 mb-2">Abstract</p>
-            <p className="text-sm text-white/70 leading-relaxed">{speaker.abstract}</p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-support-light/70 mb-2">Biography</p>
-            <p className="text-sm text-white/70 leading-relaxed">{speaker.bio}</p>
-          </div>
+          {speaker.talkTitle && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-support-light/70 mb-2">Talk</p>
+              <p className="text-base font-medium text-white/90 leading-snug">{speaker.talkTitle}</p>
+            </div>
+          )}
+          {speaker.abstract && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-support-light/70 mb-2">Abstract</p>
+              <p className="text-sm text-white/70 leading-relaxed">{speaker.abstract}</p>
+            </div>
+          )}
+          {speaker.bio && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-support-light/70 mb-2">Biography</p>
+              <p className="text-sm text-white/70 leading-relaxed">{speaker.bio}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -164,15 +196,19 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
           <p className="text-sm text-white/50 mb-4">{speaker.institution}</p>
 
           <div className="mt-auto pt-4 border-t border-white/[0.06]">
-            <p className="text-base text-white/80 line-clamp-3 leading-relaxed mb-3">
-              {speaker.talkTitle}
-            </p>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="text-xs font-medium text-support-light hover:text-white transition-colors uppercase tracking-[0.14em] cursor-pointer"
-            >
-              Read abstract →
-            </button>
+            {speaker.talkTitle && (
+              <p className="text-base text-white/80 line-clamp-3 leading-relaxed mb-3">
+                {speaker.talkTitle}
+              </p>
+            )}
+            {(speaker.abstract || speaker.bio) && (
+              <button
+                onClick={() => setModalOpen(true)}
+                className="text-xs font-medium text-support-light hover:text-white transition-colors uppercase tracking-[0.14em] cursor-pointer"
+              >
+                Read abstract →
+              </button>
+            )}
           </div>
         </div>
       </div>
