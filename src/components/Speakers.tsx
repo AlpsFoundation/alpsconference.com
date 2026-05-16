@@ -24,7 +24,7 @@ const SPEAKERS: SpeakerEntry[] = [
   {
     name: "Dr. Max Wolff",
     title: "Dr.",
-    institution: "Humboldt-Universität zu Berlin",
+    institution: "Humboldt University of Berlin, Germany",
     role: "Clinician-Scientist",
     image: "max-wolff.jpg",
     talkTitle: "The Role of Experiential Avoidance and Acceptance in Psilocybin Therapy for Depression",
@@ -204,14 +204,12 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
               <p className="text-sm text-white/30 italic mb-3">To be announced</p>
             )}
             {(speaker.abstract || speaker.bio) && (
-              <div className="flex justify-center">
-                <button
-                  onClick={() => setModalOpen(true)}
-                  className="text-xs font-medium text-support-light hover:text-white transition-colors uppercase tracking-[0.14em] cursor-pointer"
-                >
-                  Read abstract →
-                </button>
-              </div>
+              <button
+                onClick={() => setModalOpen(true)}
+                className="text-xs font-medium text-support-light hover:text-white transition-colors uppercase tracking-[0.14em] cursor-pointer"
+              >
+                Read abstract →
+              </button>
             )}
           </div>
         </div>
