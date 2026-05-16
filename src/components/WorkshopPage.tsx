@@ -333,7 +333,9 @@ export default function WorkshopPage() {
             </p>
             <div data-fade-up className="opacity-0 flex flex-wrap justify-center gap-3">
               <a
-                href="#tickets"
+                href="https://infomaniak.events/fr-ch/shop/alps-conference-2026-RQNBE4WPQY/event/1629286/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
               >
                 Buy Workshop Ticket
@@ -390,11 +392,16 @@ export default function WorkshopPage() {
             <SectionIntro eyebrow="Tickets" title="Buy Workshop Tickets">
               <p>Seats are limited across the four parallel tracks. Prices are listed in Swiss francs.</p>
             </SectionIntro>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: '<script id="etickets" src="https://infomaniak.events/scripts/shop/NWT3HX6EG2"></script>',
-              }}
-            />
+            <div className="flex justify-center mt-10">
+              <a
+                href="https://infomaniak.events/fr-ch/shop/alps-conference-2026-RQNBE4WPQY/event/1629286/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-md bg-white/10 hover:bg-white/20 border border-white/20 px-8 py-4 text-base font-semibold text-white transition-colors"
+              >
+                Buy Workshop Tickets
+              </a>
+            </div>
             <p data-fade-up className="opacity-0 text-sm text-white/55 mt-8 mb-3">
               When purchasing, please indicate your preferred workshop track in the order notes so we can plan accordingly.
             </p>

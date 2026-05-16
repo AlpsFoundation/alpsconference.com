@@ -81,6 +81,30 @@ export default function About() {
             Explore Workshop Day
           </a>
         </div>
+
+        <div
+          data-fade-up
+          className="opacity-0 mt-6 rounded-sm border border-white/10 bg-white/[0.03] p-6 sm:p-8 text-left"
+        >
+          <div className="mb-4">
+            <span className="text-sm uppercase tracking-[0.18em] text-white/50">
+              Friday–Saturday, October 9–10, 2026
+            </span>
+          </div>
+          <h3 className="text-2xl font-semibold text-white mb-3">Conference Tickets</h3>
+          <p className="text-white/72 text-base sm:text-lg leading-relaxed mb-6">
+            Secure your place at ALPS 2026. Tickets include entry to both conference days, catering,
+            networking apéro, and Saturday After Party.
+          </p>
+          <a
+            href="https://infomaniak.events/en-ch/conferences/alps-conference-2026/c2484795-1ae7-4b4b-aa21-c9b8f085008c/events/382409"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-sm transition-colors duration-200"
+          >
+            Buy Conference Tickets
+          </a>
+        </div>
       </div>
     </section>
   );
