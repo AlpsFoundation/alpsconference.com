@@ -333,7 +333,9 @@ export default function WorkshopPage() {
             </p>
             <div data-fade-up className="opacity-0 flex flex-wrap justify-center gap-3">
               <a
-                href="#tickets"
+                href="https://infomaniak.events/fr-ch/shop/alps-conference-2026-RQNBE4WPQY/event/1629286/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
               >
                 Buy Workshop Ticket
