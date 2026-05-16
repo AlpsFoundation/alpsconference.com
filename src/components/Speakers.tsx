@@ -49,6 +49,19 @@ const SPEAKERS: SpeakerEntry[] = [
   { tbd: true },
 ];
 
+function ModalPhoto({ src, alt }: { src: string; alt: string }) {
+  const [errored, setErrored] = useState(false);
+  if (errored) return null;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="w-16 h-16 rounded-full object-cover shrink-0 border border-white/10"
+      onError={() => setErrored(true)}
+    />
+  );
+}
+
 function AbstractModal({
   speaker,
   onClose,
@@ -86,11 +99,7 @@ function AbstractModal({
 
         <div className="flex items-start gap-4 mb-6">
           {speaker.image && (
-            <img
-              src={withBase(`img/speakers/${speaker.image}`)}
-              alt={speaker.name}
-              className="w-16 h-16 rounded-full object-cover shrink-0 border border-white/10"
-            />
+            <ModalPhoto src={withBase(`img/speakers/${speaker.image}`)} alt={speaker.name} />
           )}
           <div>
             <p className="text-sm text-support-light font-medium tracking-wide uppercase mb-1">
@@ -119,6 +128,42 @@ function AbstractModal({
   );
 }
 
+function initials(name: string) {
+  const parts = name.replace(/^Dr\.?\s*(phil\.?)?\s*/i, "").trim().split(" ");
+  return parts.map((p) => p[0]).join("").slice(0, 2).toUpperCase();
+}
+
+function Initials({ name }: { name: string }) {
+  return (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="w-16 h-16 rounded-full bg-support/20 border border-support/30 flex items-center justify-center">
+        <span className="text-xl text-support-light font-bold">{initials(name)}</span>
+      </div>
+    </div>
+  );
+}
+
+function SpeakerPhoto({ src, alt, initials: init }: { src: string; alt: string; initials: string }) {
+  const [errored, setErrored] = useState(false);
+  if (errored) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full bg-support/20 border border-support/30 flex items-center justify-center">
+          <span className="text-xl text-support-light font-bold">{init}</span>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
+      onError={() => setErrored(true)}
+    />
+  );
+}
+
 function SpeakerCard({ speaker }: { speaker: Speaker }) {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -129,21 +174,11 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
         className="opacity-0 group relative flex flex-col bg-white/[0.03] border border-white/[0.07] rounded-sm overflow-hidden hover:border-support/30 hover:bg-white/[0.05] transition-all duration-300"
       >
         {/* Photo */}
-        <div className="aspect-[4/3] overflow-hidden bg-white/[0.03]">
+        <div className="aspect-[4/3] overflow-hidden bg-white/[0.03] relative">
           {speaker.image ? (
-            <img
-              src={withBase(`img/speakers/${speaker.image}`)}
-              alt={speaker.name}
-              className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
-            />
+            <SpeakerPhoto src={withBase(`img/speakers/${speaker.image}`)} alt={speaker.name} initials={initials(speaker.name)} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-support/20 border border-support/30 flex items-center justify-center">
-                <span className="text-2xl text-support-light font-bold">
-                  {speaker.name.charAt(speaker.name.lastIndexOf(" ") + 1)}
-                </span>
-              </div>
-            </div>
+            <Initials name={speaker.name} />
           )}
         </div>
 
@@ -156,8 +191,8 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
           <p className="text-sm text-white/50 mb-4">{speaker.institution}</p>
 
           <div className="mt-auto pt-4 border-t border-white/[0.06]">
-            <p className="text-sm text-white/70 line-clamp-3 leading-relaxed mb-3 italic">
-              "{speaker.talkTitle}"
+            <p className="text-base text-white/80 line-clamp-3 leading-relaxed mb-3">
+              {speaker.talkTitle}
             </p>
             <button
               onClick={() => setModalOpen(true)}
