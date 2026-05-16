@@ -195,11 +195,13 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
           <h3 className="text-lg font-semibold text-white mb-0.5">{speaker.name}</h3>
           <p className="text-sm text-white/50 mb-4">{speaker.institution}</p>
 
-          <div className="mt-auto pt-4 border-t border-white/[0.06]">
-            {speaker.talkTitle && (
+          <div className="mt-auto pt-4 border-t border-white/[0.06] flex flex-col items-center text-center">
+            {speaker.talkTitle ? (
               <p className="text-base text-white/80 line-clamp-3 leading-relaxed mb-3">
                 {speaker.talkTitle}
               </p>
+            ) : (
+              <p className="text-sm text-white/30 italic mb-3">To be announced</p>
             )}
             {(speaker.abstract || speaker.bio) && (
               <button
