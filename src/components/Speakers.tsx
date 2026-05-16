@@ -294,7 +294,7 @@ export default function Speakers() {
 
         <div data-fade-up className="opacity-0 mt-12 text-center">
           <p className="text-white/40 text-sm">
-            More speakers will be announced as confirmations are received.{" "}
+            More speakers will be announced soon. Want to be part of this year conference?{" "}
             <a
               href={withBase("/speaker")}
               className="text-support-light hover:text-white transition-colors underline underline-offset-2"
