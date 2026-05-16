@@ -195,7 +195,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
           <h3 className="text-lg font-semibold text-white mb-0.5">{speaker.name}</h3>
           <p className="text-sm text-white/50 mb-4">{speaker.institution}</p>
 
-          <div className="mt-auto pt-4 border-t border-white/[0.06] flex flex-col items-center text-center">
+          <div className="mt-auto pt-4 border-t border-white/[0.06]">
             {speaker.talkTitle ? (
               <p className="text-base text-white/80 line-clamp-3 leading-relaxed mb-3">
                 {speaker.talkTitle}
@@ -204,12 +204,14 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
               <p className="text-sm text-white/30 italic mb-3">To be announced</p>
             )}
             {(speaker.abstract || speaker.bio) && (
-              <button
-                onClick={() => setModalOpen(true)}
-                className="text-xs font-medium text-support-light hover:text-white transition-colors uppercase tracking-[0.14em] cursor-pointer"
-              >
-                Read abstract →
-              </button>
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="text-xs font-medium text-support-light hover:text-white transition-colors uppercase tracking-[0.14em] cursor-pointer"
+                >
+                  Read abstract →
+                </button>
+              </div>
             )}
           </div>
         </div>
