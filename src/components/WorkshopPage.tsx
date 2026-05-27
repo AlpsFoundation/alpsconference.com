@@ -18,6 +18,7 @@ type Speaker = {
   name: string;
   bio: string;
   image?: string;
+  photoCredit?: string;
 };
 
 type WorkshopTrack = {
@@ -74,6 +75,7 @@ const WORKSHOP_TRACKS: WorkshopTrack[] = [
       {
         name: "Lea Stocker",
         image: "lea-stocker.jpg",
+        photoCredit: "© Mayk Wendt",
         bio: "Lea works as an integral doctor in her own practice. She specialized in general internal medicine and in psychiatry and psychotherapy. Her therapeutic background comprises Gestalt, catathymic imaginative, behavioural, and mindfulness-based methods alongside training in relational sexual therapy with IBP.",
       },
       {
@@ -226,11 +228,16 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
     <article className="rounded-sm border border-white/[0.06] bg-white/[0.02] p-5">
       <div className="flex flex-col sm:flex-row gap-5">
         {speaker.image && (
-          <img
-            src={withBase(`img/speakers/${speaker.image}`)}
-            alt={speaker.name}
-            className="aspect-[2/3] w-1/2 shrink-0 rounded-sm border border-white/10 object-cover sm:w-40"
-          />
+          <figure className="w-1/2 shrink-0 sm:w-40">
+            <img
+              src={withBase(`img/speakers/${speaker.image}`)}
+              alt={speaker.name}
+              className="aspect-[2/3] w-full rounded-sm border border-white/10 object-cover"
+            />
+            {speaker.photoCredit && (
+              <figcaption className="mt-1 text-xs text-white/50">{speaker.photoCredit}</figcaption>
+            )}
+          </figure>
         )}
         <div>
           <h4 className="text-lg font-semibold text-white mb-2">{speaker.name}</h4>
