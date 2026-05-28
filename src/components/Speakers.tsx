@@ -50,6 +50,17 @@ const SPEAKERS: SpeakerEntry[] = [
     role: "Professor of Psychiatry",
     image: "eric-vermetten.jpg",
   },
+  {
+    name: "Tommaso Barba",
+    title: "",
+    institution: "Imperial College London",
+    role: "PhD Candidate",
+    image: "tommaso-barba.jpg",
+    talkTitle: "EEG correlates of self-dissolution induced by intranasal 5-MeO-DMT",
+    abstract:
+      "Background\n\n5-MeO-DMT (5MeO) is a short-acting psychedelic compound reported to induce profound alterations in consciousness by disrupting the experience of self, time and space, at times leading to experiences akin to 'pure awareness'. However, there are no controlled human neuroimaging studies characterizing its effects on brain dynamics, and relationship to consciousness.\n\nHypotheses\n\nWe hypothesized that 5-MeO-DMT would induce marked reductions in the power of alpha/beta brain oscillations, and increases in delta power and neural entropy. Importantly we hypothesised reductions in alpha power and increases in neural entropy to correlate with self-dissolution. We also explored the effects of 5MeO on post-acute psychological outcomes.\n\nMethods\n\nThirty-six healthy volunteers completed a controlled within-subject study, receiving placebo and 12mg intranasal 5MeO on separate visits. High-density (hd) EEG and real-time ratings of self-dissolution were collected. We assessed changes in oscillatory power (also controlling for 1/f confounds), and neural entropy (determined with Lempel-Ziv complexity) relative to baseline for each session. Cluster-based permutation tests were used for 5MeO v placebo contrasts, and time-resolved correlations linked neural measures to subjective ratings. Source localisation mapped the spatial distribution of effects. Linear mixed models assessed pre-post psychological changes following 5-MeO-DMT.\n\nFindings\n\nAt peak effects (8–14 minutes post-administration), 5MeO increased delta/gamma power (both p<0.0001) and reduced theta, alpha, and beta power (all p<0.001) when compared to placebo. Neural entropy was also significantly increased (p<0.0001). Time-resolved correlations showed significant correlations between scores of (narrative and bodily) self-dissolution and void experiences and higher delta/gamma, and lower theta/alpha/beta power (all p<0.001). Follow-up measures indicated significantly reduced anxiety and increased connectedness.\n\nConclusions\n\nThis study provides the first controlled neural evidence of 5-MeO-DMT in humans, linking real-time experiences of self-dissolution with neural signatures and supporting models of psychedelics as transient disruptors of self-related neural processes. These findings pave the way for further research into the use of 5MeO to enhance the understanding of the sense of self and consciousness.",
+    bio: "Tommaso Barba is a PhD researcher at the Centre for Psychedelic Research, Imperial College London, where his work focuses on the neuroscience and therapeutic potential of psychedelic compounds. His research investigates the effects of substances such as DMT and 5-MeO-DMT on brain function, consciousness, mental health, and interpersonal processes, with a particular interest in mechanisms underlying well-being and transformative experiences. He has contributed to research published in leading scientific journals including Nature Medicine and The Lancet. Alongside his academic work, he is involved in science communication and public engagement around mental health, neuroscience, and emerging psychiatric treatments.",
+  },
   { tbd: true },
   { tbd: true },
   { tbd: true },
@@ -126,7 +137,7 @@ function AbstractModal({
           {speaker.abstract && (
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-support-light/70 mb-2">Abstract</p>
-              <p className="text-sm text-white/70 leading-relaxed">{speaker.abstract}</p>
+              <p className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap">{speaker.abstract}</p>
             </div>
           )}
           {speaker.bio && (
