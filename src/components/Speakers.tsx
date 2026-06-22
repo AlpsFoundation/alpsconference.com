@@ -26,7 +26,7 @@ const SPEAKERS: SpeakerEntry[] = [
     title: "Dr.",
     institution: "Humboldt-Universität zu Berlin",
     role: "Clinician-Scientist",
-    image: "max-wolff.jpg",
+    image: "Max-Wolff - Max Wolff.png",
     talkTitle: "The Role of Experiential Avoidance and Acceptance in Psilocybin Therapy for Depression",
     abstract:
       "Quantitative and qualitative findings from clinical studies suggest that the effectiveness of psychedelic therapies is linked to the reduction of dysfunctional avoidance tendencies and the promotion of acceptance toward unpleasant emotions such as fear, grief, and anger. But how can these effects be explained? From a psychotherapeutic perspective, it seems plausible that psychedelic experiences can under favorable circumstances initiate learning processes that reduce avoidance and promote acceptance. Conversely, it is also conceivable that under unfavorable conditions the opposite occurs and avoidance tendencies are reinforced. The EPIsoDE trial (a phase 2b trial testing psilocybin therapy in 144 depression patients), is the first clinical study that quantified avoidance- and acceptance-related experiences during psychedelic dosing sessions and examined their relationship to treatment outcomes. This talk presents the findings, situates them within a theoretical framework, and discusses implications for research and clinical practice.",
@@ -37,7 +37,7 @@ const SPEAKERS: SpeakerEntry[] = [
     title: "Dr. phil.",
     institution: "University of Zurich, Switzerland",
     role: "Postdoc",
-    image: "lydia-belinger.jpg",
+    image: "Picture_LydiaBelinger - Lydia Belinger.jpeg",
     talkTitle: "Serotonin System Stimulation and Social Cognition: Differential Effects of Psilocybin, MDMA, and Methylphenidate",
     abstract:
       "Changes in social cognition are discussed as a potential mechanism of action underlying the therapeutic effects of psychedelics and MDMA, which is particularly relevant given the central role of impaired social functioning in various psychiatric disorders. Both psilocybin and MDMA have shown to acutely influence social perception and behavior, with the serotonin (5-hydroxytryptamine, 5-HT) system playing an important role in these effects. However, little is known about whether such changes persist beyond the acute phase or how they differ across pharmacological compounds. This talk will present findings from a comparative study investigating the sustained effects of psilocybin and MDMA in comparison with the non-serotonergic active control compound methylphenidate across multiple domains of social cognition, highlighting differential, time-dependent effects across substances and social cognitive processes.",
