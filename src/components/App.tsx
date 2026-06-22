@@ -21,8 +21,8 @@ export default function App() {
         {/* <Conference /> */}
         {/* <Experiences /> */}
         <About />
-        <Gallery />
         <Speakers />
+        <Gallery />
         <Location />
         <FAQ />
         <Newsletter />

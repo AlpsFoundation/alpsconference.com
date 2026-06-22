@@ -3,15 +3,24 @@ import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
 
 const images = [
-  { src: "1.JPG", ext: "JPG" },
-  { src: "2.jpg", ext: "jpg" },
-  { src: "3.jpg", ext: "jpg" },
-  { src: "4.jpg", ext: "jpg" },
-  { src: "5.jpg", ext: "jpg" },
-  { src: "6.jpg", ext: "jpg" },
-  { src: "7.jpg", ext: "jpg" },
-  { src: "8.jpg", ext: "jpg" },
-  { src: "9.png", ext: "png" },
+  { src: "1.JPG" },
+  { src: "2.jpg" },
+  { src: "3.jpg" },
+  { src: "4.jpg" },
+  { src: "5.jpg" },
+  { src: "6.jpg" },
+  { src: "7.jpg" },
+  { src: "8.jpg" },
+  { src: "9.png" },
+  { src: "10.jpg" },
+  { src: "11.JPG" },
+  { src: "12.JPG" },
+  { src: "13.JPG" },
+  { src: "14.JPG" },
+  { src: "15.jpg" },
+  { src: "16.jpg" },
+  { src: "17.jpg" },
+  { src: "18.jpg" },
 ];
 
 export default function Gallery() {
@@ -91,11 +100,8 @@ export default function Gallery() {
     <section ref={sectionRef} id="gallery" className="relative py-24 sm:py-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div data-fade-up className="opacity-0 text-center mb-14">
-          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
-            Gallery
-          </p>
           <h2 className="text-3xl font-semibold text-white">
-            Highlights from Past Editions
+            Highlights from Previous Conferences
           </h2>
         </div>
 
