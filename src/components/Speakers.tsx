@@ -46,7 +46,7 @@ const SPEAKERS: SpeakerEntry[] = [
   {
     name: "Tommaso Barba",
     title: "",
-    institution: "Imperial College London",
+    institution: "Imperial College London, UK",
     role: "PhD Candidate",
     image: "Tommaso-Barba.jpg",
     talkTitle: "EEG correlates of self-dissolution induced by intranasal 5-MeO-DMT",
@@ -57,14 +57,14 @@ const SPEAKERS: SpeakerEntry[] = [
   {
     name: "Prof. Dr. Eric Vermetten",
     title: "MD, PhD",
-    institution: "Leiden University Medical Center",
+    institution: "Leiden University Medical Center, Netherlands",
     role: "Professor of Psychiatry",
     image: "eric-vermetten.jpg",
   },
   {
     name: "Dr. Matthias Forstmann",
     title: "Dr.",
-    institution: "University of Zurich",
+    institution: "University of Zurich, Switzerland",
     role: "Senior Associate",
     image: "Matthias_Forster.JPG",
     talkTitle: "The Mushroom Experience Project: Contextual Predictors and Species-Level Variation in the Subjective Effects of Psilocybin Mushrooms",
@@ -75,7 +75,7 @@ const SPEAKERS: SpeakerEntry[] = [
   {
     name: "Eirini Ketzitzidou Argyri",
     title: "",
-    institution: "",
+    institution: "University of Exeter, UK",
     role: "Speaker",
     image: "Eirini_Argyri.jpg",
   },
