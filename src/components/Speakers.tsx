@@ -79,6 +79,7 @@ const SPEAKERS: SpeakerEntry[] = [
     role: "Research Associate",
     image: "Eirini_Argyri.jpg",
     talkTitle: "Ontological Disruptions and Diversification: Learning from psychedelics",
+    abstract: "To be announced",
     bio: "Eirini is a researcher and educator working at the intersection of psychedelic studies, transformative learning, and integration support. Her work examines how experiences that challenge ordinary assumptions about self, reality, and meaning can lead to transformation and how associated distress can be better understood, supported, and mitigated when it emerges.\n\nAlongside her research, Eirini delivers training and offers consultancy on the phenomenology of challenging experiences and integration support, and volunteers with PsyCare UK. She is committed to raising awareness of the complexity of psychedelic experiences and the plurality of their possible outcomes.",
   },
   { tbd: true },
