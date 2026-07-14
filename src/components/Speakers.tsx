@@ -69,8 +69,12 @@ const SPEAKERS: SpeakerEntry[] = [
     name: "Prof. Dr. Eric Vermetten",
     title: "MD, PhD",
     institution: "Leiden University Medical Center, Netherlands",
-    role: "Professor of Psychiatry",
+    role: "Professor, Founder Trauma Innovations Network",
     image: "eric-vermetten.jpg",
+    talkTitle: "What Psychedelics Teach Us About Trauma",
+    abstract:
+      "Trauma psychiatry has traditionally conceptualized recovery as the reduction of symptoms through evidence-based psychotherapy and pharmacological treatment. Yet many patients describe recovery as a profound transformation in how they relate to themselves, their memories, and others. This presentation explores what psychedelics and entactogens may teach us about trauma, healing, and recovery. Beginning with Jan Bastiaans' pioneering work with LSD in survivors of the Second World War, the lecture traces the evolution toward contemporary research on MDMA-assisted psychotherapy and emerging psilocybin studies for PTSD. Across these developments lies a common question: can altered states of consciousness facilitate therapeutic change that conventional approaches only partially achieve? Rather than functioning solely as pharmacological agents, these compounds may facilitate transformative therapeutic processes that foster trust, meaning-making, reconnection, and what may be understood as a reorganization of consciousness. The lessons emerging from these treatments invite us to reconsider recovery not merely as symptom reduction, but as the restoration of trust and the emergence of new ways of relating to oneself, others, and the world.",
+    bio: "Prof. Eric Vermetten, MD, PhD is Professor of Psychiatry at Leiden University Medical Center and Adjunct Professor of Psychiatry at New York University. A clinical psychiatrist, retired Colonel of the Dutch Armed Forces, and founder of the Trauma Innovations Network, he has over 30 years of experience in trauma, PTSD, resilience, and military mental health. He was Principal Investigator of the first open-label MDMA-assisted psychotherapy trial in Europe and currently leads the first open-label psilocybin trial for PTSD in the Netherlands. His work explores the ecology of trauma and how movement, language, hypnosis, and psychedelics facilitate the reorganization of consciousness.",
   },
   {
     name: "Eirini Ketzitzidou Argyri",
