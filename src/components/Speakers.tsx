@@ -87,7 +87,7 @@ const SPEAKERS: SpeakerEntry[] = [
     bio: "Eirini is a researcher and educator working at the intersection of psychedelic studies, transformative learning, and integration support. Her work examines how experiences that challenge ordinary assumptions about self, reality, and meaning can lead to transformation and how associated distress can be better understood, supported, and mitigated when it emerges.\n\nAlongside her research, Eirini delivers training and offers consultancy on the phenomenology of challenging experiences and integration support, and volunteers with PsyCare UK. She is committed to raising awareness of the complexity of psychedelic experiences and the plurality of their possible outcomes.",
   },
   {
-    name: "Sandeep Nayak",
+    name: "Dr. Sandeep Nayak",
     title: "",
     institution: "Johns Hopkins Hospital, USA",
     role: "Assistant Professor",
@@ -96,7 +96,7 @@ const SPEAKERS: SpeakerEntry[] = [
     bio: "TBD",
   },
   {
-    name: "Amandine Luquiens",
+    name: "Prof. Amandine Luquiens",
     title: "Prof.",
     institution: "University of Montpellier & Nîmes University Hospital, France",
     role: "Professor, Addiction Department",
@@ -104,7 +104,16 @@ const SPEAKERS: SpeakerEntry[] = [
     abstract: "TBD",
     bio: "TBD",
   },
-  { tbd: true },
+  {
+    name: "Dr. Jason K. Day",
+    title: "PhD",
+    institution: "University of Fribourg, Switzerland",
+    role: "Postdoctoral Researcher",
+    talkTitle: "What-the-Fuckness: A Phenomenological Concept for Psychedelic Experience",
+    abstract:
+      "It is widely held that psychedelic experiences are not only incredibly difficult to describe and conceptualise but that they are, by their very nature or essence, largely ineffable. In this talk, I will introduce a new phenomenological concept that entails no metaphysical assertion concerning the nature of whatever is experienced as indescribable: 'what-the-fuckness.' Based on a phenomenological qualitative analysis of 1895 trip reports, I will first outline that the psychedelic experience can be extensively described as characterised by four characteristic features (expansion, contraction, animation, and merging) and that these together form a distinctive style of experience. I will then focus on the fifth characteristic feature of psychedelic experience: 'what-the-fuckness.' This refers to the lived experience of being at a loss of words, concepts, certainties, and capacities to describe and conceptualise one's experience. I will, however, detail that there are several distinct and describable reasons for which what-the-fuckness is experienced.",
+    bio: "Jason K. Day specializes in the phenomenology of psychedelic experiences, phenomenological scholarship, and philosophy of attention. They received their PhD in Philosophy (summa cum laude) from the University of Fribourg in 2025 for their phenomenological study of psychedelic experiences. They currently conduct postdoctoral research at the Molecular Psychiatry Lab (University of Fribourg) on the therapeutic potential of psychedelic effects on autobiographical memory. They have also published on socio-political issues concerning recreational use of psychedelics, anarchist thought, Buddhist philosophy, and ego-dissolution during 5-MeO-DMT experiences. They are a committee member of the Psychedelic Research Organisation of Fribourg and Swiss Psychedelic Student Network.",
+  },
   { tbd: true },
   { tbd: true },
   { tbd: true },
