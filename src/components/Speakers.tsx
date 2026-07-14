@@ -109,6 +109,7 @@ const SPEAKERS: SpeakerEntry[] = [
     title: "PhD",
     institution: "University of Fribourg, Switzerland",
     role: "Postdoctoral Researcher",
+    image: "Jason-Day.jpg",
     talkTitle: "What-the-Fuckness: A Phenomenological Concept for Psychedelic Experience",
     abstract:
       "It is widely held that psychedelic experiences are not only incredibly difficult to describe and conceptualise but that they are, by their very nature or essence, largely ineffable. In this talk, I will introduce a new phenomenological concept that entails no metaphysical assertion concerning the nature of whatever is experienced as indescribable: 'what-the-fuckness.' Based on a phenomenological qualitative analysis of 1895 trip reports, I will first outline that the psychedelic experience can be extensively described as characterised by four characteristic features (expansion, contraction, animation, and merging) and that these together form a distinctive style of experience. I will then focus on the fifth characteristic feature of psychedelic experience: 'what-the-fuckness.' This refers to the lived experience of being at a loss of words, concepts, certainties, and capacities to describe and conceptualise one's experience. I will, however, detail that there are several distinct and describable reasons for which what-the-fuckness is experienced.",
