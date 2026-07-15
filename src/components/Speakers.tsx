@@ -88,12 +88,14 @@ const SPEAKERS: SpeakerEntry[] = [
   },
   {
     name: "Dr. Sandeep Nayak",
-    title: "",
-    institution: "Johns Hopkins Hospital, USA",
-    role: "Assistant Professor",
+    title: "MD",
+    institution: "Johns Hopkins Center for Psychedelic and Consciousness Research, USA",
+    role: "Assistant Professor, Medical Director",
     image: "Sandeep_Nayak.jpg",
-    abstract: "TBD",
-    bio: "TBD",
+    talkTitle: "From Data to Dosing Room: Optimizing Psilocybin Therapy for Clinical Practice",
+    abstract:
+      "As classic psychedelics move toward regulatory approval, a number of practical gaps remain in translating rigorous research protocols into the flexibilities required by clinical practice. This talk synthesizes several strands of Hopkins-based data spanning hundreds of dosing sessions to outline ways of optimizing clinical practice and ongoing research directions.\n\nSubjective effects are arguably the most important determinant of therapeutic  effects, yet these vary highly between patients, and many are effectively underdosed under current protocols. We present data demonstrating how in-session data can inform data-driven re-dosing decisions in real time.\n\nSecond, converging evidence suggests that serotonin reuptake inhibitors (SRIs) attenuate psychedelic effects, which has led most trials to require tapering prior to dosing. Hopkins has since stopped requiring SRI tapering in most of its studies. We discuss the evidence for this blunting effect, whether it can be overcome with higher doses, and what this means for patients who cannot or will not discontinue their antidepressant.\n\nThird, pooled cardiovascular data across hundreds of sessions show that psilocybin's hemodynamic effects are more modest than current eligibility criteria assume, supporting a case for liberalized blood pressure thresholds.\n\nFourth, industry trials typically use psychotherapists as session monitors but putatively do not deliver psychotherapy. Whether psychotherapy actually matters remains inadequately studied — urgent given that post-approval, many if not most doses will be administered by non-psychotherapists. We present evidence that therapist-level variability accounts for substantial variance in subjective drug effects, and outline a research agenda addressing this and related open questions.\n\nFinally, we discuss pharmacological manipulations and routes of administration, including MDMA co-administration with psilocybin, 5-HT1A modulation, and methods to test how experience duration affects therapeutic outcomes.",
+    bio: "Sandeep M. Nayak, MD, is an Assistant Professor of Psychiatry at Johns Hopkins University School of Medicine and Medical Director of the Center for Psychedelic & Consciousness Research. His research focuses on the clinical applications and methodological challenges of psychedelic medicine, particularly for addictions and mood disorders. He currently serves as Principal Investigator on trials investigating psilocybin for opioid use disorder, PTSD, and microdosing safety, and has personally conducted dozens of high-dose psilocybin sessions and overseen hundreds more. He earned his MD from Brown University, completed psychiatry residency at Johns Hopkins Hospital, and finished a postdoctoral fellowship with Roland Griffiths. He also practices psychiatry at Johns Hopkins Bayview Medical Center.",
   },
   {
     name: "Prof. Amandine Luquiens",
