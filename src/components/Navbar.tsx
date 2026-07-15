@@ -23,7 +23,6 @@ const CONFERENCE_LINKS: NavLink[] = [
 
 const PARTICIPATE_LINKS: NavLink[] = [
   { label: "Workshop Day", href: "/workshops", description: "Pre-conference PAT training", badge: "New" },
-  { label: "Call for Speakers", href: "/speaker", description: "Apply to present a talk" },
   { label: "Research Poster", href: "/poster", description: "Submit a poster proposal" },
 ];
 
