@@ -24,7 +24,7 @@ const FAQS = [
       },
       {
         q: "The ticket price is a financial burden for me, is there a solution?",
-        a: "Yes. The ALPS Foundation is committed to keeping the conference accessible regardless of financial circumstances, and we review requests for a reduced ticket price on a case-by-case basis. If the ticket price presents a genuine financial barrier for you, please submit a request through the following form, and our team will get back to you: https://forms.gle/kAJ8Gmm6E3F8vaKg8"
+        a: "Yes. We review requests for a reduced ticket price on a case-by-case basis. Please submit a request through this form and our team will get back to you: https://forms.gle/kAJ8Gmm6E3F8vaKg8"
       }
     ]
   },
