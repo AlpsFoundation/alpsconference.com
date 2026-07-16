@@ -24,7 +24,7 @@ const FAQS = [
       },
       {
         q: "The ticket price is too high for me, is there a solution?",
-        a: "Yes. We review requests for a reduced ticket price on a case-by-case basis. Please submit a request through this form and our team will get back to you: https://forms.gle/kAJ8Gmm6E3F8vaKg8"
+        a: "Yes. We review requests for a reduced ticket price on a case-by-case basis. Please [submit a request here](https://forms.gle/kAJ8Gmm6E3F8vaKg8) and our team will get back to you."
       }
     ]
   },
@@ -96,6 +96,36 @@ const FAQS = [
   }
 ];
 
+const LINK_PATTERN = /\[([^\]]+)\]\(([^)]+)\)/g;
+
+function renderAnswer(text: string) {
+  const parts: (string | JSX.Element)[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = LINK_PATTERN.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    parts.push(
+      <a
+        key={match.index}
+        href={match[2]}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-support-light underline hover:text-white transition-colors"
+      >
+        {match[1]}
+      </a>
+    );
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  return parts;
+}
+
 function AccordionItem({ q, a }: { q: string; a: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -125,7 +155,7 @@ function AccordionItem({ q, a }: { q: string; a: string }) {
       >
         <div className="pb-6">
           <p className="text-white/80 leading-relaxed whitespace-pre-wrap text-base">
-            {a}
+            {renderAnswer(a)}
           </p>
         </div>
       </div>
