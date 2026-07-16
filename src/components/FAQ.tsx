@@ -23,8 +23,8 @@ const FAQS = [
         a: "Tickets are only available for the full length of the conference, two days."
       },
       {
-        q: "The ticket price is too high for me, is there a solution?",
-        a: "Yes. We want the conference to be accessible regardless of financial situation, so we offer price reductions on a case-by-case basis to those who need it. If the ticket price is a barrier for you, please fill out this form and we will get back to you: https://forms.gle/kAJ8Gmm6E3F8vaKg8"
+        q: "The ticket price is a financial burden for me, is there a solution?",
+        a: "Yes. The ALPS Foundation is committed to keeping the conference accessible regardless of financial circumstances, and we review requests for a reduced ticket price on a case-by-case basis. If the ticket price presents a genuine financial barrier for you, please submit a request through the following form, and our team will get back to you: https://forms.gle/kAJ8Gmm6E3F8vaKg8"
       }
     ]
   },
