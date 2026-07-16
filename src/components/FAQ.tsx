@@ -21,6 +21,10 @@ const FAQS = [
       {
         q: "I only want to attend one day of the conference, is that possible?",
         a: "Tickets are only available for the full length of the conference, two days."
+      },
+      {
+        q: "The ticket price is too high for me, is there a solution?",
+        a: "Yes. We want the conference to be accessible regardless of financial situation, so we offer price reductions on a case-by-case basis to those who need it. If the ticket price is a barrier for you, please fill out this form and we will get back to you: https://forms.gle/kAJ8Gmm6E3F8vaKg8"
       }
     ]
   },
