@@ -23,7 +23,7 @@ const FAQS = [
         a: "Tickets are only available for the full length of the conference, two days."
       },
       {
-        q: "The ticket price is a financial burden for me, is there a solution?",
+        q: "The ticket price is too high for me, is there a solution?",
         a: "Yes. We review requests for a reduced ticket price on a case-by-case basis. Please submit a request through this form and our team will get back to you: https://forms.gle/kAJ8Gmm6E3F8vaKg8"
       }
     ]
