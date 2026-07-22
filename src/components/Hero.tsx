@@ -116,7 +116,7 @@ export default function Hero() {
 
         <div className="flex-[1_1_0] min-h-0 shrink-0" aria-hidden="true" />
 
-        <div className="flex-[1_1_0] flex flex-col items-center justify-end gap-4 sm:gap-5 min-h-0 pb-28">
+        <div className="flex-[1_1_0] flex flex-col items-center justify-end gap-4 sm:gap-5 min-h-0 pb-4 sm:pb-28">
           <div
             data-animate
             className="opacity-0 flex w-full max-w-full flex-nowrap items-center justify-center gap-2 min-[380px]:gap-3 sm:gap-6"
