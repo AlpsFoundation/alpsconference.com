@@ -96,7 +96,7 @@ export default function Hero() {
             <img
               src={withBase("img/bones.png")}
               alt=""
-              className="w-full h-auto object-contain opacity-100 mix-blend-screen drop-shadow-[0_0_3rem_rgba(5,8,22,0.45)]"
+              className="w-full h-auto object-contain opacity-60 mix-blend-screen drop-shadow-[0_0_3rem_rgba(5,8,22,0.45)]"
             />
           </div>
         </div>
