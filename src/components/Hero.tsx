@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Calendar, Ticket, Mail, MapPin, Clock } from "lucide-react";
+import { Calendar, Ticket, Mail, Hand, MapPin, Clock } from "lucide-react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
@@ -140,7 +140,7 @@ export default function Hero() {
             Kultur & Kongresshaus Aarau
           </p>
 
-          <div className="flex flex-row flex-nowrap items-stretch justify-center gap-1 min-[400px]:gap-2 sm:gap-4 w-full max-w-full">
+          <div className="flex flex-row flex-wrap items-stretch justify-center gap-1 min-[400px]:gap-2 sm:gap-4 w-full max-w-full">
             <button
               data-animate-scale
               onClick={handleCalendar}
@@ -168,6 +168,17 @@ export default function Hero() {
             >
               <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
               <span className="whitespace-nowrap">Stay in Touch</span>
+            </a>
+
+            <a
+              data-animate-scale
+              href="https://docs.google.com/forms/d/e/1FAIpQLSep-cvkRKcHJIqjMqrvu7jlfzLpuMqphSyu43JRDO3WOFsaIQ/viewform?usp=header"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-0 flex flex-1 sm:flex-initial min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
+            >
+              <Hand className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="whitespace-nowrap">Volunteer</span>
             </a>
           </div>
         </div>
