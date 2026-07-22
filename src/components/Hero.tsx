@@ -140,11 +140,11 @@ export default function Hero() {
             Kultur & Kongresshaus Aarau
           </p>
 
-          <div className="flex flex-row flex-wrap items-stretch justify-center gap-1 min-[400px]:gap-2 sm:gap-4 w-full max-w-full">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch justify-center gap-2 sm:gap-4 w-full max-w-xs sm:max-w-full mx-auto">
             <button
               data-animate-scale
               onClick={handleCalendar}
-              className="opacity-0 group flex flex-1 sm:flex-initial min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-support hover:bg-support-light text-white text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/25 cursor-pointer leading-tight"
+              className="opacity-0 group flex w-full sm:w-auto sm:flex-initial min-w-0 items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-7 py-3 sm:py-4 bg-support hover:bg-support-light text-white text-sm sm:text-base font-medium rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/25 cursor-pointer leading-tight"
             >
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
               <span className="whitespace-nowrap">Save the Date</span>
@@ -155,7 +155,7 @@ export default function Hero() {
               href="https://infomaniak.events/en-ch/conferences/alps-conference-2026/c2484795-1ae7-4b4b-aa21-c9b8f085008c/events/382409"
               target="_blank"
               rel="noopener noreferrer"
-              className="opacity-0 flex flex-1 sm:flex-initial min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
+              className="opacity-0 flex w-full sm:w-auto sm:flex-initial min-w-0 items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-7 py-3 sm:py-4 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
             >
               <Ticket className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
               <span className="whitespace-nowrap">Buy Tickets</span>
@@ -164,7 +164,7 @@ export default function Hero() {
             <a
               data-animate-scale
               href="#newsletter"
-              className="opacity-0 flex flex-1 sm:flex-initial min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-white/10 hover:bg-white/15 text-white text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
+              className="opacity-0 flex w-full sm:w-auto sm:flex-initial min-w-0 items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-7 py-3 sm:py-4 bg-white/10 hover:bg-white/15 text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
             >
               <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
               <span className="whitespace-nowrap">Stay in Touch</span>
@@ -175,7 +175,7 @@ export default function Hero() {
               href="https://docs.google.com/forms/d/e/1FAIpQLSep-cvkRKcHJIqjMqrvu7jlfzLpuMqphSyu43JRDO3WOFsaIQ/viewform?usp=header"
               target="_blank"
               rel="noopener noreferrer"
-              className="opacity-0 flex flex-1 sm:flex-initial min-w-0 items-center justify-center gap-1 sm:gap-2.5 px-2 min-[400px]:px-3 sm:px-7 py-2.5 sm:py-4 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-[11px] min-[400px]:text-xs sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
+              className="opacity-0 flex w-full sm:w-auto sm:flex-initial min-w-0 items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-7 py-3 sm:py-4 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
             >
               <Hand className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
               <span className="whitespace-nowrap">Volunteer</span>
