@@ -85,12 +85,26 @@ export default function Hero() {
         <ParticlesCanvas variant="hero" />
       </div>
 
-      {/* Content: heading (auto height) / illustration (flexible middle row) / CTA block (auto height) —
-          grid rows instead of equal flex thirds so the heading and CTA block always get exactly the
-          space their content needs, and the bones illustration is confined to whatever's left, so it
-          can never visually overlap the text above or below it. */}
-      <div className="relative z-10 grid grid-rows-[auto_1fr_auto] flex-1 min-h-0 max-w-4xl w-full mx-auto px-4 sm:px-6 text-center pt-24">
-        <div className="flex flex-col items-center justify-start">
+      {/* Bones illustration */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div
+          ref={bonesRef}
+          className="w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl px-2 opacity-0 will-change-transform"
+          style={{ transformOrigin: "center center" }}
+        >
+          <div className="origin-center scale-[2] sm:scale-100">
+            <img
+              src={withBase("img/bones.png")}
+              alt=""
+              className="w-full h-auto object-contain opacity-100 mix-blend-screen drop-shadow-[0_0_3rem_rgba(5,8,22,0.45)]"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Content: upper / middle / lower thirds to keep center clear for illustration */}
+      <div className="relative z-10 flex flex-1 flex-col min-h-0 max-w-4xl w-full mx-auto px-4 sm:px-6 text-center pt-24">
+        <div className="flex-[1_1_0] flex flex-col items-center justify-start min-h-0">
           <h1
             data-animate
             className="opacity-0 text-4xl sm:max-md:text-7xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-4 sm:mb-6 max-w-5xl mx-auto bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent] [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
@@ -100,23 +114,9 @@ export default function Hero() {
           </h1>
         </div>
 
-        {/* Bones illustration — clipped to this row's box, so it is physically bounded by the
-            space between the heading and the CTA block and cannot bleed into either. */}
-        <div className="relative min-h-0 overflow-hidden pointer-events-none">
-          <div
-            ref={bonesRef}
-            className="absolute inset-0 flex items-center justify-center opacity-0 will-change-transform"
-            style={{ transformOrigin: "center center" }}
-          >
-            <img
-              src={withBase("img/bones.png")}
-              alt=""
-              className="max-w-full max-h-full w-auto h-auto object-contain mix-blend-screen drop-shadow-[0_0_3rem_rgba(5,8,22,0.45)]"
-            />
-          </div>
-        </div>
+        <div className="flex-[1_1_0] min-h-0 shrink-0" aria-hidden="true" />
 
-        <div className="flex flex-col items-center justify-end gap-4 sm:gap-5 pb-28">
+        <div className="flex-[1_1_0] flex flex-col items-center justify-end gap-4 sm:gap-5 min-h-0 pb-4 sm:pb-28">
           <div
             data-animate
             className="opacity-0 flex w-full max-w-full flex-nowrap items-center justify-center gap-2 min-[380px]:gap-3 sm:gap-6"
