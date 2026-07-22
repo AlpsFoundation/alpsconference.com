@@ -41,6 +41,20 @@ export default function About() {
           </h2>
         </div>
 
+        <div
+          data-fade-up
+          className="opacity-0 mb-14 rounded-sm border border-white/10 overflow-hidden aspect-video"
+        >
+          <iframe
+            className="w-full h-full"
+            src="https://www.youtube-nocookie.com/embed/_3iQxlvqZog"
+            title="ALPS Conference 2026 — you're invited"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+
         <div className="space-y-6 text-lg text-white/80 leading-relaxed text-center">
           <p data-fade-up className="opacity-0">
             The ALPS Foundation is delighted to invite you to the sixth edition of the ALPS Awareness Lectures on Psychedelic Science, taking place on <strong>Friday and Saturday, October 9–10, 2026</strong>, in the scenic city of <strong>Aarau, Switzerland</strong>.
