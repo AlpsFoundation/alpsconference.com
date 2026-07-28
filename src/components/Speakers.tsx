@@ -389,7 +389,7 @@ export default function Speakers() {
         </div>
 
         <div data-fade-up className="opacity-0 mt-12 text-center">
-          <p className="text-white/40 text-sm">More speakers will be announced soon.</p>
+          <p className="text-white/40 text-sm">Panel title and panel speakers will be uploaded soon.</p>
         </div>
       </div>
     </section>
