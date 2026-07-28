@@ -117,9 +117,39 @@ const SPEAKERS: SpeakerEntry[] = [
       "It is widely held that psychedelic experiences are not only incredibly difficult to describe and conceptualise but that they are, by their very nature or essence, largely ineffable. In this talk, I will introduce a new phenomenological concept that entails no metaphysical assertion concerning the nature of whatever is experienced as indescribable: 'what-the-fuckness.' Based on a phenomenological qualitative analysis of 1895 trip reports, I will first outline that the psychedelic experience can be extensively described as characterised by four characteristic features (expansion, contraction, animation, and merging) and that these together form a distinctive style of experience. I will then focus on the fifth characteristic feature of psychedelic experience: 'what-the-fuckness.' This refers to the lived experience of being at a loss of words, concepts, certainties, and capacities to describe and conceptualise one's experience. I will, however, detail that there are several distinct and describable reasons for which what-the-fuckness is experienced.",
     bio: "Jason K. Day specializes in the phenomenology of psychedelic experiences, phenomenological scholarship, and philosophy of attention. They received their PhD in Philosophy (summa cum laude) from the University of Fribourg in 2025 for their phenomenological study of psychedelic experiences. They currently conduct postdoctoral research at the Molecular Psychiatry Lab (University of Fribourg) on the therapeutic potential of psychedelic effects on autobiographical memory. They have also published on socio-political issues concerning recreational use of psychedelics, anarchist thought, Buddhist philosophy, and ego-dissolution during 5-MeO-DMT experiences. They are a committee member of the Psychedelic Research Organisation of Fribourg and Swiss Psychedelic Student Network.",
   },
-  { tbd: true },
-  { tbd: true },
-  { tbd: true },
+  {
+    name: "Morten Lietz",
+    title: "PhD Cand.",
+    institution: "University of Fribourg, Switzerland",
+    role: "PhD Candidate",
+    image: "Morten_Lietz.jpg",
+    talkTitle: "Do Older Adults Trip Differently? A Double-Blind Comparison of LSD Effects Across the Adult Lifespan",
+    abstract:
+      "Despite the rapid expansion of psychedelic research, older adults remain largely excluded from controlled studies of lysergic acid diethylamide (LSD). This presentation addresses two key questions: Is LSD safe in healthy older adults, and how does the psychedelic experience differ from that of younger individuals? Data are pooled from two double-blind, placebo-controlled randomized trials conducted at the same laboratory: an ongoing study in adults over 55 years (N = 45) and a completed study in younger adults. The talk presents interim findings on safety and tolerability, pharmacodynamic profiles, subjective effects, and qualitative phenomenology, alongside neurophysiological measures of acute and post-acute functional brain connectivity, cognition, and well-being. By directly comparing younger and older adults, this study provides the first comprehensive characterization of LSD effects across the adult lifespan and establishes a foundation for future clinical research in healthy aging.",
+    bio: "Morten Lietz is a PhD candidate in Medical Sciences investigating the effects of lysergic acid diethylamide (LSD) on neurophysiology, cognition, subjective experience, and safety across the adult lifespan. His doctoral research is based on one of the first double-blind, placebo-controlled clinical trials of LSD in healthy older adults. Before joining the University of Fribourg, he helped establish a research program on neuroplasticity and cognition at the University of Groningen. Beyond academia, he has organized conferences and psychedelic summer schools through the ALPS Foundation and contributes to PsyCare initiatives providing harm reduction and psychological support at festivals.",
+  },
+  {
+    name: "Manal Al-Hammadi",
+    title: "PhD Cand.",
+    institution: "University of Warsaw, Poland",
+    role: "PhD Candidate",
+    image: "Manal.png",
+    talkTitle: "Psychedelics Governance: The Category Error in Mental Health Policy",
+    abstract:
+      "Existing regulatory frameworks governing psychedelic-assisted therapy default to pharmaceutical governance logic — assuming chronic dosing, continuous risk, and commodity delivery. The presentation argues that this constitutes a category error: a structural misfit between governance design and intervention type. Drawing on comparative legal analysis across nine jurisdictions (2000–June 2025) and 25 expert interviews spanning six countries and nine professional roles, this research identifies five regulatory archetypes, each reproducing the same pattern of misapplied pharmaceutical logic. Five structural consequences are documented: restriction failure, cost exclusion, workforce vacuum, equity exclusion, and safety surveillance gaps. A multi-lane governance architecture is proposed — concurrent pathways matching regulatory controls to risk across harm reduction, supervised services, medical prescribing, compassionate use, and research — alongside five systemic adaptations and a phased implementation roadmap. This framework is presented as a testable governance hypothesis requiring implementation evidence.",
+    bio: "Manal Al-Hammadi is co-founder of the Psychedelic Women Network and a certified Psychedelic Integration Facilitator and Educator with specialized expertise in knowledge valorization, particularly in capacity building for science-based innovation. With over a decade of experience studying psychedelics, she brings together expertise in innovation, psychedelic research, and education. Originally from Yemen and now based in Poland, Manal draws on both ancestral wisdom and contemporary science to inform her work. She leads initiatives to advance training and education on the therapeutic use of psychedelics within existing legal frameworks, with a strong focus on ethical standards. Manal is a transpersonal psychotherapist and Holotropic breathwork facilitator in training, and she is finishing a Ph.D. at the intersection of psychedelics, public health, and drug policy.",
+  },
+  {
+    name: "Dr. Pablo Mallaroni",
+    title: "PhD",
+    institution: "Imperial College London, UK & Maastricht University, Netherlands",
+    role: "Postdoctoral Researcher",
+    image: "Pablo_Mallaroni.jpg",
+    talkTitle: "Finding Order in Disorder: Mapping the Dynamics of the Psychedelic Brain",
+    abstract:
+      "Neural flexibility has become a central organising principle of psychedelic medicine. Cortical 5-HT2A activation is thought to relax top-down constraints, broaden accessible brain states and relieve disorders marked by cognitive rigidity. Intuitive and clinically seductive as it is, this framework remains descriptive rather than mechanistic. Current work often captures differences between brains without defining the processes that generate them, and pooled designs reveal substantial heterogeneity across both compounds and individuals. Computational modelling offers a route into this complexity, fitting pharmacology, brain dynamics and subjective experience within a common generative framework at the individual level. Through the lens of dynamical systems theory, the brain can be understood as a landscape of attractor states, where mental illness reflects entrenched patterns of activity and psychedelics enable transitions between them. Drawing on findings from twelve psychoactive compounds, this talk maps a shared neurophenomenological space across altered states, exploring what dynamics reveal about cognition, consciousness and personalised psychedelic medicine.",
+    bio: "Pablo Mallaroni is a computational neuroscientist investigating the varieties of altered states of consciousness, holding joint postdoctoral appointments at Imperial College London and Maastricht University. He pairs multimodal pharmacoimaging with whole-brain modelling to study how psychedelics restructure neural dynamics. His research spans (non)classical psychedelics, dissociatives, cannabinoids, stimulants and meditation, integrating molecular, ultra-high-field neuroimaging and behavioural data into personalised models for precision neuroscience. He asks how individual variability defines altered states and therapeutic outcomes, bridging fundamental and clinical neuroscience. He contributes to initiatives promoting equity and harmonisation, including EU PSY-NET and the Latin American Scientific Society for the Study of Consciousness.",
+  },
 ];
 
 function ModalPhoto({ src, alt }: { src: string; alt: string }) {
@@ -359,7 +389,7 @@ export default function Speakers() {
         </div>
 
         <div data-fade-up className="opacity-0 mt-12 text-center">
-          <p className="text-white/40 text-sm">More speakers will be announced soon.</p>
+          <p className="text-white/40 text-sm">Panel title and panel speakers will be uploaded soon.</p>
         </div>
       </div>
     </section>
