@@ -4,6 +4,7 @@ import Conference from "./Conference";
 import Experiences from "./Experiences";
 import About from "./About";
 import Gallery from "./Gallery";
+import Program from "./Program";
 import Speakers from "./Speakers";
 import Location from "./Location";
 import Newsletter from "./Newsletter";
@@ -22,6 +23,7 @@ export default function App() {
         {/* <Experiences /> */}
         <About />
         <Speakers />
+        <Program />
         <Gallery />
         <Location />
         <FAQ />
