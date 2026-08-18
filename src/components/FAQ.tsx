@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowUpRight } from "lucide-react";
 import { animate } from "animejs";
+
+const REDUCED_PRICE_FORM_URL = "https://forms.gle/kAJ8Gmm6E3F8vaKg8";
 
 const FAQS = [
   {
@@ -24,7 +26,8 @@ const FAQS = [
       },
       {
         q: "The ticket price is too high for me, is there a solution?",
-        a: "Yes. We review requests for a reduced ticket price on a case-by-case basis. Please [submit a request here](https://forms.gle/kAJ8Gmm6E3F8vaKg8) and our team will get back to you."
+        a: "Yes. We review requests for a reduced ticket price on a case-by-case basis.",
+        cta: { label: "Request a Price Reduction", href: REDUCED_PRICE_FORM_URL }
       }
     ]
   },
@@ -126,7 +129,15 @@ function renderAnswer(text: string) {
   return parts;
 }
 
-function AccordionItem({ q, a }: { q: string; a: string }) {
+function AccordionItem({
+  q,
+  a,
+  cta,
+}: {
+  q: string;
+  a: string;
+  cta?: { label: string; href: string };
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -157,6 +168,17 @@ function AccordionItem({ q, a }: { q: string; a: string }) {
           <p className="text-white/80 leading-relaxed whitespace-pre-wrap text-base">
             {renderAnswer(a)}
           </p>
+          {cta && (
+            <a
+              href={cta.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-2 rounded-sm bg-support hover:bg-support-light px-5 py-3 text-sm font-semibold text-white transition-colors"
+            >
+              {cta.label}
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+          )}
         </div>
       </div>
     </div>
@@ -210,7 +232,7 @@ export default function FAQ() {
               </h3>
               <div className="bg-white/[0.02] border border-white/[0.05] rounded-sm p-6 sm:p-8">
                 {section.items.map((item, idx) => (
-                  <AccordionItem key={idx} q={item.q} a={item.a} />
+                  <AccordionItem key={idx} q={item.q} a={item.a} cta={"cta" in item ? item.cta : undefined} />
                 ))}
               </div>
             </div>
