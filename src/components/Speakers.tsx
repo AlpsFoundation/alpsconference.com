@@ -152,6 +152,30 @@ const SPEAKERS: SpeakerEntry[] = [
   },
 ];
 
+const PANEL_SPEAKERS: SpeakerEntry[] = [
+  {
+    name: "Ricardo Morales",
+    title: "",
+    institution: "Xicotepec de Juárez, Puebla, Mexico",
+    role: "Traditional Wisdom Keeper",
+    image: "richie_morales.png",
+    bio: `Ricardo Morales Fuentes was born in 1971 in Xicotepec de Juárez, in the state of Puebla, Mexico, into a family deeply connected to traditional herbal knowledge. From early childhood, his maternal grandmother became his first mentor, introducing him to the temazcal, sacred offerings, and the honoring of the elemental forces of nature.
+
+Xochipilli—the Lord of Flowers and sacred plants—has always held a central place in his life. In Xicotepec stands La Xochipila, an ancient sacred site dedicated to this great deity. The presence of Xochipilli became for Ricardo both a spiritual guide and a living connection to the ancestral heritage of Anáhuac.
+
+At the age of nineteen, he received his first Nahuatl name from an elder of the Toltec tradition. At twenty-five, he traveled to Africa as part of a cultural exchange, and from the age of thirty-eight onward, he deepened his study of the sacred plants of Mexico, Central America, and South America.
+
+For more than fifteen years, Ricardo has walked the sacred peyote path alongside distinguished mara'akate of the Wixárika people, receiving teachings and guidance within one of Mexico's most profound living traditions. Fifteen years ago, he also received a special blessing during a Vedic ceremony conducted by Brahmins from Southern India, an experience that forever changed the direction of his life.
+
+Ricardo is also devoted to preserving and revitalizing the sacred cacao tradition through the Mayan worldview, sharing it as a path toward the heart, community, and ancestral remembrance.
+
+Ricardo Morales Fuentes is a proud heir to the culture of Anáhuac, an intuitive musician, ceremonial guide, and writer who has dedicated his life to preserving, honoring, and transmitting the spiritual wisdom of the ancestors.
+
+This is the path of Ricardo Morales Fuentes.`,
+  },
+  { tbd: true },
+];
+
 function ModalPhoto({ src, alt }: { src: string; alt: string }) {
   const [errored, setErrored] = useState(false);
   if (errored) return null;
@@ -228,7 +252,7 @@ function AbstractModal({
           {speaker.bio && (
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-support-light/70 mb-2">Biography</p>
-              <p className="text-sm text-white/70 leading-relaxed">{speaker.bio}</p>
+              <p className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap">{speaker.bio}</p>
             </div>
           )}
         </div>
@@ -292,12 +316,10 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
           <p className="text-sm text-white/50 mb-4">{speaker.institution}</p>
 
           <div className="mt-auto pt-4 border-t border-white/[0.06]">
-            {speaker.talkTitle ? (
+            {speaker.talkTitle && (
               <p className="text-base text-white/80 line-clamp-3 leading-relaxed mb-3">
                 {speaker.talkTitle}
               </p>
-            ) : (
-              <p className="text-sm text-white/30 italic mb-3">To be announced</p>
             )}
             {(speaker.abstract || speaker.bio) && (
               <button
@@ -388,8 +410,24 @@ export default function Speakers() {
           )}
         </div>
 
-        <div data-fade-up className="opacity-0 mt-12 text-center">
-          <p className="text-white/40 text-sm">Panel title and panel speakers will be uploaded soon.</p>
+        <div data-fade-up className="opacity-0 mt-20 mb-14 text-center">
+          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
+            ALPS 2026
+          </p>
+          <h2 className="text-3xl font-semibold text-white mb-4">Panel</h2>
+          <p className="text-white/50 text-base max-w-xl mx-auto">
+            Panel title to be announced. Further panel speakers will be uploaded soon.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {PANEL_SPEAKERS.map((entry, i) =>
+            "tbd" in entry && entry.tbd ? (
+              <TbdCard key={`panel-tbd-${i}`} />
+            ) : (
+              <SpeakerCard key={(entry as Speaker).name} speaker={entry as Speaker} />
+            )
+          )}
         </div>
       </div>
     </section>
