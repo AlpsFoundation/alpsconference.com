@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
 
+const REDUCED_PRICE_FORM_URL = "https://forms.gle/kAJ8Gmm6E3F8vaKg8";
+
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
   const hasAnimated = useRef(false);
@@ -118,6 +120,22 @@ export default function About() {
           >
             Buy Conference Tickets
           </a>
+
+          <div className="mt-5 pt-5 border-t border-white/10">
+            <p className="text-white/55 text-sm leading-relaxed mb-3">
+              * We want ALPS open to everyone. Our whole team works unpaid, so if you can afford full
+              price, please do — it lets us support those who truly need it. Not every request can be
+              granted.
+            </p>
+            <a
+              href={REDUCED_PRICE_FORM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-support-light hover:text-white transition-colors"
+            >
+              Request a Price Reduction *
+            </a>
+          </div>
         </div>
       </div>
     </section>
