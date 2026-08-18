@@ -173,6 +173,7 @@ Ricardo Morales Fuentes is a proud heir to the culture of Anáhuac, an intuitive
 
 This is the path of Ricardo Morales Fuentes.`,
   },
+  { tbd: true },
 ];
 
 function ModalPhoto({ src, alt }: { src: string; alt: string }) {
