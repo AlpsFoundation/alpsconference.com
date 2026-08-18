@@ -252,7 +252,7 @@ function AbstractModal({
           {speaker.bio && (
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-support-light/70 mb-2">Biography</p>
-              <p className="text-sm text-white/70 leading-relaxed">{speaker.bio}</p>
+              <p className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap">{speaker.bio}</p>
             </div>
           )}
         </div>
