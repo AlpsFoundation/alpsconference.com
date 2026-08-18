@@ -159,7 +159,19 @@ const PANEL_SPEAKERS: SpeakerEntry[] = [
     institution: "Xicotepec de Juárez, Puebla, Mexico",
     role: "Traditional Wisdom Keeper",
     image: "richie_morales.png",
-    bio: "Ricardo Morales Fuentes was born in 1971 in Xicotepec de Juárez, in the state of Puebla, Mexico, into a family deeply connected to traditional herbal knowledge. From early childhood, his maternal grandmother became his first mentor, introducing him to the temazcal, sacred offerings, and the honoring of the elemental forces of nature.\n\nXochipilli—the Lord of Flowers and sacred plants—has always held a central place in his life. In Xicotepec stands La Xochipila, an ancient sacred site dedicated to this great deity. The presence of Xochipilli became for Ricardo both a spiritual guide and a living connection to the ancestral heritage of Anáhuac.\n\nAt the age of nineteen, he received his first Nahuatl name from an elder of the Toltec tradition. At twenty-five, he traveled to Africa as part of a cultural exchange, and from the age of thirty-eight onward, he deepened his study of the sacred plants of Mexico, Central America, and South America.\n\nFor more than fifteen years, Ricardo has walked the sacred peyote path alongside distinguished mara'akate of the Wixárika people, receiving teachings and guidance within one of Mexico's most profound living traditions. Fifteen years ago, he also received a special blessing during a Vedic ceremony conducted by Brahmins from Southern India, an experience that forever changed the direction of his life.\n\nRicardo is also devoted to preserving and revitalizing the sacred cacao tradition through the Mayan worldview, sharing it as a path toward the heart, community, and ancestral remembrance.\n\nRicardo Morales Fuentes is a proud heir to the culture of Anáhuac, an intuitive musician, ceremonial guide, and writer who has dedicated his life to preserving, honoring, and transmitting the spiritual wisdom of the ancestors.\n\nThis is the path of Ricardo Morales Fuentes.",
+    bio: `Ricardo Morales Fuentes was born in 1971 in Xicotepec de Juárez, in the state of Puebla, Mexico, into a family deeply connected to traditional herbal knowledge. From early childhood, his maternal grandmother became his first mentor, introducing him to the temazcal, sacred offerings, and the honoring of the elemental forces of nature.
+
+Xochipilli—the Lord of Flowers and sacred plants—has always held a central place in his life. In Xicotepec stands La Xochipila, an ancient sacred site dedicated to this great deity. The presence of Xochipilli became for Ricardo both a spiritual guide and a living connection to the ancestral heritage of Anáhuac.
+
+At the age of nineteen, he received his first Nahuatl name from an elder of the Toltec tradition. At twenty-five, he traveled to Africa as part of a cultural exchange, and from the age of thirty-eight onward, he deepened his study of the sacred plants of Mexico, Central America, and South America.
+
+For more than fifteen years, Ricardo has walked the sacred peyote path alongside distinguished mara'akate of the Wixárika people, receiving teachings and guidance within one of Mexico's most profound living traditions. Fifteen years ago, he also received a special blessing during a Vedic ceremony conducted by Brahmins from Southern India, an experience that forever changed the direction of his life.
+
+Ricardo is also devoted to preserving and revitalizing the sacred cacao tradition through the Mayan worldview, sharing it as a path toward the heart, community, and ancestral remembrance.
+
+Ricardo Morales Fuentes is a proud heir to the culture of Anáhuac, an intuitive musician, ceremonial guide, and writer who has dedicated his life to preserving, honoring, and transmitting the spiritual wisdom of the ancestors.
+
+This is the path of Ricardo Morales Fuentes.`,
   },
 ];
 
@@ -303,12 +315,10 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
           <p className="text-sm text-white/50 mb-4">{speaker.institution}</p>
 
           <div className="mt-auto pt-4 border-t border-white/[0.06]">
-            {speaker.talkTitle ? (
+            {speaker.talkTitle && (
               <p className="text-base text-white/80 line-clamp-3 leading-relaxed mb-3">
                 {speaker.talkTitle}
               </p>
-            ) : (
-              <p className="text-sm text-white/30 italic mb-3">To be announced</p>
             )}
             {(speaker.abstract || speaker.bio) && (
               <button
