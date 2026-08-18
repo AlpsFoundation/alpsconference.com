@@ -123,9 +123,9 @@ export default function About() {
 
           <div className="mt-5 pt-5 border-t border-white/10">
             <p className="text-white/55 text-sm leading-relaxed mb-3">
-              * We want ALPS open to everyone. Our whole team works unpaid, so if you can afford full
-              price, please do — it lets us support those who truly need it. Not every request can be
-              granted.
+              * We want ALPS to be as inclusive as possible. Our whole team are volunteers, so if you
+              can afford full price, please do. It lets us support those who truly need it. Not every
+              request can be granted.
             </p>
             <a
               href={REDUCED_PRICE_FORM_URL}
