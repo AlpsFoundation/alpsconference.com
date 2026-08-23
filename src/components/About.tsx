@@ -33,31 +33,32 @@ export default function About() {
 
   return (
     <section ref={sectionRef} id="about" className="relative py-24 sm:py-32 bg-white/[0.02]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div data-fade-up className="opacity-0 text-center mb-14">
-          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div data-fade-up className="opacity-0 text-center mb-10 sm:mb-12">
+          <p className="section-eyebrow">
             About the Conference
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="section-title">
             Welcome to ALPS 2026
           </h2>
         </div>
 
-        <div
-          data-fade-up
-          className="opacity-0 mb-14 rounded-sm border border-white/10 overflow-hidden aspect-video"
-        >
-          <iframe
-            className="w-full h-full"
-            src="https://www.youtube-nocookie.com/embed/_3iQxlvqZog"
-            title="ALPS Conference 2026 — you're invited"
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        </div>
+        <div className="grid gap-7 lg:grid-cols-2 lg:gap-4 lg:items-start">
+          <div
+            data-fade-up
+            className="w-full opacity-0 rounded-[1.25rem] border border-white/10 overflow-hidden aspect-[4/3] lg:sticky lg:top-24"
+          >
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube-nocookie.com/embed/_3iQxlvqZog?controls=0&iv_load_policy=3&playsinline=1&rel=0"
+              title="ALPS Conference 2026 — you're invited"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          </div>
 
-        <div className="space-y-6 text-lg text-white/80 leading-relaxed text-center">
+          <div className="space-y-4 text-base sm:text-[1.05rem] text-white/78 leading-relaxed text-left">
           <p data-fade-up className="opacity-0">
             The ALPS Foundation is delighted to invite you to the sixth edition of the ALPS Awareness Lectures on Psychedelic Science, taking place on <strong>Friday and Saturday, October 9–10, 2026</strong>, in the scenic city of <strong>Aarau, Switzerland</strong>.
           </p>
@@ -70,12 +71,14 @@ export default function About() {
           <p data-fade-up className="opacity-0">
             Attendees will have the opportunity to earn up to 14 continuing education credits, accredited by FSP and SGPP for psychologists and medical professionals. We look forward to hosting an engaging and enlightening conference that promises to expand knowledge and foster significant discussions.
           </p>
+          </div>
         </div>
 
-        <div
-          data-fade-up
-          className="opacity-0 mt-12 rounded-sm border border-accent/25 bg-accent/10 p-6 sm:p-8 text-left"
-        >
+        <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          <div
+            data-fade-up
+            className="opacity-0 rounded-[1.25rem] border border-accent/25 bg-accent/10 p-6 sm:p-7 text-left"
+          >
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <span className="inline-flex rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-neutral-dark">
               New
@@ -96,12 +99,12 @@ export default function About() {
           >
             Explore Workshop Day
           </a>
-        </div>
+          </div>
 
-        <div
-          data-fade-up
-          className="opacity-0 mt-6 rounded-sm border border-white/10 bg-white/[0.03] p-6 sm:p-8 text-left"
-        >
+          <div
+            data-fade-up
+            className="opacity-0 rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-6 sm:p-7 text-left"
+          >
           <div className="mb-4">
             <span className="text-sm uppercase tracking-[0.18em] text-white/50">
               Friday–Saturday, October 9–10, 2026
@@ -116,7 +119,7 @@ export default function About() {
             href="https://infomaniak.events/en-ch/conferences/alps-conference-2026/c2484795-1ae7-4b4b-aa21-c9b8f085008c/events/382409"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-sm transition-colors duration-200"
+            className="inline-flex items-center justify-center px-7 py-3.5 text-base font-semibold text-white bg-support hover:bg-support-light border border-support rounded-sm shadow-lg shadow-support/20 hover:shadow-support/30 hover:-translate-y-0.5 transition-all duration-200"
           >
             Buy Conference Tickets
           </a>
@@ -135,6 +138,7 @@ export default function About() {
             >
               Request a Price Reduction *
             </a>
+          </div>
           </div>
         </div>
       </div>

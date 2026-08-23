@@ -25,6 +25,8 @@ const images = [
 
 export default function Gallery() {
   const sectionRef = useRef<HTMLElement>(null);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  const lightboxImageRef = useRef<HTMLImageElement>(null);
   const hasAnimated = useRef(false);
   const [current, setCurrent] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -89,7 +91,28 @@ export default function Gallery() {
       if (e.key === "Escape") setLightbox(null);
     };
     window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    document.body.style.overflow = "hidden";
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (lightboxRef.current && lightboxImageRef.current) {
+      if (reducedMotion) {
+        lightboxRef.current.style.opacity = "1";
+        lightboxImageRef.current.style.opacity = "1";
+      } else {
+        animate(lightboxRef.current, { opacity: [0, 1], duration: 220, easing: "linear" });
+        animate(lightboxImageRef.current, {
+          opacity: [0, 1],
+          scale: [0.965, 1],
+          duration: 460,
+          easing: "easeOutCubic",
+        });
+      }
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handler);
+      document.body.style.overflow = "";
+    };
   }, [lightbox]);
 
   const visibleIndices = [-2, -1, 0, 1, 2].map(
@@ -99,8 +122,9 @@ export default function Gallery() {
   return (
     <section ref={sectionRef} id="gallery" className="relative py-24 sm:py-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div data-fade-up className="opacity-0 text-center mb-14">
-          <h2 className="text-3xl font-semibold text-white">
+        <div data-fade-up className="opacity-0 text-center mb-10 sm:mb-12">
+          <p className="section-eyebrow">Past editions</p>
+          <h2 className="section-title">
             Highlights from Previous Conferences
           </h2>
         </div>
@@ -191,13 +215,19 @@ export default function Gallery() {
       {/* Lightbox */}
       {lightbox !== null && (
         <div
+          ref={lightboxRef}
           className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          style={{ opacity: 0 }}
           onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Conference photo viewer"
         >
           <img
+            ref={lightboxImageRef}
             src={withBase(`gallery/${images[lightbox].src}`)}
             alt={`ALPS Conference gallery photo ${lightbox + 1}`}
-            className="max-w-[90vw] max-h-[90vh] object-contain rounded-sm shadow-2xl"
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded-[1rem] shadow-2xl opacity-0"
             onClick={(e) => e.stopPropagation()}
           />
           <button

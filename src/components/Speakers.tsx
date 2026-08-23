@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
+import { getSpeakerModalId, openSpeakerModal, SPEAKER_MODAL_EVENT } from "../lib/speakerModal";
 
 type Speaker = {
   name: string;
@@ -19,6 +20,48 @@ type TbdSpeaker = {
 };
 
 type SpeakerEntry = Speaker | TbdSpeaker;
+
+type FaceBox = readonly [left: number, top: number, width: number, height: number];
+
+type SpeakerImageCrop = {
+  position: string;
+  scale: number;
+  // Face rectangle as percentages of the source image: left, top, width, height.
+  faceBox: FaceBox;
+};
+
+const DEFAULT_IMAGE_CROP: SpeakerImageCrop = {
+  position: "50% 38%",
+  scale: 1,
+  faceBox: [35, 20, 30, 30],
+};
+
+// Face rectangles were detected locally, then the focal point and bounded zoom
+// were visually checked in the final 4:5 card. Keeping the data here makes new
+// crops reproducible and avoids baking one-off transforms into the markup.
+const SPEAKER_IMAGE_CROPS: Record<string, SpeakerImageCrop> = {
+  "max-wolff.jpg": { position: "50% 50%", scale: 1, faceBox: [13.5, 36.1, 68.7, 63.9] },
+  "lydia-belinger.jpg": { position: "50% 36%", scale: 1.06, faceBox: [25.4, 34.1, 36, 29.5] },
+  "Tommaso-Barba.jpg": { position: "50% 34%", scale: 1.04, faceBox: [26.6, 20.2, 45.6, 30.4] },
+  "Matthias_Forster.JPG": { position: "50% 50%", scale: 1.14, faceBox: [42, 44.5, 23.7, 23.7] },
+  "eric-vermetten-holomind.png": { position: "50% 38%", scale: 1, faceBox: [23.9, 23.4, 55.4, 55.4] },
+  "Eirini_Argyri.jpg": { position: "50% 50%", scale: 1, faceBox: [22.7, 24.3, 55.5, 55.5] },
+  "Sandeep_Nayak.jpg": { position: "50% 37%", scale: 1.08, faceBox: [32.7, 21.7, 32.6, 29.5] },
+  "amandine_luiqiens.png": { position: "50% 0%", scale: 1, faceBox: [1.3, 32.1, 61.9, 51.1] },
+  "Jason-Day.jpg": { position: "50% 34%", scale: 1.04, faceBox: [33.5, 27.1, 46.4, 34.8] },
+  "Morten_Lietz.jpg": { position: "50% 8%", scale: 1.04, faceBox: [29.2, 24.3, 52.4, 31.5] },
+  "Manal.png": { position: "50% 0%", scale: 1.18, faceBox: [36.6, 15.7, 26.5, 20.7] },
+  "Pablo_Mallaroni.jpg": { position: "48% 35%", scale: 1.08, faceBox: [30.1, 34.2, 30.9, 26.2] },
+  "richie_morales.png": { position: "68% 0%", scale: 1.24, faceBox: [37.7, 34.5, 25.5, 19.1] },
+};
+
+function getImageCrop(image?: string) {
+  return image ? SPEAKER_IMAGE_CROPS[image] ?? DEFAULT_IMAGE_CROP : DEFAULT_IMAGE_CROP;
+}
+
+function getFaceCenter([left, top, width, height]: FaceBox) {
+  return `${left + width / 2}% ${top + height / 2}%`;
+}
 
 const SPEAKERS: SpeakerEntry[] = [
   {
@@ -70,7 +113,7 @@ const SPEAKERS: SpeakerEntry[] = [
     title: "MD, PhD",
     institution: "Leiden University Medical Center, Netherlands",
     role: "Professor, Founder Trauma Innovations Network",
-    image: "eric-vermetten.jpg",
+    image: "eric-vermetten-holomind.png",
     talkTitle: "What Psychedelics Teach Us About Trauma",
     abstract:
       "Trauma psychiatry has traditionally conceptualized recovery as the reduction of symptoms through evidence-based psychotherapy and pharmacological treatment. Yet many patients describe recovery as a profound transformation in how they relate to themselves, their memories, and others. This presentation explores what psychedelics and entactogens may teach us about trauma, healing, and recovery. Beginning with Jan Bastiaans' pioneering work with LSD in survivors of the Second World War, the lecture traces the evolution toward contemporary research on MDMA-assisted psychotherapy and emerging psilocybin studies for PTSD. Across these developments lies a common question: can altered states of consciousness facilitate therapeutic change that conventional approaches only partially achieve? Rather than functioning solely as pharmacological agents, these compounds may facilitate transformative therapeutic processes that foster trust, meaning-making, reconnection, and what may be understood as a reorganization of consciousness. The lessons emerging from these treatments invite us to reconsider recovery not merely as symptom reduction, but as the restoration of trust and the emergence of new ways of relating to oneself, others, and the world.",
@@ -176,16 +219,24 @@ This is the path of Ricardo Morales Fuentes.`,
   { tbd: true },
 ];
 
-function ModalPhoto({ src, alt }: { src: string; alt: string }) {
+function ModalPhoto({ src, alt, crop }: { src: string; alt: string; crop: SpeakerImageCrop }) {
   const [errored, setErrored] = useState(false);
   if (errored) return null;
   return (
-    <img
-      src={src}
-      alt={alt}
-      className="w-16 h-16 rounded-full object-cover shrink-0 border border-white/10"
-      onError={() => setErrored(true)}
-    />
+    <div className="w-16 h-16 rounded-full shrink-0 overflow-hidden border border-white/10">
+      <div
+        className="w-full h-full"
+        style={{ transform: `scale(${crop.scale})`, transformOrigin: getFaceCenter(crop.faceBox) }}
+      >
+        <img
+          src={src}
+          alt={alt}
+          className="w-full h-full object-cover"
+          style={{ objectPosition: crop.position }}
+          onError={() => setErrored(true)}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -196,10 +247,33 @@ function AbstractModal({
   speaker: Speaker;
   onClose: () => void;
 }) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (overlayRef.current && cardRef.current) {
+      if (reducedMotion) {
+        overlayRef.current.style.opacity = "1";
+        cardRef.current.style.opacity = "1";
+      } else {
+        animate(overlayRef.current, { opacity: [0, 1], duration: 220, easing: "linear" });
+        animate(cardRef.current, {
+          opacity: [0, 1],
+          translateY: [18, 0],
+          scale: [0.97, 1],
+          duration: 440,
+          easing: "easeOutCubic",
+        });
+      }
+    }
+
     return () => {
       document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";
@@ -208,15 +282,21 @@ function AbstractModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      ref={overlayRef}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={`speaker-${speaker.name.replace(/\s+/g, "-").toLowerCase()}`}
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative z-10 w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-neutral-dark border border-white/10 rounded-sm shadow-2xl p-6 sm:p-8"
+        ref={cardRef}
+        className="relative z-10 w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-neutral-dark border border-white/10 rounded-[1.25rem] shadow-2xl p-6 sm:p-8 opacity-0"
         onClick={(e) => e.stopPropagation()}
       >
         <button
+          ref={closeRef}
           onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-white/50 hover:text-white transition-colors rounded-sm hover:bg-white/10 cursor-pointer"
           aria-label="Close"
@@ -226,13 +306,17 @@ function AbstractModal({
 
         <div className="flex items-start gap-4 mb-6">
           {speaker.image && (
-            <ModalPhoto src={withBase(`img/speakers/${speaker.image}`)} alt={speaker.name} />
+            <ModalPhoto
+              src={withBase(`img/speakers/${speaker.image}`)}
+              alt={speaker.name}
+              crop={getImageCrop(speaker.image)}
+            />
           )}
           <div>
             <p className="text-sm text-support-light font-medium tracking-wide uppercase mb-1">
               {speaker.role} · {speaker.institution}
             </p>
-            <h3 className="text-xl font-semibold text-white">{speaker.name}</h3>
+            <h3 id={`speaker-${speaker.name.replace(/\s+/g, "-").toLowerCase()}`} className="text-xl font-semibold text-white">{speaker.name}</h3>
           </div>
         </div>
 
@@ -266,7 +350,17 @@ function initials(name: string) {
   return parts.map((p) => p[0]).join("").slice(0, 2).toUpperCase();
 }
 
-function SpeakerPhoto({ src, alt, initials: init }: { src: string; alt: string; initials: string }) {
+function SpeakerPhoto({
+  src,
+  alt,
+  initials: init,
+  crop,
+}: {
+  src: string;
+  alt: string;
+  initials: string;
+  crop: SpeakerImageCrop;
+}) {
   const [errored, setErrored] = useState(false);
   if (errored) {
     return (
@@ -278,27 +372,63 @@ function SpeakerPhoto({ src, alt, initials: init }: { src: string; alt: string; 
     );
   }
   return (
-    <img
-      src={src}
-      alt={alt}
-      className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500"
-      onError={() => setErrored(true)}
-    />
+    <div
+      className="w-full h-full"
+      style={{ transform: `scale(${crop.scale})`, transformOrigin: getFaceCenter(crop.faceBox) }}
+    >
+      <img
+        src={src}
+        alt={alt}
+        className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-focus-within:grayscale-0 group-hover:scale-[1.025] transition-[filter,scale] duration-700 ease-out"
+        style={{ objectPosition: crop.position }}
+        onError={() => setErrored(true)}
+      />
+    </div>
   );
 }
 
 function SpeakerCard({ speaker }: { speaker: Speaker }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const speakerModalId = getSpeakerModalId(speaker.name);
+
+  useEffect(() => {
+    const syncFromHash = () => setModalOpen(window.location.hash === `#${speakerModalId}`);
+    const handleOpen = (event: Event) => {
+      const { speakerId } = (event as CustomEvent<{ speakerId: string }>).detail;
+      setModalOpen(speakerId === speakerModalId);
+    };
+
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    window.addEventListener(SPEAKER_MODAL_EVENT, handleOpen);
+    return () => {
+      window.removeEventListener("hashchange", syncFromHash);
+      window.removeEventListener(SPEAKER_MODAL_EVENT, handleOpen);
+    };
+  }, [speakerModalId]);
+
+  const closeModal = () => {
+    setModalOpen(false);
+    if (window.location.hash === `#${speakerModalId}`) {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+    }
+  };
 
   return (
     <>
       <div
+        id={speakerModalId}
         data-fade-up
-        className="opacity-0 group relative flex flex-col bg-white/[0.03] border border-white/[0.07] rounded-sm overflow-hidden hover:border-support/30 hover:bg-white/[0.05] transition-all duration-300"
+        className="opacity-0 group relative flex flex-col bg-white/[0.03] border border-white/[0.07] rounded-[1.25rem] overflow-hidden hover:border-support/30 hover:bg-white/[0.05] transition-all duration-300"
       >
-        <div className="aspect-[4/3] overflow-hidden bg-white/[0.03] relative">
+        <div className="aspect-[4/5] overflow-hidden bg-white/[0.03] relative">
           {speaker.image ? (
-            <SpeakerPhoto src={withBase(`img/speakers/${speaker.image}`)} alt={speaker.name} initials={initials(speaker.name)} />
+            <SpeakerPhoto
+              src={withBase(`img/speakers/${speaker.image}`)}
+              alt={speaker.name}
+              initials={initials(speaker.name)}
+              crop={getImageCrop(speaker.image)}
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <div className="w-16 h-16 rounded-full bg-support/20 border border-support/30 flex items-center justify-center">
@@ -308,23 +438,23 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
           )}
         </div>
 
-        <div className="flex flex-col flex-1 p-5">
-          <p className="text-xs font-medium uppercase tracking-[0.16em] text-support-light mb-1">
+        <div className="flex flex-col flex-1 p-3 sm:p-4 lg:p-5">
+          <p className="text-[0.62rem] sm:text-xs font-medium uppercase tracking-[0.14em] sm:tracking-[0.16em] text-support-light mb-1">
             {speaker.role}
           </p>
-          <h3 className="text-lg font-semibold text-white mb-0.5">{speaker.name}</h3>
-          <p className="text-sm text-white/50 mb-4">{speaker.institution}</p>
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-0.5 leading-snug">{speaker.name}</h3>
+          <p className="text-xs sm:text-sm text-white/50 mb-3 sm:mb-4 leading-snug">{speaker.institution}</p>
 
-          <div className="mt-auto pt-4 border-t border-white/[0.06]">
+          <div className="mt-auto pt-3 sm:pt-4 border-t border-white/[0.06]">
             {speaker.talkTitle && (
-              <p className="text-base text-white/80 line-clamp-3 leading-relaxed mb-3">
+              <p className="text-sm sm:text-base text-white/80 line-clamp-4 sm:line-clamp-3 leading-relaxed mb-3">
                 {speaker.talkTitle}
               </p>
             )}
             {(speaker.abstract || speaker.bio) && (
               <button
-                onClick={() => setModalOpen(true)}
-                className="text-xs font-medium text-support-light hover:text-white transition-colors uppercase tracking-[0.14em] cursor-pointer"
+                onClick={() => openSpeakerModal(speaker.name)}
+                className="text-[0.68rem] sm:text-xs font-medium text-support-light hover:text-white transition-colors uppercase tracking-[0.12em] sm:tracking-[0.14em] cursor-pointer"
               >
                 Read abstract →
               </button>
@@ -333,7 +463,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
         </div>
       </div>
 
-      {modalOpen && <AbstractModal speaker={speaker} onClose={() => setModalOpen(false)} />}
+      {modalOpen && <AbstractModal speaker={speaker} onClose={closeModal} />}
     </>
   );
 }
@@ -342,19 +472,19 @@ function TbdCard() {
   return (
     <div
       data-fade-up
-      className="opacity-0 relative flex flex-col bg-white/[0.01] border border-white/[0.04] rounded-sm overflow-hidden"
+      className="opacity-0 relative flex flex-col bg-white/[0.01] border border-white/[0.04] rounded-[1.25rem] overflow-hidden"
     >
-      <div className="aspect-[4/3] bg-white/[0.02] flex items-center justify-center">
+      <div className="aspect-[4/5] bg-white/[0.02] flex items-center justify-center">
         <div className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center">
           <span className="text-white/20 text-2xl">?</span>
         </div>
       </div>
-      <div className="flex flex-col flex-1 p-5">
-        <p className="text-xs font-medium uppercase tracking-[0.16em] text-white/20 mb-1">
+      <div className="flex flex-col flex-1 p-3 sm:p-4 lg:p-5">
+        <p className="text-[0.62rem] sm:text-xs font-medium uppercase tracking-[0.14em] sm:tracking-[0.16em] text-white/20 mb-1">
           Speaker
         </p>
-        <h3 className="text-lg font-semibold text-white/25 mb-0.5">To Be Announced</h3>
-        <p className="text-sm text-white/20">More speakers coming soon</p>
+        <h3 className="text-base sm:text-lg font-semibold text-white/25 mb-0.5">To Be Announced</h3>
+        <p className="text-xs sm:text-sm text-white/20">More speakers coming soon</p>
       </div>
     </div>
   );
@@ -374,9 +504,9 @@ export default function Speakers() {
           hasAnimated.current = true;
           animate(el.querySelectorAll("[data-fade-up]"), {
             opacity: [0, 1],
-            translateY: [24, 0],
-            delay: (_: unknown, i: number) => i * 80,
-            duration: 700,
+            translateY: [18, 0],
+            delay: (_: unknown, i: number) => i * 60,
+            duration: 620,
             easing: "easeOutCubic",
           });
         }
@@ -390,17 +520,17 @@ export default function Speakers() {
   return (
     <section ref={sectionRef} id="speakers" className="relative py-24 sm:py-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div data-fade-up className="opacity-0 text-center mb-14">
-          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
+        <div data-fade-up className="opacity-0 text-center mb-10 sm:mb-12">
+          <p className="section-eyebrow">
             ALPS 2026
           </p>
-          <h2 className="text-3xl font-semibold text-white mb-4">Confirmed Speakers</h2>
+          <h2 className="section-title mb-4">Confirmed speakers</h2>
           <p className="text-white/50 text-base max-w-xl mx-auto">
             Distinguished researchers and clinicians presenting at the forefront of psychedelic science.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {SPEAKERS.map((entry, i) =>
             "tbd" in entry && entry.tbd ? (
               <TbdCard key={`tbd-${i}`} />
@@ -410,17 +540,17 @@ export default function Speakers() {
           )}
         </div>
 
-        <div data-fade-up className="opacity-0 mt-20 mb-14 text-center">
-          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
+        <div data-fade-up className="opacity-0 mt-14 sm:mt-16 mb-10 sm:mb-12 text-center">
+          <p className="section-eyebrow">
             ALPS 2026
           </p>
-          <h2 className="text-3xl font-semibold text-white mb-4">Panel</h2>
+          <h2 className="section-title mb-4">Panel</h2>
           <p className="text-white/50 text-base max-w-xl mx-auto">
             Panel title to be announced. Further panel speakers will be uploaded soon.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {PANEL_SPEAKERS.map((entry, i) =>
             "tbd" in entry && entry.tbd ? (
               <TbdCard key={`panel-tbd-${i}`} />

@@ -48,11 +48,11 @@ export default function Location() {
     >
       <div className="pointer-events-none absolute inset-x-0 top-20 -z-10 h-72 bg-[radial-gradient(circle_at_center,rgba(74,154,224,0.18),transparent_72%)] blur-3xl" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div data-fade-up className="opacity-0 text-center mb-14">
-          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
+        <div data-fade-up className="opacity-0 text-center mb-10 sm:mb-12">
+          <p className="section-eyebrow">
             The Venue
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="section-title">
             Kultur & Kongresshaus Aarau
           </h2>
         </div>

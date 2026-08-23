@@ -3,6 +3,7 @@ import { Calendar, Ticket, Mail, Hand, MapPin, Clock } from "lucide-react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
+import ConferenceCountdown from "./ConferenceCountdown";
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -14,17 +15,17 @@ export default function Hero() {
 
     animate(el.querySelectorAll("[data-animate]"), {
       opacity: [0, 1],
-      translateY: [30, 0],
-      delay: (_: unknown, i: number) => 200 + i * 120,
-      duration: 900,
+      translateY: [20, 0],
+      delay: (_: unknown, i: number) => 140 + i * 90,
+      duration: 700,
       easing: "easeOutCubic",
     });
 
     animate(el.querySelectorAll("[data-animate-scale]"), {
       opacity: [0, 1],
-      scale: [0.9, 1],
-      delay: (_: unknown, i: number) => 600 + i * 100,
-      duration: 800,
+      scale: [0.96, 1],
+      delay: (_: unknown, i: number) => 420 + i * 70,
+      duration: 600,
       easing: "easeOutCubic",
     });
 
@@ -37,7 +38,7 @@ export default function Hero() {
         animate(bones, {
           opacity: [0, 1],
           scale: [1.08, 1],
-          duration: 1600,
+          duration: 1200,
           delay: 80,
           easing: "easeOutCubic",
         });
@@ -103,11 +104,12 @@ export default function Hero() {
       </div>
 
       {/* Content: upper / middle / lower thirds to keep center clear for illustration */}
-      <div className="relative z-10 flex flex-1 flex-col min-h-0 max-w-4xl w-full mx-auto px-4 sm:px-6 text-center pt-24">
+      <div className="relative z-10 flex flex-1 flex-col min-h-0 max-w-5xl w-full mx-auto px-4 sm:px-6 text-center pt-20 sm:pt-24">
         <div className="flex-[1_1_0] flex flex-col items-center justify-start min-h-0">
+          <ConferenceCountdown />
           <h1
             data-animate
-            className="opacity-0 text-4xl sm:max-md:text-7xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-4 sm:mb-6 max-w-5xl mx-auto bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent] [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
+            className="opacity-0 mt-4 text-4xl sm:max-md:text-7xl md:text-7xl lg:text-8xl font-bold tracking-[-0.035em] leading-[0.96] mb-4 sm:mb-6 max-w-5xl mx-auto bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent] [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
           >
             ALPS{" "}
             <span className="whitespace-nowrap">CONFERENCE 2026</span>

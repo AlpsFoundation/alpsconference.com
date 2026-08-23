@@ -54,10 +54,10 @@ export default function Newsletter() {
     <section ref={sectionRef} id="newsletter" className="relative py-24 sm:py-32">
       <div className="max-w-xl mx-auto px-4 sm:px-6 text-center">
         <div data-fade-up className="opacity-0">
-          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
+          <p className="section-eyebrow">
             Stay informed
           </p>
-          <h2 className="text-3xl font-semibold text-white mb-4">
+          <h2 className="section-title mb-4">
             Register for the ALPS Newsletter
           </h2>
           <p className="text-white/90 mb-8 text-base">

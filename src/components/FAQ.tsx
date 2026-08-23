@@ -215,22 +215,22 @@ export default function FAQ() {
   return (
     <section ref={sectionRef} id="faq" className="relative py-24 sm:py-32">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div data-fade-up className="opacity-0 text-center mb-16">
-          <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
+        <div data-fade-up className="opacity-0 text-center mb-10 sm:mb-12">
+          <p className="section-eyebrow">
             Got questions?
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="section-title">
             Frequently Asked Questions
           </h2>
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-8">
           {FAQS.map((section) => (
             <div key={section.category} data-fade-up className="opacity-0">
               <h3 className="text-xl font-semibold text-support-light mb-4">
                 {section.category}
               </h3>
-              <div className="bg-white/[0.02] border border-white/[0.05] rounded-sm p-6 sm:p-8">
+              <div className="bg-white/[0.02] border border-white/[0.05] rounded-[1.25rem] px-5 sm:px-7">
                 {section.items.map((item, idx) => (
                   <AccordionItem key={idx} q={item.q} a={item.a} cta={"cta" in item ? item.cta : undefined} />
                 ))}
