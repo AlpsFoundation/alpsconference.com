@@ -14,7 +14,7 @@ const TIMELINE = [
   {
     date: "31 August 2026",
     label: "Applications close",
-    done: false,
+    done: true,
   },
   {
     date: "07 September 2026",
@@ -137,15 +137,12 @@ export default function PosterPage() {
               Present your psychedelic science research at the sixth edition of the ALPS
               Conference, 9–10 October 2026, Aarau, Switzerland.
             </p>
-            <a
+            <span
               data-fade-up
-              href="https://forms.gle/kFE4LkUcwsVeejDSA"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="opacity-0 inline-block px-8 py-4 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
+              className="opacity-0 inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white/60 bg-white/5 border border-white/10 rounded-sm cursor-not-allowed"
             >
-              Submit Your Poster
-            </a>
+              Applications Closed
+            </span>
           </div>
         </section>
 
@@ -245,34 +242,28 @@ export default function PosterPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div data-fade-up className="opacity-0 text-center mb-12">
               <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
-                Ready to apply?
+                Applications closed
               </p>
-              <h2 className="text-3xl font-semibold text-white mb-4">Submit Your Poster Application</h2>
+              <h2 className="text-3xl font-semibold text-white mb-4">Poster Application Period Has Ended</h2>
               <p className="text-white/60 text-base max-w-xl mx-auto">
-                Applications are open until <strong className="text-white/80">31 August 2026</strong>.
-                The application takes approximately 10–15 minutes to complete.
+                Applications closed on <strong className="text-white/80">31 August 2026</strong>. Selected
+                presenters will be contacted directly with next steps.
               </p>
             </div>
 
             <div data-fade-up className="opacity-0">
               <div className="bg-white/[0.03] border border-white/[0.08] rounded-sm p-10 sm:p-16 text-center">
                 <div className="max-w-md mx-auto">
-                  <div className="w-14 h-14 rounded-full bg-support/15 border border-support/20 flex items-center justify-center mx-auto mb-6">
-                    <FileText className="w-6 h-6 text-support-light" />
+                  <div className="w-14 h-14 rounded-full bg-white/10 border border-white/15 flex items-center justify-center mx-auto mb-6">
+                    <FileText className="w-6 h-6 text-white/50" />
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-3">Poster Application Form</h3>
                   <p className="text-white/60 text-base mb-8 leading-relaxed">
-                    Submit your abstract, author information, and research details via our online application form.
+                    The application form is no longer accepting submissions. Thank you to everyone who applied.
                   </p>
-                  <a
-                    href="https://forms.gle/kFE4LkUcwsVeejDSA"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
-                  >
-                    Apply Now ↗
-                  </a>
-                  <p className="mt-5 text-white/40 text-sm">Opens in a new tab · Google Forms</p>
+                  <span className="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white/60 bg-white/5 border border-white/10 rounded-sm cursor-not-allowed">
+                    Applications Closed
+                  </span>
                 </div>
               </div>
             </div>
