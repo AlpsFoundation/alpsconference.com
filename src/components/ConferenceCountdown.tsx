@@ -36,17 +36,10 @@ export function getConferenceCountdown(): Countdown | null {
     };
   }
 
-  const weeks = Math.floor(daysLeft / 7);
-  const days = daysLeft % 7;
-  const parts = [
-    weeks > 0 ? `${weeks} ${weeks === 1 ? "week" : "weeks"}` : "",
-    days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : "",
-  ].filter(Boolean);
-
   return {
     prefix: "Conference begins in",
-    label: parts.join(" · "),
-    accessibleLabel: `${parts.join(" and ")} until the ALPS Conference`,
+    label: `${daysLeft} days`,
+    accessibleLabel: `${daysLeft} days until the ALPS Conference`,
   };
 }
 
