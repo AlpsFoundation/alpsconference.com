@@ -340,17 +340,10 @@ export default function WorkshopPage() {
             </p>
             <div data-fade-up className="opacity-0 flex justify-center mb-10">
               <div className="inline-flex items-center gap-3 rounded-full border border-support/35 bg-gradient-to-r from-support/20 via-support/10 to-accent/10 px-5 py-2.5 shadow-[0_0_28px_rgba(46,124,199,0.18)]">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-support/20 border border-support/30">
-                  <Award className="h-4.5 w-4.5 text-support-light" />
+                <Award className="h-5 w-5 text-support-light" />
+                <span className="text-sm sm:text-base font-semibold text-white">
+                  Earn 4 FSP credits
                 </span>
-                <div className="text-left">
-                  <p className="text-sm sm:text-base font-semibold text-white leading-tight">
-                    4 FSP credits approved
-                  </p>
-                  <p className="text-xs sm:text-sm text-white/60">
-                    Continuing education for medical professionals &amp; psychologists
-                  </p>
-                </div>
               </div>
             </div>
             <div data-fade-up className="opacity-0 flex flex-wrap justify-center gap-3">
@@ -400,10 +393,9 @@ export default function WorkshopPage() {
                   <div className="mt-4 flex items-start gap-3 rounded-sm border border-support/25 bg-support/10 px-4 py-3">
                     <Award className="mt-0.5 h-5 w-5 shrink-0 text-support-light" />
                     <p className="text-sm text-white/75 leading-relaxed">
-                      The Workshop Day has been approved for{" "}
-                      <span className="font-semibold text-white">4 FSP credits</span> for medical
-                      professionals and psychologists. A certificate of attendance will be provided after
-                      the event.
+                      Earn <span className="font-semibold text-white">4 FSP credits</span> (medical
+                      professionals &amp; psychologists). Certificate of attendance provided after the
+                      event.
                     </p>
                   </div>
                 </div>

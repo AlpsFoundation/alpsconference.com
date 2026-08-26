@@ -93,7 +93,7 @@ const FAQS = [
       },
       {
         q: "Can I get FSP credits for the Workshop Day?",
-        a: "Yes. The pre-conference Workshop Day on October 8 has been approved for 4 FSP credits for medical professionals and psychologists. A certificate of attendance will be provided after the event."
+        a: "Yes — 4 FSP credits for medical professionals and psychologists. A certificate of attendance is provided after the event."
       },
       {
         q: "Does the ALPS Foundation share my personal information?",
