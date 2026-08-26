@@ -88,8 +88,12 @@ const FAQS = [
         a: "Yes, a certificate of participation will be made available a few days after the conference. Please send an email after the conference at info@alps.foundation"
       },
       {
-        q: "Can I get ETCS credits for attending this conference?",
-        a: "Yes, up to 14 ETCS for the FSP and 8 ECTS for the SGPP/SSPP"
+        q: "Can I get ECTS credits for attending the conference?",
+        a: "Yes. The main conference (October 9–10) is accredited for up to 14 ECTS for the FSP and 8 ECTS for the SGPP/SSPP."
+      },
+      {
+        q: "Can I get FSP credits for the Workshop Day?",
+        a: "Yes. The pre-conference Workshop Day on October 8 has been approved for 4 FSP credits for medical professionals and psychologists. A certificate of attendance will be provided after the event."
       },
       {
         q: "Does the ALPS Foundation share my personal information?",

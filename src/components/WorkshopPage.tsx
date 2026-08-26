@@ -2,10 +2,10 @@ import type { ElementType, ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
 import {
+  Award,
   CalendarDays,
   Clock,
   HeartHandshake,
-  Hourglass,
   Rows3,
   Utensils,
 } from "lucide-react";
@@ -334,10 +334,25 @@ export default function WorkshopPage() {
             <h1 data-fade-up className="opacity-0 text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
               PAT Training Across Switzerland's Linguistic Regions
             </h1>
-            <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-10">
+            <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-8">
               A specialized platform for Psychedelic-Assisted Therapy training, combining theoretical input
               with experiential clinical practice in four parallel language tracks.
             </p>
+            <div data-fade-up className="opacity-0 flex justify-center mb-10">
+              <div className="inline-flex items-center gap-3 rounded-full border border-support/35 bg-gradient-to-r from-support/20 via-support/10 to-accent/10 px-5 py-2.5 shadow-[0_0_28px_rgba(46,124,199,0.18)]">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-support/20 border border-support/30">
+                  <Award className="h-4.5 w-4.5 text-support-light" />
+                </span>
+                <div className="text-left">
+                  <p className="text-sm sm:text-base font-semibold text-white leading-tight">
+                    4 FSP credits approved
+                  </p>
+                  <p className="text-xs sm:text-sm text-white/60">
+                    Continuing education for medical professionals &amp; psychologists
+                  </p>
+                </div>
+              </div>
+            </div>
             <div data-fade-up className="opacity-0 flex flex-wrap justify-center gap-3">
               <a
                 href="https://infomaniak.events/fr-ch/shop/alps-conference-2026-RQNBE4WPQY/event/1629286/"
@@ -382,10 +397,13 @@ export default function WorkshopPage() {
                     The workshops are open to everyone — clinicians, researchers, students, and anyone
                     with an interest in psychedelic-assisted therapy.
                   </p>
-                  <div className="mt-4 flex items-center gap-3 rounded-sm border border-white/10 bg-white/5 px-4 py-3">
-                    <Hourglass className="h-5 w-5 shrink-0 text-support-light" />
-                    <p className="text-sm text-white/70">
-                      We are currently applying for continuing education credits for medical professionals and psychologists.
+                  <div className="mt-4 flex items-start gap-3 rounded-sm border border-support/25 bg-support/10 px-4 py-3">
+                    <Award className="mt-0.5 h-5 w-5 shrink-0 text-support-light" />
+                    <p className="text-sm text-white/75 leading-relaxed">
+                      The Workshop Day has been approved for{" "}
+                      <span className="font-semibold text-white">4 FSP credits</span> for medical
+                      professionals and psychologists. A certificate of attendance will be provided after
+                      the event.
                     </p>
                   </div>
                 </div>
