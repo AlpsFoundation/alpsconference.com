@@ -517,6 +517,66 @@ main > section:not(:first-child) {
   }
 }
 
+/* Experiences programme — compact, pink-tinted companion to the scientific schedule */
+.experiences-board .program-day {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(243, 143, 191, 0.22), transparent 20rem),
+    linear-gradient(150deg, rgba(243, 143, 191, 0.1), rgba(8, 47, 74, 0.26));
+}
+
+.experiences-board .program-item,
+.experiences-board .program-speaker-link {
+  grid-template-columns: 9.4rem minmax(0, 1fr);
+}
+
+.experiences-board .program-item > time,
+.experiences-board .program-speaker-link > time {
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.experiences-board .program-speaker-link:hover {
+  background: rgba(243, 143, 191, 0.12);
+}
+
+.experiences-inline-names,
+.experiences-inline-names span,
+.experiences-inline-link {
+  display: inline;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  font-style: inherit;
+}
+
+.experiences-inline-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(243, 143, 191, 0.5);
+  text-underline-offset: 0.18em;
+}
+
+.experiences-inline-link:hover {
+  color: white;
+}
+
+@media (max-width: 767px) {
+  .experiences-board .program-item,
+  .experiences-board .program-speaker-link {
+    grid-template-columns: 7.6rem minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .experiences-board .program-item,
+  .experiences-board .program-speaker-link {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

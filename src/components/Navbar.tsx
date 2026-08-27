@@ -17,6 +17,7 @@ const CONFERENCE_LINKS: NavLink[] = [
   { label: "Overview", href: "/#about", description: "Theme, dates, and conference details" },
   { label: "Speakers", href: "/#speakers", description: "Confirmed speakers and talks" },
   { label: "Program", href: "/#program", description: "Full Friday–Saturday schedule" },
+  { label: "Experiences", href: "/#experiences", description: "Art, sound, and connection" },
   { label: "Location", href: "/#location", description: "Venue and travel details" },
   { label: "FAQ", href: "/#faq", description: "Practical information" },
   { label: "Partners", href: "/#partners", description: "Sponsors and collaborators" },
