@@ -34,7 +34,7 @@ type ExperienceCategory = {
 const EXPERIENCES: ExperienceCategory[] = [
   {
     id: "art",
-    title: "Art Exhibition",
+    title: "Art",
     summary: "LSD blotter art and live painting, throughout both days.",
     people: [
       {
@@ -110,7 +110,7 @@ const EXPERIENCES: ExperienceCategory[] = [
   },
   {
     id: "more",
-    title: "More",
+    title: "…and more",
     summary: "Connection, storytelling, and movement.",
     people: [
       {
@@ -424,9 +424,11 @@ function ExperienceCard({ person }: { person: ExperiencePerson }) {
 
   return (
     <>
-      <div
+      <button
+        type="button"
         id={experienceModalId}
-        className="group relative flex flex-col bg-white/[0.03] border border-white/[0.07] rounded-[1.15rem] overflow-hidden hover:border-accent/35 hover:bg-white/[0.05] transition-all duration-300"
+        onClick={() => openExperienceModal(person.name)}
+        className="group relative flex flex-col w-full text-left bg-white/[0.03] border border-white/[0.07] rounded-[1.15rem] overflow-hidden hover:border-accent/35 hover:bg-white/[0.05] transition-all duration-300 cursor-pointer"
       >
         <div className="aspect-[4/5] overflow-hidden bg-white/[0.03] relative">
           {person.image ? (
@@ -449,15 +451,11 @@ function ExperienceCard({ person }: { person: ExperiencePerson }) {
             {person.role}
           </p>
           <h4 className="text-base sm:text-lg font-semibold text-white mb-3 leading-snug">{person.name}</h4>
-          <button
-            type="button"
-            onClick={() => openExperienceModal(person.name)}
-            className="mt-auto text-[0.68rem] sm:text-xs font-medium text-accent-light hover:text-white transition-colors uppercase tracking-[0.12em] cursor-pointer text-left"
-          >
+          <span className="mt-auto text-[0.68rem] sm:text-xs font-medium text-accent-light group-hover:text-white transition-colors uppercase tracking-[0.12em]">
             Read more →
-          </button>
+          </span>
         </div>
-      </div>
+      </button>
       {modalOpen && <ExperienceModal person={person} onClose={closeModal} />}
     </>
   );

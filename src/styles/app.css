@@ -524,6 +524,20 @@ main > section:not(:first-child) {
     linear-gradient(150deg, rgba(243, 143, 191, 0.1), rgba(8, 47, 74, 0.26));
 }
 
+.experiences-board .program-list {
+  padding-top: 0;
+}
+
+.experiences-board .program-item:first-child {
+  margin-inline: -1.35rem;
+  padding-inline: 1.35rem;
+}
+
+.experiences-board .program-item--social {
+  margin-inline: -1.35rem;
+  padding-inline: 1.35rem;
+}
+
 .experiences-board .program-item,
 .experiences-board .program-speaker-link {
   grid-template-columns: 9.4rem minmax(0, 1fr);
@@ -574,6 +588,12 @@ main > section:not(:first-child) {
   .experiences-board .program-item,
   .experiences-board .program-speaker-link {
     grid-template-columns: 1fr;
+  }
+
+  .experiences-board .program-item:first-child,
+  .experiences-board .program-item--social {
+    margin-inline: -1rem;
+    padding-inline: 1rem;
   }
 }
 
