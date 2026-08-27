@@ -96,13 +96,13 @@ const EXPERIENCES: ExperienceCategory[] = [
         bio: "Marina Vovk is a Ukrainian sound healer and gong practitioner, psychologist and psyche-aroma diagnostician. She is also a certified yoga instructor, meditation guide, and Reiki and Qigong practitioner, with over sixteen years of dedicated practice.\n\nBased in Switzerland since 2022, Marina works at the intersection of sound, psychology, embodiment, contemplative practices, and psychedelic-assisted approaches. She is trained in MAPS Psychedelic-Assisted Therapy for PTSD and supports MAPS educational programs internationally, including in Ukraine, Poland and Switzerland.\n\nThrough immersive sound journeys with gongs, singing bowls, and other acoustic instruments, Marina creates spaces for deep relaxation, grounding, and reconnection with the body. Her work invites participants to slow down, shift their attention from the intellectual to the embodied, and reconnect with a sense of presence.",
       },
       {
-        name: "Dave Elmiger",
-        role: "Sound",
-        context: "Musician",
+        name: "David Elmiger & Friends",
+        role: "Live Concert",
+        context: "Musicians",
         sessions: [
           {
-            title: "Sound",
-            description: "Dave Elmiger joins the sound programme at ALPS 2026. Further details will be published here soon.",
+            title: "Live Concert",
+            description: "David Elmiger & Friends will play a live concert during Saturday lunch. Further details will be published here soon.",
           },
         ],
       },
@@ -140,7 +140,7 @@ const EXPERIENCES: ExperienceCategory[] = [
         sessions: [
           {
             title: "Yoga",
-            description: "Andrea Bacconi will offer yoga during the conference. Further details will be published here soon.",
+            description: "Andrea Bacconi will offer yoga on Saturday morning. Further details will be published here soon.",
           },
         ],
       },
@@ -171,10 +171,8 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
     dateTime: "2026-10-09",
     items: [
       { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke"] },
-      { time: "11:35–12:00", title: "Yoga", personName: "Andrea Bacconi" },
       { time: "13:40–14:25 & 16:30–17:15", title: "Sound meditation", personName: "Marina Vovk" },
       { time: "13:45–14:30", title: "Speed-friending", detail: "Second half of lunch", personName: "Kate Dalby" },
-      { time: "18:40–19:20", title: "Sound", personName: "Dave Elmiger" },
       { time: "21:00–22:00", title: "Psychedelic storytelling", personName: "Kate Dalby" },
     ],
   },
@@ -184,11 +182,9 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
     dateTime: "2026-10-10",
     items: [
       { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke"] },
-      { time: "08:10–08:50 & 18:10–18:50", title: "Sound", personName: "Dave Elmiger" },
-      { time: "11:05–11:30", title: "Yoga", personName: "Andrea Bacconi" },
-      { time: "12:30–14:00", title: "Live music", detail: "During lunch", personName: "Dave Elmiger" },
+      { time: "08:10–08:50", title: "Yoga", personName: "Andrea Bacconi" },
+      { time: "12:30–14:00", title: "Live Concert", detail: "During lunch", personName: "David Elmiger & Friends" },
       { time: "13:10–13:55 & 16:10–16:55", title: "Sound meditation", personName: "Marina Vovk" },
-      { time: "13:15–14:00", title: "Speed-friending", detail: "Second half of lunch", personName: "Kate Dalby" },
     ],
   },
 ];
