@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowUpRight, ChevronDown, Menu, X } from "lucide-react";
 import { withBase } from "../lib/withBase";
+import { lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
 type MenuKey = "conference" | "participate" | "past";
 
@@ -17,7 +18,7 @@ const CONFERENCE_LINKS: NavLink[] = [
   { label: "Overview", href: "/#about", description: "Theme, dates, and conference details" },
   { label: "Speakers", href: "/#speakers", description: "Confirmed speakers and talks" },
   { label: "Program", href: "/#program", description: "Full Friday–Saturday schedule" },
-  { label: "Experiences", href: "/#experiences", description: "Art, sound, and connection" },
+  { label: "Experiences", href: "/#experiences", description: "Art, sound, and connection", badge: "Updated" },
   { label: "Location", href: "/#location", description: "Venue and travel details" },
   { label: "FAQ", href: "/#faq", description: "Practical information" },
   { label: "Partners", href: "/#partners", description: "Sponsors and collaborators" },
@@ -174,8 +175,9 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!isOpen) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
   }, [isOpen]);
 
   useEffect(() => {

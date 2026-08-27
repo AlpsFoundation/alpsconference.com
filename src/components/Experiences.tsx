@@ -2,9 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
+import { setLocationHash } from "../lib/locationHash";
+import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
+import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 import {
   EXPERIENCE_MODAL_EVENT,
+  EXPERIENCES_SCHEDULE_ID,
   getExperienceModalId,
+  getExperienceSlotId,
   openExperienceModal,
 } from "../lib/experienceModal";
 
@@ -17,6 +22,7 @@ type ExperiencePerson = {
   name: string;
   role: string;
   context?: string;
+  eyebrow?: string;
   image?: string;
   imagePosition?: string;
   gallery?: string[];
@@ -76,6 +82,7 @@ const EXPERIENCES: ExperienceCategory[] = [
       {
         name: "Marina Vovk",
         role: "Sound meditations",
+        eyebrow: "Sound Meditations",
         context: "Sound healer · Switzerland",
         image: "marina-vovk.jpg",
         imagePosition: "50% 22%",
@@ -83,8 +90,8 @@ const EXPERIENCES: ExperienceCategory[] = [
           "marina-vovk-2.jpg",
           "marina-vovk-3.jpg",
           "marina-vovk-4.jpg",
-          "marina-vovk-5.jpg",
           "marina-vovk-6.jpg",
+          "marina-vovk-7.jpg",
         ],
         sessions: [
           {
@@ -128,10 +135,10 @@ const EXPERIENCES: ExperienceCategory[] = [
           {
             title: "Psychedelic storytelling",
             description:
-              "Open-mic, sign up on the night. Five minutes. No rehearsal. Share the weird, the tricky or the wonderful. The best ones are usually told off the cuff. A room that has already warmed up is a much kinder place to tell a story than a cold lecture hall.",
+              "End the first conference day with an evening of authentic connection and community. After a full day of talks, Kate holds an open-mic storytelling circle — a space to integrate through the simple, powerful act of sharing. Sign up on the night. Five minutes. No rehearsal. Share something from the journey: the weird, the tricky, or the wonderful. There is no need to prepare; the best stories are often told off the cuff and from the heart. Come share, listen, and connect.",
           },
         ],
-        bio: "Kate is an event coordinator at the Psychedelic Society UK. She also works in neuroaesthetics at Kinda Studios and with Onaya Science on ritual, music and plant medicines. Most people come to her nights alone. That’s the point.",
+        bio: "Kate Dalby (she/her) is a creative neuroscientist exploring how spaces and sensory environments shape our inner world. Her background spans clinical sleep studies, altered states of consciousness, and personalised gene therapies. Now her primary works is at Neuroaesthetics studio and lab, Kinda Studios. While her ongoing work with Onaya Science explores how ritual, music, and plant medicines support trauma recovery — a curiosity that flows into her wider passion for gathering people in community through The Psychedelic Society.",
       },
       {
         name: "Andrea Bacconi",
@@ -173,6 +180,7 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
       { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke"] },
       { time: "13:40–14:25 & 16:30–17:15", title: "Sound meditation", personName: "Marina Vovk" },
       { time: "13:45–14:30", title: "Speed-friending", detail: "Second half of lunch", personName: "Kate Dalby" },
+      { time: "20:00–21:30", title: "TBA" },
       { time: "21:00–22:00", title: "Psychedelic storytelling", personName: "Kate Dalby" },
     ],
   },
@@ -249,51 +257,41 @@ function ModalPhoto({ src, alt, position }: { src: string; alt: string; position
 
 function ExperienceModal({
   person,
+  open,
   onClose,
+  onExited,
 }: {
   person: ExperiencePerson;
+  open: boolean;
   onClose: () => void;
+  onExited: () => void;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
   const photos = person.image ? [person.image, ...(person.gallery ?? [])] : [];
   const [activePhoto, setActivePhoto] = useState(person.image ?? "");
-  const headingId = `experience-${person.name.replace(/\s+/g, "-").toLowerCase()}`;
+  const headingId = `${getExperienceModalId(person.name)}-title`;
 
   useEffect(() => {
-    const handleKey = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    const handleKey = (event: KeyboardEvent) => event.key === "Escape" && onCloseRef.current();
     document.addEventListener("keydown", handleKey);
-    document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (overlayRef.current && cardRef.current) {
-      if (reducedMotion) {
-        overlayRef.current.style.opacity = "1";
-        cardRef.current.style.opacity = "1";
-      } else {
-        animate(overlayRef.current, { opacity: [0, 1], duration: 220, easing: "linear" });
-        animate(cardRef.current, {
-          opacity: [0, 1],
-          translateY: [18, 0],
-          scale: [0.97, 1],
-          duration: 440,
-          easing: "easeOutCubic",
-        });
-      }
-    }
-
+    lockBodyScroll();
+    focusWithoutScroll(closeRef.current);
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
+      unlockBodyScroll();
     };
-  }, [onClose]);
+  }, []);
+
+  useModalMotion(open, overlayRef, cardRef, onExited);
 
   return createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0"
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0${open ? "" : " pointer-events-none"}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -324,7 +322,7 @@ function ExperienceModal({
           )}
           <div>
             <p className="text-sm text-accent-light font-medium tracking-wide uppercase mb-1">
-              {person.context ? `${person.role} · ${person.context}` : person.role}
+              {person.eyebrow ?? (person.context ? `${person.role} · ${person.context}` : person.role)}
             </p>
             <h3 id={headingId} className="text-xl font-semibold text-white">
               {person.name}
@@ -333,16 +331,13 @@ function ExperienceModal({
         </div>
 
         {photos.length > 1 && (
-          <div className="mb-6">
-            <div className="overflow-hidden rounded-[1rem] border border-white/10 aspect-[16/10] bg-white/[0.03] mb-3">
-              <img
-                src={withBase(`img/experiences/${activePhoto}`)}
-                alt=""
-                className="w-full h-full object-cover"
-                style={{ objectPosition: person.imagePosition ?? "50% 30%" }}
-              />
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="mb-6 flex items-start justify-center gap-2 sm:gap-3">
+            <img
+              src={withBase(`img/experiences/${activePhoto}`)}
+              alt=""
+              className="max-h-[min(32rem,55vh)] w-auto max-w-[calc(100%-3.25rem)] rounded-[1rem] border border-white/10 object-contain"
+            />
+            <div className="flex max-h-[min(32rem,55vh)] w-11 shrink-0 flex-col gap-1.5 overflow-y-auto sm:w-12">
               {photos.map((photo, index) => (
                 <button
                   key={photo}
@@ -350,7 +345,7 @@ function ExperienceModal({
                   onClick={() => setActivePhoto(photo)}
                   aria-label={`View photo ${index + 1} of ${photos.length}`}
                   aria-pressed={activePhoto === photo}
-                  className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-md border transition-colors cursor-pointer ${
+                  className={`relative aspect-[3/4] w-full shrink-0 overflow-hidden rounded-md border bg-white/[0.03] transition-colors cursor-pointer ${
                     activePhoto === photo
                       ? "border-accent-light"
                       : "border-white/10 hover:border-accent/50"
@@ -359,7 +354,7 @@ function ExperienceModal({
                   <img
                     src={withBase(`img/experiences/${photo}`)}
                     alt=""
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover object-top"
                   />
                 </button>
               ))}
@@ -393,6 +388,7 @@ function ExperienceModal({
 
 function ExperienceCard({ person }: { person: ExperiencePerson }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const { present: modalPresent, onExited } = useModalPresence(modalOpen);
   const experienceModalId = getExperienceModalId(person.name);
 
   useEffect(() => {
@@ -414,7 +410,7 @@ function ExperienceCard({ person }: { person: ExperiencePerson }) {
   const closeModal = () => {
     setModalOpen(false);
     if (window.location.hash === `#${experienceModalId}`) {
-      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+      setLocationHash(null, "replace");
     }
   };
 
@@ -422,7 +418,6 @@ function ExperienceCard({ person }: { person: ExperiencePerson }) {
     <>
       <button
         type="button"
-        id={experienceModalId}
         onClick={() => openExperienceModal(person.name)}
         className="group relative flex flex-col w-full text-left bg-white/[0.03] border border-white/[0.07] rounded-[1.15rem] overflow-hidden hover:border-accent/35 hover:bg-white/[0.05] transition-all duration-300 cursor-pointer"
       >
@@ -452,7 +447,9 @@ function ExperienceCard({ person }: { person: ExperiencePerson }) {
           </span>
         </div>
       </button>
-      {modalOpen && <ExperienceModal person={person} onClose={closeModal} />}
+      {modalPresent && (
+        <ExperienceModal person={person} open={modalOpen} onClose={closeModal} onExited={onExited} />
+      )}
     </>
   );
 }
@@ -474,7 +471,7 @@ function ScheduleNames({ names }: { names: string[] }) {
 
 function ExperiencesSchedule() {
   return (
-    <div className="program-board experiences-board">
+    <div className="program-board experiences-board" id={EXPERIENCES_SCHEDULE_ID}>
       {EXPERIENCE_DAYS.map((day, dayIndex) => (
         <article className="program-day" key={day.day}>
           <header className="program-day__header">
@@ -490,6 +487,7 @@ function ExperiencesSchedule() {
               const linked = names.length > 0;
               return (
                 <li
+                  id={getExperienceSlotId(day.day, item.title)}
                   className={`program-item${item.kind === "allday" ? " program-item--social" : ""}${linked && names.length === 1 ? " program-item--linked" : ""}`}
                   key={`${day.day}-${item.time}-${item.title}`}
                 >

@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
-import { Maximize2, X } from "lucide-react";
+import { Maximize2, Music, PersonStanding, Sparkles, Users, Waves, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { getExperienceSlotId } from "../lib/experienceModal";
+import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
 import { getSpeakerModalId, openSpeakerModal } from "../lib/speakerModal";
+import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
+
+type ProgramExperience = {
+  title: string;
+  time: string;
+};
 
 type ProgramItem = {
   time: string;
@@ -9,6 +18,14 @@ type ProgramItem = {
   detail?: string;
   kind?: "session" | "pause" | "social";
   speakerName?: string;
+  experiences?: ProgramExperience[];
+};
+
+const EXPERIENCE_ICONS: Record<string, LucideIcon> = {
+  "Sound meditation": Waves,
+  "Speed-friending": Users,
+  Yoga: PersonStanding,
+  "Live Concert": Music,
 };
 
 type ProgramDay = {
@@ -30,13 +47,18 @@ const PROGRAM: ProgramDay[] = [
       { time: "10:30–11:00", title: "Coffee break", kind: "pause" },
       { time: "11:00–12:00", title: "Morten Lietz", detail: "Do Older Adults Trip Differently? A Double-Blind Comparison of LSD Effects Across the Adult Lifespan", speakerName: "Morten Lietz" },
       { time: "12:00–13:00", title: "Tommaso Barba", detail: "EEG correlates of self-dissolution induced by intranasal 5-MeO-DMT", speakerName: "Tommaso Barba" },
-      { time: "13:00–14:30", title: "Lunch break", kind: "pause" },
+      { time: "13:00–14:30", title: "Lunch break", kind: "pause", experiences: [
+        { title: "Sound meditation", time: "13:40–14:25" },
+        { title: "Speed-friending", time: "13:45–14:30" },
+      ] },
       { time: "14:30–15:30", title: "Manal Al-Hammadi", detail: "Psychedelics Governance: The Category Error in Mental Health Policy", speakerName: "Manal Al-Hammadi" },
       { time: "15:30–16:30", title: "Dr. Sandeep Nayak", detail: "From Data to Dosing Room: Optimizing Psilocybin Therapy for Clinical Practice", speakerName: "Dr. Sandeep Nayak" },
-      { time: "16:30–17:15", title: "Coffee break", kind: "pause" },
+      { time: "16:30–17:15", title: "Coffee break", kind: "pause", experiences: [
+        { title: "Sound meditation", time: "16:30–17:15" },
+      ] },
       { time: "17:15–18:15", title: "Prof. Amandine Luquiens", detail: "Talk to be announced", speakerName: "Prof. Amandine Luquiens" },
       { time: "18:15–19:15", title: "Panel discussion", detail: "Psychotherapy and psychedelics (TBD)" },
-      { time: "19:15–20:00", title: "Friday evening meal", kind: "social" },
+      { time: "19:15–20:00", title: "Friday evening meal", detail: "self-organized", kind: "pause" },
       { time: "20:00–21:30", title: "Friday evening program", kind: "social" },
     ],
   },
@@ -45,15 +67,22 @@ const PROGRAM: ProgramDay[] = [
     date: "10 October",
     dateTime: "2026-10-10",
     items: [
-      { time: "08:00–09:00", title: "Doors open", kind: "pause" },
+      { time: "08:00–09:00", title: "Doors open", kind: "pause", experiences: [
+        { title: "Yoga", time: "08:10–08:50" },
+      ] },
       { time: "09:00–10:00", title: "Dr. Pablo Mallaroni", detail: "Finding order in disorder: mapping the dynamics of the psychedelic brain", speakerName: "Dr. Pablo Mallaroni" },
       { time: "10:00–11:00", title: "Prof. Dr. Eric Vermetten", detail: "What Psychedelics Teach Us About Trauma", speakerName: "Prof. Dr. Eric Vermetten" },
       { time: "11:00–11:30", title: "Break", kind: "pause" },
       { time: "11:30–12:30", title: "Dr. Lydia Belinger", detail: "Serotonin System Stimulation and Social Cognition: Differential Effects of Psilocybin, MDMA, and Methylphenidate", speakerName: "Dr. Lydia Belinger" },
-      { time: "12:30–14:00", title: "Lunch break", detail: "Foyer · complimentary", kind: "pause" },
+      { time: "12:30–14:00", title: "Lunch break", detail: "Foyer · complimentary", kind: "pause", experiences: [
+        { title: "Live Concert", time: "12:30–14:00" },
+        { title: "Sound meditation", time: "13:10–13:55" },
+      ] },
       { time: "14:00–15:00", title: "Dr. Matthias Forstmann", detail: "The Mushroom Experience Project: Contextual Predictors and Species-Level Variation in the Subjective Effects of Psilocybin Mushrooms", speakerName: "Dr. Matthias Forstmann" },
       { time: "15:00–16:00", title: "Eirini Ketzitzidou Argyri", detail: "Ontological Disruptions and Diversification: Learning from psychedelics", speakerName: "Eirini Ketzitzidou Argyri" },
-      { time: "16:00–17:00", title: "Coffee break", detail: "Foyer · complimentary · group picture", kind: "pause" },
+      { time: "16:00–17:00", title: "Coffee break", detail: "Foyer · complimentary · group picture", kind: "pause", experiences: [
+        { title: "Sound meditation", time: "16:10–16:55" },
+      ] },
       { time: "17:00–18:00", title: "Dr. Jason K. Day", detail: "What-the-Fuckness: A Phenomenological Concept for Psychedelic Experience", speakerName: "Dr. Jason K. Day" },
       { time: "18:00–19:00", title: "Panel discussion", detail: "Psychedelic and Spirituality (TBD)" },
       { time: "19:15–20:00", title: "Closing talk", detail: "ALPS Team" },
@@ -63,12 +92,56 @@ const PROGRAM: ProgramDay[] = [
   },
 ];
 
+function scrollToExperienceSlot(targetId: string) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth", block: "center" });
+  el.classList.remove("program-item--flash");
+  void el.offsetWidth;
+  el.classList.add("program-item--flash");
+}
+
+function ProgramExperienceHints({
+  day,
+  activities,
+  onNavigate,
+}: {
+  day: string;
+  activities: ProgramExperience[];
+  onNavigate: (targetId: string) => void;
+}) {
+  return (
+    <div className="program-experience-hints">
+      {activities.map((activity) => {
+        const Icon = EXPERIENCE_ICONS[activity.title] ?? Sparkles;
+        const tooltip = `${activity.title} (${activity.time})`;
+        return (
+          <button
+            key={activity.title}
+            type="button"
+            className="program-experience-hint"
+            data-tooltip={tooltip}
+            aria-label={`${tooltip}. View in the experiences programme.`}
+            onClick={() => onNavigate(getExperienceSlotId(day, activity.title))}
+          >
+            <Icon className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function ProgramSchedule({
   expanded = false,
   onSpeakerOpen,
+  onExperienceNavigate,
 }: {
   expanded?: boolean;
   onSpeakerOpen: (speakerName: string) => void;
+  onExperienceNavigate: (targetId: string) => void;
 }) {
   return (
     <div className={`program-board ${expanded ? "program-board--expanded" : ""}`}>
@@ -83,38 +156,48 @@ function ProgramSchedule({
           </header>
 
           <ol className="program-list">
-            {day.items.map((item) => (
-              <li
-                className={`program-item program-item--${item.kind ?? "session"}${item.speakerName ? " program-item--linked" : ""}`}
-                key={`${day.day}-${item.time}`}
-              >
-                {item.speakerName ? (
-                  <a
-                    className="program-speaker-link"
-                    href={`#${getSpeakerModalId(item.speakerName)}`}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      onSpeakerOpen(item.speakerName!);
-                    }}
-                    aria-label={`View talk details for ${item.title}`}
-                  >
-                    <time>{item.time}</time>
-                    <span className="program-speaker-link__copy">
-                      <p>{item.title}</p>
-                      {item.detail && <span>{item.detail}</span>}
-                    </span>
-                  </a>
-                ) : (
-                  <>
-                    <time>{item.time}</time>
-                    <div>
-                      <p>{item.title}</p>
-                      {item.detail && <span>{item.detail}</span>}
-                    </div>
-                  </>
-                )}
-              </li>
-            ))}
+            {day.items.map((item) => {
+              const experiences = item.experiences ?? [];
+              return (
+                <li
+                  className={`program-item program-item--${item.kind ?? "session"}${item.speakerName ? " program-item--linked" : ""}${experiences.length ? " program-item--has-experience" : ""}`}
+                  key={`${day.day}-${item.time}`}
+                >
+                  {item.speakerName ? (
+                    <a
+                      className="program-speaker-link"
+                      href={`#${getSpeakerModalId(item.speakerName)}`}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        onSpeakerOpen(item.speakerName!);
+                      }}
+                      aria-label={`View talk details for ${item.title}`}
+                    >
+                      <time>{item.time}</time>
+                      <span className="program-speaker-link__copy">
+                        <p>{item.title}</p>
+                        {item.detail && <span>{item.detail}</span>}
+                      </span>
+                    </a>
+                  ) : (
+                    <>
+                      <time>{item.time}</time>
+                      <div>
+                        <p>{item.title}</p>
+                        {item.detail && <span>{item.detail}</span>}
+                      </div>
+                    </>
+                  )}
+                  {experiences.length > 0 && (
+                    <ProgramExperienceHints
+                      day={day.day}
+                      activities={experiences}
+                      onNavigate={onExperienceNavigate}
+                    />
+                  )}
+                </li>
+              );
+            })}
           </ol>
         </article>
       ))}
@@ -130,6 +213,8 @@ export default function Program() {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const hasAnimated = useRef(false);
   const [expanded, setExpanded] = useState(false);
+  const { present: expandedPresent, onExited: onExpandedExited } = useModalPresence(expanded);
+  const pendingExperienceNav = useRef<string | null>(null);
 
   const handleSpeakerOpen = (speakerName: string) => {
     const dispatchOpen = () => openSpeakerModal(speakerName);
@@ -141,6 +226,23 @@ export default function Program() {
     }
 
     dispatchOpen();
+  };
+
+  const handleExperienceNavigate = (targetId: string) => {
+    if (expanded) {
+      pendingExperienceNav.current = targetId;
+      setExpanded(false);
+      return;
+    }
+
+    scrollToExperienceSlot(targetId);
+  };
+
+  const handleExpandedExited = () => {
+    onExpandedExited();
+    const targetId = pendingExperienceNav.current;
+    pendingExperienceNav.current = null;
+    if (targetId) scrollToExperienceSlot(targetId);
   };
 
   useEffect(() => {
@@ -174,36 +276,27 @@ export default function Program() {
   }, []);
 
   useEffect(() => {
-    if (!expanded) return;
+    if (!expandedPresent) return;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const handleKey = (event: KeyboardEvent) => event.key === "Escape" && setExpanded(false);
     document.addEventListener("keydown", handleKey);
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-
-    if (modalRef.current && modalContentRef.current) {
-      if (reducedMotion) {
-        modalRef.current.style.opacity = "1";
-        modalContentRef.current.style.opacity = "1";
-      } else {
-        animate(modalRef.current, { opacity: [0, 1], duration: 260, easing: "linear" });
-        animate(modalContentRef.current, {
-          opacity: [0, 1],
-          translateY: [18, 0],
-          scale: [0.985, 1],
-          duration: 480,
-          easing: "easeOutCubic",
-        });
-      }
-    }
-
+    lockBodyScroll();
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
-      expandButtonRef.current?.focus();
+      unlockBodyScroll();
+      focusWithoutScroll(expandButtonRef.current);
     };
+  }, [expandedPresent]);
+
+  useEffect(() => {
+    if (expanded) focusWithoutScroll(closeButtonRef.current);
   }, [expanded]);
+
+  useModalMotion(expanded, modalRef, modalContentRef, handleExpandedExited, {
+    overlayDuration: 260,
+    panelDuration: 480,
+    scale: 0.985,
+  });
 
   return (
     <section ref={sectionRef} id="program" className="relative py-24 sm:py-32 bg-white/[0.02]">
@@ -226,7 +319,7 @@ export default function Program() {
         </div>
 
         <div data-fade-up className="opacity-0">
-          <ProgramSchedule onSpeakerOpen={handleSpeakerOpen} />
+          <ProgramSchedule onSpeakerOpen={handleSpeakerOpen} onExperienceNavigate={handleExperienceNavigate} />
         </div>
 
         <p data-fade-up className="opacity-0 mt-5 text-center text-white/50 text-sm">
@@ -234,10 +327,10 @@ export default function Program() {
         </p>
       </div>
 
-      {expanded && (
+      {expandedPresent && (
         <div
           ref={modalRef}
-          className="program-modal opacity-0"
+          className={`program-modal opacity-0${expanded ? "" : " pointer-events-none"}`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="expanded-program-title"
@@ -253,7 +346,7 @@ export default function Program() {
             </button>
           </div>
           <div ref={modalContentRef} className="program-modal__content opacity-0">
-            <ProgramSchedule expanded onSpeakerOpen={handleSpeakerOpen} />
+            <ProgramSchedule expanded onSpeakerOpen={handleSpeakerOpen} onExperienceNavigate={handleExperienceNavigate} />
           </div>
         </div>
       )}
