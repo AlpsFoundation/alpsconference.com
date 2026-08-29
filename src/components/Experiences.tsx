@@ -53,7 +53,7 @@ const EXPERIENCES: ExperienceCategory[] = [
           {
             title: "LSD blotter exhibition",
             description:
-              "At ALPS he will exhibit a selection of blotter pieces and collages. Come look closely. The whole point is the micro/macro jump: a minute image on a scrap of paper, and the journey it implies.",
+              "At ALPS he will exhibit a selection of blotter pieces. Come look closely. The whole point is the micro/macro jump: a minute image on a scrap of paper, and the journey it implies.",
           },
         ],
         bio: "British blotter artist Kevin Barron has been making psychedelic images for nearly six decades. After art school in the late 1960s he stepped sideways into music (Cat Stevens, a Rolling Stones tour) and then back into the tiny square of paper that he still treats as the highest form of psychedelic art: a picture you can look at, and that can also take you somewhere.\n\nHis 1990s “Shield” blotter, co-signed by Albert Hofmann and Timothy Leary, is the piece collectors call the holy grail of blotter art. Originals of his work are scarce; he has shown in London, Paris, Ibiza and the US. His book BLOTTO: Adventures and Misadventures in Psychedelia came out in 2024.",
