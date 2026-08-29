@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
@@ -18,6 +18,11 @@ type ExperienceSession = {
   description: string;
 };
 
+type ExperienceLinks = {
+  website?: string;
+  instagram?: string;
+};
+
 type ExperiencePerson = {
   name: string;
   role: string;
@@ -28,6 +33,7 @@ type ExperiencePerson = {
   gallery?: string[];
   sessions?: ExperienceSession[];
   bio?: string;
+  links?: ExperienceLinks;
 };
 
 type ExperienceCategory = {
@@ -57,6 +63,10 @@ const EXPERIENCES: ExperienceCategory[] = [
           },
         ],
         bio: "British blotter artist Kevin Barron has been making psychedelic images for nearly six decades. After art school in the late 1960s he stepped sideways into music (Cat Stevens, a Rolling Stones tour) and then back into the tiny square of paper that he still treats as the highest form of psychedelic art: a picture you can look at, and that can also take you somewhere.\n\nHis 1990s “Shield” blotter, co-signed by Albert Hofmann and Timothy Leary, is the piece collectors call the holy grail of blotter art. Originals of his work are scarce; he has shown in London, Paris, Ibiza and the US. His book BLOTTO: Adventures and Misadventures in Psychedelia came out in 2024.",
+        links: {
+          website: "https://kbarron.co.uk",
+          instagram: "eleusisblotter",
+        },
       },
       {
         name: "Hannah Stanke",
@@ -101,6 +111,9 @@ const EXPERIENCES: ExperienceCategory[] = [
           },
         ],
         bio: "Marina Vovk is a Ukrainian sound healer and gong practitioner, psychologist and psyche-aroma diagnostician. She is also a certified yoga instructor, meditation guide, and Reiki and Qigong practitioner, with over sixteen years of dedicated practice.\n\nBased in Switzerland since 2022, Marina works at the intersection of sound, psychology, embodiment, contemplative practices, and psychedelic-assisted approaches. She is trained in MAPS Psychedelic-Assisted Therapy for PTSD and supports MAPS educational programs internationally, including in Ukraine, Poland and Switzerland.\n\nThrough immersive sound journeys with gongs, singing bowls, and other acoustic instruments, Marina creates spaces for deep relaxation, grounding, and reconnection with the body. Her work invites participants to slow down, shift their attention from the intellectual to the embodied, and reconnect with a sense of presence.",
+        links: {
+          instagram: "marevovk",
+        },
       },
       {
         name: "David Elmiger & Friends",
@@ -255,6 +268,69 @@ function ModalPhoto({ src, alt, position }: { src: string; alt: string; position
   );
 }
 
+function ExperienceLinkButtons({ links }: { links: ExperienceLinks }) {
+  const items: { href: string; label: string; icon: ReactNode }[] = [];
+
+  if (links.website) {
+    items.push({
+      href: links.website,
+      label: links.website.replace(/^https?:\/\//, "").replace(/\/$/, ""),
+      icon: (
+        <>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </>
+      ),
+    });
+  }
+
+  if (links.instagram) {
+    items.push({
+      href: `https://www.instagram.com/${links.instagram}/`,
+      label: `@${links.instagram}`,
+      icon: (
+        <>
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+        </>
+      ),
+    });
+  }
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mt-6 pt-5 border-t border-white/10 flex flex-wrap gap-2.5">
+      {items.map((item) => (
+        <a
+          key={item.href}
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-medium text-white/70 hover:text-white hover:border-accent/40 hover:bg-white/[0.06] transition-colors"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            {item.icon}
+          </svg>
+          {item.label}
+        </a>
+      ))}
+    </div>
+  );
+}
+
 function ExperienceModal({
   person,
   open,
@@ -380,6 +456,8 @@ function ExperienceModal({
             </div>
           )}
         </div>
+
+        {person.links && <ExperienceLinkButtons links={person.links} />}
       </div>
     </div>,
     document.body
