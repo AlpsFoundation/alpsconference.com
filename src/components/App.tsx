@@ -20,9 +20,9 @@ export default function App() {
       <main>
         <Hero />
         {/* <Conference /> */}
-        {/* <Experiences /> */}
         <About />
         <Program />
+        <Experiences />
         <Speakers />
         <Gallery />
         <Location />

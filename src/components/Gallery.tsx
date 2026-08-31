@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
+import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
+import { lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
 const images = [
   { src: "1.webp" },
@@ -82,38 +84,34 @@ export default function Gallery() {
     dragStart.current = null;
   };
 
-  // Keyboard nav in lightbox
+  const lightboxOpen = lightbox !== null;
+  const lastLightboxRef = useRef(0);
+  if (lightbox !== null) lastLightboxRef.current = lightbox;
+  const { present: lightboxPresent, onExited: onLightboxExited } = useModalPresence(lightboxOpen);
+  const displayIndex = lightbox ?? lastLightboxRef.current;
+
   useEffect(() => {
-    if (lightbox === null) return;
+    if (!lightboxPresent) return;
+    lockBodyScroll();
+    return () => unlockBodyScroll();
+  }, [lightboxPresent]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") setLightbox((l) => ((l ?? 0) + 1) % images.length);
-      if (e.key === "ArrowLeft") setLightbox((l) => ((l ?? 0) - 1 + images.length) % images.length);
+      if (e.key === "ArrowRight") setLightbox((l) => ((l ?? lastLightboxRef.current) + 1) % images.length);
+      if (e.key === "ArrowLeft") setLightbox((l) => ((l ?? lastLightboxRef.current) - 1 + images.length) % images.length);
       if (e.key === "Escape") setLightbox(null);
     };
     window.addEventListener("keydown", handler);
-    document.body.style.overflow = "hidden";
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightboxOpen]);
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (lightboxRef.current && lightboxImageRef.current) {
-      if (reducedMotion) {
-        lightboxRef.current.style.opacity = "1";
-        lightboxImageRef.current.style.opacity = "1";
-      } else {
-        animate(lightboxRef.current, { opacity: [0, 1], duration: 220, easing: "linear" });
-        animate(lightboxImageRef.current, {
-          opacity: [0, 1],
-          scale: [0.965, 1],
-          duration: 460,
-          easing: "easeOutCubic",
-        });
-      }
-    }
-
-    return () => {
-      window.removeEventListener("keydown", handler);
-      document.body.style.overflow = "";
-    };
-  }, [lightbox]);
+  useModalMotion(lightboxOpen, lightboxRef, lightboxImageRef, onLightboxExited, {
+    panelDuration: 460,
+    translateY: 0,
+    scale: 0.965,
+  });
 
   const visibleIndices = [-2, -1, 0, 1, 2].map(
     (offset) => (current + offset + images.length) % images.length
@@ -213,10 +211,10 @@ export default function Gallery() {
       </div>
 
       {/* Lightbox */}
-      {lightbox !== null && (
+      {lightboxPresent && (
         <div
           ref={lightboxRef}
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          className={`fixed inset-0 z-50 bg-black/90 flex items-center justify-center${lightboxOpen ? "" : " pointer-events-none"}`}
           style={{ opacity: 0 }}
           onClick={() => setLightbox(null)}
           role="dialog"
@@ -225,22 +223,22 @@ export default function Gallery() {
         >
           <img
             ref={lightboxImageRef}
-            src={withBase(`gallery/${images[lightbox].src}`)}
-            alt={`ALPS Conference gallery photo ${lightbox + 1}`}
+            src={withBase(`gallery/${images[displayIndex].src}`)}
+            alt={`ALPS Conference gallery photo ${displayIndex + 1}`}
             className="max-w-[90vw] max-h-[90vh] object-contain rounded-[1rem] shadow-2xl opacity-0"
             onClick={(e) => e.stopPropagation()}
           />
           <button
             aria-label="Previous photo"
             className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            onClick={(e) => { e.stopPropagation(); setLightbox((lightbox - 1 + images.length) % images.length); }}
+            onClick={(e) => { e.stopPropagation(); setLightbox((displayIndex - 1 + images.length) % images.length); }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <button
             aria-label="Next photo"
             className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            onClick={(e) => { e.stopPropagation(); setLightbox((lightbox + 1) % images.length); }}
+            onClick={(e) => { e.stopPropagation(); setLightbox((displayIndex + 1) % images.length); }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
@@ -252,7 +250,7 @@ export default function Gallery() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
           <div className="absolute bottom-4 text-white/50 text-sm">
-            {lightbox + 1} / {images.length} — press ← → to navigate, Esc to close
+            {displayIndex + 1} / {images.length} — press ← → to navigate, Esc to close
           </div>
         </div>
       )}
