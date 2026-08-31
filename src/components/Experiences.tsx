@@ -116,13 +116,15 @@ const EXPERIENCES: ExperienceCategory[] = [
         },
       },
       {
-        name: "David Elmiger & Friends",
+        name: "David & Anna-Lea Wennberg",
         role: "Live Concert",
         context: "Musicians",
+        image: "david-anna-lea-wennberg.jpg",
+        gallery: ["david-anna-lea-wennberg-2.jpg"],
         sessions: [
           {
             title: "Live Concert",
-            description: "David Elmiger & Friends will play a live concert during Saturday lunch. Further details will be published here soon.",
+            description: "David & Anna-Lea Wennberg will play a live concert during Saturday lunch. Further details will be published here soon.",
           },
         ],
       },
@@ -204,7 +206,7 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
     items: [
       { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke"] },
       { time: "08:10–08:50", title: "Yoga", personName: "Andrea Bacconi" },
-      { time: "12:30–14:00", title: "Live Concert", detail: "During lunch", personName: "David Elmiger & Friends" },
+      { time: "12:30–14:00", title: "Live Concert", detail: "During lunch", personName: "David & Anna-Lea Wennberg" },
       { time: "13:10–13:55 & 16:10–16:55", title: "Sound meditation", personName: "Marina Vovk" },
     ],
   },
