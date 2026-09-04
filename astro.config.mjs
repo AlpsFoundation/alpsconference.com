@@ -31,7 +31,12 @@ export default defineConfig({
   },
   site,
   base,
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      filter: (page) => !page.includes("/booklet"),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

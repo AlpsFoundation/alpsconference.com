@@ -1,0 +1,555 @@
+---
+import BookletPage from "./BookletPage.astro";
+import { PROGRAM } from "../../data/program";
+import { PARTNERS } from "../../data/partners";
+import {
+  getFaceCenter,
+  getImageCrop,
+  isConfirmedSpeaker,
+  PANEL_SPEAKERS,
+  speakerByName,
+} from "../../data/speakers";
+import {
+  BOOKLET_NAV,
+  CORE_PROGRAMS,
+  CREDITS,
+  EXPERIENCES,
+  FRIDAY_PANEL,
+  INTRO_BRIDGES,
+  INTRO_WELCOME,
+  MEMBERSHIP,
+  PALE_BLUE_DOT,
+  PILLARS,
+  PRACTICAL_COPY,
+  PROJECTS,
+  SATURDAY_PANEL,
+  SPSN_COPY,
+  SWITZERLAND_COPY,
+  TEAM_SECTIONS,
+  VENUE_COPY,
+} from "../../data/bookletContent";
+import { withBase } from "../../lib/withBase";
+
+const NUMBERED_PAGE_KEYS = [
+  "index",
+  "welcome",
+  "who-we-are",
+  "switzerland",
+  "venue",
+  "program-friday",
+  "program-saturday",
+  "experiences",
+] as const;
+
+const talkKeys = PROGRAM.flatMap((day) =>
+  day.items
+    .filter((item) => item.speakerName)
+    .flatMap((item) => [`talk-${item.speakerName}`, `notes-${item.speakerName}`])
+);
+
+const firstTalkKey = talkKeys[0];
+
+const NUMBERED_PAGES = [
+  ...NUMBERED_PAGE_KEYS,
+  ...talkKeys,
+  "panel-friday",
+  "panel-saturday",
+  "team",
+  "partners",
+  "projects",
+  "membership",
+  "conclusions",
+];
+
+const PAGE = Object.fromEntries(NUMBERED_PAGES.map((key, index) => [key, index + 1])) as Record<string, number>;
+
+const TOC_PAGES: Record<(typeof BOOKLET_NAV)[number]["id"], number> = {
+  introduction: PAGE.welcome,
+  "who-we-are": PAGE["who-we-are"],
+  venue: PAGE.venue,
+  program: PAGE["program-friday"],
+  experiences: PAGE.experiences,
+  talks: PAGE[firstTalkKey],
+  team: PAGE.team,
+  partners: PAGE.partners,
+  projects: PAGE.projects,
+  membership: PAGE.membership,
+  conclusions: PAGE.conclusions,
+};
+
+const TOC = BOOKLET_NAV.map((item) => ({
+  ...item,
+  page: TOC_PAGES[item.id],
+}));
+
+const SPSN_GROUPS = [
+  "PR@Be · Bern",
+  "PARAB · Basel",
+  "PROOF · Fribourg",
+  "PROZ · Zurich",
+  "NAPA · Neuchâtel",
+  "PALA · Lausanne",
+  "ARP · Geneva",
+];
+
+const confirmedTalks = PROGRAM.flatMap((day) =>
+  day.items
+    .filter((item) => item.speakerName)
+    .map((item) => {
+      const speaker = speakerByName(item.speakerName!);
+      return speaker ? { speaker, item, day } : null;
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
+);
+
+const ricardo = PANEL_SPEAKERS.find(isConfirmedSpeaker);
+const kukInside = withBase("img/kuk-inside.jpg");
+const kukOutside = withBase("img/kuk-outside.jpg");
+const logoSrc = withBase("img/logo.png");
+
+function cropStyle(image?: string) {
+  const crop = getImageCrop(image);
+  return `--crop-pos:${crop.position};--crop-scale:${crop.scale};--crop-origin:${getFaceCenter(crop.faceBox)}`;
+}
+
+function compactTalk(abstract?: string, bio?: string) {
+  return (abstract?.length ?? 0) + (bio?.length ?? 0) > 2400;
+}
+
+const talkCount = confirmedTalks.length;
+---
+
+<BookletPage id="cover" cover glow="center" bones="center" logo={false} stickyTitle="ALPS 2026">
+  <div class="booklet-cover">
+    <div class="booklet-cover__brand">
+      <img class="booklet-cover__logo" src={logoSrc} alt="ALPS" />
+      <p class="booklet-kicker">Awareness Lectures on Psychedelic Science</p>
+    </div>
+    <div class="booklet-cover__hero">
+      <p class="booklet-cover__edition">Sixth edition</p>
+      <h1>
+        ALPS
+        <span>2026</span>
+      </h1>
+      <p class="booklet-cover__subtitle">Conference booklet</p>
+    </div>
+    <div class="booklet-cover__meta">
+      <div>
+        <span>Dates</span>
+        9–10 October
+      </div>
+      <div>
+        <span>Venue</span>
+        Kultur &amp; Kongresshaus Aarau
+      </div>
+    </div>
+  </div>
+</BookletPage>
+
+<BookletPage id="index" number={PAGE.index} section="Index" glow="br" bones="right">
+  <div class="booklet-index">
+    <div>
+      <p class="booklet-kicker">ALPS Conference 2026</p>
+      <h1 class="booklet-title">Contents</h1>
+      <ol>
+        {TOC.map((item) => (
+          <li>
+            <a href={`#${item.id}`}>
+              <span>{item.printLabel}</span>
+              <span></span>
+              <span>{String(item.page).padStart(2, "0")}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+    <aside class="booklet-index__aside">
+      <p>
+        <strong>9–10 October 2026</strong>
+        Kultur &amp; Kongresshaus Aarau
+      </p>
+      <p>
+        <strong>{talkCount} talks · 2 panels</strong>
+        Speakers, posters, and community program
+      </p>
+      <p>
+        <strong>Up to 14 FSP credits</strong>
+        8 ECTS for SGPP / SSPP
+      </p>
+      <p>
+        <strong>Working language</strong>
+        English
+      </p>
+    </aside>
+  </div>
+</BookletPage>
+
+<BookletPage id="introduction" number={PAGE.welcome} section="Introduction" glow="bl" bones="bottom">
+  <div class="booklet-split booklet-split--tight">
+    <div class="booklet-split__block">
+      <p class="booklet-kicker">ALPS 2026 · Aarau</p>
+      <h1 class="booklet-title">{INTRO_WELCOME.title}</h1>
+      <div class="booklet-cols booklet-cols--text booklet-copy">
+        {INTRO_WELCOME.columns.map((column) => (
+          <div>
+            {column.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="booklet-split__block">
+      <p class="booklet-kicker">The foundation</p>
+      <h1 class="booklet-title">{INTRO_BRIDGES.title}</h1>
+      <div class="booklet-cols booklet-cols--text booklet-copy">
+        {INTRO_BRIDGES.columns.map((column) => (
+          <div>
+            {column.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BookletPage>
+
+<BookletPage id="who-we-are" number={PAGE["who-we-are"]} section="Who we are" glow="tl" bones="left">
+  <div class="booklet-split booklet-split--tight booklet-split--fill">
+    <div class="booklet-split__block">
+      <h1 class="booklet-title">{PILLARS.title}</h1>
+      <div class="booklet-cols booklet-cols--text booklet-copy">
+        {PILLARS.columns.map((column) => (
+          <div>
+            {column.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="booklet-split__block">
+      <h1 class="booklet-title">Our Three Core Programs</h1>
+      <div class="booklet-copy booklet-stack" style="height: auto;">
+        {CORE_PROGRAMS.map((program) => (
+          <div>
+            <p class="booklet-kicker">{program.title}</p>
+            <p>{program.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BookletPage>
+
+<BookletPage number={PAGE.switzerland} section="Who we are" glow="br" bones="right">
+  <div class="booklet-split booklet-split--tight">
+    <div class="booklet-split__block">
+      <h1 class="booklet-title">The Swiss Psychedelic Student Network</h1>
+      <div class="booklet-logo-row" style="margin-bottom: 4mm;">
+        {SPSN_GROUPS.map((group) => (
+          <span class="booklet-pill">{group}</span>
+        ))}
+      </div>
+      <div class="booklet-copy">
+        {SPSN_COPY.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </div>
+    <div class="booklet-split__block">
+      <h1 class="booklet-title">Switzerland: A Unique Landscape for Psychedelic Science</h1>
+      <div class="booklet-map" aria-hidden="true">
+        <svg viewBox="0 0 320 180" fill="none">
+          <path
+            d="M54 78c18-22 42-31 70-34 22-2 38 6 58 2 21-4 36-18 58-16 18 2 32 14 42 28 8 12 6 28-2 40-10 16-28 22-46 28-16 5-28 16-46 18-24 3-40-8-62-6-20 2-32 14-52 10-18-4-28-18-32-34-3-14 4-24 12-36z"
+            stroke="rgba(255,255,255,0.88)"
+            stroke-width="1.4"
+            fill="rgba(82,169,236,0.08)"
+          />
+          <circle cx="168" cy="52" r="3.2" fill="#f8acd0" />
+          <circle cx="214" cy="70" r="2.6" fill="#52a9ec" />
+          <circle cx="132" cy="86" r="2.4" fill="#f8acd0" />
+        </svg>
+      </div>
+      <p class="booklet-copy" style="margin-bottom: 3mm;">{SWITZERLAND_COPY.lead}</p>
+      <div class="booklet-cols booklet-cols--text booklet-copy">
+        {SWITZERLAND_COPY.columns.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </div>
+    </div>
+  </div>
+</BookletPage>
+
+<BookletPage id="venue" number={PAGE.venue} section="Venue" glow="tl" bones="left">
+  <h1 class="booklet-title">{VENUE_COPY.title}</h1>
+  <div class="booklet-cols" style="margin-bottom: 4mm;">
+    <div class="booklet-venue-photo" style="margin: 0;">
+      <img src={kukOutside} alt="Exterior of Kultur & Kongresshaus Aarau" />
+    </div>
+    <div class="booklet-venue-photo" style="margin: 0;">
+      <img src={kukInside} alt="Interior of Kultur & Kongresshaus Aarau" />
+    </div>
+  </div>
+  <div class="booklet-copy" style="margin-bottom: 3mm;">
+    {VENUE_COPY.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </div>
+  <div class="booklet-facts" style="margin-top: 2mm;">
+    {VENUE_COPY.facts.map((fact) => (
+      <div>
+        <strong>{fact.label}</strong>
+        <p>{fact.value}</p>
+      </div>
+    ))}
+  </div>
+  <div class="booklet-cols booklet-copy" style="margin-top: 5mm;">
+    {PRACTICAL_COPY.map((item) => (
+      <p>
+        <strong style="color: white;">{item.title}.</strong> {item.body}
+      </p>
+    ))}
+  </div>
+</BookletPage>
+
+{PROGRAM.map((day) => (
+  <BookletPage
+    id={day.day === "Friday" ? "program" : undefined}
+    number={PAGE[`program-${day.day.toLowerCase()}`]}
+    section="Program"
+    glow={day.day === "Friday" ? "bl" : "br"}
+    bones={day.day === "Friday" ? "left" : "right"}
+  >
+    <p class="booklet-kicker">{day.date} 2026 · Kultur & Kongresshaus Aarau</p>
+    <div class="booklet-program">
+      <p class="booklet-program__day">{day.day}</p>
+      <ol>
+        {day.items.map((item) => (
+          <li data-kind={item.kind ?? "session"}>
+            <time>{item.time}</time>
+            <div>
+              <p>{item.title}</p>
+              {item.detail && <em>{item.detail}</em>}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </BookletPage>
+))}
+
+<BookletPage id="experiences" number={PAGE.experiences} section="Experiences" glow="tl" bones="left">
+  <p class="booklet-kicker">Beyond the talks</p>
+  <h1 class="booklet-title">Evenings, music, and community</h1>
+  <div class="booklet-facts">
+    {EXPERIENCES.map((item) => (
+      <div>
+        <strong>{item.when}</strong>
+        <p>
+          {item.title}
+          <br />
+          <em>{item.detail}</em>
+        </p>
+      </div>
+    ))}
+  </div>
+  <p class="booklet-copy" style="margin-top: auto; padding-top: 8mm;">
+    Speakers, timings, and side experiences are subject to change. The latest program is always on alpsconference.com.
+  </p>
+</BookletPage>
+
+{confirmedTalks.map(({ speaker, item, day }, talkIndex) => {
+  const compact = compactTalk(speaker.abstract, speaker.bio);
+  const hasAbstract = Boolean(
+    speaker.abstract && speaker.abstract !== "TBD" && speaker.abstract !== "To be announced"
+  );
+  return (
+    <>
+      <BookletPage
+        id={talkIndex === 0 ? "talks" : undefined}
+        number={PAGE[`talk-${speaker.name}`]}
+        section="Talks & panels"
+        glow="bl"
+        bones="bottom"
+      >
+        <article class:list={["booklet-talk", compact && "booklet-talk--compact"]}>
+          <div class="booklet-talk__header">
+            {speaker.image ? (
+              <div class="booklet-avatar" style={cropStyle(speaker.image)}>
+                <img src={withBase(`img/speakers/${speaker.image}`)} alt={speaker.name} />
+              </div>
+            ) : (
+              <div class="booklet-avatar"></div>
+            )}
+            <div class="booklet-talk__identity">
+              <p class="booklet-kicker">
+                {day.day} · {item.time}
+              </p>
+              <h1>{speaker.name}</h1>
+              <p class="booklet-talk__role">{[speaker.role, speaker.institution].filter(Boolean).join(", ")}</p>
+              {speaker.bio && <p class="booklet-talk__bio">{speaker.bio}</p>}
+            </div>
+          </div>
+          {speaker.talkTitle && <h2>{speaker.talkTitle}</h2>}
+          {hasAbstract && <div class="booklet-talk__abstract">{speaker.abstract}</div>}
+        </article>
+      </BookletPage>
+      <BookletPage
+        number={PAGE[`notes-${speaker.name}`]}
+        stickyTitle="Talks & panels"
+        notes
+        glow="tr"
+        bones="right"
+      >
+        <div class="booklet-notes">
+          <h1>Notes</h1>
+          <div class="booklet-lined"></div>
+        </div>
+      </BookletPage>
+    </>
+  );
+})}
+
+<BookletPage number={PAGE["panel-friday"]} section="Talks & panels" glow="tl" bones="left">
+  <p class="booklet-kicker">Friday · 18:15–19:15</p>
+  <h1 class="booklet-title booklet-title--xl">{FRIDAY_PANEL.title}</h1>
+  <p class="booklet-copy" style="max-width: 160mm; margin: 5mm 0 7mm;">
+    {FRIDAY_PANEL.body}
+  </p>
+  <div class="booklet-notes" style="flex: 1;">
+    <h1>Notes</h1>
+    <div class="booklet-lined"></div>
+  </div>
+</BookletPage>
+
+<BookletPage number={PAGE["panel-saturday"]} section="Talks & panels" glow="br" bones="right">
+  <p class="booklet-kicker">Saturday · 18:00–19:00</p>
+  <h1 class="booklet-title booklet-title--xl">{SATURDAY_PANEL.title}</h1>
+  <p class="booklet-copy" style="max-width: 160mm; margin: 4mm 0 6mm;">
+    {SATURDAY_PANEL.body}
+  </p>
+  {ricardo && (
+    <div class="booklet-panel-guest">
+      <div class="booklet-talk__header">
+        {ricardo.image && (
+          <div class="booklet-avatar" style={cropStyle(ricardo.image)}>
+            <img src={withBase(`img/speakers/${ricardo.image}`)} alt={ricardo.name} />
+          </div>
+        )}
+        <div class="booklet-talk__identity">
+          <p class="booklet-kicker">Confirmed panelist</p>
+          <h1>{ricardo.name}</h1>
+          <p class="booklet-talk__role">{[ricardo.role, ricardo.institution].filter(Boolean).join(", ")}</p>
+        </div>
+      </div>
+      {ricardo.bio && <p class="booklet-talk__bio booklet-talk__bio--cols">{ricardo.bio}</p>}
+    </div>
+  )}
+</BookletPage>
+
+<BookletPage id="team" number={PAGE.team} section="Team" glow="bl" bones="left">
+  <p class="booklet-kicker">ALPS 2026</p>
+  <h1 class="booklet-title">Meet the team</h1>
+  {TEAM_SECTIONS.map((section) => (
+    <div class="booklet-team-block">
+      <h2>
+        <span>ALPS</span> {section.title}
+      </h2>
+      <div class="booklet-team-grid">
+        {section.people.map((person) => (
+          <p>
+            {person.name}
+            <span>{person.role}</span>
+          </p>
+        ))}
+      </div>
+    </div>
+  ))}
+</BookletPage>
+
+<BookletPage id="partners" number={PAGE.partners} section="Partners" glow="tl" bones="none">
+  <h1 class="booklet-title">Our partners</h1>
+  {Object.entries(PARTNERS).map(([category, logos]) => (
+    <div>
+      <h3 class="booklet-partners">{category}</h3>
+      <div class="booklet-logo-row">
+        {logos.map((partner) => (
+          <img
+            src={withBase(partner.src.replace(/^\//, ""))}
+            alt={partner.alt}
+            style={partner.scale != null ? `transform: scale(${partner.scale})` : undefined}
+          />
+        ))}
+      </div>
+    </div>
+  ))}
+  <div style="margin-top: auto;">
+    <h2 class="booklet-title" style="font-size: 13pt; margin-bottom: 3mm;">Postgraduate training credits</h2>
+    <div class="booklet-copy">
+      <p>{CREDITS.fsp}</p>
+      <p>{CREDITS.sgpp}</p>
+      <p>{CREDITS.note}</p>
+    </div>
+  </div>
+</BookletPage>
+
+<BookletPage id="projects" number={PAGE.projects} section="Our projects" glow="br" bones="left">
+  <h1 class="booklet-title">Our projects</h1>
+  <div class="booklet-stack">
+    {PROJECTS.map((project) => (
+      <div class="booklet-copy">
+        <p class="booklet-kicker">{project.title}</p>
+        <p>{project.body}</p>
+      </div>
+    ))}
+  </div>
+</BookletPage>
+
+<BookletPage id="membership" number={PAGE.membership} section="Membership" glow="bl" bones="right">
+  <div class="booklet-cols" style="height: 100%;">
+    <div>
+      <p class="booklet-kicker">Membership</p>
+      {MEMBERSHIP.tiers.map((tier) => (
+        <p class="booklet-copy" style="margin-bottom: 4mm;">
+          <strong style="color: white;">{tier.name}</strong>
+          <br />
+          {tier.price}
+        </p>
+      ))}
+      <div class="booklet-copy">
+        {MEMBERSHIP.membership.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </div>
+    <div>
+      <p class="booklet-kicker">Donations</p>
+      <div class="booklet-copy">
+        {MEMBERSHIP.donations.map((paragraph) => <p>{paragraph}</p>)}
+        <p>alps.foundation</p>
+      </div>
+    </div>
+  </div>
+</BookletPage>
+
+<BookletPage id="conclusions" number={PAGE.conclusions} section="Conclusions" glow="center" bones="none">
+  <div class="booklet-quote">
+    <figure>
+      {PALE_BLUE_DOT.map((paragraph) => <p>{paragraph}</p>)}
+      <figcaption>Carl Sagan — Pale Blue Dot</figcaption>
+    </figure>
+    <div class="booklet-pale-blue" aria-hidden="true">
+      <svg viewBox="0 0 400 400">
+        <defs>
+          <radialGradient id="space" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stop-color="#145f91" stop-opacity="0.35" />
+            <stop offset="55%" stop-color="#082f4a" />
+            <stop offset="100%" stop-color="#031018" />
+          </radialGradient>
+          <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0" />
+            <stop offset="45%" stop-color="#cfe6ff" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="400" fill="url(#space)" />
+        <polygon points="40,20 360,300 320,360 0,80" fill="url(#beam)" />
+        <circle cx="248" cy="214" r="2.4" fill="#7eb6ff" />
+        <path d="M262 198 l-8 10" stroke="white" stroke-width="1" fill="none" />
+        <circle cx="262" cy="196" r="1.2" fill="white" />
+      </svg>
+    </div>
+  </div>
+</BookletPage>
+

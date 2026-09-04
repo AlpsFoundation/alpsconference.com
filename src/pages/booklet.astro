@@ -1,0 +1,269 @@
+---
+import "../styles/booklet.css";
+import Booklet from "../components/booklet/Booklet.astro";
+import { BOOKLET_NAV } from "../data/bookletContent";
+import { withBase } from "../lib/withBase";
+
+const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const switzerItalic = withBase("fonts/Switzer-VariableItalic.woff2");
+const ogImagePath = withBase("img/opengraph.jpg");
+const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
+
+const fontFaceCss = `@font-face {
+  font-family: "Switzer";
+  src: url("${switzerFont}") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("${switzerItalic}") format("woff2");
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+}`;
+---
+
+<!doctype html>
+<html lang="en" data-booklet-view="print" data-booklet-toc="closed">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conference Booklet | ALPS Conference 2026</title>
+    <meta
+      name="description"
+      content="Conference booklet for ALPS 2026 in Aarau, Switzerland."
+    />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ALPS 2026 conference booklet" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta name="theme-color" content="#0B3C5D" />
+    <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
+    <style is:global set:html={fontFaceCss}></style>
+    <script is:inline>
+      (function () {
+        var key = "alps-booklet-view";
+        var view = "print";
+        try {
+          var param = new URLSearchParams(window.location.search).get("view");
+          if (param === "print" || param === "web") {
+            view = param;
+          } else {
+            var saved = window.localStorage.getItem(key);
+            if (saved === "print" || saved === "web") {
+              view = saved;
+            } else if (window.matchMedia("(max-width: 720px)").matches) {
+              view = "web";
+            }
+          }
+        } catch (error) {
+          view = "print";
+        }
+        document.documentElement.dataset.bookletView = view;
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="booklet-chrome">
+      <div class="booklet-chrome__toggle">
+        <div class="booklet-view-toggle" role="group" aria-label="Booklet layout">
+          <button type="button" data-view="print" aria-pressed="true">Print (A4)</button>
+          <button type="button" data-view="web" aria-pressed="false">Web (responsive)</button>
+        </div>
+      </div>
+      <div class="booklet-chrome__nav">
+        <p class="booklet-chrome__title" id="booklet-current-section">ALPS 2026</p>
+        <button
+          type="button"
+          class="booklet-chrome__menu"
+          aria-expanded="false"
+          aria-controls="booklet-toc"
+          aria-label="Table of contents"
+        >
+          <span class="booklet-chrome__menu-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <button type="button" class="booklet-toc__backdrop" tabindex="-1" aria-label="Close table of contents" hidden></button>
+    <nav class="booklet-toc" id="booklet-toc" aria-label="Table of contents" hidden>
+      <p class="booklet-toc__kicker">ALPS 2026</p>
+      <p class="booklet-toc__heading">Contents</p>
+      <ol>
+        {BOOKLET_NAV.map((item) => (
+          <li>
+            <a href={`#${item.id}`}>{item.label}</a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+
+    <div class="booklet-stage">
+      <div class="booklet-scale" id="booklet-scale">
+        <Booklet />
+      </div>
+    </div>
+    <script>
+      const VIEW_KEY = "alps-booklet-view";
+
+      function currentView() {
+        return document.documentElement.dataset.bookletView === "web" ? "web" : "print";
+      }
+
+      function resetWebLayout() {
+        const stage = document.querySelector<HTMLElement>(".booklet-stage");
+        const scaleEl = document.querySelector<HTMLElement>("#booklet-scale");
+        if (!stage || !scaleEl) return;
+        scaleEl.style.removeProperty("--booklet-scale");
+        scaleEl.style.height = "";
+        stage.style.height = "";
+      }
+
+      function fitPrintBooklet() {
+        const stage = document.querySelector<HTMLElement>(".booklet-stage");
+        const scaleEl = document.querySelector<HTMLElement>("#booklet-scale");
+        if (!stage || !scaleEl) return;
+        scaleEl.style.height = "auto";
+        stage.style.height = "auto";
+        const pageWidth = 210 * (96 / 25.4);
+        const nextScale = Math.min(1, stage.clientWidth / pageWidth);
+        scaleEl.style.setProperty("--booklet-scale", String(nextScale));
+        stage.style.height = `${scaleEl.scrollHeight * nextScale}px`;
+      }
+
+      function fitBooklet() {
+        if (currentView() === "web") resetWebLayout();
+        else fitPrintBooklet();
+      }
+
+      function syncViewToggle() {
+        const view = currentView();
+        document.querySelectorAll<HTMLButtonElement>(".booklet-view-toggle [data-view]").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.view === view));
+        });
+      }
+
+      function setTocOpen(open: boolean) {
+        const root = document.documentElement;
+        const button = document.querySelector<HTMLButtonElement>(".booklet-chrome__menu");
+        const nav = document.querySelector<HTMLElement>("#booklet-toc");
+        const backdrop = document.querySelector<HTMLButtonElement>(".booklet-toc__backdrop");
+        root.dataset.bookletToc = open ? "open" : "closed";
+        button?.setAttribute("aria-expanded", String(open));
+        button?.setAttribute("aria-label", open ? "Close table of contents" : "Table of contents");
+        nav?.toggleAttribute("hidden", !open);
+        backdrop?.toggleAttribute("hidden", !open);
+      }
+
+      function setView(view: "print" | "web") {
+        document.documentElement.dataset.bookletView = view;
+        if (view === "print") setTocOpen(false);
+        syncViewToggle();
+        try {
+          localStorage.setItem(VIEW_KEY, view);
+        } catch {
+          /* ignore quota / private mode */
+        }
+        requestAnimationFrame(() => {
+          fitBooklet();
+          updateStickyTitle();
+          updateChromeHeight();
+        });
+      }
+
+      function updateChromeHeight() {
+        const chrome = document.querySelector<HTMLElement>(".booklet-chrome");
+        if (!chrome) return;
+        document.documentElement.style.setProperty("--booklet-chrome-h", `${chrome.offsetHeight}px`);
+      }
+
+      function updateStickyTitle() {
+        const titleEl = document.querySelector("#booklet-current-section");
+        if (!titleEl) return;
+        const chromeHeight =
+          parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--booklet-chrome-h")) || 56;
+        const probeY = Math.min(window.innerHeight - 8, chromeHeight + 24);
+        const probeX = Math.min(120, window.innerWidth / 2);
+        const hit = document.elementFromPoint(probeX, probeY);
+        const page = hit?.closest<HTMLElement>(".booklet-page");
+        const nextTitle = page?.dataset.section;
+        if (nextTitle && titleEl.textContent !== nextTitle) titleEl.textContent = nextTitle;
+
+        let activeId = page?.id ?? "";
+        if (!activeId && page?.dataset.section) {
+          document.querySelectorAll<HTMLElement>(".booklet-page[data-section]").forEach((candidate) => {
+            if (!activeId && candidate.dataset.section === page.dataset.section && candidate.id) {
+              activeId = candidate.id;
+            }
+          });
+        }
+        document.querySelectorAll<HTMLAnchorElement>(".booklet-toc a").forEach((link) => {
+          const isCurrent = activeId !== "" && link.hash === `#${activeId}`;
+          link.classList.toggle("is-current", isCurrent);
+          if (isCurrent) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      }
+
+      const chrome = document.querySelector(".booklet-chrome");
+      if (chrome) {
+        updateChromeHeight();
+        new ResizeObserver(() => {
+          updateChromeHeight();
+          fitBooklet();
+        }).observe(chrome);
+      }
+
+      document.querySelectorAll<HTMLButtonElement>(".booklet-view-toggle [data-view]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const view = button.dataset.view === "web" ? "web" : "print";
+          setView(view);
+          const url = new URL(window.location.href);
+          url.searchParams.set("view", view);
+          history.replaceState(null, "", url);
+        });
+      });
+
+      document.querySelector(".booklet-chrome__menu")?.addEventListener("click", () => {
+        setTocOpen(document.documentElement.dataset.bookletToc !== "open");
+      });
+      document.querySelector(".booklet-toc__backdrop")?.addEventListener("click", () => setTocOpen(false));
+      document.querySelectorAll<HTMLAnchorElement>(".booklet-toc a").forEach((link) => {
+        link.addEventListener("click", () => setTocOpen(false));
+      });
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") setTocOpen(false);
+      });
+
+      let titleFrame = 0;
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (titleFrame) return;
+          titleFrame = requestAnimationFrame(() => {
+            titleFrame = 0;
+            updateStickyTitle();
+          });
+        },
+        { passive: true }
+      );
+      window.addEventListener("pageshow", () => {
+        fitBooklet();
+        updateStickyTitle();
+      });
+      window.addEventListener("resize", fitBooklet);
+
+      syncViewToggle();
+      fitBooklet();
+      updateStickyTitle();
+      setTimeout(updateStickyTitle, 50);
+    </script>
+  </body>
+</html>

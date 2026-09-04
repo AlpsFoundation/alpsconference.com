@@ -1,0 +1,52 @@
+---
+import { withBase } from "../../lib/withBase";
+
+interface Props {
+  id?: string;
+  number?: string | number;
+  section?: string;
+  stickyTitle?: string;
+  notes?: boolean;
+  glow?: "bl" | "br" | "tl" | "tr" | "center";
+  bones?: "left" | "right" | "bottom" | "center" | "none";
+  logo?: boolean;
+  cover?: boolean;
+}
+
+const {
+  id,
+  number,
+  section,
+  stickyTitle,
+  notes = false,
+  glow = "bl",
+  bones = "left",
+  logo = true,
+  cover = false,
+} = Astro.props;
+
+const pageNumber = number == null ? "" : String(number).padStart(2, "0");
+const dataSection = stickyTitle ?? section;
+const bonesSrc = withBase("img/bones.png");
+const logoSrc = withBase("img/logo.png");
+---
+
+<article
+  id={id}
+  data-section={dataSection}
+  class:list={[
+    "booklet-page",
+    `booklet-page--glow-${glow}`,
+    `booklet-page--bones-${bones}`,
+    cover && "booklet-page--cover",
+    notes && "booklet-page--notes",
+  ]}
+>
+  <img class="booklet-page__bones" src={bonesSrc} alt="" />
+  {logo && <img class="booklet-page__logo" src={logoSrc} alt="ALPS" />}
+  <div class="booklet-page__body">
+    <slot />
+  </div>
+  {section && <p class="booklet-page__section">{section}</p>}
+  {pageNumber && <p class="booklet-page__number">{pageNumber}</p>}
+</article>
