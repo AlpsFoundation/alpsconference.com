@@ -1,3 +1,5 @@
+import { setLocationHash } from "./locationHash";
+
 export const SPEAKER_MODAL_EVENT = "alps:open-speaker";
 
 export function getSpeakerModalId(name: string) {
@@ -13,7 +15,7 @@ export function getSpeakerModalId(name: string) {
 
 export function openSpeakerModal(name: string) {
   const speakerId = getSpeakerModalId(name);
-  window.history.pushState(null, "", `#${speakerId}`);
+  setLocationHash(speakerId);
   window.dispatchEvent(
     new CustomEvent<{ speakerId: string }>(SPEAKER_MODAL_EVENT, {
       detail: { speakerId },

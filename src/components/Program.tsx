@@ -1,15 +1,70 @@
 import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
-import { Maximize2, X } from "lucide-react";
-import { PROGRAM } from "../data/program";
+import { Maximize2, Music, PersonStanding, Sparkles, Users, Waves, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { PROGRAM, type ProgramExperience } from "../data/program";
+import { getExperienceSlotId } from "../lib/experienceModal";
+import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
 import { getSpeakerModalId, openSpeakerModal } from "../lib/speakerModal";
+import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
+
+const EXPERIENCE_ICONS: Record<string, LucideIcon> = {
+  "Sound meditation": Waves,
+  "Speed-friending": Users,
+  Yoga: PersonStanding,
+  "Live Concert": Music,
+};
+
+function scrollToExperienceSlot(targetId: string) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth", block: "center" });
+  el.classList.remove("program-item--flash");
+  void el.offsetWidth;
+  el.classList.add("program-item--flash");
+}
+
+function ProgramExperienceHints({
+  day,
+  activities,
+  onNavigate,
+}: {
+  day: string;
+  activities: ProgramExperience[];
+  onNavigate: (targetId: string) => void;
+}) {
+  return (
+    <div className="program-experience-hints">
+      {activities.map((activity) => {
+        const Icon = EXPERIENCE_ICONS[activity.title] ?? Sparkles;
+        const tooltip = `${activity.title} (${activity.time})`;
+        return (
+          <button
+            key={activity.title}
+            type="button"
+            className="program-experience-hint"
+            data-tooltip={tooltip}
+            aria-label={`${tooltip}. View in the experiences programme.`}
+            onClick={() => onNavigate(getExperienceSlotId(day, activity.title))}
+          >
+            <Icon className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 function ProgramSchedule({
   expanded = false,
   onSpeakerOpen,
+  onExperienceNavigate,
 }: {
   expanded?: boolean;
   onSpeakerOpen: (speakerName: string) => void;
+  onExperienceNavigate: (targetId: string) => void;
 }) {
   return (
     <div className={`program-board ${expanded ? "program-board--expanded" : ""}`}>
@@ -24,38 +79,48 @@ function ProgramSchedule({
           </header>
 
           <ol className="program-list">
-            {day.items.map((item) => (
-              <li
-                className={`program-item program-item--${item.kind ?? "session"}${item.speakerName ? " program-item--linked" : ""}`}
-                key={`${day.day}-${item.time}`}
-              >
-                {item.speakerName ? (
-                  <a
-                    className="program-speaker-link"
-                    href={`#${getSpeakerModalId(item.speakerName)}`}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      onSpeakerOpen(item.speakerName!);
-                    }}
-                    aria-label={`View talk details for ${item.title}`}
-                  >
-                    <time>{item.time}</time>
-                    <span className="program-speaker-link__copy">
-                      <p>{item.title}</p>
-                      {item.detail && <span>{item.detail}</span>}
-                    </span>
-                  </a>
-                ) : (
-                  <>
-                    <time>{item.time}</time>
-                    <div>
-                      <p>{item.title}</p>
-                      {item.detail && <span>{item.detail}</span>}
-                    </div>
-                  </>
-                )}
-              </li>
-            ))}
+            {day.items.map((item) => {
+              const experiences = item.experiences ?? [];
+              return (
+                <li
+                  className={`program-item program-item--${item.kind ?? "session"}${item.speakerName ? " program-item--linked" : ""}${experiences.length ? " program-item--has-experience" : ""}`}
+                  key={`${day.day}-${item.time}`}
+                >
+                  {item.speakerName ? (
+                    <a
+                      className="program-speaker-link"
+                      href={`#${getSpeakerModalId(item.speakerName)}`}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        onSpeakerOpen(item.speakerName!);
+                      }}
+                      aria-label={`View talk details for ${item.title}`}
+                    >
+                      <time>{item.time}</time>
+                      <span className="program-speaker-link__copy">
+                        <p>{item.title}</p>
+                        {item.detail && <span>{item.detail}</span>}
+                      </span>
+                    </a>
+                  ) : (
+                    <>
+                      <time>{item.time}</time>
+                      <div>
+                        <p>{item.title}</p>
+                        {item.detail && <span>{item.detail}</span>}
+                      </div>
+                    </>
+                  )}
+                  {experiences.length > 0 && (
+                    <ProgramExperienceHints
+                      day={day.day}
+                      activities={experiences}
+                      onNavigate={onExperienceNavigate}
+                    />
+                  )}
+                </li>
+              );
+            })}
           </ol>
         </article>
       ))}
@@ -71,6 +136,8 @@ export default function Program() {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const hasAnimated = useRef(false);
   const [expanded, setExpanded] = useState(false);
+  const { present: expandedPresent, onExited: onExpandedExited } = useModalPresence(expanded);
+  const pendingExperienceNav = useRef<string | null>(null);
 
   const handleSpeakerOpen = (speakerName: string) => {
     const dispatchOpen = () => openSpeakerModal(speakerName);
@@ -82,6 +149,23 @@ export default function Program() {
     }
 
     dispatchOpen();
+  };
+
+  const handleExperienceNavigate = (targetId: string) => {
+    if (expanded) {
+      pendingExperienceNav.current = targetId;
+      setExpanded(false);
+      return;
+    }
+
+    scrollToExperienceSlot(targetId);
+  };
+
+  const handleExpandedExited = () => {
+    onExpandedExited();
+    const targetId = pendingExperienceNav.current;
+    pendingExperienceNav.current = null;
+    if (targetId) scrollToExperienceSlot(targetId);
   };
 
   useEffect(() => {
@@ -115,36 +199,27 @@ export default function Program() {
   }, []);
 
   useEffect(() => {
-    if (!expanded) return;
+    if (!expandedPresent) return;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const handleKey = (event: KeyboardEvent) => event.key === "Escape" && setExpanded(false);
     document.addEventListener("keydown", handleKey);
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-
-    if (modalRef.current && modalContentRef.current) {
-      if (reducedMotion) {
-        modalRef.current.style.opacity = "1";
-        modalContentRef.current.style.opacity = "1";
-      } else {
-        animate(modalRef.current, { opacity: [0, 1], duration: 260, easing: "linear" });
-        animate(modalContentRef.current, {
-          opacity: [0, 1],
-          translateY: [18, 0],
-          scale: [0.985, 1],
-          duration: 480,
-          easing: "easeOutCubic",
-        });
-      }
-    }
-
+    lockBodyScroll();
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
-      expandButtonRef.current?.focus();
+      unlockBodyScroll();
+      focusWithoutScroll(expandButtonRef.current);
     };
+  }, [expandedPresent]);
+
+  useEffect(() => {
+    if (expanded) focusWithoutScroll(closeButtonRef.current);
   }, [expanded]);
+
+  useModalMotion(expanded, modalRef, modalContentRef, handleExpandedExited, {
+    overlayDuration: 260,
+    panelDuration: 480,
+    scale: 0.985,
+  });
 
   return (
     <section ref={sectionRef} id="program" className="relative py-24 sm:py-32 bg-white/[0.02]">
@@ -167,7 +242,7 @@ export default function Program() {
         </div>
 
         <div data-fade-up className="opacity-0">
-          <ProgramSchedule onSpeakerOpen={handleSpeakerOpen} />
+          <ProgramSchedule onSpeakerOpen={handleSpeakerOpen} onExperienceNavigate={handleExperienceNavigate} />
         </div>
 
         <p data-fade-up className="opacity-0 mt-5 text-center text-white/50 text-sm">
@@ -175,10 +250,10 @@ export default function Program() {
         </p>
       </div>
 
-      {expanded && (
+      {expandedPresent && (
         <div
           ref={modalRef}
-          className="program-modal opacity-0"
+          className={`program-modal opacity-0${expanded ? "" : " pointer-events-none"}`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="expanded-program-title"
@@ -194,7 +269,7 @@ export default function Program() {
             </button>
           </div>
           <div ref={modalContentRef} className="program-modal__content opacity-0">
-            <ProgramSchedule expanded onSpeakerOpen={handleSpeakerOpen} />
+            <ProgramSchedule expanded onSpeakerOpen={handleSpeakerOpen} onExperienceNavigate={handleExperienceNavigate} />
           </div>
         </div>
       )}

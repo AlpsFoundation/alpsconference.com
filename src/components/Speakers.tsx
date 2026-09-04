@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { animate } from "animejs";
 import {
   getFaceCenter,
@@ -9,6 +10,9 @@ import {
   type SpeakerImageCrop,
 } from "../data/speakers";
 import { withBase } from "../lib/withBase";
+import { setLocationHash } from "../lib/locationHash";
+import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
+import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 import { getSpeakerModalId, openSpeakerModal, SPEAKER_MODAL_EVENT } from "../lib/speakerModal";
 
 
@@ -35,52 +39,42 @@ function ModalPhoto({ src, alt, crop }: { src: string; alt: string; crop: Speake
 
 function AbstractModal({
   speaker,
+  open,
   onClose,
+  onExited,
 }: {
   speaker: Speaker;
+  open: boolean;
   onClose: () => void;
+  onExited: () => void;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const handleKey = (e: KeyboardEvent) => e.key === "Escape" && onCloseRef.current();
     document.addEventListener("keydown", handleKey);
-    document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (overlayRef.current && cardRef.current) {
-      if (reducedMotion) {
-        overlayRef.current.style.opacity = "1";
-        cardRef.current.style.opacity = "1";
-      } else {
-        animate(overlayRef.current, { opacity: [0, 1], duration: 220, easing: "linear" });
-        animate(cardRef.current, {
-          opacity: [0, 1],
-          translateY: [18, 0],
-          scale: [0.97, 1],
-          duration: 440,
-          easing: "easeOutCubic",
-        });
-      }
-    }
-
+    lockBodyScroll();
+    focusWithoutScroll(closeRef.current);
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
+      unlockBodyScroll();
     };
-  }, [onClose]);
+  }, []);
 
-  return (
+  useModalMotion(open, overlayRef, cardRef, onExited);
+
+  return createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0"
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0${open ? "" : " pointer-events-none"}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-labelledby={`speaker-${speaker.name.replace(/\s+/g, "-").toLowerCase()}`}
+      aria-labelledby={`${getSpeakerModalId(speaker.name)}-title`}
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
@@ -109,7 +103,7 @@ function AbstractModal({
             <p className="text-sm text-support-light font-medium tracking-wide uppercase mb-1">
               {speaker.role} · {speaker.institution}
             </p>
-            <h3 id={`speaker-${speaker.name.replace(/\s+/g, "-").toLowerCase()}`} className="text-xl font-semibold text-white">{speaker.name}</h3>
+            <h3 id={`${getSpeakerModalId(speaker.name)}-title`} className="text-xl font-semibold text-white">{speaker.name}</h3>
           </div>
         </div>
 
@@ -134,7 +128,8 @@ function AbstractModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -182,6 +177,7 @@ function SpeakerPhoto({
 
 function SpeakerCard({ speaker }: { speaker: Speaker }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const { present: modalPresent, onExited } = useModalPresence(modalOpen);
   const speakerModalId = getSpeakerModalId(speaker.name);
 
   useEffect(() => {
@@ -203,14 +199,13 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
   const closeModal = () => {
     setModalOpen(false);
     if (window.location.hash === `#${speakerModalId}`) {
-      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+      setLocationHash(null, "replace");
     }
   };
 
   return (
     <>
       <div
-        id={speakerModalId}
         data-fade-up
         className="opacity-0 group relative flex flex-col bg-white/[0.03] border border-white/[0.07] rounded-[1.25rem] overflow-hidden hover:border-support/30 hover:bg-white/[0.05] transition-all duration-300"
       >
@@ -256,7 +251,9 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
         </div>
       </div>
 
-      {modalOpen && <AbstractModal speaker={speaker} onClose={closeModal} />}
+      {modalPresent && (
+        <AbstractModal speaker={speaker} open={modalOpen} onClose={closeModal} onExited={onExited} />
+      )}
     </>
   );
 }
