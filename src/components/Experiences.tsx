@@ -159,12 +159,15 @@ const EXPERIENCES: ExperienceCategory[] = [
         name: "Andrea Bacconi",
         role: "Yoga",
         context: "Yoga",
+        image: "andrea-bacconi.jpg",
         sessions: [
           {
-            title: "Yoga",
-            description: "Andrea Bacconi will offer yoga on Saturday morning. Further details will be published here soon.",
+            title: "Yoga and embodiment",
+            description:
+              "During the conference, her yoga session offers a chance to step out of sitting and thinking and come back into the body. Through slow movement and gentle stretching, participants can let go of the stiffness and stress, give the nervous system time to settle, and return to the programme at a calmer pace.\n\nHer approach is slow and unhurried, with more attention on how a movement feels than on how it looks. No previous experience is needed, and nothing in the practice is demanding. She guides participants towards their own sensations, so they can notice what it is like to be fully present in their body while they move, and follow what they need on the day.\n\nFor the conference, Andrea will offer a quiet session of gentle movement, breath, and embodiment, designed as a space to release tension, regulate, and arrive back in the body.",
           },
         ],
+        bio: "Andrea is a yoga teacher and somatic coach. She works with people who want to reconnect with their bodies and learn to listen to what the body already knows. She is a certified InnerLifeSkills master coach and trained as a somatic educator with the Somatic Institute for Women. Alongside her one-to-one practice she runs embodiment workshops and women's circles, with a growing focus on guiding women to reclaim sovereignty over their own bodies.",
       },
     ],
   },
