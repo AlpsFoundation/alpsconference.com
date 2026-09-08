@@ -125,7 +125,7 @@ export const SPEAKERS: SpeakerEntry[] = [
     bio: "Prof. Eric Vermetten, MD, PhD is Professor of Psychiatry at Leiden University Medical Center and Adjunct Professor of Psychiatry at New York University. A clinical psychiatrist, retired Colonel of the Dutch Armed Forces, and founder of the Trauma Innovations Network, he has over 30 years of experience in trauma, PTSD, resilience, and military mental health. He was Principal Investigator of the first open-label MDMA-assisted psychotherapy trial in Europe and currently leads the first open-label psilocybin trial for PTSD in the Netherlands. His work explores the ecology of trauma and how movement, language, hypnosis, and psychedelics facilitate the reorganization of consciousness.",
   },
   {
-    name: "Eirini Ketzitzidou Argyri",
+    name: "Dr. Eirini Ketzitzidou Argyri",
     title: "Dr.",
     institution: "University of Exeter - Exeter Psychedelic Interdisciplinary Centre (EPIC), UK",
     role: "Research Associate",

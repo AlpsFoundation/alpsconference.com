@@ -65,7 +65,7 @@ export const PROGRAM: ProgramDay[] = [
         { title: "Sound meditation", time: "13:10–13:55" },
       ] },
       { time: "14:00–15:00", title: "Dr. Matthias Forstmann", detail: "The Mushroom Experience Project: Contextual Predictors and Species-Level Variation in the Subjective Effects of Psilocybin Mushrooms", speakerName: "Dr. Matthias Forstmann" },
-      { time: "15:00–16:00", title: "Eirini Ketzitzidou Argyri", detail: "Ontological Disruptions and Diversification: Learning from psychedelics", speakerName: "Eirini Ketzitzidou Argyri" },
+      { time: "15:00–16:00", title: "Dr. Eirini Ketzitzidou Argyri", detail: "Ontological Disruptions and Diversification: Learning from psychedelics", speakerName: "Dr. Eirini Ketzitzidou Argyri" },
       { time: "16:00–17:00", title: "Coffee break", detail: "Foyer · complimentary · group picture", kind: "pause", experiences: [
         { title: "Sound meditation", time: "16:10–16:55" },
       ] },
