@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Calendar, Ticket, Mail, Hand, MapPin, Clock } from "lucide-react";
+import { Calendar, Ticket, Mail, MapPin, Clock } from "lucide-react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
@@ -171,17 +171,6 @@ export default function Hero() {
               >
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <span className="whitespace-nowrap">Stay in Touch</span>
-              </a>
-
-              <a
-                data-animate-scale
-                href="https://docs.google.com/forms/d/e/1FAIpQLSep-cvkRKcHJIqjMqrvu7jlfzLpuMqphSyu43JRDO3WOFsaIQ/viewform?usp=header"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="opacity-0 flex w-full sm:w-auto sm:flex-initial min-w-0 items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
-              >
-                <Hand className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-                <span className="whitespace-nowrap">Volunteer</span>
               </a>
             </div>
           </div>
