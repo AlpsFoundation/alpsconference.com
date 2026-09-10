@@ -373,7 +373,7 @@ function PanelBlock({
     <div className="mt-14 sm:mt-16">
       <div data-fade-up className="opacity-0 mb-10 sm:mb-12 text-center">
         <p className="section-eyebrow">{eyebrow}</p>
-        <h2 className="section-title mb-6">{title}</h2>
+        <h2 className="section-title mb-10">{title}</h2>
         {subtitle && <p className="text-white/70 text-base max-w-xl mx-auto mb-6">{subtitle}</p>}
         <p className="text-white/50 text-base max-w-2xl mx-auto text-justify">{body}</p>
       </div>
