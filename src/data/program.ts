@@ -44,8 +44,8 @@ export const PROGRAM: ProgramDay[] = [
       ] },
       { time: "17:15–18:15", title: "Prof. Amandine Luquiens", detail: "Talk to be announced", speakerName: "Prof. Amandine Luquiens" },
       { time: "18:15–19:15", title: "Panel discussion", detail: "What Counts as Therapy in Psychedelic-Assisted Care" },
-      { time: "19:15–20:00", title: "Optional Networking Dinner", detail: "tickets available at checkout", kind: "pause" },
-      { time: "20:00–21:30", title: "Friday evening program", kind: "social" },
+      { time: "19:15–20:15", title: "Optional Networking Dinner", detail: "tickets available at checkout", kind: "pause" },
+      { time: "20:15–21:45", title: "Friday evening program", kind: "social" },
     ],
   },
   {
