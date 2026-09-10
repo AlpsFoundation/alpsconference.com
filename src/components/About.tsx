@@ -69,7 +69,7 @@ export default function About() {
             Your conference experience includes comprehensive catering (all Vegetarian) with breakfast, morning and afternoon breaks, lunch, and Saturday-evening Apero, ensuring a comfortable and enriching environment. For Friday evening, an optional networking dinner will be available for which you can buy your ticket separately. Throughout the event, take advantage of the networking breaks to connect with fellow enthusiasts, researchers, and practitioners over apéros, and join us for our traditional After Party on Saturday night.
           </p>
           <p data-fade-up className="opacity-0">
-            Attendees will have the opportunity to earn up to 14 continuing education credits, accredited by FSP and SGPP for psychologists and medical professionals. We look forward to hosting an engaging and enlightening conference that promises to expand knowledge and foster significant discussions.
+            Attendees will have the opportunity to earn up to 14 FSP credits and up to 10 SGPP credits, accredited for psychologists and medical professionals. We look forward to hosting an engaging and enlightening conference that promises to expand knowledge and foster significant discussions.
           </p>
           </div>
         </div>
