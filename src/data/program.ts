@@ -9,6 +9,7 @@ export type ProgramItem = {
   time: string;
   title: string;
   detail?: string;
+  detailHighlight?: boolean;
   kind?: "session" | "pause" | "social";
   speakerName?: string;
   experiences?: ProgramExperience[];
@@ -44,7 +45,7 @@ export const PROGRAM: ProgramDay[] = [
       ] },
       { time: "17:15–18:15", title: "Prof. Amandine Luquiens", detail: "Talk to be announced", speakerName: "Prof. Amandine Luquiens" },
       { time: "18:15–19:15", title: "Panel discussion", detail: "What Counts as Therapy in Psychedelic-Assisted Care" },
-      { time: "19:15–20:15", title: "Optional Networking Dinner", detail: "tickets available at checkout", kind: "pause" },
+      { time: "19:15–20:15", title: "Optional Networking Dinner", detail: "Pre-Sale available on Infomaniak or @ALPS Info table at the venue", detailHighlight: true, kind: "pause" },
       { time: "20:15–21:45", title: "Friday evening program", kind: "social" },
     ],
   },
@@ -60,13 +61,13 @@ export const PROGRAM: ProgramDay[] = [
       { time: "10:00–11:00", title: "Prof. Dr. Eric Vermetten", detail: "What Psychedelics Teach Us About Trauma", speakerName: "Prof. Dr. Eric Vermetten" },
       { time: "11:00–11:30", title: "Break", kind: "pause" },
       { time: "11:30–12:30", title: "Dr. Lydia Belinger", detail: "Serotonin System Stimulation and Social Cognition: Differential Effects of Psilocybin, MDMA, and Methylphenidate", speakerName: "Dr. Lydia Belinger" },
-      { time: "12:30–14:00", title: "Lunch break", detail: "Foyer · complimentary", kind: "pause", experiences: [
+      { time: "12:30–14:00", title: "Lunch break", kind: "pause", experiences: [
         { title: "Live Concert", time: "12:30–14:00" },
         { title: "Sound meditation", time: "13:10–13:55" },
       ] },
       { time: "14:00–15:00", title: "Dr. Matthias Forstmann", detail: "The Mushroom Experience Project: Contextual Predictors and Species-Level Variation in the Subjective Effects of Psilocybin Mushrooms", speakerName: "Dr. Matthias Forstmann" },
       { time: "15:00–16:00", title: "Dr. Eirini Ketzitzidou Argyri", detail: "Ontological Disruptions and Diversification: Learning from psychedelics", speakerName: "Dr. Eirini Ketzitzidou Argyri" },
-      { time: "16:00–17:00", title: "Coffee break", detail: "Foyer · complimentary · group picture", kind: "pause", experiences: [
+      { time: "16:00–17:00", title: "Coffee break", detail: "group picture", detailHighlight: true, kind: "pause", experiences: [
         { title: "Sound meditation", time: "16:10–16:55" },
       ] },
       { time: "17:00–18:00", title: "Dr. Jason K. Day", detail: "What-the-Fuckness: A Phenomenological Concept for Psychedelic Experience", speakerName: "Dr. Jason K. Day" },

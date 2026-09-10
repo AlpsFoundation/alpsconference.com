@@ -99,7 +99,7 @@ function ProgramSchedule({
                       <time>{item.time}</time>
                       <span className="program-speaker-link__copy">
                         <p>{item.title}</p>
-                        {item.detail && <span>{item.detail}</span>}
+                        {item.detail && <span style={item.detailHighlight ? { color: "var(--color-accent-light)", fontStyle: "normal", fontWeight: 600 } : undefined}>{item.detail}</span>}
                       </span>
                     </a>
                   ) : (
@@ -107,7 +107,7 @@ function ProgramSchedule({
                       <time>{item.time}</time>
                       <div>
                         <p>{item.title}</p>
-                        {item.detail && <span>{item.detail}</span>}
+                        {item.detail && <span style={item.detailHighlight ? { color: "var(--color-accent-light)", fontStyle: "normal", fontWeight: 600 } : undefined}>{item.detail}</span>}
                       </div>
                     </>
                   )}
