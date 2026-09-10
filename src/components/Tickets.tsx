@@ -5,7 +5,7 @@ export default function Tickets() {
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-12 bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent [-webkit-text-fill-color:transparent]">
           Tickets
         </h2>
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center">
           <a
             href="https://infomaniak.events/en-ch/conferences/alps-conference-2026/c2484795-1ae7-4b4b-aa21-c9b8f085008c/events/382409"
             target="_blank"
@@ -14,6 +14,14 @@ export default function Tickets() {
           >
             Buy Conference Tickets
           </a>
+          <div className="mt-5 pt-5 border-t border-white/10 max-w-lg w-full text-center">
+            <p className="text-white/55 text-sm leading-relaxed">
+              * Team ticket — 3 + 1 free: buy 4 tickets and the cheapest is on us. The discount is
+              applied automatically at checkout — no code needed. It applies within the same ticket
+              type (conference-only or workshop-only; the two can't be mixed) and excludes the
+              optional networking dinner.
+            </p>
+          </div>
         </div>
       </div>
     </section>

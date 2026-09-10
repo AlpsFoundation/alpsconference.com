@@ -126,6 +126,12 @@ export default function About() {
 
           <div className="mt-5 pt-5 border-t border-white/10">
             <p className="text-white/55 text-sm leading-relaxed mb-3">
+              * Team ticket — 3 + 1 free: buy 4 tickets and the cheapest is on us. The discount is
+              applied automatically at checkout — no code needed. It applies within the same ticket
+              type (conference-only or workshop-only; the two can't be mixed) and excludes the
+              optional networking dinner.
+            </p>
+            <p className="text-white/55 text-sm leading-relaxed mb-3">
               * We want ALPS to be as inclusive as possible. Our whole team are volunteers, so if you
               can afford full price, please do. It lets us support those who truly need it. Not every
               request can be granted.
