@@ -126,7 +126,7 @@ export default function About() {
 
           <div className="mt-5 pt-5 border-t border-white/10">
             <p className="text-white/55 text-sm leading-relaxed mb-3">
-              * Team ticket — 3 + 1 free: buy 4 tickets and the cheapest is on us. The discount is
+              * Team ticket — 3 + 1 free: buy 4 tickets and one is on us. The discount is
               applied automatically at checkout — no code needed. It applies within the same ticket
               type (conference-only or workshop-only; the two can't be mixed) and excludes the
               optional networking dinner.
