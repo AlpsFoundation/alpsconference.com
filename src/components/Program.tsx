@@ -100,6 +100,7 @@ function ProgramSchedule({
                       <span className="program-speaker-link__copy">
                         <p>{item.title}</p>
                         {item.detail && <span style={item.detailHighlight ? { color: "var(--color-accent-light)", fontStyle: "normal", fontWeight: 600 } : undefined}>{item.detail}</span>}
+                        {item.menuNote && <span style={{ color: "rgba(255,255,255,0.42)", fontStyle: "italic", fontSize: "0.78rem" }}>{item.menuNote}</span>}
                       </span>
                     </a>
                   ) : (
@@ -108,6 +109,7 @@ function ProgramSchedule({
                       <div>
                         <p>{item.title}</p>
                         {item.detail && <span style={item.detailHighlight ? { color: "var(--color-accent-light)", fontStyle: "normal", fontWeight: 600 } : undefined}>{item.detail}</span>}
+                        {item.menuNote && <span style={{ color: "rgba(255,255,255,0.42)", fontStyle: "italic", fontSize: "0.78rem" }}>{item.menuNote}</span>}
                       </div>
                     </>
                   )}
