@@ -155,8 +155,8 @@ export default function Hero() {
             </p>
 
             <ul data-animate className="opacity-0 text-xs sm:text-sm text-white/50 space-y-1 text-center list-none m-0 p-0">
-              <li>3+1 Team &amp; Friends Tickets available</li>
-              <li>Financial Support Compassion Fund available</li>
+              <li>3+1 Team &amp; Friends Tickets available (applied at checkout)</li>
+              <li>Financial Support Compassion Fund available *(see FAQ)</li>
             </ul>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch justify-center gap-2 sm:gap-3 w-full max-w-xs sm:max-w-full mx-auto">
