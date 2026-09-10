@@ -12,17 +12,17 @@ const TIMELINE = [
     done: true,
   },
   {
-    date: "31 August 2026",
-    label: "Applications close",
+    date: "18 September 2026, midnight",
+    label: "Applications close — exceptionally extended by one week",
     done: false,
   },
   {
-    date: "07 September 2026",
+    date: "25 September 2026",
     label: "Last decisions communicated",
     done: false,
   },
   {
-    date: "28 September 2026",
+    date: "02 October 2026",
     label: "PDF submission of accepted posters",
     done: false,
   },
@@ -133,6 +133,9 @@ export default function PosterPage() {
             <h1 data-fade-up className="opacity-0 text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
               Call for Research Posters
             </h1>
+            <p data-fade-up className="opacity-0 inline-block text-sm font-medium text-support-light bg-support/10 border border-support/20 rounded-full px-4 py-2 mb-6">
+              Applications exceptionally open for one more week — now closing midnight, 18 September 2026
+            </p>
             <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed mb-10">
               Present your psychedelic science research at the sixth edition of the ALPS
               Conference, 9–10 October 2026, Aarau, Switzerland.
@@ -248,8 +251,11 @@ export default function PosterPage() {
                 Ready to apply?
               </p>
               <h2 className="text-3xl font-semibold text-white mb-4">Submit Your Poster Application</h2>
+              <p className="text-support-light text-sm font-medium mb-3">
+                Exceptionally extended by one week — now open until midnight, 18 September 2026.
+              </p>
               <p className="text-white/60 text-base max-w-xl mx-auto">
-                Applications are open until <strong className="text-white/80">31 August 2026</strong>.
+                Applications are open until <strong className="text-white/80">midnight, 18 September 2026</strong>.
                 The application takes approximately 10–15 minutes to complete.
               </p>
             </div>

@@ -65,7 +65,9 @@ export function isConfirmedSpeaker(entry: SpeakerEntry): entry is Speaker {
 }
 
 export function speakerByName(name: string): Speaker | undefined {
-  return [...SPEAKERS, ...PANEL_SPEAKERS].filter(isConfirmedSpeaker).find((speaker) => speaker.name === name);
+  return [...SPEAKERS, ...FRIDAY_PANEL_SPEAKERS, ...SATURDAY_PANEL_SPEAKERS]
+    .filter(isConfirmedSpeaker)
+    .find((speaker) => speaker.name === name);
 }
 
 export const SPEAKERS: SpeakerEntry[] = [
@@ -201,7 +203,14 @@ export const SPEAKERS: SpeakerEntry[] = [
   },
 ];
 
-export const PANEL_SPEAKERS: SpeakerEntry[] = [
+const FRIDAY_PANEL_SPEAKER_NAMES = ["Dr. Max Wolff", "Dr. Sandeep Nayak", "Prof. Amandine Luquiens"];
+
+export const FRIDAY_PANEL_SPEAKERS: SpeakerEntry[] = [
+  ...SPEAKERS.filter(isConfirmedSpeaker).filter((speaker) => FRIDAY_PANEL_SPEAKER_NAMES.includes(speaker.name)),
+  { tbd: true },
+];
+
+export const SATURDAY_PANEL_SPEAKERS: SpeakerEntry[] = [
   {
     name: "Ricardo Morales",
     title: "",
