@@ -375,7 +375,7 @@ function PanelBlock({
         <p className="section-eyebrow">{eyebrow}</p>
         <h2 className="section-title mb-2">{title}</h2>
         {subtitle && <p className="text-white/70 text-base max-w-xl mx-auto mb-4">{subtitle}</p>}
-        <p className="text-white/50 text-base max-w-2xl mx-auto">{body}</p>
+        <p className="text-white/50 text-base max-w-2xl mx-auto text-justify">{body}</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">

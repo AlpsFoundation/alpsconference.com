@@ -5,49 +5,6 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
 
-const TIMELINE = [
-  {
-    date: "04 May 2026",
-    label: "Application period opens",
-    done: true,
-  },
-  {
-    date: "18 September 2026, midnight",
-    label: "Applications close — exceptionally extended by one week",
-    done: false,
-  },
-  {
-    date: "25 September 2026",
-    label: "Last decisions communicated",
-    done: false,
-  },
-  {
-    date: "02 October 2026",
-    label: "PDF submission of accepted posters",
-    done: false,
-  },
-];
-
-
-function TimelineItem({ date, label, done }: { date: string; label: string; done: boolean }) {
-  return (
-    <div className="relative flex gap-6 pb-10 last:pb-0" data-fade-up style={{ opacity: 0 }}>
-      <div className="flex flex-col items-center">
-        <div
-          className={`w-4 h-4 rounded-full border-2 shrink-0 mt-1 ${
-            done ? "bg-support border-support" : "bg-transparent border-white/30"
-          }`}
-        />
-        <div className="w-px flex-1 bg-white/10 mt-2" />
-      </div>
-      <div className="pb-2">
-        <p className="text-sm font-medium text-support-light tracking-wide uppercase mb-1">{date}</p>
-        <p className="text-lg text-white/90 font-medium">{label}</p>
-      </div>
-    </div>
-  );
-}
-
 function Section({
   icon: Icon,
   title,
@@ -152,18 +109,15 @@ export default function PosterPage() {
           </div>
         </section>
 
-        {/* ── Timeline ── */}
+        {/* ── Key dates ── */}
         <section ref={timelineRef} className="relative py-24 sm:py-32 bg-white/[0.02]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div data-fade-up className="opacity-0 mb-14">
-              <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">Key dates</p>
-              <h2 className="text-3xl font-semibold text-white">Application Timeline</h2>
-            </div>
-            <div className="max-w-lg">
-              {TIMELINE.map((item, i) => (
-                <TimelineItem key={i} {...item} />
-              ))}
-            </div>
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+            <p data-fade-up className="opacity-0 text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
+              Key dates
+            </p>
+            <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
+              Research poster applications are exceptionally open until 18 September 2026, with final decisions communicated on 19 September 2026.
+            </p>
           </div>
         </section>
 
