@@ -154,6 +154,7 @@ export const SPEAKERS: SpeakerEntry[] = [
     institution: "University of Montpellier & Nîmes University Hospital, France",
     role: "Professor, Addiction Department",
     image: "amandine_luiqiens.png",
+    talkTitle: "Is It More Than the Drug? Exploring Precision Psychedelic Therapy for Addiction",
     abstract: "TBD",
     bio: "TBD",
   },

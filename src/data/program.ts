@@ -43,7 +43,7 @@ export const PROGRAM: ProgramDay[] = [
       { time: "16:30–17:15", title: "Coffee break", kind: "pause", experiences: [
         { title: "Sound meditation", time: "16:30–17:15" },
       ] },
-      { time: "17:15–18:15", title: "Prof. Amandine Luquiens", detail: "Talk to be announced", speakerName: "Prof. Amandine Luquiens" },
+      { time: "17:15–18:15", title: "Prof. Amandine Luquiens", detail: "Is It More Than the Drug? Exploring Precision Psychedelic Therapy for Addiction", speakerName: "Prof. Amandine Luquiens" },
       { time: "18:15–19:15", title: "Panel discussion", detail: "What Counts as Therapy in Psychedelic-Assisted Care" },
       { time: "19:15–20:15", title: "Optional Networking Dinner", detail: "Pre-Sale available on Infomaniak or @ALPS Info table at the venue", detailHighlight: true, kind: "pause" },
       { time: "20:15–21:45", title: "Friday evening program", kind: "social" },
