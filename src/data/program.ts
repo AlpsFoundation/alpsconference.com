@@ -74,7 +74,7 @@ export const PROGRAM: ProgramDay[] = [
       { time: "18:00–19:00", title: "Panel discussion", detail: "Psychedelics and spirituality: ontological shifts and meaning-making experiences" },
       { time: "19:00–20:00", title: "Closing talk", detail: "ALPS Team" },
       { time: "20:00–21:30", title: "Networking apéro", kind: "social" },
-      { time: "22:00–04:00", title: "Afterparty", kind: "social" },
+      { time: "21:30–04:00", title: "Afterparty", detail: "@Jugendkulturhaus Floesserplatz (Floesserstrasse 7, 5000 Aarau)", detailHighlight: true, kind: "social" },
     ],
   },
 ];
