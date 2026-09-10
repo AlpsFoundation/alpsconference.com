@@ -200,13 +200,13 @@ export default function WorkshopPage() {
         <section ref={heroRef} className="workshop-hero relative pt-40 pb-24 sm:pt-48 sm:pb-32 overflow-hidden">
           <ParticlesCanvas variant="workshopHero" />
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
-            <p data-fade-up className="opacity-0 text-base tracking-[0.2em] uppercase text-support-light font-medium mb-4">
+            <p data-fade-up className="opacity-0 text-base tracking-[0.2em] uppercase text-support-light font-medium mb-6">
               Pre-Conference Workshop Day
             </p>
-            <h1 data-fade-up className="opacity-0 text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
-              PAT Training Across Switzerland's Linguistic Regions
+            <h1 data-fade-up className="opacity-0 text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-8">
+              Psychedelic-Assisted Therapy Training Across Switzerland's Linguistic Regions
             </h1>
-            <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-8">
+            <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-10">
               A specialized platform for Psychedelic-Assisted Therapy training, combining theoretical input
               with experiential clinical practice in four parallel language tracks.
             </p>
