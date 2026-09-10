@@ -2,13 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { animate } from "animejs";
 import {
+  FRIDAY_PANEL_SPEAKERS,
   getFaceCenter,
   getImageCrop,
-  PANEL_SPEAKERS,
+  SATURDAY_PANEL_SPEAKERS,
   SPEAKERS,
   type Speaker,
+  type SpeakerEntry,
   type SpeakerImageCrop,
 } from "../data/speakers";
+import { FRIDAY_PANEL, SATURDAY_PANEL } from "../data/bookletContent";
 import { withBase } from "../lib/withBase";
 import { setLocationHash } from "../lib/locationHash";
 import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
@@ -330,26 +333,60 @@ export default function Speakers() {
           )}
         </div>
 
-        <div data-fade-up className="opacity-0 mt-14 sm:mt-16 mb-10 sm:mb-12 text-center">
-          <p className="section-eyebrow">
-            ALPS 2026
-          </p>
-          <h2 className="section-title mb-4">Panel</h2>
-          <p className="text-white/50 text-base max-w-xl mx-auto">
-            Panel title to be announced. Further panel speakers will be uploaded soon.
-          </p>
-        </div>
+        <PanelBlock
+          eyebrow="Friday · 18:15–19:15"
+          title={FRIDAY_PANEL.title}
+          subtitle={FRIDAY_PANEL.subtitle}
+          body={FRIDAY_PANEL.body}
+          speakers={FRIDAY_PANEL_SPEAKERS}
+          idPrefix="friday-panel"
+        />
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-          {PANEL_SPEAKERS.map((entry, i) =>
-            "tbd" in entry && entry.tbd ? (
-              <TbdCard key={`panel-tbd-${i}`} />
-            ) : (
-              <SpeakerCard key={(entry as Speaker).name} speaker={entry as Speaker} />
-            )
-          )}
-        </div>
+        <PanelBlock
+          eyebrow="Saturday · 18:00–19:00"
+          title={SATURDAY_PANEL.title}
+          body={SATURDAY_PANEL.body}
+          speakers={SATURDAY_PANEL_SPEAKERS}
+          idPrefix="saturday-panel"
+        />
       </div>
     </section>
+  );
+}
+
+function PanelBlock({
+  eyebrow,
+  title,
+  subtitle,
+  body,
+  speakers,
+  idPrefix,
+}: {
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
+  body: string;
+  speakers: SpeakerEntry[];
+  idPrefix: string;
+}) {
+  return (
+    <div className="mt-14 sm:mt-16">
+      <div data-fade-up className="opacity-0 mb-10 sm:mb-12 text-center">
+        <p className="section-eyebrow">{eyebrow}</p>
+        <h2 className="section-title mb-2">{title}</h2>
+        {subtitle && <p className="text-white/70 text-base max-w-xl mx-auto mb-4">{subtitle}</p>}
+        <p className="text-white/50 text-base max-w-2xl mx-auto">{body}</p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+        {speakers.map((entry, i) =>
+          "tbd" in entry && entry.tbd ? (
+            <TbdCard key={`${idPrefix}-tbd-${i}`} />
+          ) : (
+            <SpeakerCard key={(entry as Speaker).name} speaker={entry as Speaker} />
+          )
+        )}
+      </div>
+    </div>
   );
 }

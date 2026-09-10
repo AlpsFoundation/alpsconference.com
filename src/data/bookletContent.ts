@@ -158,13 +158,14 @@ export const EXPERIENCES = [
 ];
 
 export const FRIDAY_PANEL = {
-  title: "Psychotherapy and psychedelics",
-  body: "This panel explores how psychedelics sit alongside psychotherapy — as catalysts, tools, or treatments in their own right — and what that means for clinical practice, training, and regulation. Additional panel participants will be announced.",
+  title: "The therapy in psychedelic-assisted therapy",
+  subtitle: "What kind of therapy, how much of it, and delivered by whom",
+  body: "Psychedelic-assisted therapy names a psychotherapeutic intervention that no regulator requires. The FDA's July 2026 final guidance asks for two trained monitors, not two psychotherapists, and Swiss law does not make psychotherapy a prerequisite. Yet most trials behind today's evidence included preparation, support and integration. This panel begins in that gap. Four clinicians and researchers who all hold that the psychological work is real turn to what remains unresolved: what kind of therapy, how many hours, delivered by whom, who should be in the room during the experience, and whether any model can scale.",
 };
 
 export const SATURDAY_PANEL = {
-  title: "Psychedelics and spirituality",
-  body: "This panel considers the spiritual, traditional, and meaning-making dimensions of psychedelic experience, and how they meet contemporary science. Additional panel participants will be announced.",
+  title: "Psychedelics and spirituality: ontological shifts and meaning-making experiences",
+  body: "Psychedelics reliably occasion experiences that participants describe as revelatory and that leave behind altered convictions about what reality contains, what the self is, and where meaning comes from. Such shifts are reported in ceremonial traditions across the Americas, West Africa and beyond, where they are held within cosmology and community, and in clinical trials, where they are recorded as mystical-type or insight experiences. This panel examines how ontological change is produced, interpreted and made durable across these settings, the difficulty of measuring it, and what is at stake when practices rooted in traditional use are relocated to the clinic.",
 };
 
 export const TEAM_SECTIONS = [
