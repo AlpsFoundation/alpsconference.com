@@ -196,7 +196,8 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
     dateTime: "2026-10-09",
     items: [
       { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke"] },
-      { time: "13:40–14:25 & 16:30–17:15", title: "Sound meditation", personName: "Marina Vovk" },
+      { time: "13:40–14:25", title: "Sound meditation", personName: "Marina Vovk" },
+      { time: "16:30–17:15", title: "Sound meditation", personName: "Marina Vovk" },
       { time: "13:45–14:30", title: "Speed-friending", detail: "Second half of lunch", personName: "Kate Dalby" },
       { time: "20:00–21:30", title: "TBA" },
       { time: "21:00–22:00", title: "Psychedelic storytelling", personName: "Kate Dalby" },
@@ -210,7 +211,8 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
       { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke"] },
       { time: "08:10–08:50", title: "Yoga", personName: "Andrea Bacconi" },
       { time: "12:30–14:00", title: "Live Concert", detail: "During lunch", personName: "David & Anna-Lea Wennberg" },
-      { time: "13:10–13:55 & 16:10–16:55", title: "Sound meditation", personName: "Marina Vovk" },
+      { time: "13:10–13:55", title: "Sound meditation", personName: "Marina Vovk" },
+      { time: "16:10–16:55", title: "Sound meditation", personName: "Marina Vovk" },
     ],
   },
 ];
