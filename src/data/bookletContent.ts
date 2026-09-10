@@ -158,7 +158,7 @@ export const EXPERIENCES = [
 ];
 
 export const FRIDAY_PANEL = {
-  title: "What Counts as Therapy in Psychedelic-Assisted Care",
+  title: "The \"Therapy\" in Psychedelic-Assisted Therapy",
   subtitle: "What kind of therapy, how much of it, and delivered by whom",
   body: "Psychedelic-assisted therapy names a psychotherapeutic intervention that no regulator requires. The FDA's July 2026 final guidance asks for two trained monitors, not two psychotherapists, and Swiss law does not make psychotherapy a prerequisite. Yet most trials behind today's evidence included preparation, support and integration. This panel begins in that gap. Four clinicians and researchers who all hold that the psychological work is real turn to what remains unresolved: what kind of therapy, how many hours, delivered by whom, who should be in the room during the experience, and whether any model can scale.",
 };
