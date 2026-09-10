@@ -12,7 +12,7 @@ const TIMELINE = [
     done: true,
   },
   {
-    date: "20 September 2026",
+    date: "18 September 2026, midnight",
     label: "Applications close — exceptionally extended by one week",
     done: false,
   },
@@ -134,7 +134,7 @@ export default function PosterPage() {
               Call for Research Posters
             </h1>
             <p data-fade-up className="opacity-0 inline-block text-sm font-medium text-support-light bg-support/10 border border-support/20 rounded-full px-4 py-2 mb-6">
-              Applications exceptionally open for one more week — now closing 20 September 2026
+              Applications exceptionally open for one more week — now closing midnight, 18 September 2026
             </p>
             <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed mb-10">
               Present your psychedelic science research at the sixth edition of the ALPS
@@ -252,10 +252,10 @@ export default function PosterPage() {
               </p>
               <h2 className="text-3xl font-semibold text-white mb-4">Submit Your Poster Application</h2>
               <p className="text-support-light text-sm font-medium mb-3">
-                Exceptionally extended by one week — now open until 20 September 2026.
+                Exceptionally extended by one week — now open until midnight, 18 September 2026.
               </p>
               <p className="text-white/60 text-base max-w-xl mx-auto">
-                Applications are open until <strong className="text-white/80">20 September 2026</strong>.
+                Applications are open until <strong className="text-white/80">midnight, 18 September 2026</strong>.
                 The application takes approximately 10–15 minutes to complete.
               </p>
             </div>
