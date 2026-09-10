@@ -16,6 +16,8 @@ export const PARTNERS = {
     { src: "/img/partners/sspm.png", alt: "Swiss Society for Psychedelic Medicine (SSPM)", url: "https://swisspsychedelic.ch/", scale: 0.8 }
   ],
   "Media Partners": [
+    { src: "/img/partners/nachtschatten.png", alt: "Nachtschatten Verlag", url: "https://nachtschatten.ch/" },
+    { src: "/img/partners/lucys.png", alt: "Lucys Magazin", url: "https://lucys-magazin.com/" },
     { src: "/img/partners/maps.png", alt: "MAPS (Multidisciplinary Association for Psychedelic Studies)", url: "https://maps.org/" },
     { src: "/img/partners/open-foundation.png", alt: "OPEN Foundation", url: "https://open-foundation.org/" },
     { src: "/img/partners/ciis.png", alt: "California Institute of Integral Studies (CIIS)", url: "https://www.ciis.edu/" },

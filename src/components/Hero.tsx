@@ -121,7 +121,7 @@ export default function Hero() {
         <div className="flex-[1_1_0] flex flex-col items-center justify-end gap-4 sm:gap-5 min-h-0 pb-4 sm:pb-28">
           <div
             data-animate
-            className="opacity-0 flex w-full max-w-full flex-nowrap items-center justify-center gap-2 min-[380px]:gap-3 sm:gap-6"
+            className="opacity-0 flex w-full max-w-full flex-wrap sm:flex-nowrap items-center justify-center gap-x-2 gap-y-1 min-[380px]:gap-x-3 sm:gap-6"
           >
             <div className="flex shrink-0 items-center gap-1.5 min-[380px]:gap-2 text-white">
               <Clock className="w-5 h-5 text-support-light" />
