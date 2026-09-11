@@ -199,8 +199,8 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
       { time: "13:40–14:25", title: "Sound meditation", detail: "Saal 4", personName: "Marina Vovk" },
       { time: "16:30–17:15", title: "Sound meditation", detail: "Saal 4", personName: "Marina Vovk" },
       { time: "13:45–14:30", title: "Speed-friending", detail: "Second half of lunch", personName: "Kate Dalby" },
-      { time: "20:15–20:45", title: "Evening Program Part I" },
-      { time: "20:45–21:45", title: "Psychedelic storytelling", personName: "Kate Dalby" },
+      { time: "20:15–20:45", title: "Evening Program Part I", detail: "Saal 4" },
+      { time: "20:45–21:45", title: "Psychedelic storytelling", detail: "Saal 4", personName: "Kate Dalby" },
     ],
   },
   {
