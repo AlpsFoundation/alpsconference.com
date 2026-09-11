@@ -204,14 +204,17 @@ export const SPEAKERS: SpeakerEntry[] = [
   },
 ];
 
-const FRIDAY_PANEL_SPEAKER_NAMES = ["Dr. Max Wolff", "Dr. Sandeep Nayak", "Prof. Amandine Luquiens"];
+const FRIDAY_PANEL_SPEAKER_NAMES = ["Dr. Max Wolff", "Dr. Sandeep Nayak", "Prof. Amandine Luquiens", "Prof. Dr. Eric Vermetten"];
 
 export const FRIDAY_PANEL_SPEAKERS: SpeakerEntry[] = [
   ...SPEAKERS.filter(isConfirmedSpeaker).filter((speaker) => FRIDAY_PANEL_SPEAKER_NAMES.includes(speaker.name)),
   { tbd: true },
 ];
 
+const SATURDAY_PANEL_SPEAKER_NAMES = ["Dr. Eirini Ketzitzidou Argyri", "Dr. Matthias Forstmann"];
+
 export const SATURDAY_PANEL_SPEAKERS: SpeakerEntry[] = [
+  ...SPEAKERS.filter(isConfirmedSpeaker).filter((speaker) => SATURDAY_PANEL_SPEAKER_NAMES.includes(speaker.name)),
   {
     name: "Ricardo Morales",
     title: "",
