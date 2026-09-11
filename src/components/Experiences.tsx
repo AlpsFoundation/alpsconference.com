@@ -210,7 +210,7 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
     items: [
       { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke"] },
       { time: "08:10–08:50", title: "Yoga", detail: "Saal 4", personName: "Andrea Bacconi" },
-      { time: "12:30–14:00", title: "Live Concert", detail: "During lunch · Saal 4", personName: "David & Anna-Lea Wennberg" },
+      { time: "12:30–14:00", title: "Live Concert", detail: "During lunch · Saal 2", personName: "David & Anna-Lea Wennberg" },
       { time: "13:10–13:55", title: "Sound meditation", detail: "Saal 4", personName: "Marina Vovk" },
       { time: "16:10–16:55", title: "Sound meditation", detail: "Saal 4", personName: "Marina Vovk" },
     ],
