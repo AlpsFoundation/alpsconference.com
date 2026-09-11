@@ -208,7 +208,6 @@ const FRIDAY_PANEL_SPEAKER_NAMES = ["Dr. Max Wolff", "Dr. Sandeep Nayak", "Prof.
 
 export const FRIDAY_PANEL_SPEAKERS: SpeakerEntry[] = [
   ...SPEAKERS.filter(isConfirmedSpeaker).filter((speaker) => FRIDAY_PANEL_SPEAKER_NAMES.includes(speaker.name)),
-  { tbd: true },
 ];
 
 const SATURDAY_PANEL_SPEAKER_NAMES = ["Dr. Eirini Ketzitzidou Argyri", "Dr. Matthias Forstmann"];
@@ -235,5 +234,4 @@ Ricardo Morales Fuentes is a proud heir to the culture of Anáhuac, an intuitive
 
 This is the path of Ricardo Morales Fuentes.`,
   },
-  { tbd: true },
 ];
