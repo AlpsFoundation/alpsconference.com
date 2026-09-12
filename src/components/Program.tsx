@@ -1,39 +1,29 @@
 import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
-import { Maximize2, Music, PersonStanding, Sparkles, Users, Waves, X } from "lucide-react";
+import { Maximize2, MessageCircle, Music, PersonStanding, Sparkles, Users, Waves, Wind, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PROGRAM, type ProgramExperience } from "../data/program";
-import { getExperienceSlotId } from "../lib/experienceModal";
+import MapAddress from "./MapAddress";
+import { getExperienceModalId, openExperienceModal } from "../lib/experienceModal";
 import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
 import { getSpeakerModalId, openSpeakerModal } from "../lib/speakerModal";
 import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
 const EXPERIENCE_ICONS: Record<string, LucideIcon> = {
   "Sound meditation": Waves,
+  Breathwork: Wind,
   "Speed-friending": Users,
   Yoga: PersonStanding,
   "Live Concert": Music,
+  Storytelling: MessageCircle,
 };
 
-function scrollToExperienceSlot(targetId: string) {
-  const el = document.getElementById(targetId);
-  if (!el) return;
-
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  el.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth", block: "center" });
-  el.classList.remove("program-item--flash");
-  void el.offsetWidth;
-  el.classList.add("program-item--flash");
-}
-
 function ProgramExperienceHints({
-  day,
   activities,
-  onNavigate,
+  onOpen,
 }: {
-  day: string;
   activities: ProgramExperience[];
-  onNavigate: (targetId: string) => void;
+  onOpen: (name: string) => void;
 }) {
   return (
     <div className="program-experience-hints">
@@ -42,12 +32,12 @@ function ProgramExperienceHints({
         const tooltip = `${activity.title} (${activity.time})`;
         return (
           <button
-            key={activity.title}
+            key={`${activity.title}-${activity.time}`}
             type="button"
             className="program-experience-hint"
             data-tooltip={tooltip}
-            aria-label={`${tooltip}. View in the experiences programme.`}
-            onClick={() => onNavigate(getExperienceSlotId(day, activity.title))}
+            aria-label={`${tooltip}. View details.`}
+            onClick={() => onOpen(activity.personName)}
           >
             <Icon className="h-3.5 w-3.5" aria-hidden />
           </button>
@@ -57,14 +47,34 @@ function ProgramExperienceHints({
   );
 }
 
+function ProgramItemDetail({ item }: { item: (typeof PROGRAM)[number]["items"][number] }) {
+  return (
+    <>
+      {item.detail && (
+        <span style={item.detailHighlight ? { color: "var(--color-accent-light)", fontStyle: "normal", fontWeight: 600 } : undefined}>
+          {item.detail}
+        </span>
+      )}
+      {item.address && item.mapUrl && (
+        <span>
+          <MapAddress address={item.address} href={item.mapUrl} />
+        </span>
+      )}
+      {item.menuNote && (
+        <span style={{ color: "rgba(255,255,255,0.42)", fontStyle: "italic", fontSize: "0.78rem" }}>{item.menuNote}</span>
+      )}
+    </>
+  );
+}
+
 function ProgramSchedule({
   expanded = false,
   onSpeakerOpen,
-  onExperienceNavigate,
+  onExperienceOpen,
 }: {
   expanded?: boolean;
   onSpeakerOpen: (speakerName: string) => void;
-  onExperienceNavigate: (targetId: string) => void;
+  onExperienceOpen: (name: string) => void;
 }) {
   return (
     <div className={`program-board ${expanded ? "program-board--expanded" : ""}`}>
@@ -83,24 +93,24 @@ function ProgramSchedule({
               const experiences = item.experiences ?? [];
               return (
                 <li
-                  className={`program-item program-item--${item.kind ?? "session"}${item.speakerName ? " program-item--linked" : ""}${experiences.length ? " program-item--has-experience" : ""}`}
+                  className={`program-item program-item--${item.kind ?? "session"}${item.speakerName || item.experienceName ? " program-item--linked" : ""}${experiences.length ? " program-item--has-experience" : ""}`}
                   key={`${day.day}-${item.time}`}
                 >
-                  {item.speakerName ? (
+                  {item.speakerName || item.experienceName ? (
                     <a
                       className="program-speaker-link"
-                      href={`#${getSpeakerModalId(item.speakerName)}`}
+                      href={`#${item.speakerName ? getSpeakerModalId(item.speakerName) : getExperienceModalId(item.experienceName!)}`}
                       onClick={(event) => {
                         event.preventDefault();
-                        onSpeakerOpen(item.speakerName!);
+                        if (item.speakerName) onSpeakerOpen(item.speakerName);
+                        else onExperienceOpen(item.experienceName!);
                       }}
-                      aria-label={`View talk details for ${item.title}`}
+                      aria-label={`View ${item.speakerName ? "talk" : "experience"} details for ${item.title}`}
                     >
                       <time>{item.time}</time>
                       <span className="program-speaker-link__copy">
                         <p>{item.title}</p>
-                        {item.detail && <span style={item.detailHighlight ? { color: "var(--color-accent-light)", fontStyle: "normal", fontWeight: 600 } : undefined}>{item.detail}</span>}
-                        {item.menuNote && <span style={{ color: "rgba(255,255,255,0.42)", fontStyle: "italic", fontSize: "0.78rem" }}>{item.menuNote}</span>}
+                        <ProgramItemDetail item={item} />
                       </span>
                     </a>
                   ) : (
@@ -108,17 +118,12 @@ function ProgramSchedule({
                       <time>{item.time}</time>
                       <div>
                         <p>{item.title}</p>
-                        {item.detail && <span style={item.detailHighlight ? { color: "var(--color-accent-light)", fontStyle: "normal", fontWeight: 600 } : undefined}>{item.detail}</span>}
-                        {item.menuNote && <span style={{ color: "rgba(255,255,255,0.42)", fontStyle: "italic", fontSize: "0.78rem" }}>{item.menuNote}</span>}
+                        <ProgramItemDetail item={item} />
                       </div>
                     </>
                   )}
                   {experiences.length > 0 && (
-                    <ProgramExperienceHints
-                      day={day.day}
-                      activities={experiences}
-                      onNavigate={onExperienceNavigate}
-                    />
+                    <ProgramExperienceHints activities={experiences} onOpen={onExperienceOpen} />
                   )}
                 </li>
               );
@@ -139,7 +144,6 @@ export default function Program() {
   const hasAnimated = useRef(false);
   const [expanded, setExpanded] = useState(false);
   const { present: expandedPresent, onExited: onExpandedExited } = useModalPresence(expanded);
-  const pendingExperienceNav = useRef<string | null>(null);
 
   const handleSpeakerOpen = (speakerName: string) => {
     const dispatchOpen = () => openSpeakerModal(speakerName);
@@ -153,21 +157,16 @@ export default function Program() {
     dispatchOpen();
   };
 
-  const handleExperienceNavigate = (targetId: string) => {
+  const handleExperienceOpen = (name: string) => {
+    const dispatchOpen = () => openExperienceModal(name);
+
     if (expanded) {
-      pendingExperienceNav.current = targetId;
       setExpanded(false);
+      window.setTimeout(dispatchOpen, 0);
       return;
     }
 
-    scrollToExperienceSlot(targetId);
-  };
-
-  const handleExpandedExited = () => {
-    onExpandedExited();
-    const targetId = pendingExperienceNav.current;
-    pendingExperienceNav.current = null;
-    if (targetId) scrollToExperienceSlot(targetId);
+    dispatchOpen();
   };
 
   useEffect(() => {
@@ -217,7 +216,7 @@ export default function Program() {
     if (expanded) focusWithoutScroll(closeButtonRef.current);
   }, [expanded]);
 
-  useModalMotion(expanded, modalRef, modalContentRef, handleExpandedExited, {
+  useModalMotion(expanded, modalRef, modalContentRef, onExpandedExited, {
     overlayDuration: 260,
     panelDuration: 480,
     scale: 0.985,
@@ -244,7 +243,7 @@ export default function Program() {
         </div>
 
         <div data-fade-up className="opacity-0">
-          <ProgramSchedule onSpeakerOpen={handleSpeakerOpen} onExperienceNavigate={handleExperienceNavigate} />
+          <ProgramSchedule onSpeakerOpen={handleSpeakerOpen} onExperienceOpen={handleExperienceOpen} />
         </div>
 
         <p data-fade-up className="opacity-0 mt-5 text-center text-white/50 text-sm">
@@ -271,7 +270,7 @@ export default function Program() {
             </button>
           </div>
           <div ref={modalContentRef} className="program-modal__content opacity-0">
-            <ProgramSchedule expanded onSpeakerOpen={handleSpeakerOpen} onExperienceNavigate={handleExperienceNavigate} />
+            <ProgramSchedule expanded onSpeakerOpen={handleSpeakerOpen} onExperienceOpen={handleExperienceOpen} />
           </div>
         </div>
       )}

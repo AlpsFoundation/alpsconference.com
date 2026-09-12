@@ -2,8 +2,6 @@ import { setLocationHash } from "./locationHash";
 
 export const EXPERIENCE_MODAL_EVENT = "alps:open-experience";
 
-export const EXPERIENCES_SCHEDULE_ID = "experiences-schedule";
-
 function slugify(value: string) {
   return value
     .normalize("NFKD")
@@ -15,10 +13,6 @@ function slugify(value: string) {
 
 export function getExperienceModalId(name: string) {
   return `experience-${slugify(name)}`;
-}
-
-export function getExperienceSlotId(day: string, title: string) {
-  return `experience-slot-${slugify(day)}-${slugify(title)}`;
 }
 
 export function openExperienceModal(name: string) {
