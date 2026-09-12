@@ -155,8 +155,9 @@ export const SPEAKERS: SpeakerEntry[] = [
     role: "Professor, Addiction Department",
     image: "amandine_luiqiens.png",
     talkTitle: "Is It More Than the Drug? Exploring Precision Psychedelic Therapy for Addiction",
-    abstract: "TBD",
-    bio: "TBD",
+    abstract:
+      "Addiction, a paradigmatic biopsychosocial disorder, provides a unique model to explore whether psychedelics act beyond the molecule by modulating processes that can be engaged through psychotherapy. In our PAD pilot RCT (n=30), two 25-mg psilocybin sessions added to relapse-prevention treatment were associated with higher 12-week past-month abstinence than 1 mg (55% vs 11%), with substantial heterogeneity in response. Qualitative analyses identified inner dialogue and active introspection as distinctive features of responders, suggesting processes potentially amenable to psychotherapeutic priming. Preliminary data also suggest reduced egocentric bias after psilocybin. Our program explores clinical and biological markers to identify more homogeneous responder profiles, including the transdiagnostic role of depression, PTSD and dual disorders, while investigating how psychotherapy may be optimized. These questions require coordinated research. The emerging Psychedelics in Addiction Network integrates patient and public involvement to rethink meaningful efficacy, outcome measures and guidance, toward a precision, biopsychosocial model of psychedelic-assisted therapy.",
+    bio: "Amandine Luquiens is a psychiatrist and addiction specialist, Full Professor at the University of Montpellier and the Addiction Department of Nîmes University Hospital. Her research focuses on patient-reported outcomes and psychotherapy-based interventions in addiction, with a particular interest in mindfulness and psychedelic-assisted psychotherapy; she conducted the first clinical trial in France on psychedelics. Her work also addresses alcohol use disorder and gambling disorder, including the use of account-based gambling data to inform evidence-based guidance for policymakers. She is a member of the CESP Inserm U1018 team Primary Care, Prevention and Women's Health, and aims to advance patient-centered addiction care.",
   },
   {
     name: "Dr. Jason K. Day",
