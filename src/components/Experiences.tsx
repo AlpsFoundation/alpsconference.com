@@ -83,14 +83,14 @@ const EXPERIENCES: ExperienceCategory[] = [
         ],
       },
       {
-        name: "Regis Paroz",
+        name: "Régis Paroz",
         role: "Artist",
         context: "ALPS",
         sessions: [
           {
             title: "Art",
             description:
-              "Regis Paroz will be presenting his work throughout the conference. Further details will be published here soon.",
+              "Régis Paroz will be presenting his work throughout the conference. Further details will be published here soon.",
           },
         ],
       },
@@ -207,7 +207,7 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
     date: "9 October",
     dateTime: "2026-10-09",
     items: [
-      { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke", "Regis Paroz"] },
+      { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke", "Régis Paroz"] },
       { time: "13:40–14:25", title: "Sound meditation", detail: "Saal 4", personName: "Marina Vovk" },
       { time: "16:30–17:15", title: "Sound meditation", detail: "Saal 4", personName: "Marina Vovk" },
       { time: "13:45–14:30", title: "Speed-friending", detail: "Second half of lunch", personName: "Kate Dalby" },
@@ -220,7 +220,7 @@ const EXPERIENCE_DAYS: ExperienceDay[] = [
     date: "10 October",
     dateTime: "2026-10-10",
     items: [
-      { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke", "Regis Paroz"] },
+      { time: "All day", title: "Art exhibition", detail: "LSD blotter art & live painting", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke", "Régis Paroz"] },
       { time: "08:10–08:50", title: "Yoga", detail: "Saal 4", personName: "Andrea Bacconi" },
       { time: "12:30–14:00", title: "Live Concert", detail: "During lunch · Saal 2", personName: "David & Anna-Lea Wennberg" },
       { time: "13:10–13:55", title: "Sound meditation", detail: "Saal 4", personName: "Marina Vovk" },
