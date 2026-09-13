@@ -11,6 +11,7 @@ import {
   openExperienceModal,
 } from "../lib/experienceModal";
 import Afterparty from "./Afterparty";
+import { EXPERIENCE_DAYS } from "../data/experiences";
 
 type ExperienceSession = {
   title: string;
@@ -77,9 +78,13 @@ const EXPERIENCES: ExperienceCategory[] = [
           {
             title: "Live painting",
             description:
-              "Hannah Stanke will be live-painting throughout the conference, in the same space as the blotter exhibition. Further details will be published here soon.",
+              "Hannah will exhibit work in the Foyer Art Corner, with pieces available for purchase. She will live-paint both days; finished works may be purchased by visitors.",
           },
         ],
+        bio: "Hannah Stanke is a visual artist who expresses her inner world and philosophy through paint. Her art is inspired by her inner cosmos and the human experience. She likes to visually express her emotions and inner world with elements she connects to such as botany, airy and moving elements like clouds and energies, micro and natural patterns.",
+        links: {
+          instagram: "chuvatti",
+        },
       },
       {
         name: "Régis Paroz",
@@ -198,55 +203,12 @@ const EXPERIENCES: ExperienceCategory[] = [
   },
 ];
 
-type ExperienceSlot = {
-  time: string;
-  title: string;
-  detail?: string;
-  kind?: "allday" | "session";
-  personName?: string;
-  personNames?: string[];
-};
-
-type ExperienceDay = {
-  day: string;
-  date: string;
-  dateTime: string;
-  items: ExperienceSlot[];
-};
-
-const EXPERIENCE_DAYS: ExperienceDay[] = [
-  {
-    day: "Friday",
-    date: "9 October",
-    dateTime: "2026-10-09",
-    items: [
-      { time: "All day", title: "Art exhibition", detail: "LSD blotter art, live painting & Uncanny World", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke", "Régis Paroz"] },
-      { time: "11:00–12:00 & 14:30–15:30", title: "Sound meditation", detail: "Saal 4", personName: "Marina Vovk" },
-      { time: "13:45–14:30", title: "Speed-friending", detail: "Second half of lunch", personName: "Kate Dalby" },
-      { time: "20:15–20:45", title: "Evening Program Part I", detail: "Saal 4" },
-      { time: "20:45–21:30", title: "Storytelling", detail: "Saal 4", personName: "Kate Dalby" },
-    ],
-  },
-  {
-    day: "Saturday",
-    date: "10 October",
-    dateTime: "2026-10-10",
-    items: [
-      { time: "All day", title: "Art exhibition", detail: "LSD blotter art, live painting & Uncanny World", kind: "allday", personNames: ["Kevin Barron", "Hannah Stanke", "Régis Paroz"] },
-      { time: "08:10–08:50", title: "Yoga", detail: "Saal 4", personName: "Andrea Bacconi" },
-      { time: "11:15–12:30 & 13:45–15:00", title: "Breathwork", personName: "Pascal Kälin" },
-      { time: "12:30–14:00", title: "Live Concert", detail: "During lunch · Saal 2", personName: "David & Anna-Lea Wennberg" },
-      { time: "13:10–13:55 & 16:10–16:55", title: "Sound meditation", detail: "Saal 4", personName: "Marina Vovk" },
-    ],
-  },
-];
-
 function getPersonSessionTimes(name: string) {
   return EXPERIENCE_DAYS.flatMap((day) =>
     day.items
       .filter((item) => {
         if (item.kind === "allday") return false;
-        const names = item.personNames ?? (item.personName ? [item.personName] : []);
+        const names = item.credits?.map((credit) => credit.name) ?? item.personNames ?? (item.personName ? [item.personName] : []);
         return names.includes(name);
       })
       .map((item) => ({
@@ -650,9 +612,9 @@ export default function Experiences() {
             <div
               key={category.id}
               data-fade-up
-              className="opacity-0 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4"
+              className="opacity-0 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-4"
             >
-              <div className="col-span-2 lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
+              <div className="col-span-2 md:col-span-1 md:sticky md:top-24 md:self-start">
                 <h3 className="text-white font-semibold tracking-tight text-[1.85rem] sm:text-[2.15rem] leading-none">
                   {category.title}
                 </h3>

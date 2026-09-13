@@ -24,6 +24,8 @@ SITE_URL=https://alpsconference.com pnpm build
 
 No lint, test, or formatting scripts are configured.
 
+**Never start an Astro (or `pnpm`) dev server unprompted.** Always first try to use the server that is already running on port 4321 (`http://localhost:4321`). Only start a new one if the user explicitly asks you to.
+
 ## Architecture
 
 This is a minimal Astro static site (`output: "static"`) with a single page:
