@@ -1,125 +1,287 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { animate } from "animejs";
-import { Maximize2, Music, PersonStanding, Sparkles, Users, Waves, X } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { PROGRAM, type ProgramExperience } from "../data/program";
-import { getExperienceSlotId } from "../lib/experienceModal";
+import {
+  ArrowUpRight,
+  AudioLines,
+  BookOpen,
+  Coffee,
+  DoorOpen,
+  Flower2,
+  Handshake,
+  type LucideIcon,
+  MessagesSquare,
+  Mic2,
+  Moon,
+  Music,
+  Paintbrush,
+  Palette,
+  PartyPopper,
+  Sparkles,
+  Utensils,
+  UtensilsCrossed,
+  Wind,
+  Wine,
+} from "lucide-react";
+import { PROGRAM, type ProgramDay, type ProgramItem } from "../data/program";
+import { EXPERIENCE_DAYS, EXPERIENCE_PORTRAITS, type ExperienceCredit } from "../data/experiences";
+import {
+  FRIDAY_PANEL_SPEAKER_NAMES,
+  getImageCrop,
+  SATURDAY_PANEL_SPEAKER_NAMES,
+  speakerByName,
+  speakersNamed,
+  type Speaker,
+} from "../data/speakers";
+import { FRIDAY_PANEL, SATURDAY_PANEL } from "../data/bookletContent";
+import MapAddress from "./MapAddress";
+import { withBase } from "../lib/withBase";
+import { setLocationHash } from "../lib/locationHash";
 import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
+import { getExperienceModalId, openExperienceModal } from "../lib/experienceModal";
 import { getSpeakerModalId, openSpeakerModal } from "../lib/speakerModal";
+import { getPanelModalId, openPanelModal, PANEL_MODAL_EVENT, type PanelId } from "../lib/panelModal";
 import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
-const EXPERIENCE_ICONS: Record<string, LucideIcon> = {
-  "Sound meditation": Waves,
-  "Speed-friending": Users,
-  Yoga: PersonStanding,
-  "Live Concert": Music,
+type ScheduleView = "talks" | "experiences";
+type ScheduleItem = ProgramItem & { people?: string[]; allDay?: boolean; credits?: ExperienceCredit[] };
+type ScheduleDay = Omit<ProgramDay, "items"> & { items: ScheduleItem[] };
+
+const PANELS: Record<PanelId, {
+  title: string;
+  subtitle?: string;
+  body: string;
+  speakers: Speaker[];
+  eyebrow: string;
+}> = {
+  friday: {
+    title: FRIDAY_PANEL.title,
+    subtitle: FRIDAY_PANEL.subtitle,
+    body: FRIDAY_PANEL.body,
+    speakers: speakersNamed(FRIDAY_PANEL_SPEAKER_NAMES),
+    eyebrow: "Friday panel · 18:15–19:15",
+  },
+  saturday: {
+    title: SATURDAY_PANEL.title,
+    body: SATURDAY_PANEL.body,
+    speakers: speakersNamed(SATURDAY_PANEL_SPEAKER_NAMES),
+    eyebrow: "Saturday panel · 18:00–19:00",
+  },
 };
 
-function scrollToExperienceSlot(targetId: string) {
-  const el = document.getElementById(targetId);
-  if (!el) return;
+// Split repeat sessions into individual rows and sort by their actual start time.
+const EXPERIENCE_SCHEDULE: ScheduleDay[] = EXPERIENCE_DAYS.map((day) => ({
+  ...day,
+  items: day.items.flatMap((item) => item.time.split(" & ").map((time) => ({
+    time,
+    title: item.title,
+    detail: item.personName && item.personName !== item.title ? item.personName : undefined,
+    menuNote: item.detail,
+    venue: item.venue,
+    experienceName: item.personName,
+    people: item.credits?.map((credit) => credit.name) ?? item.personNames,
+    credits: item.credits,
+    allDay: item.kind === "allday",
+    kind: item.personName === "Afterparty" ? "social" as const : "session" as const,
+  }))).sort((a, b) => Number(b.allDay) - Number(a.allDay) || a.time.localeCompare(b.time)),
+}));
 
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  el.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth", block: "center" });
-  el.classList.remove("program-item--flash");
-  void el.offsetWidth;
-  el.classList.add("program-item--flash");
+function speakerPortrait(name?: string) {
+  const speaker = name ? speakerByName(name) : undefined;
+  if (!speaker?.image) return undefined;
+  return {
+    src: withBase(`img/speakers/${speaker.image}`),
+    position: getImageCrop(speaker.image).position,
+  };
 }
 
-function ProgramExperienceHints({
-  day,
-  activities,
-  onNavigate,
-}: {
-  day: string;
-  activities: ProgramExperience[];
-  onNavigate: (targetId: string) => void;
-}) {
+function experiencePortrait(name?: string) {
+  if (!name) return undefined;
+  const portrait = EXPERIENCE_PORTRAITS[name];
+  if (!portrait) return undefined;
+  return {
+    src: withBase(`img/experiences/${portrait.file}`),
+    position: portrait.position,
+  };
+}
+
+function facilitatorName(item: ScheduleItem) {
+  if (item.people?.length === 1) return item.people[0];
+  if (item.people && item.people.length > 1) return undefined;
+  if (item.experienceName && EXPERIENCE_PORTRAITS[item.experienceName]) return item.experienceName;
+  return undefined;
+}
+
+function PortraitMark({ src, position, small = false }: { src: string; position: string; small?: boolean }) {
   return (
-    <div className="program-experience-hints">
-      {activities.map((activity) => {
-        const Icon = EXPERIENCE_ICONS[activity.title] ?? Sparkles;
-        const tooltip = `${activity.title} (${activity.time})`;
-        return (
-          <button
-            key={activity.title}
-            type="button"
-            className="program-experience-hint"
-            data-tooltip={tooltip}
-            aria-label={`${tooltip}. View in the experiences programme.`}
-            onClick={() => onNavigate(getExperienceSlotId(day, activity.title))}
-          >
-            <Icon className="h-3.5 w-3.5" aria-hidden />
-          </button>
-        );
-      })}
-    </div>
+    <span className={`program-item__mark program-item__mark--photo${small ? " program-item__mark--sm" : ""}`} aria-hidden="true">
+      <img src={src} alt="" style={{ objectPosition: position }} />
+    </span>
   );
 }
 
-function ProgramSchedule({
-  expanded = false,
-  onSpeakerOpen,
-  onExperienceNavigate,
-}: {
-  expanded?: boolean;
-  onSpeakerOpen: (speakerName: string) => void;
-  onExperienceNavigate: (targetId: string) => void;
-}) {
-  return (
-    <div className={`program-board ${expanded ? "program-board--expanded" : ""}`}>
-      {PROGRAM.map((day, dayIndex) => (
-        <article className="program-day" key={day.day}>
-          <header className="program-day__header">
-            <span>Day {String(dayIndex + 1).padStart(2, "0")}</span>
-            <div>
-              <h3>{day.day}</h3>
-              <time dateTime={day.dateTime}>{day.date}, 2026</time>
-            </div>
-          </header>
+function iconForItem(item: ScheduleItem): LucideIcon {
+  const title = item.title.toLowerCase();
+  if (title.includes("coffee") || title === "break") return Coffee;
+  if (title.includes("lunch")) return Utensils;
+  if (title.includes("dinner")) return UtensilsCrossed;
+  if (title.includes("doors")) return DoorOpen;
+  if (title === "opening") return Sparkles;
+  if (title.includes("panel")) return MessagesSquare;
+  if (title.includes("evening")) return Moon;
+  if (title.includes("closing")) return Mic2;
+  if (title.includes("apéro") || title.includes("apero")) return Wine;
+  if (title.includes("afterparty")) return PartyPopper;
+  if (title.includes("exhibition")) return Palette;
+  if (title.includes("painting")) return Paintbrush;
+  if (title.includes("sound") || title.includes("meditation")) return AudioLines;
+  if (title.includes("speed-friending") || title.includes("speed friending")) return Handshake;
+  if (title.includes("story")) return BookOpen;
+  if (title.includes("yoga")) return Flower2;
+  if (title.includes("breath")) return Wind;
+  if (title.includes("concert")) return Music;
+  if (item.kind === "pause") return Coffee;
+  return Sparkles;
+}
 
+function ProgramItemMark({ item }: { item: ScheduleItem }) {
+  const portrait = speakerPortrait(item.speakerName) ?? experiencePortrait(facilitatorName(item));
+  if (portrait) return <PortraitMark src={portrait.src} position={portrait.position} />;
+  if (item.panel || (item.people && item.people.length > 1)) return null;
+  const Icon = iconForItem(item);
+  const accent = item.kind === "social" || item.allDay || item.detailHighlight;
+  return (
+    <span className={`program-item__mark program-item__mark--icon${accent ? " program-item__mark--accent" : ""}`} aria-hidden="true">
+      <Icon size={18} strokeWidth={2.25} />
+    </span>
+  );
+}
+
+function ProgramItemWhen({ item }: { item: ScheduleItem }) {
+  return (
+    <span className="program-item__when">
+      <span className="program-item__time">{item.time}</span>
+      {item.venue && <span className="program-item__venue">{item.venue}</span>}
+    </span>
+  );
+}
+
+function facilitatorNames(item: ScheduleItem) {
+  if (item.people?.length) return item.people;
+  const name = facilitatorName(item) ?? item.experienceName;
+  if (name && name !== item.title) return [name];
+  return [];
+}
+
+function experienceCredits(item: ScheduleItem): ExperienceCredit[] {
+  if (item.credits?.length) return item.credits;
+  return facilitatorNames(item).map((name) => ({ name }));
+}
+
+function ExperienceCredits({ item }: { item: ScheduleItem }) {
+  const credits = experienceCredits(item);
+  if (!credits.length) return null;
+  const linkedRow = Boolean(item.speakerName || item.experienceName || item.panel);
+  const showPhotos = credits.length > 1;
+  return (
+    <>
+      <span className="program-item__sep" aria-hidden="true">·</span>
+      <span className="program-item__people">
+        {credits.map((credit) => {
+          const portrait = showPhotos ? experiencePortrait(credit.name) : undefined;
+          const label = (
+            <>
+              {portrait && <PortraitMark src={portrait.src} position={portrait.position} small />}
+              {credit.name}
+              {credit.type && <span className="program-item__credit-type">{credit.type}</span>}
+              {!linkedRow && <ArrowUpRight size={12} aria-hidden="true" />}
+            </>
+          );
+          if (linkedRow) {
+            return <span key={credit.name} className="program-item__with">{label}</span>;
+          }
+          return (
+            <a key={credit.name} href={`#${getExperienceModalId(credit.name)}`} onClick={(event) => {
+              event.preventDefault();
+              openExperienceModal(credit.name);
+            }}>
+              {label}
+            </a>
+          );
+        })}
+      </span>
+    </>
+  );
+}
+
+function ProgramItemDetail({ item }: { item: ScheduleItem }) {
+  if (item.panel) {
+    return <span className="program-item__detail">{PANELS[item.panel].title}</span>;
+  }
+  const names = facilitatorNames(item);
+  const detailIsFacilitator = Boolean(item.detail && names.includes(item.detail));
+  return (
+    <>
+      {item.detail && !detailIsFacilitator && (
+        <span className={`program-item__detail${item.detailHighlight ? " program-item__detail--highlight" : ""}`}>
+          {item.detail}
+        </span>
+      )}
+      {item.address && item.mapUrl && <span className="program-item__detail"><MapAddress address={item.address} href={item.mapUrl} /></span>}
+      {item.menuNote && <span className="program-item__note">{item.menuNote}</span>}
+    </>
+  );
+}
+
+function itemHref(item: ScheduleItem) {
+  if (item.speakerName) return `#${getSpeakerModalId(item.speakerName)}`;
+  if (item.panel) return `#${getPanelModalId(item.panel)}`;
+  return `#${getExperienceModalId(item.experienceName!)}`;
+}
+
+function openItem(item: ScheduleItem) {
+  if (item.speakerName) openSpeakerModal(item.speakerName);
+  else if (item.panel) openPanelModal(item.panel);
+  else openExperienceModal(item.experienceName!);
+}
+
+function ProgramSchedule({ view }: { view: ScheduleView }) {
+  const days = view === "talks" ? PROGRAM : EXPERIENCE_SCHEDULE;
+  return (
+    <div className="program-board">
+      {days.map((day) => (
+        <article className="program-day" key={day.day} aria-labelledby={`program-${view}-${day.day}`}>
+          <header className="program-day__header">
+            <h3 id={`program-${view}-${day.day}`}>{day.day}</h3>
+            <time dateTime={day.dateTime}>{day.date} 2026</time>
+          </header>
           <ol className="program-list">
-            {day.items.map((item) => {
-              const experiences = item.experiences ?? [];
+            {day.items.map((item: ScheduleItem) => {
+              const linked = Boolean(item.speakerName || item.experienceName || item.panel);
+              const copy = (
+                <div className="program-item__copy">
+                  <div className="program-item__headline">
+                    <ProgramItemMark item={item} />
+                    <p>
+                      {item.title}
+                      {view === "experiences" && <ExperienceCredits item={item} />}
+                    </p>
+                  </div>
+                  <ProgramItemDetail item={item} />
+                </div>
+              );
               return (
-                <li
-                  className={`program-item program-item--${item.kind ?? "session"}${item.speakerName ? " program-item--linked" : ""}${experiences.length ? " program-item--has-experience" : ""}`}
-                  key={`${day.day}-${item.time}`}
-                >
-                  {item.speakerName ? (
-                    <a
-                      className="program-speaker-link"
-                      href={`#${getSpeakerModalId(item.speakerName)}`}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        onSpeakerOpen(item.speakerName!);
-                      }}
-                      aria-label={`View talk details for ${item.title}`}
-                    >
-                      <time>{item.time}</time>
-                      <span className="program-speaker-link__copy">
-                        <p>{item.title}</p>
-                        {item.detail && <span style={item.detailHighlight ? { color: "var(--color-accent-light)", fontStyle: "normal", fontWeight: 600 } : undefined}>{item.detail}</span>}
-                        {item.menuNote && <span style={{ color: "rgba(255,255,255,0.42)", fontStyle: "italic", fontSize: "0.78rem" }}>{item.menuNote}</span>}
-                      </span>
+                <li className={`program-item program-item--${item.kind ?? "session"}${linked ? " program-item--linked" : ""}${item.allDay ? " program-item--allday" : ""}`} key={`${item.time}-${item.title}`}>
+                  {linked ? (
+                    <a className="program-session-link" href={itemHref(item)} onClick={(event) => {
+                      event.preventDefault();
+                      openItem(item);
+                    }} aria-label={`View ${item.panel ? "panel" : item.speakerName ? "talk" : "experience"} details for ${item.panel ? PANELS[item.panel].title : item.title}, ${day.day} ${item.time}`}>
+                      <ProgramItemWhen item={item} />
+                      {copy}
+                      <ArrowUpRight className="program-item__arrow" size={15} aria-hidden="true" />
                     </a>
-                  ) : (
-                    <>
-                      <time>{item.time}</time>
-                      <div>
-                        <p>{item.title}</p>
-                        {item.detail && <span style={item.detailHighlight ? { color: "var(--color-accent-light)", fontStyle: "normal", fontWeight: 600 } : undefined}>{item.detail}</span>}
-                        {item.menuNote && <span style={{ color: "rgba(255,255,255,0.42)", fontStyle: "italic", fontSize: "0.78rem" }}>{item.menuNote}</span>}
-                      </div>
-                    </>
-                  )}
-                  {experiences.length > 0 && (
-                    <ProgramExperienceHints
-                      day={day.day}
-                      activities={experiences}
-                      onNavigate={onExperienceNavigate}
-                    />
-                  )}
+                  ) : <><ProgramItemWhen item={item} />{copy}</>}
                 </li>
               );
             })}
@@ -130,98 +292,148 @@ function ProgramSchedule({
   );
 }
 
+function PanelModal({
+  panelId,
+  open,
+  onClose,
+  onExited,
+}: {
+  panelId: PanelId;
+  open: boolean;
+  onClose: () => void;
+  onExited: () => void;
+}) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const panel = PANELS[panelId];
+  const headingId = `${getPanelModalId(panelId)}-title`;
+
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => event.key === "Escape" && onCloseRef.current();
+    document.addEventListener("keydown", handleKey);
+    lockBodyScroll();
+    focusWithoutScroll(closeRef.current);
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      unlockBodyScroll();
+    };
+  }, []);
+
+  useModalMotion(open, overlayRef, cardRef, onExited);
+
+  return createPortal(
+    <div
+      ref={overlayRef}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0${open ? "" : " pointer-events-none"}`}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={headingId}
+    >
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div
+        ref={cardRef}
+        className="relative z-10 w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-neutral-dark border border-white/10 rounded-[1.25rem] shadow-2xl p-6 sm:p-8 opacity-0"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          ref={closeRef}
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-white/50 hover:text-white transition-colors rounded-sm hover:bg-white/10 cursor-pointer"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+        <p className="text-sm text-support-light font-medium tracking-wide uppercase mb-2">{panel.eyebrow}</p>
+        <h3 id={headingId} className="text-xl font-semibold text-white text-balance pr-8">{panel.title}</h3>
+        {panel.subtitle && <p className="mt-2 text-white/70 text-base">{panel.subtitle}</p>}
+        <p className="mt-5 text-sm text-white/70 leading-relaxed">{panel.body}</p>
+        <ul className="program-panel-speakers">
+          {panel.speakers.map((speaker) => {
+            const portrait = speakerPortrait(speaker.name);
+            return (
+              <li key={speaker.name}>
+                <button type="button" onClick={() => {
+                  onClose();
+                  openSpeakerModal(speaker.name);
+                }}>
+                  {portrait && <PortraitMark src={portrait.src} position={portrait.position} />}
+                  <span>
+                    <strong>{speaker.name}</strong>
+                    <em>{speaker.role} · {speaker.institution}</em>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 export default function Program() {
   const sectionRef = useRef<HTMLElement>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
-  const modalContentRef = useRef<HTMLDivElement>(null);
-  const expandButtonRef = useRef<HTMLButtonElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const hasAnimated = useRef(false);
-  const [expanded, setExpanded] = useState(false);
-  const { present: expandedPresent, onExited: onExpandedExited } = useModalPresence(expanded);
-  const pendingExperienceNav = useRef<string | null>(null);
+  const [view, setView] = useState<ScheduleView>("talks");
+  const [openPanel, setOpenPanel] = useState<PanelId | null>(null);
+  const { present: panelPresent, onExited: onPanelExited } = useModalPresence(Boolean(openPanel));
+  const lastPanel = useRef<PanelId>("friday");
+  if (openPanel) lastPanel.current = openPanel;
+  const views = ["talks", "experiences"] as const;
 
-  const handleSpeakerOpen = (speakerName: string) => {
-    const dispatchOpen = () => openSpeakerModal(speakerName);
-
-    if (expanded) {
-      setExpanded(false);
-      window.setTimeout(dispatchOpen, 0);
-      return;
-    }
-
-    dispatchOpen();
-  };
-
-  const handleExperienceNavigate = (targetId: string) => {
-    if (expanded) {
-      pendingExperienceNav.current = targetId;
-      setExpanded(false);
-      return;
-    }
-
-    scrollToExperienceSlot(targetId);
-  };
-
-  const handleExpandedExited = () => {
-    onExpandedExited();
-    const targetId = pendingExperienceNav.current;
-    pendingExperienceNav.current = null;
-    if (targetId) scrollToExperienceSlot(targetId);
-  };
+  useEffect(() => {
+    const panelFromHash = () => {
+      const hash = window.location.hash.slice(1);
+      if (hash === getPanelModalId("friday")) return "friday";
+      if (hash === getPanelModalId("saturday")) return "saturday";
+      return null;
+    };
+    const syncFromHash = () => setOpenPanel(panelFromHash());
+    const handleOpen = (event: Event) => {
+      const { panelId } = (event as CustomEvent<{ panelId: string }>).detail;
+      setOpenPanel(panelId === getPanelModalId("friday") ? "friday" : panelId === getPanelModalId("saturday") ? "saturday" : null);
+    };
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    window.addEventListener(PANEL_MODAL_EVENT, handleOpen);
+    return () => {
+      window.removeEventListener("hashchange", syncFromHash);
+      window.removeEventListener(PANEL_MODAL_EVENT, handleOpen);
+    };
+  }, []);
 
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
-
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      el.querySelectorAll<HTMLElement>("[data-fade-up]").forEach((item) => {
-        item.style.opacity = "1";
-      });
+      el.querySelectorAll<HTMLElement>("[data-fade-up]").forEach((item) => { item.style.opacity = "1"; });
       return;
     }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-          animate(el.querySelectorAll("[data-fade-up]"), {
-            opacity: [0, 1],
-            translateY: [18, 0],
-            delay: (_: unknown, i: number) => i * 80,
-            duration: 620,
-            easing: "easeOutCubic",
-          });
-        }
-      },
-      { threshold: 0.08 }
-    );
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !hasAnimated.current) {
+        hasAnimated.current = true;
+        animate(el.querySelectorAll("[data-fade-up]"), {
+          opacity: [0, 1], translateY: [18, 0],
+          delay: (_: unknown, i: number) => i * 80,
+          duration: 620, easing: "easeOutCubic",
+        });
+      }
+    }, { threshold: 0.08 });
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (!expandedPresent) return;
-
-    const handleKey = (event: KeyboardEvent) => event.key === "Escape" && setExpanded(false);
-    document.addEventListener("keydown", handleKey);
-    lockBodyScroll();
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-      unlockBodyScroll();
-      focusWithoutScroll(expandButtonRef.current);
-    };
-  }, [expandedPresent]);
-
-  useEffect(() => {
-    if (expanded) focusWithoutScroll(closeButtonRef.current);
-  }, [expanded]);
-
-  useModalMotion(expanded, modalRef, modalContentRef, handleExpandedExited, {
-    overlayDuration: 260,
-    panelDuration: 480,
-    scale: 0.985,
-  });
+  const closePanel = () => {
+    setOpenPanel(null);
+    if (window.location.hash === `#${getPanelModalId("friday")}` || window.location.hash === `#${getPanelModalId("saturday")}`) {
+      setLocationHash(null, "replace");
+    }
+  };
 
   return (
     <section ref={sectionRef} id="program" className="relative py-24 sm:py-32 bg-white/[0.02]">
@@ -229,51 +441,32 @@ export default function Program() {
         <div data-fade-up className="opacity-0 program-heading">
           <div>
             <p className="section-eyebrow">Friday–Saturday, 9–10 October 2026</p>
-            <h2 className="section-title">Scientific program</h2>
+            <h2 className="section-title">Conference program</h2>
           </div>
-          <button
-            ref={expandButtonRef}
-            type="button"
-            onClick={() => setExpanded(true)}
-            className="program-expand-button"
-            aria-label="Expand scientific program to full screen"
-          >
-            <Maximize2 className="h-4 w-4" aria-hidden />
-            Expand schedule
-          </button>
+          <div className="program-tabs" role="tablist" aria-label="Program type">
+            {views.map((option) => (
+              <button key={option} id={`program-tab-${option}`} type="button" role="tab" aria-selected={view === option} aria-controls={`program-panel-${option}`} tabIndex={view === option ? 0 : -1} onClick={() => setView(option)} onKeyDown={(event) => {
+                if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+                event.preventDefault();
+                const next = event.key === "Home" ? "talks" : event.key === "End" ? "experiences" : views[(views.indexOf(option) + 1) % views.length];
+                setView(next);
+                document.getElementById(`program-tab-${next}`)?.focus({ preventScroll: true });
+              }}>{option === "talks" ? "Talks" : "Experiences"}</button>
+            ))}
+          </div>
         </div>
-
         <div data-fade-up className="opacity-0">
-          <ProgramSchedule onSpeakerOpen={handleSpeakerOpen} onExperienceNavigate={handleExperienceNavigate} />
-        </div>
-
-        <p data-fade-up className="opacity-0 mt-5 text-center text-white/50 text-sm">
-          Speakers and timings are subject to change.
-        </p>
-      </div>
-
-      {expandedPresent && (
-        <div
-          ref={modalRef}
-          className={`program-modal opacity-0${expanded ? "" : " pointer-events-none"}`}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="expanded-program-title"
-        >
-          <div className="program-modal__bar">
-            <div>
-              <p>ALPS 2026</p>
-              <h2 id="expanded-program-title">Scientific program</h2>
+          {views.map((option) => (
+            <div key={option} id={`program-panel-${option}`} role="tabpanel" aria-labelledby={`program-tab-${option}`} hidden={view !== option} tabIndex={0}>
+              <p className="program-intro">{option === "talks" ? "Research talks, panel discussions and time to connect. Select a speaker or panel to read more." : "Art, sound, movement and connection alongside the talks. Select a session for details; some sessions overlap."}</p>
+              <ProgramSchedule view={option} />
             </div>
-            <button ref={closeButtonRef} type="button" onClick={() => setExpanded(false)} aria-label="Close full screen program">
-              <X className="h-5 w-5" aria-hidden />
-              Close
-            </button>
-          </div>
-          <div ref={modalContentRef} className="program-modal__content opacity-0">
-            <ProgramSchedule expanded onSpeakerOpen={handleSpeakerOpen} onExperienceNavigate={handleExperienceNavigate} />
-          </div>
+          ))}
         </div>
+        <p data-fade-up className="opacity-0 program-footnote">All times are local to Aarau, Switzerland. Program and timings are subject to change.</p>
+      </div>
+      {panelPresent && (
+        <PanelModal panelId={openPanel ?? lastPanel.current} open={Boolean(openPanel)} onClose={closePanel} onExited={onPanelExited} />
       )}
     </section>
   );

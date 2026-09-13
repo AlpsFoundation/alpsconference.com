@@ -5,6 +5,7 @@ import {
   FRIDAY_PANEL_SPEAKERS,
   getFaceCenter,
   getImageCrop,
+  isConfirmedSpeaker,
   SATURDAY_PANEL_SPEAKERS,
   SPEAKERS,
   type Speaker,
@@ -178,6 +179,46 @@ function SpeakerPhoto({
   );
 }
 
+function TalkTitle({ title }: { title: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [clamped, setClamped] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const update = () => setClamped(el.scrollHeight - el.clientHeight > 1);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [title]);
+
+  return (
+    <div className="relative">
+      <p
+        ref={ref}
+        className={`text-sm sm:text-base text-white/80 line-clamp-4 leading-snug${clamped ? " pr-5 [overflow-wrap:anywhere] [text-overflow:clip]" : ""}`}
+      >
+        {title}
+        {!clamped && (
+          <span className="ml-1.5 text-support-light group-hover:text-white transition-colors" aria-hidden>
+            →
+          </span>
+        )}
+      </p>
+      {clamped && (
+        <span
+          className="pointer-events-none absolute right-0 bottom-0 text-support-light group-hover:text-white transition-colors"
+          aria-hidden
+        >
+          →
+        </span>
+      )}
+    </div>
+  );
+}
+
 function SpeakerCard({ speaker }: { speaker: Speaker }) {
   const [modalOpen, setModalOpen] = useState(false);
   const { present: modalPresent, onExited } = useModalPresence(modalOpen);
@@ -208,15 +249,17 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
 
   return (
     <>
-      <div
+      <button
+        type="button"
         data-fade-up
-        className="opacity-0 group relative flex flex-col bg-white/[0.03] border border-white/[0.07] rounded-[1.25rem] overflow-hidden hover:border-support/30 hover:bg-white/[0.05] transition-all duration-300"
+        onClick={() => openSpeakerModal(speaker.name)}
+        className="opacity-0 group relative flex flex-col w-full text-left bg-white/[0.03] border border-white/[0.07] rounded-[1.25rem] overflow-hidden hover:border-support/30 hover:bg-white/[0.05] transition-all duration-300 cursor-pointer"
       >
         <div className="aspect-[4/5] overflow-hidden bg-white/[0.03] relative">
           {speaker.image ? (
             <SpeakerPhoto
               src={withBase(`img/speakers/${speaker.image}`)}
-              alt={speaker.name}
+              alt=""
               initials={initials(speaker.name)}
               crop={getImageCrop(speaker.image)}
             />
@@ -234,25 +277,15 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
             {speaker.role}
           </p>
           <h3 className="text-base sm:text-lg font-semibold text-white mb-0.5 leading-snug">{speaker.name}</h3>
-          <p className="text-xs sm:text-sm text-white/50 mb-3 sm:mb-4 leading-snug">{speaker.institution}</p>
+          <p className="text-xs sm:text-sm text-white/50 mb-2 leading-snug">{speaker.institution}</p>
 
-          <div className="mt-auto pt-3 sm:pt-4 border-t border-white/[0.06]">
-            {speaker.talkTitle && (
-              <p className="text-sm sm:text-base text-white/80 line-clamp-4 sm:line-clamp-3 leading-relaxed mb-3">
-                {speaker.talkTitle}
-              </p>
-            )}
-            {(speaker.abstract || speaker.bio) && (
-              <button
-                onClick={() => openSpeakerModal(speaker.name)}
-                className="text-[0.68rem] sm:text-xs font-medium text-support-light hover:text-white transition-colors uppercase tracking-[0.12em] sm:tracking-[0.14em] cursor-pointer"
-              >
-                Read abstract →
-              </button>
-            )}
-          </div>
+          {speaker.talkTitle && (
+            <div className="mt-auto pt-2 border-t border-white/[0.06]">
+              <TalkTitle title={speaker.talkTitle} />
+            </div>
+          )}
         </div>
-      </div>
+      </button>
 
       {modalPresent && (
         <AbstractModal speaker={speaker} open={modalOpen} onClose={closeModal} onExited={onExited} />
@@ -333,60 +366,79 @@ export default function Speakers() {
           )}
         </div>
 
-        <PanelBlock
-          eyebrow="Friday · 18:15–19:15"
-          title={FRIDAY_PANEL.title}
-          subtitle={FRIDAY_PANEL.subtitle}
-          body={FRIDAY_PANEL.body}
-          speakers={FRIDAY_PANEL_SPEAKERS}
-          idPrefix="friday-panel"
-        />
-
-        <PanelBlock
-          eyebrow="Saturday · 18:00–19:00"
-          title={SATURDAY_PANEL.title}
-          body={SATURDAY_PANEL.body}
-          speakers={SATURDAY_PANEL_SPEAKERS}
-          idPrefix="saturday-panel"
-        />
+        <div className="mt-14 sm:mt-16">
+          <div data-fade-up className="opacity-0 mb-8 sm:mb-10 text-center">
+            <h2 className="section-title">Panels</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-0 md:divide-x md:divide-white/10">
+            <PanelColumn
+              eyebrow="Friday · 18:15–19:15"
+              title={FRIDAY_PANEL.title}
+              subtitle={FRIDAY_PANEL.subtitle}
+              body={FRIDAY_PANEL.body}
+              speakers={FRIDAY_PANEL_SPEAKERS}
+            />
+            <PanelColumn
+              eyebrow="Saturday · 18:00–19:00"
+              title={SATURDAY_PANEL.title}
+              body={SATURDAY_PANEL.body}
+              speakers={SATURDAY_PANEL_SPEAKERS}
+            />
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-function PanelBlock({
+function CompactSpeaker({ speaker }: { speaker: Speaker }) {
+  const crop = speaker.image ? getImageCrop(speaker.image) : undefined;
+
+  return (
+    <span className="inline-flex items-center gap-2 text-sm text-white/80">
+      {speaker.image && crop && (
+        <span className="w-9 h-9 rounded-full overflow-hidden border border-white/10 shrink-0 bg-white/[0.04]">
+          <img
+            src={withBase(`img/speakers/${speaker.image}`)}
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ objectPosition: crop.position }}
+          />
+        </span>
+      )}
+      {speaker.name}
+    </span>
+  );
+}
+
+function PanelColumn({
   eyebrow,
   title,
   subtitle,
   body,
   speakers,
-  idPrefix,
 }: {
   eyebrow: string;
   title: string;
   subtitle?: string;
   body: string;
   speakers: SpeakerEntry[];
-  idPrefix: string;
 }) {
   return (
-    <div className="mt-14 sm:mt-16">
-      <div data-fade-up className="opacity-0 mb-10 sm:mb-12 text-center">
-        <p className="section-eyebrow">{eyebrow}</p>
-        <h2 className="section-title mb-10">{title}</h2>
-        {subtitle && <p className="text-white/70 text-base max-w-xl mx-auto mb-6">{subtitle}</p>}
-        <p className="text-white/50 text-base max-w-2xl mx-auto text-justify">{body}</p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-        {speakers.map((entry, i) =>
-          "tbd" in entry && entry.tbd ? (
-            <TbdCard key={`${idPrefix}-tbd-${i}`} />
-          ) : (
-            <SpeakerCard key={(entry as Speaker).name} speaker={entry as Speaker} />
-          )
-        )}
-      </div>
+    <div data-fade-up className="opacity-0 md:px-6 lg:px-8 first:md:pl-0 last:md:pr-0">
+      <p className="section-eyebrow">{eyebrow}</p>
+      <h3 className="text-xl sm:text-2xl font-semibold text-white leading-snug tracking-tight text-balance">
+        {title}
+      </h3>
+      {subtitle && <p className="mt-2 text-white/70 text-sm sm:text-base leading-snug">{subtitle}</p>}
+      <p className="mt-4 text-white/50 text-sm leading-relaxed">{body}</p>
+      <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2.5">
+        {speakers.filter(isConfirmedSpeaker).map((speaker) => (
+          <li key={speaker.name}>
+            <CompactSpeaker speaker={speaker} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

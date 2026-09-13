@@ -7,7 +7,6 @@ import Gallery from "./Gallery";
 import Program from "./Program";
 import Speakers from "./Speakers";
 import Location from "./Location";
-import Afterparty from "./Afterparty";
 import Newsletter from "./Newsletter";
 import Partners from "./Partners";
 import FAQ from "./FAQ";
@@ -23,11 +22,10 @@ export default function App() {
         {/* <Conference /> */}
         <About />
         <Program />
-        <Experiences />
         <Speakers />
+        <Experiences />
         <Gallery />
         <Location />
-        <Afterparty />
         <FAQ />
         <Newsletter />
       </main>

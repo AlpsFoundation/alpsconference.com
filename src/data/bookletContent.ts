@@ -143,7 +143,7 @@ export const EXPERIENCES = [
   {
     when: "Saturday evening",
     title: "Networking apéro",
-    detail: "20:00–21:30 · included with your ticket",
+    detail: "19:30–21:30 · included with your ticket",
   },
   {
     when: "Saturday night",
@@ -164,7 +164,7 @@ export const FRIDAY_PANEL = {
 };
 
 export const SATURDAY_PANEL = {
-  title: "Psychedelics and spirituality: ontological shifts and meaning-making experiences",
+  title: "Psychedelics and Spirituality: Ontological Shifts and Meaning-Making Experiences",
   body: "Psychedelics reliably occasion experiences that participants describe as revelatory and that leave behind altered convictions about what reality contains, what the self is, and where meaning comes from. Such shifts are reported in ceremonial traditions across the Americas, West Africa and beyond, where they are held within cosmology and community, and in clinical trials, where they are recorded as mystical-type or insight experiences. This panel examines how ontological change is produced, interpreted and made durable across these settings, the difficulty of measuring it, and what is at stake when practices rooted in traditional use are relocated to the clinic.",
 };
 

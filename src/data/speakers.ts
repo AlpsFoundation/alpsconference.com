@@ -70,6 +70,13 @@ export function speakerByName(name: string): Speaker | undefined {
     .find((speaker) => speaker.name === name);
 }
 
+export function speakersNamed(names: readonly string[]): Speaker[] {
+  return names.flatMap((name) => {
+    const speaker = speakerByName(name);
+    return speaker ? [speaker] : [];
+  });
+}
+
 export const SPEAKERS: SpeakerEntry[] = [
   {
     name: "Dr. Max Wolff",
@@ -205,13 +212,13 @@ export const SPEAKERS: SpeakerEntry[] = [
   },
 ];
 
-const FRIDAY_PANEL_SPEAKER_NAMES = ["Dr. Max Wolff", "Dr. Sandeep Nayak", "Prof. Amandine Luquiens", "Prof. Dr. Eric Vermetten"];
+export const FRIDAY_PANEL_SPEAKER_NAMES = ["Dr. Max Wolff", "Dr. Sandeep Nayak", "Prof. Amandine Luquiens", "Prof. Dr. Eric Vermetten"];
 
 export const FRIDAY_PANEL_SPEAKERS: SpeakerEntry[] = [
   ...SPEAKERS.filter(isConfirmedSpeaker).filter((speaker) => FRIDAY_PANEL_SPEAKER_NAMES.includes(speaker.name)),
 ];
 
-const SATURDAY_PANEL_SPEAKER_NAMES = ["Dr. Eirini Ketzitzidou Argyri", "Dr. Matthias Forstmann"];
+export const SATURDAY_PANEL_SPEAKER_NAMES = ["Dr. Eirini Ketzitzidou Argyri", "Dr. Matthias Forstmann", "Ricardo Morales"];
 
 export const SATURDAY_PANEL_SPEAKERS: SpeakerEntry[] = [
   ...SPEAKERS.filter(isConfirmedSpeaker).filter((speaker) => SATURDAY_PANEL_SPEAKER_NAMES.includes(speaker.name)),
