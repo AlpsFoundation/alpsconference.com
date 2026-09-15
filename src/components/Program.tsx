@@ -443,16 +443,19 @@ export default function Program() {
             <p className="section-eyebrow">Friday–Saturday, 9–10 October 2026</p>
             <h2 className="section-title">Conference program</h2>
           </div>
-          <div className="program-tabs" role="tablist" aria-label="Program type">
-            {views.map((option) => (
-              <button key={option} id={`program-tab-${option}`} type="button" role="tab" aria-selected={view === option} aria-controls={`program-panel-${option}`} tabIndex={view === option ? 0 : -1} onClick={() => setView(option)} onKeyDown={(event) => {
-                if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-                event.preventDefault();
-                const next = event.key === "Home" ? "talks" : event.key === "End" ? "experiences" : views[(views.indexOf(option) + 1) % views.length];
-                setView(next);
-                document.getElementById(`program-tab-${next}`)?.focus({ preventScroll: true });
-              }}>{option === "talks" ? "Talks" : "Experiences"}</button>
-            ))}
+          <div className="program-tabs-wrap">
+            <span className="program-tabs-hint" aria-hidden="true">Switch view</span>
+            <div className="program-tabs" role="tablist" aria-label="Program type">
+              {views.map((option) => (
+                <button key={option} id={`program-tab-${option}`} type="button" role="tab" aria-selected={view === option} aria-controls={`program-panel-${option}`} tabIndex={view === option ? 0 : -1} onClick={() => setView(option)} onKeyDown={(event) => {
+                  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+                  event.preventDefault();
+                  const next = event.key === "Home" ? "talks" : event.key === "End" ? "experiences" : views[(views.indexOf(option) + 1) % views.length];
+                  setView(next);
+                  document.getElementById(`program-tab-${next}`)?.focus({ preventScroll: true });
+                }}>{option === "talks" ? "Talks" : "Experiences"}</button>
+              ))}
+            </div>
           </div>
         </div>
         <div data-fade-up className="opacity-0">
