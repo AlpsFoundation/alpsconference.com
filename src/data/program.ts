@@ -75,11 +75,13 @@ export const PROGRAM: ProgramDay[] = [
       { time: "11:30–12:30", title: "Dr. Lydia Belinger", detail: "Serotonin System Stimulation and Social Cognition: Differential Effects of Psilocybin, MDMA, and Methylphenidate", speakerName: "Dr. Lydia Belinger" },
       { time: "12:30–14:00", title: "Lunch break", kind: "pause", menuNote: "Beet tzatziki on chicory · Bolognese with pea mince & sour cream", experiences: [
         { title: "Live concert", time: "12:30–14:00", personName: "David & Anna-Lea Wennberg" },
-        { title: "Breathwork", time: "13:45–15:00", personName: "Pascal Kälin" },
+        { title: "Sound meditation", time: "13:45–14:45", personName: "Marina Vovk" },
       ] },
       { time: "14:00–15:00", title: "Dr. Matthias Forstmann", detail: "The Mushroom Experience Project: Contextual Predictors and Species-Level Variation in the Subjective Effects of Psilocybin Mushrooms", speakerName: "Dr. Matthias Forstmann" },
       { time: "15:00–16:00", title: "Dr. Eirini Ketzitzidou Argyri", detail: "Ontological Disruptions and Diversification: Learning from psychedelics", speakerName: "Dr. Eirini Ketzitzidou Argyri" },
-      { time: "16:00–17:00", title: "Coffee break", detail: "Group picture", detailHighlight: true, menuNote: "Coffee, tea · Vegan cakes, Ayurvedic energy balls & fresh fruit", kind: "pause" },
+      { time: "16:00–17:00", title: "Coffee break", detail: "Group picture", detailHighlight: true, menuNote: "Coffee, tea · Vegan cakes, Ayurvedic energy balls & fresh fruit", kind: "pause", experiences: [
+        { title: "Breathwork", time: "16:45–18:00", personName: "Pascal Kälin" },
+      ] },
       { time: "17:00–18:00", title: "Dr. Jason K. Day", detail: "What-the-Fuckness: A Phenomenological Concept for Psychedelic Experience", speakerName: "Dr. Jason K. Day" },
       { time: "18:00–19:00", title: "Panel discussion", detail: "Psychedelics and Spirituality: Ontological Shifts and Meaning-Making Experiences", panel: "saturday" },
       { time: "19:00–19:30", title: "Closing talk", detail: "ALPS team" },
