@@ -8,6 +8,7 @@ import {
   Coffee,
   DoorOpen,
   Flower2,
+  GraduationCap,
   Handshake,
   type LucideIcon,
   MessagesSquare,
@@ -18,6 +19,7 @@ import {
   Palette,
   PartyPopper,
   Sparkles,
+  Ticket,
   Utensils,
   UtensilsCrossed,
   Wind,
@@ -34,6 +36,7 @@ import {
   type Speaker,
 } from "../data/speakers";
 import { FRIDAY_PANEL, SATURDAY_PANEL } from "../data/bookletContent";
+import { WORKSHOP_DAY, WORKSHOP_TRACKS } from "../data/workshops";
 import MapAddress from "./MapAddress";
 import { withBase } from "../lib/withBase";
 import { setLocationHash } from "../lib/locationHash";
@@ -43,9 +46,33 @@ import { getSpeakerModalId, openSpeakerModal } from "../lib/speakerModal";
 import { getPanelModalId, openPanelModal, PANEL_MODAL_EVENT, type PanelId } from "../lib/panelModal";
 import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
-type ScheduleView = "talks" | "experiences";
-type ScheduleItem = ProgramItem & { people?: string[]; allDay?: boolean; credits?: ExperienceCredit[] };
+type ScheduleView = "talks" | "experiences" | "workshops";
+type ScheduleItem = ProgramItem & {
+  people?: string[];
+  allDay?: boolean;
+  credits?: ExperienceCredit[];
+  href?: string;
+  icon?: LucideIcon;
+};
 type ScheduleDay = Omit<ProgramDay, "items"> & { items: ScheduleItem[] };
+
+// The pre-conference Workshop Day: four parallel tracks in one afternoon, booked separately.
+const WORKSHOP_SCHEDULE: ScheduleDay[] = [
+  {
+    day: WORKSHOP_DAY.day,
+    date: WORKSHOP_DAY.date,
+    dateTime: WORKSHOP_DAY.dateTime,
+    items: WORKSHOP_TRACKS.map((track) => ({
+      time: WORKSHOP_DAY.time,
+      title: track.title,
+      detail: track.presenters,
+      venue: track.language,
+      menuNote: `${track.places} places`,
+      href: withBase("/workshops#tracks"),
+      icon: GraduationCap,
+    })),
+  },
+];
 
 const PANELS: Record<PanelId, {
   title: string;
@@ -121,6 +148,7 @@ function PortraitMark({ src, position, small = false }: { src: string; position:
 }
 
 function iconForItem(item: ScheduleItem): LucideIcon {
+  if (item.icon) return item.icon;
   const title = item.title.toLowerCase();
   if (title.includes("coffee") || title === "break") return Coffee;
   if (title.includes("lunch")) return Utensils;
@@ -245,10 +273,16 @@ function openItem(item: ScheduleItem) {
   else openExperienceModal(item.experienceName!);
 }
 
+const SCHEDULES: Record<ScheduleView, ScheduleDay[]> = {
+  talks: PROGRAM,
+  experiences: EXPERIENCE_SCHEDULE,
+  workshops: WORKSHOP_SCHEDULE,
+};
+
 function ProgramSchedule({ view }: { view: ScheduleView }) {
-  const days = view === "talks" ? PROGRAM : EXPERIENCE_SCHEDULE;
+  const days = SCHEDULES[view];
   return (
-    <div className="program-board">
+    <div className={`program-board${days.length === 1 ? " program-board--single" : ""}`}>
       {days.map((day) => (
         <article className="program-day" key={day.day} aria-labelledby={`program-${view}-${day.day}`}>
           <header className="program-day__header">
@@ -257,7 +291,8 @@ function ProgramSchedule({ view }: { view: ScheduleView }) {
           </header>
           <ol className="program-list">
             {day.items.map((item: ScheduleItem) => {
-              const linked = Boolean(item.speakerName || item.experienceName || item.panel);
+              const modalLinked = Boolean(item.speakerName || item.experienceName || item.panel);
+              const linked = modalLinked || Boolean(item.href);
               const copy = (
                 <div className="program-item__copy">
                   <div className="program-item__headline">
@@ -273,10 +308,12 @@ function ProgramSchedule({ view }: { view: ScheduleView }) {
               return (
                 <li className={`program-item program-item--${item.kind ?? "session"}${linked ? " program-item--linked" : ""}${item.allDay ? " program-item--allday" : ""}`} key={`${item.time}-${item.title}`}>
                   {linked ? (
-                    <a className="program-session-link" href={itemHref(item)} onClick={(event) => {
+                    <a className="program-session-link" href={item.href ?? itemHref(item)} onClick={modalLinked ? (event) => {
                       event.preventDefault();
                       openItem(item);
-                    }} aria-label={`View ${item.panel ? "panel" : item.speakerName ? "talk" : "experience"} details for ${item.panel ? PANELS[item.panel].title : item.title}, ${day.day} ${item.time}`}>
+                    } : undefined} aria-label={modalLinked
+                      ? `View ${item.panel ? "panel" : item.speakerName ? "talk" : "experience"} details for ${item.panel ? PANELS[item.panel].title : item.title}, ${day.day} ${item.time}`
+                      : `View workshop details for ${item.title}, ${day.day} ${item.time}`}>
                       <ProgramItemWhen item={item} />
                       {copy}
                       <ArrowUpRight className="program-item__arrow" size={15} aria-hidden="true" />
@@ -376,6 +413,44 @@ function PanelModal({
   );
 }
 
+const TAB_LABELS: Record<ScheduleView, string> = {
+  talks: "Talks",
+  experiences: "Experiences",
+  workshops: "Workshop Day",
+};
+
+const TAB_INTROS: Record<ScheduleView, string> = {
+  talks: "Research talks, panel discussions and time to connect. Select a speaker or panel to read more.",
+  experiences: "Art, sound, movement and connection alongside the talks. Select a session for details; some sessions overlap.",
+  workshops: "Four parallel Psychedelic-Assisted Therapy training tracks on the afternoon before the conference opens, each combining theoretical input with experiential clinical practice. Select a track to read more.",
+};
+
+function WorkshopDayNotice() {
+  return (
+    <div className="program-notice">
+      <Ticket className="program-notice__icon" size={20} aria-hidden="true" />
+      <div className="program-notice__body">
+        <p className="program-notice__title">Separate ticket — the day before the conference</p>
+        <p>
+          The Workshop Day runs on Thursday 8 October, one day before ALPS 2026 opens. It is booked
+          separately and is not included in a conference ticket. Places are limited and accredited for
+          4 FSP credits.
+        </p>
+        <span className="program-notice__actions">
+          <a href={withBase("/workshops")}>
+            Workshop Day details
+            <ArrowUpRight size={14} aria-hidden="true" />
+          </a>
+          <a href={WORKSHOP_DAY.ticketUrl} target="_blank" rel="noopener noreferrer">
+            Buy a workshop ticket
+            <ArrowUpRight size={14} aria-hidden="true" />
+          </a>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function Program() {
   const sectionRef = useRef<HTMLElement>(null);
   const hasAnimated = useRef(false);
@@ -384,7 +459,7 @@ export default function Program() {
   const { present: panelPresent, onExited: onPanelExited } = useModalPresence(Boolean(openPanel));
   const lastPanel = useRef<PanelId>("friday");
   if (openPanel) lastPanel.current = openPanel;
-  const views = ["talks", "experiences"] as const;
+  const views = ["talks", "experiences", "workshops"] as const;
 
   useEffect(() => {
     const panelFromHash = () => {
@@ -440,8 +515,8 @@ export default function Program() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div data-fade-up className="opacity-0 program-heading">
           <div>
-            <p className="section-eyebrow">Friday–Saturday, 9–10 October 2026</p>
-            <h2 className="section-title">Conference program</h2>
+            <p className="section-eyebrow">{view === "workshops" ? "Thursday, 8 October 2026" : "Friday–Saturday, 9–10 October 2026"}</p>
+            <h2 className="section-title">{view === "workshops" ? "Workshop Day program" : "Conference program"}</h2>
           </div>
           <div className="program-tabs-wrap">
             <span className="program-tabs-hint" aria-hidden="true">Switch view</span>
@@ -450,10 +525,10 @@ export default function Program() {
                 <button key={option} id={`program-tab-${option}`} type="button" role="tab" aria-selected={view === option} aria-controls={`program-panel-${option}`} tabIndex={view === option ? 0 : -1} onClick={() => setView(option)} onKeyDown={(event) => {
                   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
                   event.preventDefault();
-                  const next = event.key === "Home" ? "talks" : event.key === "End" ? "experiences" : views[(views.indexOf(option) + 1) % views.length];
+                  const next = event.key === "Home" ? views[0] : event.key === "End" ? views[views.length - 1] : views[(views.indexOf(option) + (event.key === "ArrowLeft" ? views.length - 1 : 1)) % views.length];
                   setView(next);
                   document.getElementById(`program-tab-${next}`)?.focus({ preventScroll: true });
-                }}>{option === "talks" ? "Talks" : "Experiences"}</button>
+                }}>{TAB_LABELS[option]}</button>
               ))}
             </div>
           </div>
@@ -461,7 +536,8 @@ export default function Program() {
         <div data-fade-up className="opacity-0">
           {views.map((option) => (
             <div key={option} id={`program-panel-${option}`} role="tabpanel" aria-labelledby={`program-tab-${option}`} hidden={view !== option} tabIndex={0}>
-              <p className="program-intro">{option === "talks" ? "Research talks, panel discussions and time to connect. Select a speaker or panel to read more." : "Art, sound, movement and connection alongside the talks. Select a session for details; some sessions overlap."}</p>
+              <p className="program-intro">{TAB_INTROS[option]}</p>
+              {option === "workshops" && <WorkshopDayNotice />}
               <ProgramSchedule view={option} />
             </div>
           ))}
