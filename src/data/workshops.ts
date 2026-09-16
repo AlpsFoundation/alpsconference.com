@@ -86,7 +86,7 @@ export const WORKSHOP_TRACKS: WorkshopTrack[] = [
     places: 12,
     title: "Oltre il sintomo: la PAT e il trattamento dei disturbi alimentari in Ticino",
     abstract: [
-      "Presenteremo la struttura, la storia clinica e i metodi di lavoro dell'unico Centro ticinese per la cura dei disturbi alimentari. Esploreremo le ragioni alla base della decisione di applicare la PAT a pazienti con disturbi alimentari, presenteremo casi clinici per la discussione e mostreremo i risultati ottenuti a partire da dicembre 2024.",
+      "Presenteremo la struttura, la casistica e i metodi di lavoro dell'unico Centro ticinese per la cura dei disturbi alimentari. Esploreremo le ragioni alla base della decisione di applicare la PAT a pazienti con disturbi alimentari, presenteremo casi clinici per la discussione e mostreremo i risultati ottenuti a partire da dicembre 2024.",
       "Nel corso della sessione, esercizi esperienziali inviteranno i partecipanti a riflettere e a incarnare i temi emersi dal lavoro di gruppo. Delineeremo i progetti futuri, in particolare l'avvio di un Certificate of Advanced Studies in Terapia Assistita da Psichedelici presso la SUPSI, il primo CAS in lingua italiana su questa pratica clinica, e un progetto di ricerca SUPSI basato sui casi clinici trattati.",
     ],
     englishTranslation: {
@@ -118,14 +118,14 @@ export const WORKSHOP_TRACKS: WorkshopTrack[] = [
       "Relation thérapeutique et dynamique du couple thérapeutique en psychothérapie assistée par psychédéliques (PAP)",
     abstract: [
       "Cet atelier propose une exploration clinique, expérientielle et systémique des états modifiés de conscience dans le cadre de la psychothérapie assistée par psychédéliques et des approches non pharmacologiques telles que la méditation, l'hypnose et la musique.",
-      "L'atelier visera également à aider les participants à expérimenter, de manière soutenue et sécurisée, certains mécanismes psychologiques et relationnels activés dans les états modifiés de conscience.",
+      "L'atelier visera également à permettre aux participants d'expérimenter, dans un cadre soutenant et sécurisant, certains mécanismes psychologiques et relationnels activés dans les états modifiés de conscience.",
     ],
     bullets: [
       "La qualité de la présence thérapeutique",
       "La sécurité relationnelle",
-      "La dynamique du transfert dans les états modifiés de conscience",
+      "Les dynamiques transférentielles dans les états modifiés de conscience",
       "Le rôle du cadre et du set and setting",
-      "La fonction de modélisation des co-thérapeutes",
+      "La fonction de modèle des co-thérapeutes",
       "Les spécificités de la co-supervision par un binôme homme/femme vivant en couple",
     ],
     englishTranslation: {
