@@ -1,5 +1,6 @@
 import type { ElementType, ReactNode } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Languages } from "lucide-react";
 import { animate } from "animejs";
 import {
   Award,
@@ -121,6 +122,9 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
 }
 
 function TrackCard({ track }: { track: WorkshopTrack }) {
+  const [showEnglish, setShowEnglish] = useState(false);
+  const content = showEnglish && track.englishTranslation ? track.englishTranslation : track;
+
   return (
     <article data-fade-up className="opacity-0 rounded-sm border border-white/[0.08] bg-white/[0.03] p-6 sm:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between mb-7">
@@ -134,19 +138,31 @@ function TrackCard({ track }: { track: WorkshopTrack }) {
             </span>
             <span className="text-sm text-white/45">{track.places} places</span>
           </div>
-          <h3 className="text-2xl font-semibold text-white leading-tight">{track.title}</h3>
+          <h3 className="text-2xl font-semibold text-white leading-tight">{content.title}</h3>
         </div>
+
+        {track.englishTranslation && (
+          <button
+            type="button"
+            onClick={() => setShowEnglish((current) => !current)}
+            aria-pressed={showEnglish}
+            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/75 transition-colors duration-200 hover:border-white/30 hover:bg-white/[0.08] hover:text-white"
+          >
+            <Languages className="h-4 w-4" aria-hidden="true" />
+            {showEnglish ? `View in ${track.language}` : "View in English"}
+          </button>
+        )}
       </div>
 
       <div className="space-y-4 text-white/72 text-base leading-relaxed">
-        {track.abstract.map((paragraph) => (
+        {content.abstract.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
       </div>
 
-      {track.bullets && (
+      {content.bullets && (
         <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-          {track.bullets.map((item) => (
+          {content.bullets.map((item) => (
             <li key={item} className="flex gap-2.5 text-white/70 text-base leading-relaxed">
               <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-light/70" />
               <span>{item}</span>

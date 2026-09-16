@@ -7,6 +7,12 @@ export type WorkshopSpeaker = {
   photoCredit?: string;
 };
 
+export type WorkshopTranslation = {
+  title: string;
+  abstract: string[];
+  bullets?: string[];
+};
+
 export type WorkshopTrack = {
   language: string;
   flag: string;
@@ -15,6 +21,8 @@ export type WorkshopTrack = {
   places: number;
   abstract: string[];
   bullets?: string[];
+  /** Original English text, offered as a toggle for tracks whose description isn't in English. */
+  englishTranslation?: WorkshopTranslation;
   sharedImage?: {
     src: string;
     alt: string;
@@ -76,11 +84,18 @@ export const WORKSHOP_TRACKS: WorkshopTrack[] = [
     flag: "🇮🇹",
     presenters: "Dr Claudia Ariemma and Simona Porta",
     places: 12,
-    title: "Beyond the Symptom: PAT and the Treatment of Eating Disorders in Ticino",
+    title: "Oltre il sintomo: la PAT e il trattamento dei disturbi alimentari in Ticino",
     abstract: [
-      "We will present the structure, case history, and working methods of the only Ticino Center for the treatment of eating disorders. We will explore the reasons behind the decision to apply PAT to patients with eating disorders, present clinical cases for discussion, and show the results obtained since December 2024.",
-      "Throughout the session, experiential exercises will invite participants to reflect on and embody the themes emerging from the group work. We will outline future projects, particularly the launch of a Certificate of Advanced Studies in Psychedelic-Assisted Therapy at SUPSI, the first Italian-language CAS on this clinical practice, and a SUPSI research project based on the clinical cases treated.",
+      "Presenteremo la struttura, la storia clinica e i metodi di lavoro dell'unico Centro ticinese per la cura dei disturbi alimentari. Esploreremo le ragioni alla base della decisione di applicare la PAT a pazienti con disturbi alimentari, presenteremo casi clinici per la discussione e mostreremo i risultati ottenuti a partire da dicembre 2024.",
+      "Nel corso della sessione, esercizi esperienziali inviteranno i partecipanti a riflettere e a incarnare i temi emersi dal lavoro di gruppo. Delineeremo i progetti futuri, in particolare l'avvio di un Certificate of Advanced Studies in Terapia Assistita da Psichedelici presso la SUPSI, il primo CAS in lingua italiana su questa pratica clinica, e un progetto di ricerca SUPSI basato sui casi clinici trattati.",
     ],
+    englishTranslation: {
+      title: "Beyond the Symptom: PAT and the Treatment of Eating Disorders in Ticino",
+      abstract: [
+        "We will present the structure, case history, and working methods of the only Ticino Center for the treatment of eating disorders. We will explore the reasons behind the decision to apply PAT to patients with eating disorders, present clinical cases for discussion, and show the results obtained since December 2024.",
+        "Throughout the session, experiential exercises will invite participants to reflect on and embody the themes emerging from the group work. We will outline future projects, particularly the launch of a Certificate of Advanced Studies in Psychedelic-Assisted Therapy at SUPSI, the first Italian-language CAS on this clinical practice, and a SUPSI research project based on the clinical cases treated.",
+      ],
+    },
     speakers: [
       {
         name: "Claudia Ariemma",
@@ -99,19 +114,36 @@ export const WORKSHOP_TRACKS: WorkshopTrack[] = [
     flag: "🇫🇷",
     presenters: "Catherine Duffour and Hervé Duffour",
     places: 12,
-    title: "Therapeutic relationship and dynamics of the therapeutic couple in Psychedelic-Assisted Psychotherapy (PAP)",
+    title:
+      "Relation thérapeutique et dynamique du couple thérapeutique en psychothérapie assistée par psychédéliques (PAP)",
     abstract: [
-      "This workshop offers a clinical, experiential, and systemic exploration of modified states of consciousness within the context of psychedelic-assisted psychotherapy and non-pharmacological approaches such as meditation, hypnosis, and music.",
-      "The workshop will also aim to help participants experience, in a supportive and safe manner, certain psychological and relational mechanisms activated in modified states of consciousness.",
+      "Cet atelier propose une exploration clinique, expérientielle et systémique des états modifiés de conscience dans le cadre de la psychothérapie assistée par psychédéliques et des approches non pharmacologiques telles que la méditation, l'hypnose et la musique.",
+      "L'atelier visera également à aider les participants à expérimenter, de manière soutenue et sécurisée, certains mécanismes psychologiques et relationnels activés dans les états modifiés de conscience.",
     ],
     bullets: [
-      "The quality of therapeutic presence",
-      "Relational safety",
-      "Transference dynamics in modified states of consciousness",
-      "The role of setting and set and setting",
-      "The modelling function of co-therapists",
-      "The specificities of co-supervision by a male/female pair living as a couple",
+      "La qualité de la présence thérapeutique",
+      "La sécurité relationnelle",
+      "La dynamique du transfert dans les états modifiés de conscience",
+      "Le rôle du cadre et du set and setting",
+      "La fonction de modélisation des co-thérapeutes",
+      "Les spécificités de la co-supervision par un binôme homme/femme vivant en couple",
     ],
+    englishTranslation: {
+      title:
+        "Therapeutic relationship and dynamics of the therapeutic couple in Psychedelic-Assisted Psychotherapy (PAP)",
+      abstract: [
+        "This workshop offers a clinical, experiential, and systemic exploration of modified states of consciousness within the context of psychedelic-assisted psychotherapy and non-pharmacological approaches such as meditation, hypnosis, and music.",
+        "The workshop will also aim to help participants experience, in a supportive and safe manner, certain psychological and relational mechanisms activated in modified states of consciousness.",
+      ],
+      bullets: [
+        "The quality of therapeutic presence",
+        "Relational safety",
+        "Transference dynamics in modified states of consciousness",
+        "The role of setting and set and setting",
+        "The modelling function of co-therapists",
+        "The specificities of co-supervision by a male/female pair living as a couple",
+      ],
+    },
     sharedImage: {
       src: "catherine-herve-duffour.jpg",
       alt: "Catherine Duffour and Hervé Duffour",
