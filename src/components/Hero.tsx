@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ArrowUpRight, Calendar, Ticket, Mail, MapPin, Clock } from "lucide-react";
+import { Calendar, Ticket, Mail, MapPin, Clock } from "lucide-react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
@@ -137,23 +137,6 @@ export default function Hero() {
               </span>
             </div>
           </div>
-
-          <a
-            data-animate
-            href={withBase("/workshops")}
-            className="opacity-0 group flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-sm border border-accent/30 bg-accent/10 px-3 py-2 text-white/85 transition-colors duration-200 hover:border-accent/55 hover:bg-accent/15 hover:text-white sm:px-4"
-          >
-            <span className="rounded-full bg-accent px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-neutral-dark">
-              New
-            </span>
-            <span className="text-[13px] font-semibold min-[380px]:text-[15px] sm:text-base">
-              Pre-conference Workshop Day
-            </span>
-            <span className="text-[13px] font-medium text-white/65 min-[380px]:text-[15px] sm:text-base">
-              Thursday 8 October
-            </span>
-            <ArrowUpRight className="h-4 w-4 shrink-0 text-accent-light transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </a>
 
           <div className="flex flex-col items-center gap-3 sm:gap-4 w-full max-w-xs sm:max-w-sm mx-auto">
             <a
