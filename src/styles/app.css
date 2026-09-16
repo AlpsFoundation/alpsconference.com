@@ -260,12 +260,53 @@ main > section:not(:first-child) {
 .program-intro { margin: 0 0 1.75rem; max-width: 48rem; }
 .program-footnote { margin: 1.5rem 0 0; text-align: center; font-size: 0.82rem; }
 
+.program-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(243, 143, 191, 0.3);
+  border-radius: 1rem;
+  background: linear-gradient(110deg, rgba(243, 143, 191, 0.12), rgba(8, 47, 74, 0.35));
+}
+.program-notice__icon { flex-shrink: 0; margin-top: 0.15rem; color: var(--color-accent-light); }
+.program-notice__body { min-width: 0; }
+.program-notice__body p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.program-notice__title {
+  margin-bottom: 0.25rem !important;
+  color: white !important;
+  font-weight: 650;
+}
+.program-notice__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin-top: 0.7rem;
+}
+.program-notice__actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-support-light);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 180ms ease;
+}
+.program-notice__actions a:hover { color: white; }
+
 .program-board {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: 1.25rem;
 }
+.program-board--single { grid-template-columns: minmax(0, 1fr); }
 .program-day {
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.13);
@@ -475,12 +516,14 @@ main > section:not(:first-child) {
 @media (max-width: 767px) {
   .countdown-banner { gap: 0.4rem; padding-inline: 0.7rem; font-size: 0.72rem; }
   .program-heading { align-items: flex-start; flex-direction: column; gap: 1.25rem; }
+  .program-tabs button { padding-inline: 1rem; }
   .program-day { border-radius: 1.15rem; }
+  .program-notice { padding: 0.9rem 1rem; }
 }
 @media (max-width: 480px) {
   .program-tabs-wrap { width: 100%; }
   .program-tabs { width: 100%; }
-  .program-tabs button { flex: 1; }
+  .program-tabs button { flex: 1; padding-inline: 0.45rem; font-size: 0.82rem; }
   .program-day__header { padding: 0.85rem 1rem; }
   .program-item, .program-session-link { grid-template-columns: 1fr; gap: 0.25rem; }
   .program-item:not(.program-item--linked), .program-session-link { padding: 0.85rem 1rem; }

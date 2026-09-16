@@ -17,7 +17,7 @@ const CONFERENCE_LINKS: NavLink[] = [
   { label: "Tickets", href: "/#tickets", description: "Reserve your place" },
   { label: "Overview", href: "/#about", description: "Theme, dates, and conference details" },
   { label: "Speakers", href: "/#speakers", description: "Confirmed speakers and talks" },
-  { label: "Program", href: "/#program", description: "Full Friday–Saturday schedule" },
+  { label: "Program", href: "/#program", description: "Workshop Day plus the Friday–Saturday schedule" },
   { label: "Experiences", href: "/#experiences", description: "Art, sound, and connection", badge: "Updated" },
   { label: "Location", href: "/#location", description: "Venue and travel details" },
   { label: "FAQ", href: "/#faq", description: "Practical information" },
@@ -36,6 +36,14 @@ const PAST_EDITIONS: NavLink[] = [
   { label: "ALPS 2022", href: "https://sites.google.com/view/alpsconference2022/home", external: true },
   { label: "ALPS 2021", href: "https://sites.google.com/view/pala-psychedelics-congress/home", external: true },
 ];
+
+// Kept in the Participate dropdown as well, so the Workshop Day is reachable from both places.
+const WORKSHOP_DAY_LINK: NavLink = {
+  label: "Workshop Day",
+  href: "/workshops",
+  description: "Pre-conference PAT training",
+  badge: "New",
+};
 
 const FOUNDATION_URL = "https://www.alps.foundation/";
 
@@ -220,6 +228,15 @@ export default function Navbar() {
                 openMenu={openMenu}
                 setOpenMenu={setOpenMenu}
               />
+              <a
+                href={withBase(WORKSHOP_DAY_LINK.href)}
+                className="flex items-center gap-2 px-4 py-2.5 text-base font-medium text-white/90 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5"
+              >
+                Workshop Day
+                <span className="rounded-full bg-accent px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-neutral-dark">
+                  New
+                </span>
+              </a>
               <DesktopDropdown
                 label="Participate"
                 menuKey="participate"
@@ -274,6 +291,20 @@ export default function Navbar() {
           }`}
         >
           <div className="flex h-full flex-col gap-8 overflow-y-auto pt-24 px-6 pb-8">
+            <a
+              href={withBase(WORKSHOP_DAY_LINK.href)}
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-between gap-3 rounded-sm border border-accent/30 bg-accent/10 px-4 py-3.5 text-white transition-colors hover:border-accent/55 hover:bg-accent/15"
+            >
+              <span>
+                <span className="block text-lg font-semibold">Workshop Day</span>
+                <span className="block text-sm text-white/60">Thursday 8 October · separate ticket</span>
+              </span>
+              <span className="rounded-full bg-accent px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-neutral-dark">
+                New
+              </span>
+            </a>
+
             <MobileLinkGroup title="Conference" items={CONFERENCE_LINKS} onNavigate={() => setIsOpen(false)} />
             <MobileLinkGroup title="Participate" items={PARTICIPATE_LINKS} onNavigate={() => setIsOpen(false)} />
             <MobileLinkGroup title="Archive" items={PAST_EDITIONS} onNavigate={() => setIsOpen(false)} />

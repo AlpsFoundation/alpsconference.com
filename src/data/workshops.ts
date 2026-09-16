@@ -22,6 +22,15 @@ export type WorkshopTrack = {
   speakers: WorkshopSpeaker[];
 };
 
+/** Shared facts about the pre-conference Workshop Day, reused by the conference program. */
+export const WORKSHOP_DAY = {
+  day: "Thursday",
+  date: "8 October",
+  dateTime: "2026-10-08",
+  time: "13:00–17:00",
+  ticketUrl: "https://infomaniak.events/fr-ch/shop/alps-conference-2026-RQNBE4WPQY/event/1629286/",
+} as const;
+
 export const WORKSHOP_TRACKS: WorkshopTrack[] = [
   {
     language: "English",
