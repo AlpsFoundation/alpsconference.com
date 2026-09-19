@@ -4,31 +4,39 @@ import { withBase } from "../../lib/withBase";
 interface Props {
   id?: string;
   number?: string | number;
+  /** Large word set at the foot of the page. */
   section?: string;
+  sectionStyle?: "bold" | "light";
+  /** Overrides the sticky title shown by the web chrome. */
   stickyTitle?: string;
-  notes?: boolean;
-  glow?: "bl" | "br" | "tl" | "tr" | "center";
-  bones?: "left" | "right" | "bottom" | "center" | "none";
+  /** Corner the magenta wash rolls out of. */
+  wash?: "tl" | "tr" | "bl" | "br" | "none";
   logo?: boolean;
   cover?: boolean;
+  notes?: boolean;
+  /** Tightens body type for pages carrying a long abstract. */
+  dense?: boolean;
+  /** Drops the tall footer reserve on pages with no section word. */
+  tight?: boolean;
 }
 
 const {
   id,
   number,
   section,
+  sectionStyle = "bold",
   stickyTitle,
-  notes = false,
-  glow = "bl",
-  bones = "left",
+  wash = "tl",
   logo = true,
   cover = false,
+  notes = false,
+  dense = false,
+  tight = false,
 } = Astro.props;
 
 const pageNumber = number == null ? "" : String(number).padStart(2, "0");
 const dataSection = stickyTitle ?? section;
-const bonesSrc = withBase("img/bones.png");
-const logoSrc = withBase("img/logo.png");
+const logoSrc = withBase("img/booklet/alps-mark.png");
 ---
 
 <article
@@ -36,17 +44,20 @@ const logoSrc = withBase("img/logo.png");
   data-section={dataSection}
   class:list={[
     "booklet-page",
-    `booklet-page--glow-${glow}`,
-    `booklet-page--bones-${bones}`,
+    `booklet-page--wash-${wash}`,
     cover && "booklet-page--cover",
     notes && "booklet-page--notes",
+    dense && "booklet-page--dense",
+    (tight || !section) && "booklet-page--tight",
   ]}
 >
-  <img class="booklet-page__bones" src={bonesSrc} alt="" />
-  {logo && <img class="booklet-page__logo" src={logoSrc} alt="ALPS" />}
-  <div class="booklet-page__body">
+  <div class="bk-deco-layer" aria-hidden="true">
+    <slot name="deco" />
+  </div>
+  {logo && <img class="bk-logo" src={logoSrc} alt="ALPS" />}
+  <div class="bk-body">
     <slot />
   </div>
-  {section && <p class="booklet-page__section">{section}</p>}
-  {pageNumber && <p class="booklet-page__number">{pageNumber}</p>}
+  {section && <p class="bk-section" data-style={sectionStyle}>{section}</p>}
+  {pageNumber && <p class="bk-number">{pageNumber}</p>}
 </article>

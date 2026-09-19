@@ -1,0 +1,41 @@
+---
+import { withBase } from "../../lib/withBase";
+
+/**
+ * One piece of the printed booklet's white line-art furniture: neuron, brain,
+ * connectome sphere, mushrooms. Positions are page-relative and deliberately
+ * allowed to run off the trim, the way they do in the Canva original.
+ */
+interface Props {
+  src: string;
+  /** Width in page units (mm for print). */
+  w: string;
+  top?: string;
+  right?: string;
+  bottom?: string;
+  left?: string;
+  rotate?: number;
+  opacity?: number;
+  flip?: boolean;
+}
+
+const { src, w, top, right, bottom, left, rotate = 0, opacity = 0.16, flip = false } = Astro.props;
+
+const transforms = [rotate ? `rotate(${rotate}deg)` : "", flip ? "scaleX(-1)" : ""]
+  .filter(Boolean)
+  .join(" ");
+
+const style = [
+  `width:${w}`,
+  top != null ? `top:${top}` : "",
+  right != null ? `right:${right}` : "",
+  bottom != null ? `bottom:${bottom}` : "",
+  left != null ? `left:${left}` : "",
+  `--deco-o:${opacity}`,
+  transforms ? `transform:${transforms}` : "",
+]
+  .filter(Boolean)
+  .join(";");
+---
+
+<img class="bk-deco" src={withBase(`img/booklet/${src}`)} alt="" style={style} />
