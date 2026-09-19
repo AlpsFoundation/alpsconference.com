@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MapPin } from "lucide-react";
-import AfterpartyDisco, { AfterpartyDiscoScene } from "./AfterpartyDisco";
+import AfterpartyDiscoScene from "./AfterpartyDisco";
+import { withBase } from "../lib/withBase";
 import { setLocationHash } from "../lib/locationHash";
+import { registerPhotoParallax } from "../lib/photoParallax";
 import {
   EXPERIENCE_MODAL_EVENT,
   getExperienceModalId,
@@ -21,10 +23,21 @@ const LINEUP = [
   { name: "DK ∞", genre: "Progressive Jungle Psy" },
 ];
 
-const VENUE = "Jugendkulturhaus, Flösserstrasse 7";
+const VENUE_NAME = "AAREAL Flösserplatz";
+const VENUE = `${VENUE_NAME}, Flösserstrasse 7`;
 const MAP_URL =
-  "https://www.google.com/maps/search/?api=1&query=Jugendkulturhaus%2C+Fl%C3%B6sserstrasse+7%2C+Aarau";
-const EVENTFROG_URL = "https://eventfrog.ch";
+  "https://www.google.com/maps/search/?api=1&query=AAREAL+Fl%C3%B6sserplatz%2C+Fl%C3%B6sserstrasse+7%2C+5000+Aarau";
+const EVENTFROG_URL =
+  "https://eventfrog.ch/de/p/partys/house-techno/afterglow-afterparty-for-the-alps-conference-guestlist-only-7505194045364252288.html";
+
+/** The party's own artwork, panned inside its crop the way the speaker photos are. */
+function AfterglowPhoto({ src, className }: { src: string; className: string }) {
+  const photoRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => registerPhotoParallax(photoRef.current), []);
+
+  return <img ref={photoRef} src={src} alt="" aria-hidden="true" className={className} />;
+}
 
 function AfterpartyModal({
   open,
@@ -86,11 +99,21 @@ function AfterpartyModal({
         <h3 id={headingId} className="text-2xl font-semibold text-white">
           Afterparty
         </h3>
-        <p className="mt-2 text-sm font-medium text-white/80">21:30–04:00</p>
+        <p className="mt-2 text-sm font-medium text-white/80">
+          <span className="text-accent-light/90">Sat</span>
+          <span className="text-white/30"> · </span>
+          21:30–04:00
+        </p>
+
+        <img
+          src={withBase("img/experiences/afterglow-banner.jpg")}
+          alt="Afterglow — an SPSN afterparty for the ALPS Conference"
+          className="mt-5 w-full rounded-[1rem] border border-white/10"
+        />
 
         <p className="mt-5 text-sm text-white/80 leading-relaxed">
           The conference closes with a private afterparty — an evening of music to close the day
-          together. Doors open at <span className="font-medium text-white">10 pm</span>, the
+          together. Music starts at <span className="font-medium text-white">10 pm</span>, the
           night runs until <span className="font-medium text-white">4 am</span>.
         </p>
 
@@ -135,7 +158,8 @@ function AfterpartyModal({
               conference ticket.
             </p>
             <p className="mt-2 text-xs text-white/65 leading-relaxed">
-              ALPS & SPSN Friends &amp; Family can purchase a separate ticket via{" "}
+              The party is guestlist only — message somebody from the psychedelic community to be
+              put on the guestlist, then buy a ticket on{" "}
               <a
                 href={EVENTFROG_URL}
                 target="_blank"
@@ -157,11 +181,8 @@ function AfterpartyModal({
 export default function Afterparty() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
   const { present: modalPresent, onExited } = useModalPresence(modalOpen);
   const afterpartyModalId = getExperienceModalId(AFTERPARTY_NAME);
-  const cardSpinning = (hovered || focused) && !modalPresent;
 
   useEffect(() => {
     const syncFromHash = () => setModalOpen(AFTERPARTY_HASHES.has(window.location.hash));
@@ -194,37 +215,24 @@ export default function Afterparty() {
           id="afterparty"
           type="button"
           onClick={() => openExperienceModal(AFTERPARTY_NAME)}
-          onPointerEnter={(event) => { if (event.pointerType !== "touch") setHovered(true); }}
-          onPointerDown={(event) => { if (event.pointerType === "touch") setHovered(true); }}
-          onPointerUp={() => setHovered(false)}
-          onPointerCancel={() => setHovered(false)}
-          onPointerLeave={() => setHovered(false)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          className="afterparty-surface group relative flex flex-col w-full h-full text-left text-white rounded-[1.15rem] overflow-hidden border border-white/20 hover:border-white/35 transition-[border-color,filter] duration-300 cursor-pointer p-4 sm:p-5"
+          className="afterparty-surface group relative flex flex-col w-full h-full text-left text-white rounded-[1.15rem] overflow-hidden border border-white/20 hover:border-white/35 transition-[border-color,filter] duration-300 cursor-pointer"
         >
-          <AfterpartyDisco spinning={cardSpinning} placement="card" />
+          <div className="aspect-[16/10] md:aspect-square overflow-hidden relative">
+            <AfterglowPhoto
+              src={withBase("img/experiences/afterglow.jpg")}
+              className="w-full h-full object-cover object-center group-hover:scale-[1.025] transition-[scale] duration-700 ease-out"
+            />
+          </div>
 
-          <div className="afterparty-card__copy min-w-0">
-            <p className="text-[0.62rem] sm:text-xs font-semibold uppercase tracking-[0.14em] text-accent-light/90 mb-1">
+          <div className="flex flex-col flex-1 p-3 sm:p-4">
+            <p className="text-[0.62rem] sm:text-xs font-medium uppercase tracking-[0.14em] text-accent-light mb-1">
               Saturday night
             </p>
-            <h4 className="text-[1.65rem] sm:text-[1.85rem] font-semibold text-white leading-none tracking-tight">
+            <h4 className="text-base sm:text-lg font-semibold text-white leading-snug">
               Afterparty
             </h4>
 
-            <div className="mt-4 space-y-1.5">
-              <p className="text-sm font-medium text-white">21:30–04:00</p>
-              <p className="text-sm text-white/75 leading-snug">{VENUE}</p>
-              <p className="text-xs text-white/65">5 minutes on foot</p>
-            </div>
-          </div>
-
-          <div className="mt-auto pt-4 w-full">
-            <p className="text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-accent-light/80 mb-2.5">
-              Lineup
-            </p>
-            <ul className="space-y-1.5">
+            <ul className="mt-3 space-y-1.5">
               {LINEUP.map(({ name, genre }) => (
                 <li key={name} className="flex items-baseline justify-between gap-2">
                   <span className="text-sm font-medium text-white">{name}</span>
@@ -234,6 +242,18 @@ export default function Afterparty() {
                 </li>
               ))}
             </ul>
+
+            <div className="mt-auto pt-3 space-y-1">
+              <p className="text-[0.68rem] sm:text-xs text-white/55 leading-snug">
+                <span className="text-accent-light/90">Sat</span>
+                <span className="text-white/25"> · </span>
+                21:30–04:00
+              </p>
+              <p className="text-[0.68rem] sm:text-xs text-white/55 leading-snug">
+                {VENUE_NAME}
+                <span className="text-white/25"> · </span>5 minutes on foot
+              </p>
+            </div>
           </div>
         </button>
       </div>

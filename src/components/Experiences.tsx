@@ -36,6 +36,8 @@ type ExperienceArtist = {
 type ExperiencePerson = {
   name: string;
   role: string;
+  /** Card headline when it should name the artists rather than the card itself. */
+  cardTitle?: string;
   context?: string;
   eyebrow?: string;
   image?: string;
@@ -84,7 +86,8 @@ const EXPERIENCES: ExperienceCategory[] = [
       },
       {
         name: "Art Corner",
-        role: "Exhibition & live painting",
+        role: "Art Corner",
+        cardTitle: "Hannah Stanke & Joanne Lackey",
         eyebrow: "Exhibition & live painting",
         aliases: ["Joanne Lackey", "Hannah Stanke"],
         artists: [
@@ -654,7 +657,9 @@ function ExperienceCard({ person }: { person: ExperiencePerson }) {
           <p className="text-[0.62rem] sm:text-xs font-medium uppercase tracking-[0.14em] text-accent-light mb-1">
             {person.role}
           </p>
-          <h4 className="text-base sm:text-lg font-semibold text-white leading-snug">{person.name}</h4>
+          <h4 className="text-base sm:text-lg font-semibold text-white leading-snug">
+            {person.cardTitle ?? person.name}
+          </h4>
           {sessions.length > 0 && (
             <ul className="mt-auto pt-3 space-y-1">
               {sessions.map((session) => (

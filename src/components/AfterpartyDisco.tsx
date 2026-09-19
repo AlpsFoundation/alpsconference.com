@@ -3,33 +3,6 @@ import type { NeoDiscoInstance, NeoDiscoOptions } from "neodisco";
 
 const SPARKLE_COUNT = 10;
 
-function cardOptions(): NeoDiscoOptions {
-  return {
-    size: "auto",
-    background: false,
-    theme: "mono",
-    palette: {
-      base: "#ffffff",
-      mirror: ["#ffffff", "#f4f6f8", "#d5dbe2", "#9aa3ab"],
-      glow: "#ffffff",
-      wire: "rgba(255, 255, 255, 0.55)",
-      shadow: "rgba(8, 47, 74, 0.16)",
-    },
-    radius: 0.38,
-    tileRows: 20,
-    tileColumns: 36,
-    tileGap: 0.7,
-    rotationSpeed: 0.16,
-    contrast: 0.58,
-    sparkle: 0.85,
-    glow: 0.42,
-    cord: true,
-    pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-    seed: 2026,
-    paused: true,
-  };
-}
-
 function viewportOptions(): NeoDiscoOptions {
   const styles = getComputedStyle(document.documentElement);
   const color = (name: string, fallback: string) =>
@@ -148,24 +121,14 @@ function bindDiscoPointer(
   };
 }
 
-export default function AfterpartyDisco({
-  spinning = false,
-  placement,
-  live = false,
-}: {
-  spinning?: boolean;
-  placement: "card" | "viewport";
-  live?: boolean;
-}) {
+function AfterpartyDisco({ live }: { live: boolean }) {
   const hostRef = useRef<HTMLSpanElement>(null);
   const instanceRef = useRef<NeoDiscoInstance>();
   const playingRef = useRef(false);
-  const spinningRef = useRef(spinning);
   const liveRef = useRef(live);
   const visibleRef = useRef(false);
   const engagedRef = useRef(false);
   const [engaged, setEngaged] = useState(false);
-  spinningRef.current = spinning;
   liveRef.current = live;
 
   const setEngagedState = (value: boolean) => {
@@ -189,7 +152,7 @@ export default function AfterpartyDisco({
         visibleRef.current &&
         !document.hidden &&
         !reducedMotion.matches &&
-        (placement === "viewport" ? liveRef.current : spinningRef.current);
+        liveRef.current;
       if (shouldPlay === playingRef.current) return;
       playingRef.current = shouldPlay;
       if (shouldPlay) instance.play();
@@ -207,11 +170,8 @@ export default function AfterpartyDisco({
     void import("neodisco")
       .then(({ createNeoDisco }) => {
         if (disposed) return;
-        instanceRef.current = createNeoDisco(
-          host,
-          placement === "card" ? cardOptions() : viewportOptions()
-        );
-        instanceRef.current.update({ rotationSpeed: engagedRef.current ? 0.14 : placement === "viewport" ? 0 : 0.16 });
+        instanceRef.current = createNeoDisco(host, viewportOptions());
+        instanceRef.current.update({ rotationSpeed: engagedRef.current ? 0.14 : 0 });
         syncPlayback();
       })
       .catch((error) => {
@@ -227,7 +187,7 @@ export default function AfterpartyDisco({
       instanceRef.current = undefined;
       playingRef.current = false;
     };
-  }, [placement]);
+  }, []);
 
   useEffect(() => {
     const instance = instanceRef.current;
@@ -237,16 +197,16 @@ export default function AfterpartyDisco({
       visibleRef.current &&
       !document.hidden &&
       !reducedMotion &&
-      (placement === "viewport" ? live : spinning);
+      live;
     if (shouldPlay === playingRef.current) return;
     playingRef.current = shouldPlay;
     if (shouldPlay) instance.play();
     else instance.pause();
-  }, [live, placement, spinning]);
+  }, [live]);
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host || placement !== "viewport" || !live) return;
+    if (!host || !live) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const unbindPointer = bindDiscoPointer(host, reducedMotion, engagedRef);
@@ -281,13 +241,13 @@ export default function AfterpartyDisco({
       document.removeEventListener("pointerdown", onOutside);
       setEngagedState(false);
     };
-  }, [live, placement]);
+  }, [live]);
 
   return (
     <span
       ref={hostRef}
-      className={`afterparty-disco afterparty-disco--${placement}`}
-      data-spinning={placement === "viewport" ? engaged : spinning}
+      className="afterparty-disco afterparty-disco--viewport"
+      data-spinning={engaged}
       data-engaged={engaged}
       aria-hidden="true"
     >
@@ -300,10 +260,10 @@ export default function AfterpartyDisco({
   );
 }
 
-export function AfterpartyDiscoScene({ active }: { active: boolean }) {
+export default function AfterpartyDiscoScene({ active }: { active: boolean }) {
   return (
     <div className="afterparty-disco-scene" data-active={active} aria-hidden="true">
-      <AfterpartyDisco placement="viewport" live={active} />
+      <AfterpartyDisco live={active} />
     </div>
   );
 }

@@ -571,40 +571,11 @@ main > section:not(:first-child) {
 .afterparty-card:focus-within::before { opacity: 0.7; animation: afterparty-spotlight 7s ease-in-out infinite alternate; }
 button.afterparty-surface > div { position: relative; z-index: 1; }
 button.afterparty-surface:focus-visible { outline: 2px solid var(--color-accent-light); outline-offset: 4px; }
-.afterparty-card__copy { padding-top: 8.35rem; }
 .afterparty-disco {
   display: block;
   aspect-ratio: 1;
   pointer-events: none;
 }
-.afterparty-disco--card {
-  position: absolute;
-  z-index: 0;
-  top: 0;
-  left: 50%;
-  width: min(10.75rem, 78%);
-  transform: translateX(-50%);
-}
-.afterparty-disco--card::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  left: 50%;
-  top: 0;
-  width: 1px;
-  height: 16%;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18));
-  pointer-events: none;
-}
-.afterparty-disco--card canvas {
-  position: relative;
-  z-index: 0;
-  opacity: 0.3;
-  mix-blend-mode: screen;
-  transition: opacity 350ms ease;
-}
-.afterparty-disco--card[data-spinning="true"] canvas { opacity: 0.46; }
 .afterparty-disco-scene {
   position: absolute;
   inset: 0;
@@ -652,11 +623,10 @@ button.afterparty-surface:focus-visible { outline: 2px solid var(--color-accent-
   opacity: 0.2;
   animation: afterparty-sparkle 2.6s ease-in-out infinite;
 }
-.afterparty-disco--card .afterparty-disco__sparkles {
+.afterparty-disco--viewport .afterparty-disco__sparkles {
   opacity: 0;
   transition: opacity 280ms ease;
 }
-.afterparty-disco--card[data-spinning="true"] .afterparty-disco__sparkles,
 .afterparty-disco--viewport[data-spinning="true"] .afterparty-disco__sparkles i { opacity: 0.95; }
 .afterparty-disco__sparkles i:nth-child(1) { top: 10%; left: 28%; animation-delay: 0s; }
 .afterparty-disco__sparkles i:nth-child(2) { top: 18%; right: 22%; animation-delay: -0.35s; width: 0.3rem; height: 0.3rem; }
