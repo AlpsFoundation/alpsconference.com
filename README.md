@@ -99,6 +99,22 @@ wrangler secret put INFOMANIAK_NEWSLETTER_GROUPS
 wrangler secret put NEWSLETTER_DEBUG
 ```
 
+## Calendar feeds
+
+Two subscribable iCalendar feeds are prerendered at build time from the same data the
+schedule renders, so publishing a program change republishes the feeds:
+
+| Feed | URL | Source |
+| --- | --- | --- |
+| Main track | `https://alpsconference.com/alps-2026-talks.ics` | `src/data/program.ts` |
+| Experiences | `https://alpsconference.com/alps-2026-experiences.ics` | `src/data/experiences.ts` |
+
+`src/lib/ical.ts` builds them; `src/components/CalendarSubscribe.tsx` renders the
+"Add to calendar" button above each schedule (Google Calendar, `webcal://` subscription,
+or a one-off `.ics` download). People who subscribe rather than download receive later
+changes on their calendar client's own refresh schedule — typically a few hours, up to
+about a day for Google Calendar.
+
 ## Deployment
 
 This repository is configured for **Cloudflare Workers**, not Pages.
@@ -129,3 +145,4 @@ After `pnpm build`, the Cloudflare-ready artifacts are generated in `dist/`:
 - `dist/client/` — prerendered static assets
 - `dist/server/` — Worker entry and generated Wrangler deployment config
 - `dist/client/sitemap-index.xml` and `dist/client/sitemap-0.xml` — generated sitemap files
+- `dist/client/alps-2026-talks.ics` and `dist/client/alps-2026-experiences.ics` — calendar feeds

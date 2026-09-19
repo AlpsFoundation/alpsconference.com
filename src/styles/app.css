@@ -209,14 +209,6 @@ main > section:not(:first-child) {
   flex-shrink: 0;
 }
 
-.program-tabs-hint {
-  font-size: 0.7rem;
-  font-weight: 550;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
-}
-
 .program-tabs {
   display: inline-flex;
   gap: 0.25rem;
@@ -258,6 +250,80 @@ main > section:not(:first-child) {
   line-height: 1.6;
 }
 .program-intro { margin: 0 0 1.75rem; max-width: 48rem; }
+
+.program-intro-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem 2rem;
+  margin-bottom: 1.75rem;
+}
+.program-intro-row .program-intro { margin-bottom: 0; }
+
+.calendar-subscribe { position: relative; flex-shrink: 0; }
+
+.calendar-subscribe__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.6rem 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(4, 30, 49, 0.72);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+.calendar-subscribe__trigger:hover {
+  border-color: rgba(82, 169, 236, 0.55);
+  background: rgba(255, 255, 255, 0.09);
+  color: white;
+}
+.calendar-subscribe__trigger:focus-visible {
+  outline: 2px solid var(--color-support-light);
+  outline-offset: 3px;
+}
+.calendar-subscribe__chevron { transition: transform 180ms ease; }
+.calendar-subscribe__chevron.is-open { transform: rotate(180deg); }
+
+.calendar-subscribe__menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: min(20rem, calc(100vw - 2rem));
+  padding: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.9rem;
+  background: rgba(8, 47, 74, 0.97);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.calendar-subscribe__menu a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.6rem;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: background 150ms ease, color 150ms ease;
+}
+.calendar-subscribe__menu a:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+.calendar-subscribe__menu a:focus-visible {
+  outline: 2px solid var(--color-support-light);
+  outline-offset: -2px;
+}
+.calendar-subscribe__note {
+  margin: 0.25rem 0.75rem 0.5rem;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
 .program-footnote { margin: 1.5rem 0 0; text-align: center; font-size: 0.82rem; }
 
 .program-notice {
@@ -524,6 +590,10 @@ main > section:not(:first-child) {
   .program-tabs-wrap { width: 100%; }
   .program-tabs { width: 100%; }
   .program-tabs button { flex: 1; padding-inline: 0.45rem; font-size: 0.82rem; }
+  .program-intro-row { flex-direction: column; }
+  .calendar-subscribe { width: 100%; }
+  .calendar-subscribe__trigger { width: 100%; justify-content: center; }
+  .calendar-subscribe__menu { right: auto; left: 0; width: 100%; }
   .program-day__header { padding: 0.85rem 1rem; }
   .program-item, .program-session-link { grid-template-columns: 1fr; gap: 0.25rem; }
   .program-item:not(.program-item--linked), .program-session-link { padding: 0.85rem 1rem; }

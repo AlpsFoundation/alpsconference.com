@@ -10,6 +10,8 @@ type ExperienceSlot = {
   title: string;
   detail?: string;
   venue?: string;
+  /** Overrides the conference venue in the calendar feed. */
+  calendarLocation?: string;
   kind?: "allday" | "session";
   personName?: string;
   personNames?: string[];
@@ -78,7 +80,7 @@ export const EXPERIENCE_DAYS: ExperienceDay[] = [
       { time: "11:15–12:30 & 16:45–18:00", title: "Breathwork", venue: "Saal 4", personName: "Pascal Kälin" },
       { time: "12:30–14:00", title: "Live concert", venue: "Saal 2", personName: "David & Anna-Lea Wennberg" },
       { time: "13:45–14:45", title: "Sound meditation", venue: "Saal 4", personName: "Marina Vovk" },
-      { time: "21:30–04:00", title: "Afterparty", detail: "AAREAL Flösserplatz, Flösserstrasse 7 · 5 minutes on foot", personName: "Afterparty" },
+      { time: "21:30–04:00", title: "Afterparty", detail: "AAREAL Flösserplatz, Flösserstrasse 7 · 5 minutes on foot", personName: "Afterparty", calendarLocation: "AAREAL Flösserplatz, Flösserstrasse 7, 5000 Aarau, Switzerland" },
     ],
   },
 ];

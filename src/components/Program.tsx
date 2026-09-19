@@ -37,6 +37,7 @@ import {
 } from "../data/speakers";
 import { FRIDAY_PANEL, SATURDAY_PANEL } from "../data/bookletContent";
 import { WORKSHOP_DAY, WORKSHOP_TRACKS } from "../data/workshops";
+import CalendarSubscribe from "./CalendarSubscribe";
 import MapAddress from "./MapAddress";
 import { withBase } from "../lib/withBase";
 import { setLocationHash } from "../lib/locationHash";
@@ -519,7 +520,6 @@ export default function Program() {
             <h2 className="section-title">{view === "workshops" ? "Workshop Day program" : "Conference program"}</h2>
           </div>
           <div className="program-tabs-wrap">
-            <span className="program-tabs-hint" aria-hidden="true">Switch view</span>
             <div className="program-tabs" role="tablist" aria-label="Program type">
               {views.map((option) => (
                 <button key={option} id={`program-tab-${option}`} type="button" role="tab" aria-selected={view === option} aria-controls={`program-panel-${option}`} tabIndex={view === option ? 0 : -1} onClick={() => setView(option)} onKeyDown={(event) => {
@@ -536,7 +536,12 @@ export default function Program() {
         <div data-fade-up className="opacity-0">
           {views.map((option) => (
             <div key={option} id={`program-panel-${option}`} role="tabpanel" aria-labelledby={`program-tab-${option}`} hidden={view !== option} tabIndex={0}>
-              <p className="program-intro">{TAB_INTROS[option]}</p>
+              <div className="program-intro-row">
+                <p className="program-intro">{TAB_INTROS[option]}</p>
+                {option !== "workshops" && (
+                  <CalendarSubscribe feed={option} label={option === "talks" ? "Add talks to calendar" : "Add experiences to calendar"} />
+                )}
+              </div>
               {option === "workshops" && <WorkshopDayNotice />}
               <ProgramSchedule view={option} />
             </div>
