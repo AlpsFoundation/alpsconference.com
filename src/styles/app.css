@@ -301,7 +301,8 @@ main > section:not(:first-child) {
   background: rgba(8, 47, 74, 0.97);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
-.calendar-subscribe__menu a {
+.calendar-subscribe__menu a,
+.calendar-subscribe__menu button {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -313,11 +314,24 @@ main > section:not(:first-child) {
   font-weight: 600;
   transition: background 150ms ease, color 150ms ease;
 }
-.calendar-subscribe__menu a:hover { background: rgba(255, 255, 255, 0.08); color: white; }
-.calendar-subscribe__menu a:focus-visible {
+.calendar-subscribe__menu button { width: 100%; cursor: pointer; text-align: left; }
+.calendar-subscribe__menu a:hover,
+.calendar-subscribe__menu button:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+.calendar-subscribe__menu a:focus-visible,
+.calendar-subscribe__menu button:focus-visible {
   outline: 2px solid var(--color-support-light);
   outline-offset: -2px;
 }
+.calendar-subscribe__url {
+  display: block;
+  margin: 0.25rem 0.75rem;
+  overflow-wrap: anywhere;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  user-select: all;
+}
+
 .calendar-subscribe__note {
   margin: 0.25rem 0.75rem 0.5rem;
   color: rgba(255, 255, 255, 0.58);
