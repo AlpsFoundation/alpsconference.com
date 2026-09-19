@@ -539,13 +539,19 @@ main > section:not(:first-child) {
   color: var(--color-neutral-light);
 }
 
-.afterparty-modal { padding-top: clamp(10.5rem, 24vh, 14.5rem); padding-bottom: 2rem; }
+.afterparty-modal {
+  /* The card is top-anchored so its clearance follows the ball rather than
+     drifting with however tall the content centres out to. */
+  --afterparty-disco-size: clamp(5.625rem, 11vw, 7.75rem);
+  padding-top: calc(var(--afterparty-disco-size) - 0.35rem);
+  padding-bottom: 2rem;
+}
 .afterparty-modal__backdrop {
   background: rgba(3, 20, 35, 0.8);
   backdrop-filter: blur(9px);
 }
 .afterparty-modal__surface {
-  max-height: calc(100dvh - clamp(10rem, 23vh, 15rem));
+  max-height: calc(100dvh - var(--afterparty-disco-size) - 2.5rem);
   border: 1px solid rgba(82, 169, 236, 0.25);
   background: radial-gradient(ellipse at 100% 0%, rgba(243, 143, 191, 0.09), transparent 60%),
     linear-gradient(155deg, #174969, #082f4a 80%);
@@ -597,7 +603,7 @@ button.afterparty-surface:focus-visible { outline: 2px solid var(--color-accent-
   position: absolute;
   top: 0.2rem;
   left: 50%;
-  width: clamp(11.25rem, 22vw, 15.5rem);
+  width: var(--afterparty-disco-size, 7.75rem);
   transform-origin: top center;
   transform: translate3d(calc(-50% + var(--disco-nudge, 0px)), var(--disco-tilt, 0px), 0)
     rotate(var(--disco-swing, 0deg));

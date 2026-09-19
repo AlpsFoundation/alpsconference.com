@@ -38,6 +38,8 @@ type ExperiencePerson = {
   role: string;
   /** Card headline when it should name the artists rather than the card itself. */
   cardTitle?: string;
+  /** Show every photo side by side instead of one large photo with thumbnails. */
+  photoLayout?: "grid";
   context?: string;
   eyebrow?: string;
   image?: string;
@@ -177,14 +179,16 @@ const EXPERIENCES: ExperienceCategory[] = [
         name: "David & Anna-Lea Wennberg",
         role: "Live Concert",
         context: "Musicians",
-        image: "david-anna-lea-wennberg.jpg",
-        gallery: ["david-anna-lea-wennberg-2.jpg"],
         sessions: [
           {
             title: "Live Concert",
             description: "David & Anna-Lea Wennberg will play a live concert during Saturday lunch. Further details will be published here soon.",
           },
         ],
+        image: "david-anna-lea-wennberg-2.jpg",
+        imagePosition: "50% 30%",
+        gallery: ["david-anna-lea-wennberg.jpg"],
+        photoLayout: "grid",
       },
       {
         name: "Pascal Kälin",
@@ -461,7 +465,7 @@ function ExperienceModal({
         </button>
 
         <div className="flex items-start gap-4 mb-6">
-          {!person.artists?.length && activePhoto && (
+          {!person.artists?.length && !person.photoLayout && activePhoto && (
             <ModalPhoto
               src={withBase(`img/experiences/${activePhoto.file}`)}
               alt={person.name}
@@ -478,7 +482,21 @@ function ExperienceModal({
           </div>
         </div>
 
-        {!person.artists?.length && photos.length > 1 && (
+        {!person.artists?.length && photos.length > 1 && person.photoLayout === "grid" && (
+          <div className="mb-7 grid gap-3 sm:grid-cols-2">
+            {photos.map((photo) => (
+              <img
+                key={photo.file}
+                src={withBase(`img/experiences/${photo.file}`)}
+                alt=""
+                className="aspect-[4/5] w-full rounded-[1rem] border border-white/10 object-cover"
+                style={{ objectPosition: photo.position }}
+              />
+            ))}
+          </div>
+        )}
+
+        {!person.artists?.length && photos.length > 1 && !person.photoLayout && (
           <div className="mb-6 flex items-start justify-center gap-2 sm:gap-3">
             <img
               src={withBase(`img/experiences/${activePhoto.file}`)}

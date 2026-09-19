@@ -71,7 +71,7 @@ function AfterpartyModal({
   return createPortal(
     <div
       ref={overlayRef}
-      className={`afterparty-modal fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0${open ? "" : " pointer-events-none"}`}
+      className={`afterparty-modal fixed inset-0 z-50 flex items-start justify-center p-4 opacity-0${open ? "" : " pointer-events-none"}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -87,11 +87,17 @@ function AfterpartyModal({
         <button
           ref={closeRef}
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-white/65 hover:text-white transition-colors rounded-sm hover:bg-white/10 cursor-pointer"
+          className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center text-white/75 hover:text-white transition-colors rounded-full bg-black/35 backdrop-blur-sm hover:bg-black/55 cursor-pointer"
           aria-label="Close"
         >
           ✕
         </button>
+
+        <img
+          src={withBase("img/experiences/afterglow-banner.jpg")}
+          alt="Afterglow — an SPSN afterparty for the ALPS Conference"
+          className="block w-[calc(100%+3rem)] -mx-6 -mt-6 mb-6 sm:w-[calc(100%+4rem)] sm:-mx-8 sm:-mt-8 sm:mb-7 max-w-none rounded-t-[1.25rem]"
+        />
 
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-light mb-1">
           Saturday night
@@ -104,12 +110,6 @@ function AfterpartyModal({
           <span className="text-white/30"> · </span>
           21:30–04:00
         </p>
-
-        <img
-          src={withBase("img/experiences/afterglow-banner.jpg")}
-          alt="Afterglow — an SPSN afterparty for the ALPS Conference"
-          className="mt-5 w-full rounded-[1rem] border border-white/10"
-        />
 
         <p className="mt-5 text-sm text-white/80 leading-relaxed">
           The conference closes with a private afterparty — an evening of music to close the day
