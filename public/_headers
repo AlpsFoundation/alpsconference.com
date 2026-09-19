@@ -1,0 +1,4 @@
+# Calendar clients need the charset spelled out: the feeds carry non-ASCII names
+# (Régis, Kälin, en dashes) and Cloudflare serves .ics without a charset by default.
+/*.ics
+  Content-Type: text/calendar; charset=utf-8

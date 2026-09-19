@@ -14,7 +14,9 @@ export default function CalendarSubscribe({ feed, label }: { feed: CalendarFeed;
   const path = withBase(file);
   const feedUrl = new URL(path, SITE).href;
   const webcalUrl = feedUrl.replace(/^https?:/, "webcal:");
-  const googleUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcalUrl)}`;
+  // Google's fetcher does not follow `webcal:` — handed one it saves the subscription and never
+  // syncs it, leaving the raw URL as the calendar name. It needs the https URL.
+  const googleUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(feedUrl)}`;
 
   useEffect(() => {
     if (!open) return;

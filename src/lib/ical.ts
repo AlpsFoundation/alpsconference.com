@@ -18,12 +18,12 @@ export const CALENDAR_FILES: Record<CalendarFeed, string> = {
 
 const FEED_META: Record<CalendarFeed, { name: string; description: string }> = {
   talks: {
-    name: "ALPS Conference 2026 · Talks",
+    name: "ALPS 2026 Talks",
     description:
       "Research talks, panel discussions and breaks of the ALPS Conference 2026 main track, 9–10 October 2026 at the Kultur & Kongresshaus Aarau.",
   },
   experiences: {
-    name: "ALPS Conference 2026 · Experiences",
+    name: "ALPS 2026 Experiences",
     description:
       "Art, sound, movement and connection running alongside the talks at the ALPS Conference 2026, 9–10 October 2026 in Aarau.",
   },
