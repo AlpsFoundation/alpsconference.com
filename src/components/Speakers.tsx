@@ -14,6 +14,7 @@ import {
 } from "../data/speakers";
 import { FRIDAY_PANEL, SATURDAY_PANEL } from "../data/bookletContent";
 import { withBase } from "../lib/withBase";
+import { registerPhotoParallax } from "../lib/photoParallax";
 import { setLocationHash } from "../lib/locationHash";
 import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
 import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
@@ -154,6 +155,10 @@ function SpeakerPhoto({
   crop: SpeakerImageCrop;
 }) {
   const [errored, setErrored] = useState(false);
+  const photoRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => registerPhotoParallax(photoRef.current), [errored]);
+
   if (errored) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -169,6 +174,7 @@ function SpeakerPhoto({
       style={{ transform: `scale(${crop.scale})`, transformOrigin: getFaceCenter(crop.faceBox) }}
     >
       <img
+        ref={photoRef}
         src={src}
         alt={alt}
         className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-focus-within:grayscale-0 group-hover:scale-[1.025] transition-[filter,scale] duration-700 ease-out"
@@ -255,7 +261,7 @@ function SpeakerCard({ speaker }: { speaker: Speaker }) {
         onClick={() => openSpeakerModal(speaker.name)}
         className="opacity-0 group relative flex flex-col w-full text-left bg-white/[0.03] border border-white/[0.07] rounded-[1.25rem] overflow-hidden hover:border-support/30 hover:bg-white/[0.05] transition-all duration-300 cursor-pointer"
       >
-        <div className="aspect-[4/5] overflow-hidden bg-white/[0.03] relative">
+        <div className="aspect-square overflow-hidden bg-white/[0.03] relative">
           {speaker.image ? (
             <SpeakerPhoto
               src={withBase(`img/speakers/${speaker.image}`)}
@@ -300,7 +306,7 @@ function TbdCard() {
       data-fade-up
       className="opacity-0 relative flex flex-col bg-white/[0.01] border border-white/[0.04] rounded-[1.25rem] overflow-hidden"
     >
-      <div className="aspect-[4/5] bg-white/[0.02] flex items-center justify-center">
+      <div className="aspect-square bg-white/[0.02] flex items-center justify-center">
         <div className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center">
           <span className="text-white/20 text-2xl">?</span>
         </div>
