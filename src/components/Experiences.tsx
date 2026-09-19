@@ -23,6 +23,15 @@ type ExperienceLinks = {
   instagram?: string;
 };
 
+type ExperienceArtist = {
+  name: string;
+  image?: string;
+  imagePosition?: string;
+  sessions?: ExperienceSession[];
+  bio?: string;
+  links?: ExperienceLinks;
+};
+
 type ExperiencePerson = {
   name: string;
   role: string;
@@ -34,6 +43,10 @@ type ExperiencePerson = {
   sessions?: ExperienceSession[];
   bio?: string;
   links?: ExperienceLinks;
+  /** Other names (individual artists behind a shared card) that also open this modal. */
+  aliases?: string[];
+  /** Individual profiles shown inside a shared card's modal, each with their own photo. */
+  artists?: ExperienceArtist[];
 };
 
 type ExperienceCategory = {
@@ -69,22 +82,44 @@ const EXPERIENCES: ExperienceCategory[] = [
         },
       },
       {
-        name: "Hannah Stanke",
-        role: "Live painting",
-        context: "Artist",
-        image: "hannah-stanke.jpg",
-        imagePosition: "42% 28%",
-        sessions: [
+        name: "Art Corner",
+        role: "Exhibition & live painting",
+        eyebrow: "Exhibition & live painting",
+        aliases: ["Joanne Lackey", "Hannah Stanke"],
+        artists: [
           {
-            title: "Live painting",
-            description:
-              "Hannah will exhibit work in the Foyer Art Corner, with pieces available for purchase. She will live-paint both days; finished works may be purchased by visitors.",
+            name: "Hannah Stanke",
+            image: "hannah-stanke.jpg",
+            imagePosition: "42% 28%",
+            sessions: [
+              {
+                title: "Live painting",
+                description:
+                  "Hannah will exhibit work in the Foyer Art Corner, with pieces available for purchase. She will live-paint both days; finished works may be purchased by visitors.",
+              },
+            ],
+            bio: "Hannah Stanke is a visual artist who expresses her inner world and philosophy through paint. Her art is inspired by her inner cosmos and the human experience. She likes to visually express her emotions and inner world with elements she connects to such as botany, airy and moving elements like clouds and energies, micro and natural patterns.",
+            links: {
+              instagram: "chuvatti",
+            },
+          },
+          {
+            name: "Joanne Lackey",
+            image: "joanne-lackey.jpg",
+            imagePosition: "50% 6%",
+            sessions: [
+              {
+                title: "Exhibition & live painting",
+                description:
+                  "Joanne Lackey will exhibit a selection of her work in the Foyer Art Corner and may also be live-painting during the event.",
+              },
+            ],
+            bio: "Joanne Lackey is a multidisciplinary visual artist working across painting, drawing, digital art and sculpture. Flowing freely between acrylics, watercolour, gouache, pastels and other mediums, she lets each material become a different way of expressing an idea, feeling or experience.\n\nHer work is inspired by nature, movement, geometry, energy and the shifting nature of perception. Psychedelic experiences, self-discovery and the exploration of consciousness also influence her visual language, creating colourful and multilayered worlds where the seen and unseen meet.",
+            links: {
+              instagram: "joltherixo_art",
+            },
           },
         ],
-        bio: "Hannah Stanke is a visual artist who expresses her inner world and philosophy through paint. Her art is inspired by her inner cosmos and the human experience. She likes to visually express her emotions and inner world with elements she connects to such as botany, airy and moving elements like clouds and energies, micro and natural patterns.",
-        links: {
-          instagram: "chuvatti",
-        },
       },
       {
         name: "Régis Paroz",
@@ -150,14 +185,17 @@ const EXPERIENCES: ExperienceCategory[] = [
       {
         name: "Pascal Kälin",
         role: "Breathwork",
+        context: "Switzerland",
         image: "pascal-kalin.jpg",
         imagePosition: "50% 24%",
         sessions: [
           {
-            title: "Breathwork",
-            description: "Join Pascal Kälin for a breathwork session during the conference. Further details will be published here soon.",
+            title: "Breathwork Journey",
+            description:
+              "Pascal offers you a guided breathwork journey as a space to slow down, reconnect with your body and turn inward.\n\nThrough conscious connected breathing, you are invited to meet what is present within you – physically, emotionally and mentally. The breath can open a space for release, clarity, inner connection and a deeper sense of presence.\n\nThe session is an invitation to step out of your mind for a moment, listen to your body and allow the breath to guide the way inward.",
           },
         ],
+        bio: "Pascal Kälin is a Swiss breathwork facilitator and founder of Secrets of Alchemy. His work is centered around the breath, body awareness, inner processes and a deeper connection to oneself.\n\nAt the heart of his work is a simple idea: the breath is already within us. Rather than giving people something from the outside, his work invites them to explore what may already be waiting to be discovered.",
       },
     ],
   },
@@ -340,6 +378,21 @@ function ExperienceLinkButtons({ links }: { links: ExperienceLinks }) {
   );
 }
 
+type ModalPhoto = { file: string; position: string };
+
+function collectModalPhotos(person: ExperiencePerson): ModalPhoto[] {
+  if (person.artists?.length) {
+    return person.artists.flatMap((artist) =>
+      artist.image ? [{ file: artist.image, position: artist.imagePosition ?? "50% 30%" }] : []
+    );
+  }
+  if (!person.image) return [];
+  return [person.image, ...(person.gallery ?? [])].map((file) => ({
+    file,
+    position: person.imagePosition ?? "50% 30%",
+  }));
+}
+
 function ExperienceModal({
   person,
   open,
@@ -356,8 +409,9 @@ function ExperienceModal({
   const closeRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
-  const photos = person.image ? [person.image, ...(person.gallery ?? [])] : [];
-  const [activePhoto, setActivePhoto] = useState(person.image ?? "");
+  const photos = collectModalPhotos(person);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activePhoto = photos[activeIndex];
   const headingId = `${getExperienceModalId(person.name)}-title`;
 
   useEffect(() => {
@@ -398,11 +452,11 @@ function ExperienceModal({
         </button>
 
         <div className="flex items-start gap-4 mb-6">
-          {activePhoto && (
+          {!person.artists?.length && activePhoto && (
             <ModalPhoto
-              src={withBase(`img/experiences/${activePhoto}`)}
+              src={withBase(`img/experiences/${activePhoto.file}`)}
               alt={person.name}
-              position={person.imagePosition ?? "50% 30%"}
+              position={activePhoto.position}
             />
           )}
           <div>
@@ -415,29 +469,29 @@ function ExperienceModal({
           </div>
         </div>
 
-        {photos.length > 1 && (
+        {!person.artists?.length && photos.length > 1 && (
           <div className="mb-6 flex items-start justify-center gap-2 sm:gap-3">
             <img
-              src={withBase(`img/experiences/${activePhoto}`)}
+              src={withBase(`img/experiences/${activePhoto.file}`)}
               alt=""
               className="max-h-[min(32rem,55vh)] w-auto max-w-[calc(100%-3.25rem)] rounded-[1rem] border border-white/10 object-contain"
             />
             <div className="flex max-h-[min(32rem,55vh)] w-11 shrink-0 flex-col gap-1.5 overflow-y-auto sm:w-12">
               {photos.map((photo, index) => (
                 <button
-                  key={photo}
+                  key={photo.file}
                   type="button"
-                  onClick={() => setActivePhoto(photo)}
+                  onClick={() => setActiveIndex(index)}
                   aria-label={`View photo ${index + 1} of ${photos.length}`}
-                  aria-pressed={activePhoto === photo}
+                  aria-pressed={activeIndex === index}
                   className={`relative aspect-[3/4] w-full shrink-0 overflow-hidden rounded-md border bg-white/[0.03] transition-colors cursor-pointer ${
-                    activePhoto === photo
+                    activeIndex === index
                       ? "border-accent-light"
                       : "border-white/10 hover:border-accent/50"
                   }`}
                 >
                   <img
-                    src={withBase(`img/experiences/${photo}`)}
+                    src={withBase(`img/experiences/${photo.file}`)}
                     alt=""
                     className="h-full w-full object-cover object-top"
                   />
@@ -466,6 +520,52 @@ function ExperienceModal({
           )}
         </div>
 
+        {person.artists && person.artists.length > 0 && (
+          <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            {person.artists.map((artist) => (
+              <div
+                key={artist.name}
+                className="flex flex-col border-t border-white/10 pt-5 first:border-t-0 first:pt-0 sm:border-t-0 sm:pt-0"
+              >
+                {artist.image && (
+                  <img
+                    src={withBase(`img/experiences/${artist.image}`)}
+                    alt={artist.name}
+                    className="mb-4 aspect-[4/5] max-h-[40vh] w-full rounded-[1rem] border border-white/10 object-cover sm:max-h-none"
+                    style={{ objectPosition: artist.imagePosition ?? "50% 30%" }}
+                  />
+                )}
+                <h4 className="text-lg font-semibold text-white mb-4">{artist.name}</h4>
+                <div className="space-y-5">
+                  {artist.sessions?.map((session) => (
+                    <div key={session.title}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-light/80 mb-2">
+                        {session.title}
+                      </p>
+                      <p className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap">
+                        {session.description}
+                      </p>
+                    </div>
+                  ))}
+                  {artist.bio && (
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-light/80 mb-2">
+                        Biography
+                      </p>
+                      <p className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap">{artist.bio}</p>
+                    </div>
+                  )}
+                </div>
+                {artist.links && (
+                  <div className="mt-auto">
+                    <ExperienceLinkButtons links={artist.links} />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         {person.links && <ExperienceLinkButtons links={person.links} />}
       </div>
     </div>,
@@ -476,15 +576,20 @@ function ExperienceModal({
 function ExperienceCard({ person }: { person: ExperiencePerson }) {
   const [modalOpen, setModalOpen] = useState(false);
   const { present: modalPresent, onExited } = useModalPresence(modalOpen);
-  const experienceModalId = getExperienceModalId(person.name);
+  // A shared card (e.g. the Art Corner) also answers to each artist's own modal id,
+  // so credit links in the programme still resolve.
+  const modalIdKey = [person.name, ...(person.aliases ?? [])].map(getExperienceModalId).join("|");
+  // Two-photo experiences (two artists, a duo) split the thumbnail into stacked halves.
+  const cardPhotos = collectModalPhotos(person);
   const sessions = getPersonSessionTimes(person.name);
   const showSessionTitles = new Set(sessions.map((session) => session.title)).size > 1;
 
   useEffect(() => {
-    const syncFromHash = () => setModalOpen(window.location.hash === `#${experienceModalId}`);
+    const modalIds = modalIdKey.split("|");
+    const syncFromHash = () => setModalOpen(modalIds.includes(window.location.hash.slice(1)));
     const handleOpen = (event: Event) => {
       const { experienceId } = (event as CustomEvent<{ experienceId: string }>).detail;
-      setModalOpen(experienceId === experienceModalId);
+      setModalOpen(modalIds.includes(experienceId));
     };
 
     syncFromHash();
@@ -494,11 +599,11 @@ function ExperienceCard({ person }: { person: ExperiencePerson }) {
       window.removeEventListener("hashchange", syncFromHash);
       window.removeEventListener(EXPERIENCE_MODAL_EVENT, handleOpen);
     };
-  }, [experienceModalId]);
+  }, [modalIdKey]);
 
   const closeModal = () => {
     setModalOpen(false);
-    if (window.location.hash === `#${experienceModalId}`) {
+    if (modalIdKey.split("|").includes(window.location.hash.slice(1))) {
       setLocationHash(null, "replace");
     }
   };
@@ -511,12 +616,25 @@ function ExperienceCard({ person }: { person: ExperiencePerson }) {
         className="group relative flex flex-col w-full text-left bg-white/[0.03] border border-white/[0.07] rounded-[1.15rem] overflow-hidden hover:border-accent/35 hover:bg-white/[0.05] transition-all duration-300 cursor-pointer"
       >
         <div className="aspect-[4/5] overflow-hidden bg-white/[0.03] relative">
-          {person.image ? (
+          {cardPhotos.length === 2 ? (
+            <div className="flex h-full w-full flex-col gap-px">
+              {cardPhotos.map((photo) => (
+                <div key={photo.file} className="relative h-1/2 w-full overflow-hidden">
+                  <ExperiencePhoto
+                    src={withBase(`img/experiences/${photo.file}`)}
+                    alt={person.name}
+                    initials={initials(person.name)}
+                    position="50% 50%"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : cardPhotos.length > 0 ? (
             <ExperiencePhoto
-              src={withBase(`img/experiences/${person.image}`)}
+              src={withBase(`img/experiences/${cardPhotos[0].file}`)}
               alt={person.name}
               initials={initials(person.name)}
-              position={person.imagePosition ?? "50% 30%"}
+              position={cardPhotos[0].position}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

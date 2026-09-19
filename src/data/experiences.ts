@@ -26,6 +26,7 @@ type ExperienceDay = {
 export const EXPERIENCE_PORTRAITS: Record<string, { file: string; position: string }> = {
   "Kevin Barron": { file: "kevin-barron.jpg", position: "50% 12%" },
   "Hannah Stanke": { file: "hannah-stanke.jpg", position: "42% 28%" },
+  "Joanne Lackey": { file: "joanne-lackey.jpg", position: "50% 6%" },
   "Régis Paroz": { file: "regis-paroz.jpg", position: "54% 16%" },
   "Marina Vovk": { file: "marina-vovk.jpg", position: "50% 22%" },
   "David & Anna-Lea Wennberg": { file: "david-anna-lea-wennberg.jpg", position: "50% 30%" },
@@ -46,6 +47,7 @@ export const EXPERIENCE_DAYS: ExperienceDay[] = [
         kind: "allday",
         credits: [
           { name: "Kevin Barron", type: "LSD blotter art" },
+          { name: "Joanne Lackey", type: "Exhibition & live painting" },
           { name: "Hannah Stanke", type: "Live painting" },
           { name: "Régis Paroz", type: "Uncanny World" },
         ],
@@ -67,6 +69,7 @@ export const EXPERIENCE_DAYS: ExperienceDay[] = [
         kind: "allday",
         credits: [
           { name: "Kevin Barron", type: "LSD blotter art" },
+          { name: "Joanne Lackey", type: "Exhibition & live painting" },
           { name: "Hannah Stanke", type: "Live painting" },
           { name: "Régis Paroz", type: "Uncanny World" },
         ],
