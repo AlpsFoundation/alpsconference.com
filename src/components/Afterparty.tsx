@@ -220,7 +220,7 @@ export default function Afterparty() {
           <div className="aspect-[16/10] md:aspect-square overflow-hidden relative">
             <AfterglowPhoto
               src={withBase("img/experiences/afterglow.jpg")}
-              className="w-full h-full object-cover object-center group-hover:scale-[1.025] transition-[scale] duration-700 ease-out"
+              className="w-full h-full object-cover object-center grayscale group-hover:grayscale-0 group-focus-within:grayscale-0 group-hover:scale-[1.025] transition-[filter,scale] duration-700 ease-out"
             />
           </div>
 

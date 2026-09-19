@@ -134,8 +134,12 @@ export default function Gallery() {
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
         >
-          {/* Track */}
-          <div ref={trackRef} className="relative flex items-center justify-center h-[340px] sm:h-[460px] overflow-hidden">
+          {/* Track — height follows the centre photo's 3:2 crop so no background shows above or below it. */}
+          <div
+            ref={trackRef}
+            className="relative flex items-center justify-center overflow-hidden"
+            style={{ height: "calc(min(560px, 90vw) / 1.5)" }}
+          >
             {images.map((img, idx) => {
               const pos = visibleIndices.indexOf(idx);
               if (pos === -1) return null;

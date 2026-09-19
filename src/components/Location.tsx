@@ -118,13 +118,6 @@ export default function Location() {
           </div>
 
           <div className="order-1 space-y-6 lg:order-2 lg:pt-4">
-            <div
-              data-fade-up
-              className="opacity-0 inline-flex items-center rounded-full border border-support/20 bg-support/10 px-4 py-2 text-[0.72rem] font-medium uppercase tracking-[0.2em] text-support-light/90"
-            >
-              Designed for gathering, learning, and exchange
-            </div>
-
             <p data-fade-up className="opacity-0 text-white/90 leading-relaxed text-base sm:text-[1.05rem]">
               The Kultur & Kongresshaus Aarau, located at Schlossplatz in Aarau, combines
               architectural elegance with modern functionality. The facility boasts high ceilings
