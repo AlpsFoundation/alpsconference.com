@@ -3,7 +3,7 @@ import { ArrowUpRight, ChevronDown, Menu, X } from "lucide-react";
 import { withBase } from "../lib/withBase";
 import { lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 
-type MenuKey = "conference" | "participate" | "past";
+type MenuKey = "conference" | "past";
 
 type NavLink = {
   label: string;
@@ -24,11 +24,6 @@ const CONFERENCE_LINKS: NavLink[] = [
   { label: "Partners", href: "/#partners", description: "Sponsors and collaborators" },
 ];
 
-const PARTICIPATE_LINKS: NavLink[] = [
-  { label: "Workshop Day", href: "/workshops", description: "Pre-conference PAT training", badge: "New" },
-  { label: "Research Poster", href: "/poster", description: "Submit a poster proposal" },
-];
-
 const PAST_EDITIONS: NavLink[] = [
   { label: "ALPS 2025", href: "https://sites.google.com/view/alps-conference-2025", external: true },
   { label: "ALPS 2024", href: "https://sites.google.com/view/alps-conference-2024", external: true },
@@ -37,7 +32,6 @@ const PAST_EDITIONS: NavLink[] = [
   { label: "ALPS 2021", href: "https://sites.google.com/view/pala-psychedelics-congress/home", external: true },
 ];
 
-// Kept in the Participate dropdown as well, so the Workshop Day is reachable from both places.
 const WORKSHOP_DAY_LINK: NavLink = {
   label: "Workshop Day",
   href: "/workshops",
@@ -238,13 +232,6 @@ export default function Navbar() {
                 </span>
               </a>
               <DesktopDropdown
-                label="Participate"
-                menuKey="participate"
-                items={PARTICIPATE_LINKS}
-                openMenu={openMenu}
-                setOpenMenu={setOpenMenu}
-              />
-              <DesktopDropdown
                 label="Past editions"
                 eyebrow="Archive"
                 menuKey="past"
@@ -306,7 +293,6 @@ export default function Navbar() {
             </a>
 
             <MobileLinkGroup title="Conference" items={CONFERENCE_LINKS} onNavigate={() => setIsOpen(false)} />
-            <MobileLinkGroup title="Participate" items={PARTICIPATE_LINKS} onNavigate={() => setIsOpen(false)} />
             <MobileLinkGroup title="Archive" items={PAST_EDITIONS} onNavigate={() => setIsOpen(false)} />
 
             <a
