@@ -399,21 +399,57 @@ export default function Speakers() {
 
 function CompactSpeaker({ speaker }: { speaker: Speaker }) {
   const crop = speaker.image ? getImageCrop(speaker.image) : undefined;
+  const [modalOpen, setModalOpen] = useState(false);
+  const { present: modalPresent, onExited } = useModalPresence(modalOpen);
+  const speakerModalId = getSpeakerModalId(speaker.name);
+
+  useEffect(() => {
+    const syncFromHash = () => setModalOpen(window.location.hash === `#${speakerModalId}`);
+    const handleOpen = (event: Event) => {
+      const { speakerId } = (event as CustomEvent<{ speakerId: string }>).detail;
+      setModalOpen(speakerId === speakerModalId);
+    };
+
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    window.addEventListener(SPEAKER_MODAL_EVENT, handleOpen);
+    return () => {
+      window.removeEventListener("hashchange", syncFromHash);
+      window.removeEventListener(SPEAKER_MODAL_EVENT, handleOpen);
+    };
+  }, [speakerModalId]);
+
+  const closeModal = () => {
+    setModalOpen(false);
+    if (window.location.hash === `#${speakerModalId}`) {
+      setLocationHash(null, "replace");
+    }
+  };
 
   return (
-    <span className="inline-flex items-center gap-2 text-sm text-white/80">
-      {speaker.image && crop && (
-        <span className="w-9 h-9 rounded-full overflow-hidden border border-white/10 shrink-0 bg-white/[0.04]">
-          <img
-            src={withBase(`img/speakers/${speaker.image}`)}
-            alt=""
-            className="w-full h-full object-cover"
-            style={{ objectPosition: crop.position }}
-          />
-        </span>
+    <>
+      <button
+        type="button"
+        onClick={() => openSpeakerModal(speaker.name)}
+        className="group inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors cursor-pointer"
+      >
+        {speaker.image && crop && (
+          <span className="w-9 h-9 rounded-full overflow-hidden border border-white/10 shrink-0 bg-white/[0.04] transition-colors group-hover:border-support/30">
+            <img
+              src={withBase(`img/speakers/${speaker.image}`)}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{ objectPosition: crop.position }}
+            />
+          </span>
+        )}
+        {speaker.name}
+      </button>
+
+      {modalPresent && (
+        <AbstractModal speaker={speaker} open={modalOpen} onClose={closeModal} onExited={onExited} />
       )}
-      {speaker.name}
-    </span>
+    </>
   );
 }
 
