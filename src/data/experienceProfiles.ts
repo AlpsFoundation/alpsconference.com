@@ -221,6 +221,7 @@ export const EXPERIENCES: ExperienceCategory[] = [
       {
         name: "Andrea Bacconi",
         role: "Yoga",
+        context: "Somatic Coach",
         image: "andrea-bacconi.jpg",
         sessions: [
           {
