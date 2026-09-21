@@ -4,12 +4,16 @@ import { BedDouble, Wallet } from "lucide-react";
 
 const IN_AARAU = [
   {
-    name: "Sorell Hotel Aarauerhof",
-    note: "Right at Aarau train station, a short walk from Kultur & Kongresshaus Aarau.",
+    name: "Aarauerhof",
+    note: "Self check-in city hotel right at Aarau train station, a short walk from Kultur & Kongresshaus Aarau.",
   },
   {
     name: "Hotel Kettenbrücke",
     note: "A few minutes' walk from the station, on the edge of Aarau's Old Town.",
+  },
+  {
+    name: "Gasthof zum Schützen",
+    note: "By the Aare river in Aarau, a short walk from the Old Town and the venue.",
   },
 ];
 
@@ -17,6 +21,10 @@ const NEARBY_BUDGET = [
   {
     name: "Suhr Guest House",
     note: "Budget guesthouse in Suhr, about 10 minutes from Aarau by bus or car.",
+  },
+  {
+    name: "Anstatthotel Schafisheim",
+    note: "Serviced apartments in Schafisheim, between Aarau and Lenzburg, about 10 minutes by car.",
   },
   {
     name: "Ochsen Lodge, Lenzburg",
@@ -105,6 +113,11 @@ export default function Accommodation() {
             </ul>
           </div>
         </div>
+
+        <p data-fade-up className="opacity-0 mt-6 text-center text-white/55 text-sm">
+          Airbnb and other short-term rental platforms are also worth checking, in Aarau and the
+          surrounding towns.
+        </p>
       </div>
     </section>
   );
