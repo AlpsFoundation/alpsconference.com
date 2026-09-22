@@ -88,7 +88,7 @@ export const PROGRAM: ProgramDay[] = [
       { time: "18:00–19:00", title: "Panel discussion", detail: "Psychedelics and Spirituality: Ontological Shifts and Meaning-Making Experiences", panel: "saturday" },
       { time: "19:00–19:30", title: "Closing talk", detail: "ALPS team" },
       { time: "19:30–21:30", title: "Networking apéro", kind: "social" },
-      { time: "21:30–04:00", title: "Afterparty", detail: "AAREAL Flösserplatz, Flösserstrasse 7", detailHighlight: true, kind: "social", experienceName: "Afterparty", calendarLocation: "AAREAL Flösserplatz, Flösserstrasse 7, 5000 Aarau, Switzerland" },
+      { time: "21:30–04:00", title: "Afterparty", detail: "Jugendkulturhaus Flösserplatz, Flösserstrasse 7", detailHighlight: true, kind: "social", experienceName: "Afterparty", calendarLocation: "Jugendkulturhaus Flösserplatz, Flösserstrasse 7, 5000 Aarau, Switzerland" },
     ],
   },
 ];

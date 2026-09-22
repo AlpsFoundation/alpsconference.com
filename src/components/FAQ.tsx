@@ -18,7 +18,7 @@ const FAQS = [
       },
       {
         q: "Who is eligible for the reduced ticket?",
-        a: "Students currently enrolled in any official college or university are eligible for the ALPS Conference 2025 Student Ticket. Please bring proof, such as a student card on the day of the event."
+        a: "Students currently enrolled in any official college or university are eligible for the ALPS Conference 2026 Student Ticket. Please bring proof, such as a student card on the day of the event."
       },
       {
         q: "I only want to attend one day of the conference, is that possible?",
@@ -36,7 +36,7 @@ const FAQS = [
     items: [
       {
         q: "What is included in my ticket?",
-        a: "Tickets include entry to the conference for both days, featuring 16 speakers, poster presentations, a networking apéro, and an afterparty. Attendees will enjoy snacks and coffee/tea during morning and afternoon breaks. Additionally, lunch will be provided on Friday, and on Saturday, lunch and food/refreshments will be available during the networking apéro."
+        a: "Tickets include entry to the conference for both days, featuring 12 speakers, poster presentations, a networking apéro, and an afterparty. Attendees will enjoy snacks and coffee/tea during morning and afternoon breaks. Additionally, lunch will be provided on Friday, and on Saturday, lunch and food/refreshments will be available during the networking apéro."
       },
       {
         q: "What food will be served during the conference?",
@@ -85,7 +85,7 @@ const FAQS = [
       },
       {
         q: "Can I get ECTS credits for attending the conference?",
-        a: "Yes. The main conference (October 9–10) is accredited for up to 14 ECTS for the FSP and 8 ECTS for the SGPP/SSPP."
+        a: "Yes. The main conference (October 9–10) is accredited for up to 14 ECTS for the FSP and 10 ECTS for the SGPP/SSPP."
       },
       {
         q: "Can I get FSP credits for the Workshop Day?",

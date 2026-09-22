@@ -27,7 +27,7 @@ type ExperienceDay = {
 
 export const EXPERIENCE_PORTRAITS: Record<string, { file: string; position: string }> = {
   "Kevin Barron": { file: "kevin-barron.jpg", position: "50% 12%" },
-  "Hannah Stanke": { file: "hannah-stanke.jpg", position: "42% 28%" },
+  "Hana Stanke": { file: "hannah-stanke.jpg", position: "42% 28%" },
   "Joanne Lackey": { file: "joanne-lackey.jpg", position: "50% 6%" },
   "Régis Paroz": { file: "regis-paroz.jpg", position: "54% 16%" },
   "Marina Vovk": { file: "marina-vovk.jpg", position: "50% 22%" },
@@ -50,14 +50,14 @@ export const EXPERIENCE_DAYS: ExperienceDay[] = [
         credits: [
           { name: "Kevin Barron", type: "LSD blotter art" },
           { name: "Joanne Lackey", type: "Exhibition & live painting" },
-          { name: "Hannah Stanke", type: "Live painting" },
+          { name: "Hana Stanke", type: "Live painting" },
           { name: "Régis Paroz", type: "Uncanny World" },
         ],
       },
       { time: "11:00–12:00 & 14:30–15:30", title: "Sound meditation", venue: "Saal 4", personName: "Marina Vovk" },
       { time: "13:45–14:30", title: "Speed-friending", personName: "Kate Dalby" },
       { time: "20:15–20:45", title: "Evening program part I", venue: "Saal 4" },
-      { time: "20:45–21:30", title: "Storytelling", venue: "Saal 4", personName: "Kate Dalby" },
+      { time: "20:15–21:15", title: "Storytelling", venue: "Saal 4", personName: "Kate Dalby" },
     ],
   },
   {
@@ -72,7 +72,7 @@ export const EXPERIENCE_DAYS: ExperienceDay[] = [
         credits: [
           { name: "Kevin Barron", type: "LSD blotter art" },
           { name: "Joanne Lackey", type: "Exhibition & live painting" },
-          { name: "Hannah Stanke", type: "Live painting" },
+          { name: "Hana Stanke", type: "Live painting" },
           { name: "Régis Paroz", type: "Uncanny World" },
         ],
       },
@@ -80,7 +80,7 @@ export const EXPERIENCE_DAYS: ExperienceDay[] = [
       { time: "11:15–12:30 & 16:45–18:00", title: "Breathwork", venue: "Saal 4", personName: "Pascal Kälin" },
       { time: "12:30–14:00", title: "Live concert", venue: "Saal 2", personName: "David & Anna-Lea Wennberg" },
       { time: "13:45–14:45", title: "Sound meditation", venue: "Saal 4", personName: "Marina Vovk" },
-      { time: "21:30–04:00", title: "Afterparty", detail: "AAREAL Flösserplatz, Flösserstrasse 7 · 5 minutes on foot", personName: "Afterparty", calendarLocation: "AAREAL Flösserplatz, Flösserstrasse 7, 5000 Aarau, Switzerland" },
+      { time: "21:30–04:00", title: "Afterparty", detail: "Jugendkulturhaus Flösserplatz, Flösserstrasse 7 · 5 minutes on foot", personName: "Afterparty", calendarLocation: "Jugendkulturhaus Flösserplatz, Flösserstrasse 7, 5000 Aarau, Switzerland" },
     ],
   },
 ];
