@@ -23,7 +23,7 @@ const LINEUP = [
   { name: "DK ∞", genre: "Progressive Jungle Psy" },
 ];
 
-const VENUE_NAME = "AAREAL Flösserplatz";
+const VENUE_NAME = "Jugendkulturhaus Flösserplatz";
 const VENUE = `${VENUE_NAME}, Flösserstrasse 7`;
 const MAP_URL =
   "https://www.google.com/maps/search/?api=1&query=AAREAL+Fl%C3%B6sserplatz%2C+Fl%C3%B6sserstrasse+7%2C+5000+Aarau";
