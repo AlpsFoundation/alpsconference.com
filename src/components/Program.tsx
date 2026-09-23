@@ -57,7 +57,7 @@ type ScheduleItem = ProgramItem & {
 };
 type ScheduleDay = Omit<ProgramDay, "items"> & { items: ScheduleItem[] };
 
-// The pre-conference Workshop Day: four parallel tracks in one afternoon, booked separately.
+// The pre-conference Workshop Day: three parallel tracks in one afternoon, booked separately.
 const WORKSHOP_SCHEDULE: ScheduleDay[] = [
   {
     day: WORKSHOP_DAY.day,
@@ -423,7 +423,7 @@ const TAB_LABELS: Record<ScheduleView, string> = {
 const TAB_INTROS: Record<ScheduleView, string> = {
   talks: "Research talks, panel discussions and time to connect. Select a speaker or panel to read more.",
   experiences: "Art, sound, movement and connection alongside the talks. Select a session for details; some sessions overlap.",
-  workshops: "Four parallel Psychedelic-Assisted Therapy training tracks on the afternoon before the conference opens, each combining theoretical input with experiential clinical practice. Select a track to read more.",
+  workshops: "Three parallel Psychedelic-Assisted Therapy training tracks on the afternoon before the conference opens, each combining theoretical input with experiential clinical practice. Select a track to read more.",
 };
 
 function WorkshopDayNotice() {

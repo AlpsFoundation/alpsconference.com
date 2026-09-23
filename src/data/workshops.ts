@@ -81,29 +81,6 @@ export const WORKSHOP_TRACKS: WorkshopTrack[] = [
     ],
   },
   {
-    language: "Italian",
-    flag: "🇮🇹",
-    presenters: "Dr Claudia Ariemma and Simona Porta",
-    places: 12,
-    title: "Beyond the Symptom: PAT and the Treatment of Eating Disorders in Ticino",
-    abstract: [
-      "We will present the structure, case history, and working methods of the only Ticino Center for the treatment of eating disorders. We will explore the reasons behind the decision to apply PAT to patients with eating disorders, present clinical cases for discussion, and show the results obtained since December 2024.",
-      "Throughout the session, experiential exercises will invite participants to reflect on and embody the themes emerging from the group work. We will outline future projects, particularly the launch of a Certificate of Advanced Studies in Psychedelic-Assisted Therapy at SUPSI, the first Italian-language CAS on this clinical practice, and a SUPSI research project based on the clinical cases treated.",
-    ],
-    speakers: [
-      {
-        name: "Claudia Ariemma",
-        image: "claudia-ariemma.jpg",
-        bio: "Claudia Ariemma is a psychiatrist and Jungian analytical psychotherapist. She holds a certification of professional training in eating disorders and obesity. She has worked for the Ticino public psychiatry department in the cantonal socio-psychiatric organization since 2005 and has been the medical manager of the center for the treatment of eating and nutrition disorders since 2016. In 2024, she trained with part of her multidisciplinary team in Psychedelic-Assisted Therapy, which she has practiced since October 2024.",
-      },
-      {
-        name: "Simona Porta",
-        image: "simona-porta.jpg",
-        bio: "Simona Porta is a psychologist and psychotherapist with over twenty years of clinical experience in eating disorders and complex psychological distress. She is currently developing a Psychedelic-Assisted Therapy protocol with LSD within a multidisciplinary team at OSC Mendrisio, Switzerland, and is certified in EMDR and mindfulness-based approaches.",
-      },
-    ],
-  },
-  {
     language: "French",
     flag: "🇫🇷",
     presenters: "Catherine Duffour and Hervé Duffour",

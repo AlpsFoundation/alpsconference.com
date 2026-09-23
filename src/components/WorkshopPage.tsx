@@ -34,7 +34,7 @@ const LOGISTICS = [
   {
     icon: Rows3,
     label: "Format",
-    value: "Four parallel clinical training tracks",
+    value: "Three parallel clinical training tracks",
   },
 ];
 
@@ -208,7 +208,7 @@ export default function WorkshopPage() {
             </h1>
             <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-8">
               A specialized platform for Psychedelic-Assisted Therapy training, combining theoretical input
-              with experiential clinical practice in four parallel language tracks.
+              with experiential clinical practice in three parallel language tracks.
             </p>
             <div data-fade-up className="opacity-0 flex justify-center mb-10">
               <div className="inline-flex items-center gap-3 rounded-full border border-support/35 bg-gradient-to-r from-support/20 via-support/10 to-accent/10 px-5 py-2.5 shadow-[0_0_28px_rgba(46,124,199,0.18)]">
@@ -239,9 +239,9 @@ export default function WorkshopPage() {
 
         <section ref={conceptRef} className="relative pt-24 pb-12 sm:pt-32 sm:pb-16 bg-white/[0.02]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <SectionIntro eyebrow="Program concept & logistics" title="One Afternoon, Four Parallel Tracks">
+            <SectionIntro eyebrow="Program concept & logistics" title="One Afternoon, Three Parallel Tracks">
               <p>
-                Four parallel clinical training tracks reflecting Switzerland's multilingual landscape. No prior experience required.
+                Three parallel clinical training tracks reflecting Switzerland's multilingual landscape. No prior experience required.
               </p>
             </SectionIntro>
 
@@ -279,7 +279,7 @@ export default function WorkshopPage() {
         <section ref={ticketsRef} id="tickets" className="relative py-24 sm:py-32">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <SectionIntro eyebrow="Tickets" title="Buy Workshop Tickets">
-              <p>Seats are limited across the four parallel tracks. Prices are listed in Swiss francs.</p>
+              <p>Seats are limited across the three parallel tracks. Prices are listed in Swiss francs.</p>
             </SectionIntro>
             <div className="flex justify-center mt-10">
               <a
@@ -294,7 +294,7 @@ export default function WorkshopPage() {
             <p data-fade-up className="opacity-0 text-sm text-white/55 mt-8 mb-3">
               When purchasing, please indicate your preferred workshop track in the order notes so we can plan accordingly.
             </p>
-            <div data-fade-up className="opacity-0 grid gap-3 grid-cols-2 lg:grid-cols-4">
+            <div data-fade-up className="opacity-0 grid gap-3 grid-cols-1 sm:grid-cols-3">
               {WORKSHOP_TRACKS.map((track) => (
                 <div key={track.language} className="flex items-center justify-between rounded-sm border border-white/[0.07] bg-white/[0.03] px-4 py-3">
                   <span className="flex items-center gap-2 text-white/80 text-sm font-medium">
@@ -312,7 +312,7 @@ export default function WorkshopPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <SectionIntro eyebrow="Abstracts & bios" title="Parallel Workshop Tracks">
               <p>
-                Choose one of four specialized tracks led by experienced clinicians and trainers working
+                Choose one of three specialized tracks led by experienced clinicians and trainers working
                 across Switzerland's linguistic regions.
               </p>
             </SectionIntro>

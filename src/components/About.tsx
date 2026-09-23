@@ -63,7 +63,7 @@ export default function About() {
             The ALPS Foundation is delighted to invite you to the sixth edition of the ALPS Awareness Lectures on Psychedelic Science, taking place on <strong>Friday and Saturday, October 9–10, 2026</strong>, in the scenic city of <strong>Aarau, Switzerland</strong>.
           </p>
           <p data-fade-up className="opacity-0">
-            Join us for two full days of cutting-edge science, meaningful dialogue, and community building. This year's conference will feature distinguished speakers and interactive panels, providing deep insights into the latest advancements in psychedelic research and therapy. For the first time, ALPS 2026 also opens with a dedicated <a href={withBase("/workshops")} className="text-support-light hover:text-white transition-colors underline underline-offset-4">Workshop Day</a> on Thursday, October 8th, offering four parallel PAT training tracks before the conference begins. The conference will be held in English.
+            Join us for two full days of cutting-edge science, meaningful dialogue, and community building. This year's conference will feature distinguished speakers and interactive panels, providing deep insights into the latest advancements in psychedelic research and therapy. For the first time, ALPS 2026 also opens with a dedicated <a href={withBase("/workshops")} className="text-support-light hover:text-white transition-colors underline underline-offset-4">Workshop Day</a> on Thursday, October 8th, offering three parallel PAT training tracks before the conference begins. The conference will be held in English.
           </p>
           <p data-fade-up className="opacity-0">
             Your conference experience includes comprehensive catering (all Vegetarian) with breakfast, morning and afternoon breaks, lunch, and Saturday-evening Apero, ensuring a comfortable and enriching environment. For Friday evening, an optional networking dinner will be available for which you can buy your ticket separately. Throughout the event, take advantage of the networking breaks to connect with fellow enthusiasts, researchers, and practitioners over apéros, and join us for our traditional After Party on Saturday night.
@@ -90,7 +90,7 @@ export default function About() {
           <h3 className="text-2xl font-semibold text-white mb-3">Pre-Conference Workshop Day</h3>
           <p className="text-white/72 text-base sm:text-lg leading-relaxed mb-6">
             Start ALPS 2026 with a specialized afternoon of Psychedelic-Assisted Therapy training across
-            English, Italian, French, and German tracks, combining theoretical input with experiential
+            English, German, and French tracks, combining theoretical input with experiential
             clinical practice.
           </p>
           <a
