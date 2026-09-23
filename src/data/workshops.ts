@@ -108,7 +108,7 @@ export const WORKSHOP_TRACKS: WorkshopTrack[] = [
     flag: "🇫🇷",
     presenters: "Catherine Duffour and Hervé Duffour",
     places: 12,
-    title: "Therapeutic relationship and dynamics of the therapeutic couple in Psychedelic-Assisted Psychotherapy (PAP)",
+    title: "Therapeutic relationship and dynamics of the therapeutic couple in Psychedelic-Assisted Therapy (PAT)",
     abstract: [
       "This workshop offers a clinical, experiential, and systemic exploration of modified states of consciousness within the context of psychedelic-assisted psychotherapy and non-pharmacological approaches such as meditation, hypnosis, and music.",
       "The workshop will also aim to help participants experience, in a supportive and safe manner, certain psychological and relational mechanisms activated in modified states of consciousness.",
@@ -128,7 +128,7 @@ export const WORKSHOP_TRACKS: WorkshopTrack[] = [
     speakers: [
       {
         name: "Catherine Duffour",
-        bio: 'Originally from South Korea and having grown up in Switzerland, Catherine Duffour is a psychiatrist, systemic therapist, and hypnotherapist. Founder of CXIO and co-founder of the Swiss Society for Psychedelic Medicine, she has been training psychiatrists in PAP since 2021 and published "Ketamine Consciousness Therapy" in 2025.',
+        bio: 'Originally from South Korea and having grown up in Switzerland, Catherine Duffour is a psychiatrist, systemic therapist, and hypnotherapist. Founder of CXIO and co-founder of the Swiss Society for Psychedelic Medicine, she has been training psychiatrists in PAT since 2021 and published "Ketamine Consciousness Therapy" in 2025.',
       },
       {
         name: "Hervé Duffour",
