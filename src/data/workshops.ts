@@ -20,6 +20,8 @@ export type WorkshopTrack = {
     alt: string;
   };
   speakers: WorkshopSpeaker[];
+  /** Set when a track had to be cancelled after publication; the track's info stays for reference. */
+  cancelledNote?: string;
 };
 
 /** Shared facts about the pre-conference Workshop Day, reused by the conference program. */
@@ -86,6 +88,7 @@ export const WORKSHOP_TRACKS: WorkshopTrack[] = [
     presenters: "Dr Claudia Ariemma and Simona Porta",
     places: 12,
     title: "Beyond the Symptom: PAT and the Treatment of Eating Disorders in Ticino",
+    cancelledNote: "This track has been cancelled due to too few registrations.",
     abstract: [
       "We will present the structure, case history, and working methods of the only Ticino Center for the treatment of eating disorders. We will explore the reasons behind the decision to apply PAT to patients with eating disorders, present clinical cases for discussion, and show the results obtained since December 2024.",
       "Throughout the session, experiential exercises will invite participants to reflect on and embody the themes emerging from the group work. We will outline future projects, particularly the launch of a Certificate of Advanced Studies in Psychedelic-Assisted Therapy at SUPSI, the first Italian-language CAS on this clinical practice, and a SUPSI research project based on the clinical cases treated.",

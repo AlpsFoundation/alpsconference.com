@@ -68,7 +68,7 @@ const WORKSHOP_SCHEDULE: ScheduleDay[] = [
       title: track.title,
       detail: track.presenters,
       venue: track.language,
-      menuNote: `${track.places} places`,
+      menuNote: track.cancelledNote ?? `${track.places} places`,
       href: withBase("/workshops#tracks"),
       icon: GraduationCap,
     })),

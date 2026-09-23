@@ -363,6 +363,7 @@ const dayStamp: Record<string, string> = {
           <span class="bk-flag">{track.flag}</span>{track.language} — “{track.title}”
         </p>
         <p class="bk-track__people">Facilitators: {track.presenters} · {track.places} places</p>
+        {track.cancelledNote && <p class="bk-track__cancelled">{track.cancelledNote}</p>}
         <p>{track.abstract[0]}</p>
       </div>
     ))}

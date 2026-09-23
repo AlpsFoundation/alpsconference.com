@@ -132,11 +132,19 @@ function TrackCard({ track }: { track: WorkshopTrack }) {
               </span>
               {track.language}
             </span>
-            <span className="text-sm text-white/45">{track.places} places</span>
+            <span className="text-sm text-white/45">
+              {track.cancelledNote ? "Cancelled" : `${track.places} places`}
+            </span>
           </div>
           <h3 className="text-2xl font-semibold text-white leading-tight">{track.title}</h3>
         </div>
       </div>
+
+      {track.cancelledNote && (
+        <div className="mb-6 rounded-sm border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-medium text-red-200">
+          {track.cancelledNote}
+        </div>
+      )}
 
       <div className="space-y-4 text-white/72 text-base leading-relaxed">
         {track.abstract.map((paragraph) => (
@@ -301,7 +309,9 @@ export default function WorkshopPage() {
                     <span aria-hidden="true">{track.flag}</span>
                     {track.language}
                   </span>
-                  <span className="text-sm text-white/45">{track.places} places</span>
+                  <span className="text-sm text-white/45">
+                    {track.cancelledNote ? "Cancelled" : `${track.places} places`}
+                  </span>
                 </div>
               ))}
             </div>
