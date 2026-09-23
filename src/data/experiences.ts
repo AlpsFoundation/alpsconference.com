@@ -55,7 +55,7 @@ export const EXPERIENCE_DAYS: ExperienceDay[] = [
         ],
       },
       { time: "11:00–12:00 & 14:30–15:30", title: "Sound meditation", venue: "Saal 4", personName: "Marina Vovk" },
-      { time: "13:45–14:30", title: "Speed-friending", personName: "Kate Dalby" },
+      { time: "13:45–14:30", title: "Speed-friending", venue: "Saal 2", personName: "Kate Dalby" },
       { time: "20:15–21:15", title: "Storytelling", venue: "Saal 4", personName: "Kate Dalby" },
     ],
   },
