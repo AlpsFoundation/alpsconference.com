@@ -168,7 +168,8 @@ export const EXPERIENCES: ExperienceCategory[] = [
         sessions: [
           {
             title: "Live Concert",
-            description: "David & Anna-Lea Wennberg will play a live concert during Saturday lunch. Further details will be published here soon.",
+            description:
+              "David & Anna-Lea Wennberg will perform a live concert accompanying your lunch break on Saturday. Their music blends original compositions with spontaneous improvisation, allowing each piece to unfold naturally in the moment.\n\nCombining the warm, meditative sounds of the handpan with piano, cajón and voice, they create rich and immersive soundscapes, ranging from atmospheric ambient music to more rhythmically driven sounds. Join them on a musical journey and let yourself be carried by the sound.",
           },
         ],
         image: "david-anna-lea-wennberg-2.jpg",
