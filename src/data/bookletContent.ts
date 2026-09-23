@@ -104,7 +104,7 @@ export const VENUE_COPY = {
     { label: "Train", value: "A short walk from Aarau station" },
     { label: "Access", value: "Wheelchair accessible; contact us for special needs" },
     { label: "Language", value: "The working language of the conference is English" },
-    { label: "Credits", value: "Up to 14 FSP credits; 8 ECTS for SGPP/SSPP" },
+    { label: "Credits", value: "Up to 14 FSP credits; 10 ECTS for SGPP/SSPP" },
   ],
 };
 
@@ -248,7 +248,7 @@ export const MEMBERSHIP = {
 
 export const CREDITS = {
   fsp: "Psychologists (FSP): 14 credits for the main conference.",
-  sgpp: "Medical doctors (SGPP/SSPP): 8 ECTS for the main conference.",
+  sgpp: "Medical doctors (SGPP/SSPP): 10 ECTS for the main conference.",
   note: "Every participant will receive a certificate by email after the conference. If you did not receive it, write to info@alps.foundation.",
 };
 
