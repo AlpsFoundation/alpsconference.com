@@ -316,7 +316,7 @@ export default function WorkshopPage() {
                 across Switzerland's linguistic regions.
               </p>
               <p className="mt-4 text-white/55">
-                Please note: the Italian-language workshop has been cancelled due to insufficient registrations.
+                Please note: the Italian-language workshop has been cancelled due to insufficient registrations. Each of the other workshops has around 3 spots left.
               </p>
             </SectionIntro>
 
