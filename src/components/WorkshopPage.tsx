@@ -315,6 +315,9 @@ export default function WorkshopPage() {
                 Choose one of three specialized tracks led by experienced clinicians and trainers working
                 across Switzerland's linguistic regions.
               </p>
+              <p className="mt-4 text-white/55">
+                Please note: the Italian-language workshop has been cancelled due to insufficient registrations.
+              </p>
             </SectionIntro>
 
             <div className="grid gap-8">
