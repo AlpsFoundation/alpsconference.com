@@ -153,6 +153,18 @@ export default function Hero() {
             <ul data-animate className="opacity-0 text-xs sm:text-sm text-white/50 space-y-1 text-center list-none m-0 p-0">
               <li>3+1 Team &amp; Friends Tickets available (applied at checkout)</li>
               <li>Financial Support Compassion Fund available (see FAQ)</li>
+              <li>
+                Budget accommodation option:{" "}
+                <a
+                  href="https://my.anstatthotel.ch/search?MAGIC_PROMO_CODE=4fYHv3M7F6JWEXKhjc8CzS"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-white/30 underline-offset-2 hover:text-white hover:decoration-white"
+                >
+                  10% off at Anstatthotel
+                </a>{" "}
+                (<a href="#accommodation" className="underline decoration-white/30 underline-offset-2 hover:text-white">details</a>)
+              </li>
             </ul>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch justify-center gap-2 sm:gap-3 w-full max-w-xs sm:max-w-full mx-auto">
