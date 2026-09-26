@@ -870,8 +870,9 @@ button.links-row:not(:disabled):hover {
   width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0.8rem 1rem;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.875rem;
   border-radius: 999px;
   background: white;
   color: var(--color-primary);
@@ -901,7 +902,7 @@ button.links-row:not(:disabled):hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.links-acc--muted .links-acc__summary { opacity: 0.55; }
+.links-acc--muted { opacity: 0.55; }
 
 .links-acc__summary {
   display: flex;
@@ -977,3 +978,29 @@ button.links-row:not(:disabled):hover {
     rgba(8, 47, 74, 0.5);
   text-align: center;
 }
+
+.links-thumb {
+  width: 3.5rem;
+  height: 3.5rem;
+  flex-shrink: 0;
+  align-self: flex-start;
+  border-radius: 0.75rem;
+  object-fit: cover;
+}
+
+.links-past__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.25rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+
+.links-past__summary::-webkit-details-marker { display: none; }
+.links-past[open] > .links-past__summary .links-acc__chevron { rotate: 180deg; }

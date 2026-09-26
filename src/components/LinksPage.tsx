@@ -27,6 +27,7 @@ import {
   type ExperienceSession,
   type TimelineEntry,
 } from "../data/conferenceTimeline";
+import { EXPERIENCE_PORTRAITS } from "../data/experiences";
 import { QUICK_LINKS, VENUE_MAP_IMAGE, WIFI, type QuickLinkAction, type QuickLinkIcon } from "../data/links";
 import type { SignupAvailability, SignupResult } from "../lib/experienceSignups";
 import { withBase } from "../lib/withBase";
@@ -339,7 +340,7 @@ function WifiDetails() {
         {WIFI.password && <div><dt>Password</dt><dd className="font-mono">{WIFI.password}</dd></div>}
       </dl>
       {WIFI.password && (
-        <button type="button" onClick={copyPassword} className="links-button" aria-live="polite">
+        <button type="button" onClick={copyPassword} className="links-button mt-2" aria-live="polite">
           {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
           {copied ? "Password copied" : "Copy password"}
         </button>
@@ -388,7 +389,7 @@ function QuickLinks({ now }: { now: Date }) {
                   </dl>
                 )}
                 {link.actions && (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 pt-2">
                     {link.actions.map((action, i) => (
                       <ActionLink key={action.label} action={action} secondary={i > 0} />
                     ))}
@@ -534,7 +535,7 @@ function SignupPanel({
             </p>
           </div>
           {!closed && (
-            <button type="button" onClick={cancel} disabled={pending} className="links-button links-button--ghost">
+            <button type="button" onClick={cancel} disabled={pending} className="links-button links-button--ghost mt-2">
               {pending ? "Cancelling…" : "Cancel my spot"}
             </button>
           )}
@@ -560,7 +561,7 @@ function SignupPanel({
             </label>
           </div>
           <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
-          <button type="submit" disabled={pending} className="links-button">
+          <button type="submit" disabled={pending} className="links-button mt-2">
             {pending ? "Saving…" : full ? "Join the waitlist" : "Save my spot"}
           </button>
         </form>
@@ -595,6 +596,68 @@ function ExperiencesSection({
     }
     return [...byDay.entries()];
   }, []);
+  const isPast = (session: ExperienceSession) => (session.end ? now >= session.end : false);
+  const upcomingDays = days
+    .map(([day, sessions]) => [day, sessions.filter((session) => !isPast(session))] as const)
+    .filter(([, sessions]) => sessions.length > 0);
+  const past = days.flatMap(([, sessions]) => sessions.filter(isPast));
+
+  const renderSession = (session: ExperienceSession) => {
+    const own = mine[session.id];
+    const ended = isPast(session);
+    const started = session.start ? now >= session.start : false;
+    const label = availabilityLabel(availability?.[session.id]);
+    const portrait = session.personName ? EXPERIENCE_PORTRAITS[session.personName] : undefined;
+    return (
+      <AccordionItem
+        key={session.id}
+        id={session.id}
+        group="experiences"
+        disabled={ended}
+        summary={
+          <>
+            {portrait ? (
+              <img
+                src={withBase(`img/experiences/${portrait.file}`)}
+                alt=""
+                loading="lazy"
+                className="links-thumb"
+                style={{ objectPosition: portrait.position }}
+              />
+            ) : (
+              <span className="links-thumb links-icon"><Users className="h-5 w-5" aria-hidden /></span>
+            )}
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold leading-snug text-white">{session.title}</span>
+              <span className="mt-0.5 block text-sm text-white/85">
+                <span className="font-semibold tabular-nums">{session.time}</span>
+                {session.venue && <span className="text-white/60"> · {session.venue}</span>}
+              </span>
+              {session.personName && <span className="block text-sm text-white/60">{session.personName}</span>}
+              <span className="mt-1 block text-xs text-white/50">
+                {ended ? "Ended" : started ? "Happening now" : own ? label : label ? `${label} · Sign up` : "Sign up"}
+              </span>
+            </span>
+            {own && (
+              <span className={`links-chip ${own.status === "confirmed" ? "links-chip--ok" : ""}`}>
+                <Check className="h-3.5 w-3.5" aria-hidden />
+                {own.status === "confirmed" ? "You're in" : `Waitlist #${own.waitlistPosition}`}
+              </span>
+            )}
+          </>
+        }
+      >
+        <SignupPanel
+          session={session}
+          availability={availability?.[session.id]}
+          own={own}
+          closed={started}
+          onSignedUp={onSignedUp}
+          onCancelled={onCancelled}
+        />
+      </AccordionItem>
+    );
+  };
   // The afterparty has its own quick link above.
   const dropIns = EXPERIENCE_SESSIONS.filter(
     (s, i, all) =>
@@ -611,58 +674,22 @@ function ExperiencesSection({
         </p>
       </div>
 
-      {days.map(([day, sessions]) => (
+      {upcomingDays.map(([day, sessions]) => (
         <div key={day}>
           <h3 className="mb-2 text-sm font-semibold uppercase tracking-[0.14em] text-white/55">{day}</h3>
-          <div className="space-y-2">
-            {sessions.map((session) => {
-              const own = mine[session.id];
-              const ended = session.end ? now >= session.end : false;
-              const started = session.start ? now >= session.start : false;
-              const label = availabilityLabel(availability?.[session.id]);
-              return (
-                <AccordionItem
-                  key={session.id}
-                  id={session.id}
-                  group="experiences"
-                  disabled={ended}
-                  summary={
-                    <>
-                      <span className="w-[3.4rem] shrink-0 text-sm tabular-nums text-white/60">
-                        {session.time.split("–").map((t) => <span key={t} className="block">{t}</span>)}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-semibold text-white">{session.title}</span>
-                        <span className="block text-sm text-white/60">
-                          {[session.personName, session.venue].filter(Boolean).join(" · ")}
-                        </span>
-                        <span className="mt-1 block text-xs text-white/50">
-                          {ended ? "Ended" : started ? "Happening now" : own ? label : label ? `${label} · Sign up` : "Sign up"}
-                        </span>
-                      </span>
-                      {own && (
-                        <span className={`links-chip ${own.status === "confirmed" ? "links-chip--ok" : ""}`}>
-                          <Check className="h-3.5 w-3.5" aria-hidden />
-                          {own.status === "confirmed" ? "You're in" : `Waitlist #${own.waitlistPosition}`}
-                        </span>
-                      )}
-                    </>
-                  }
-                >
-                  <SignupPanel
-                    session={session}
-                    availability={availability?.[session.id]}
-                    own={own}
-                    closed={started}
-                    onSignedUp={onSignedUp}
-                    onCancelled={onCancelled}
-                  />
-                </AccordionItem>
-              );
-            })}
-          </div>
+          <div className="space-y-2">{sessions.map(renderSession)}</div>
         </div>
       ))}
+
+      {past.length > 0 && (
+        <details className="links-past">
+          <summary className="links-past__summary">
+            <span>Past sessions ({past.length})</span>
+            <ChevronDown className="links-acc__chevron h-4 w-4" aria-hidden />
+          </summary>
+          <div className="mt-2 space-y-2">{past.map(renderSession)}</div>
+        </details>
+      )}
 
       {dropIns.length > 0 && (
         <div className="links-card">
