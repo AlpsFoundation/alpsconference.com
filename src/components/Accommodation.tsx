@@ -17,7 +17,12 @@ const IN_AARAU = [
   },
 ];
 
-const NEARBY_BUDGET = [
+const ANSTATTHOTEL_PROMO_URL =
+  "https://my.anstatthotel.ch/search?MAGIC_PROMO_CODE=4fYHv3M7F6JWEXKhjc8CzS";
+
+type Stay = { name: string; note: string; url?: string; perk?: string };
+
+const NEARBY_BUDGET: Stay[] = [
   {
     name: "Suhr Guest House",
     note: "Budget guesthouse in Suhr, about 10 minutes from Aarau by bus or car.",
@@ -25,6 +30,8 @@ const NEARBY_BUDGET = [
   {
     name: "Anstatthotel Schafisheim",
     note: "Serviced apartments in Schafisheim, between Aarau and Lenzburg, about 10 minutes by car.",
+    url: ANSTATTHOTEL_PROMO_URL,
+    perk: "10% off for ALPS attendees — book directly via this link and the discount is applied automatically.",
   },
   {
     name: "Ochsen Lodge, Lenzburg",
@@ -76,6 +83,18 @@ export default function Accommodation() {
             If you're looking to save on your stay, nearby towns just a short train or bus ride
             away tend to be cheaper.
           </p>
+          <p className="mt-4 inline-block rounded-lg border border-support/40 bg-support/10 px-4 py-2.5 text-sm sm:text-base text-white/85 leading-relaxed">
+            <strong className="text-white">Budget tip:</strong> get 10% off at{" "}
+            <a
+              href={ANSTATTHOTEL_PROMO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-white underline decoration-support-light underline-offset-4 hover:text-support-light"
+            >
+              Anstatthotel Schafisheim
+            </a>{" "}
+            — open this link and book directly through it; the discount is applied automatically.
+          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -106,8 +125,27 @@ export default function Accommodation() {
             <ul className="space-y-3">
               {NEARBY_BUDGET.map((item) => (
                 <li key={item.name} className="text-sm sm:text-[0.95rem]">
-                  <span className="text-white font-medium">{item.name}</span>
+                  {item.url ? (
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white font-medium underline decoration-white/30 underline-offset-4 hover:decoration-white"
+                    >
+                      {item.name}
+                    </a>
+                  ) : (
+                    <span className="text-white font-medium">{item.name}</span>
+                  )}
+                  {item.perk && (
+                    <span className="ml-2 inline-block rounded-full bg-support/25 px-2 py-0.5 align-middle text-[0.7rem] font-semibold uppercase tracking-wide text-support-light">
+                      10% off
+                    </span>
+                  )}
                   <span className="block text-white/65 leading-relaxed">{item.note}</span>
+                  {item.perk && (
+                    <span className="block text-support-light leading-relaxed">{item.perk}</span>
+                  )}
                 </li>
               ))}
             </ul>
