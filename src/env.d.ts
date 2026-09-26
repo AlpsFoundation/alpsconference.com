@@ -5,4 +5,5 @@ interface Env {
   INFOMANIAK_NEWSLETTER_DOMAIN: string;
   INFOMANIAK_NEWSLETTER_GROUPS?: string;
   NEWSLETTER_DEBUG?: string;
+  DB: D1Database;
 }

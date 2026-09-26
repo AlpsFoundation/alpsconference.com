@@ -57,7 +57,7 @@ export const PROGRAM: ProgramDay[] = [
       { time: "18:15–19:15", title: "Panel discussion", detail: "The \"Therapy\" in Psychedelic-Assisted Therapy", panel: "friday" },
       { time: "19:15–20:15", title: "Optional networking dinner", detail: "Pre-sale available on Infomaniak or the ALPS info table at the venue", detailHighlight: true, menuNote: "Tofu-vegetable curry on rice with herb pesto · Crêpe station · Drinks included", kind: "pause" },
       { time: "20:15–21:15", title: "Friday evening program", kind: "social", experiences: [
-        { title: "Storytelling", time: "20:45–21:30", personName: "Kate Dalby" },
+        { title: "Storytelling", time: "20:15–21:15", personName: "Kate Dalby" },
       ] },
     ],
   },

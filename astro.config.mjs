@@ -34,7 +34,7 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
-      filter: (page) => !page.includes("/booklet"),
+      filter: (page) => !page.includes("/booklet") && !page.includes("/links"),
     }),
   ],
   vite: {

@@ -12,6 +12,8 @@
     "postinstall": "pnpm run generate-types",
     "test:newsletter": "vitest run tests/newsletter-signup.test.ts",
     "generate-types": "wrangler types",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "deploy": "wrangler deploy",
     "deploy:preview": "wrangler versions upload"
   },

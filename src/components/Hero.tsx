@@ -150,10 +150,6 @@ export default function Hero() {
               <span className="whitespace-nowrap">Buy Tickets</span>
             </a>
 
-            <p data-animate className="opacity-0 text-sm sm:text-base text-white/70">
-              Early bird pricing ends September 20
-            </p>
-
             <ul data-animate className="opacity-0 text-xs sm:text-sm text-white/50 space-y-1 text-center list-none m-0 p-0">
               <li>3+1 Team &amp; Friends Tickets available (applied at checkout)</li>
               <li>Financial Support Compassion Fund available (see FAQ)</li>
