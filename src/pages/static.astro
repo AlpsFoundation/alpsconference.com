@@ -21,6 +21,8 @@ const fontFaceCss = `@font-face {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Previous landing page with the static illustration: not linked, not in the sitemap. -->
+    <meta name="robots" content="noindex" />
     <title>ALPS Conference 2026 | Awareness Lectures on Psychedelics in Switzerland</title>
     <meta
       name="description"
@@ -49,6 +51,6 @@ const fontFaceCss = `@font-face {
     <style is:global set:html={fontFaceCss}></style>
   </head>
   <body>
-    <App client:load illustration="synapse" />
+    <App client:load />
   </body>
 </html>

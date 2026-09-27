@@ -19,11 +19,11 @@ import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 const TAU = Math.PI * 2;
 const AXIS_ANGLE = THREE.MathUtils.degToRad(27);
-const GAP = 0.3; // between the two flat faces
+const GAP = 0.34; // between the two flat faces
 const STROKE = 0.02; // stroke width, world units (≈3.5 px in the source)
 const STROKE_HEAVY = 0.027;
-const INK = 0.62; // stroke intensity, as the landing page shows the PNG at 60%
-const INK_RGB = [0.909, 0.914, 0.929]; // #e8e9ed, the source stroke colour
+const INK = 1; // stroke intensity: full strength, brighter than the PNG (shown at 60%)
+const INK_RGB = [1, 1, 1]; // pure white (the source strokes are #e8e9ed)
 
 // Outlines as (x along the axis, radius); the face sits at x = 0.
 const PROFILE_A: [number, number][] = [
@@ -695,7 +695,25 @@ export type SynapseOptions = {
   intro?: boolean;
   onTitle?: () => void;
   onParticles?: () => void;
+  // Called when the device can't keep a usable frame rate; the caller shows
+  // the PNG instead (the loop keeps running until it disposes this).
+  onSlow?: () => void;
+  // Clicks and taps here (outside links and buttons) flare the glow and the
+  // particles, and on iOS ask for the motion permission.
+  interactionTarget?: HTMLElement;
   particleScale?: number;
+  // Turn continuously about the synapse axis (radians per second) under a
+  // slight fixed tilt, instead of following the pointer or the device.
+  spin?: number;
+  // Embedded framing: size relative to the hero PNG, and how far to move the
+  // synapse right and up (fractions of the canvas size; the canvas itself
+  // stays full size, so nothing is clipped).
+  zoom?: number;
+  shiftX?: number;
+  shiftY?: number;
+  // Receives controls once running: replay() draws the mesh in again (the
+  // opening sequence without the particle fade).
+  onReady?: (controls: { replay(): void }) => void;
   // Extra, larger motes floating across the whole view.
   floaters?: boolean;
 };
@@ -715,6 +733,24 @@ const REVEAL_TO = 1.4;
 const INTRO_YAW = 0.85;
 const INTRO_PITCH = -0.14;
 const INTRO_ROLL = 0.22;
+
+// Camera tilt (radians) per unit of pointer offset, and the resting pose: the
+// view the pointer used to reach at the bottom-right corner.
+const TILT_YAW = 0.2;
+const TILT_PITCH = 0.14;
+const REST_YAW = 0.16;
+const REST_PITCH = 0.11;
+// Roll of the whole synapse about its own axis as the pointer moves above or
+// below it (radians at the top/bottom edge); it stays centred.
+const AXIS_SPIN = 0.3;
+// Fixed tilt used with the continuous spin option.
+const SPIN_YAW = 0.24;
+const SPIN_PITCH = 0.16;
+// Frame-rate check: after a warm-up, a sample of this many seconds below
+// SLOW_FPS hands over to the PNG.
+const FPS_WARMUP_FRAMES = 20;
+const FPS_SAMPLE_S = 1.5;
+const SLOW_FPS = 24;
 
 const progress = (t: number, [a, b]: readonly [number, number]) => Math.min(1, Math.max(0, (t - a) / (b - a)));
 
@@ -744,6 +780,8 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
   // The fibre ends are faded out, so the visible drawing starts ~0.1 in.
   const reveal = { value: intro ? REVEAL_FROM : 2 };
   const particleFade = { value: intro ? 0 : 1 };
+  // The vesicles fade in with the particles but don't flare with them.
+  const vesicleFade = { value: particleFade.value };
 
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
 
@@ -752,6 +790,9 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
   const root = new THREE.Group();
   root.rotation.set(0.05, -0.1, -AXIS_ANGLE);
   scene.add(root);
+  // Everything on the axis, spun about it (local x) by the pointer.
+  const axis = new THREE.Group();
+  root.add(axis);
 
   const lineOpts = { vertexColors: true, worldUnits: true, ...INK_BLEND };
   const fineMaterial = new LineMaterial({ ...lineOpts, linewidth: STROKE });
@@ -770,7 +811,7 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     const occluder = new THREE.Mesh(buildOccluderGeometry(t), occluderMat);
     occluder.renderOrder = -1;
     group.add(occluder, new LineSegments2(fine, fineMaterial), new LineSegments2(heavy, heavyMaterial));
-    root.add(group);
+    axis.add(group);
   }
 
   const groupA = new THREE.Group();
@@ -811,7 +852,7 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     uniforms: {
       uColor: { value: inkColor(1, new THREE.Color()) },
       uStroke: { value: STROKE * 0.75 },
-      uFade: particleFade,
+      uFade: vesicleFade,
     },
     vertexShader: vesicleVertex,
     fragmentShader: vesicleFragment,
@@ -819,7 +860,7 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
   });
   const vesicles = new THREE.Mesh(vesicleGeo, vesicleMat);
   vesicles.frustumCulled = false;
-  root.add(vesicles);
+  axis.add(vesicles);
 
   // x of a terminal's face at a point in its local frame (y measured from the
   // fibre's axis), including the fuller rim on one side.
@@ -919,7 +960,7 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
   });
   const specks = new THREE.Points(speckGeo, speckMat);
   specks.frustumCulled = false;
-  root.add(specks);
+  axis.add(specks);
 
   type Speck = { y: number; z: number; vy: number; vz: number; p: number; speed: number; wait: number };
   const releaseSpeck = (sp: Speck) => {
@@ -1055,6 +1096,10 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     scene.add(floaters);
   }
 
+  const spin = opts.spin ?? 0;
+  const zoom = opts.zoom ?? 1;
+  const shiftX = opts.shiftX ?? 0;
+  const shiftY = opts.shiftY ?? 0;
   let distance = 14;
   function resize() {
     const w = embedded ? canvas.clientWidth : window.innerWidth;
@@ -1073,9 +1118,10 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     const tanHalf = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     if (embedded) {
       // Match the hero's PNG: 8.9 units across its box, which is capped by the
-      // Tailwind max-widths and shown at 2x below the sm breakpoint.
-      const illoW = w < 640 ? 2 * w : Math.min(w - 16, w >= 1280 ? 1280 : w >= 1024 ? 1152 : 1024);
-      distance = (8.9 * (w / illoW)) / 2 / (tanHalf * camera.aspect);
+      // Tailwind max-widths and enlarged below the sm breakpoint (1.75x, and
+      // 1.5x on phones under 480px; keep in step with Hero.tsx).
+      const illoW = w < 480 ? 1.5 * w : w < 640 ? 1.75 * w : Math.min(w - 16, w >= 1280 ? 1280 : w >= 1024 ? 1152 : 1024);
+      distance = (8.9 * (w / illoW)) / 2 / (tanHalf * camera.aspect) / zoom;
     } else {
       // Landscape frames it like the source (fibres fading out near the edges);
       // portrait keeps both boutons and the cleft in view.
@@ -1085,8 +1131,9 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     if (floaterMat) {
       // Cover the view at the synapse plane, with some margin for the drift.
       const halfH = distance * tanHalf;
-      floaterMat.uniforms.uBound.value.set(halfH * camera.aspect * 1.25, halfH * 1.2);
+      floaterMat.uniforms.uBound.value.set(halfH * camera.aspect * (1.25 + 2 * Math.abs(shiftX)), halfH * (1.2 + 2 * Math.abs(shiftY)));
     }
+    if (shiftX || shiftY) camera.setViewOffset(w, h, -shiftX * w, shiftY * h, w, h);
     camera.updateProjectionMatrix();
     if (reducedMotion) render(0, 0);
   }
@@ -1099,7 +1146,7 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
   window.addEventListener(
     "pointermove",
     (e) => {
-      if (usingOrientation || e.pointerType === "touch") return;
+      if (spin || usingOrientation || e.pointerType === "touch") return;
       target.x = (e.clientX / window.innerWidth) * 2 - 1;
       target.y = (e.clientY / window.innerHeight) * 2 - 1;
     },
@@ -1131,9 +1178,11 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
   }
 
   const DOE = window.DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> } | undefined;
-  if (!reducedMotion && DOE) {
+  // iOS: permission must be requested from a user gesture (see onTap).
+  let motionPermission: "needed" | "asked" | "none" = "none";
+  if (!reducedMotion && !spin && DOE) {
     if (typeof DOE.requestPermission === "function") {
-      // iOS: permission must be requested from a user gesture.
+      if (opts.interactionTarget && matchMedia("(pointer: coarse)").matches) motionPermission = "needed";
       const btn = opts.motionButton;
       if (btn && matchMedia("(pointer: coarse)").matches) {
         btn.hidden = false;
@@ -1155,10 +1204,41 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     }
   }
 
+  // --- Taps: flare, and ask for motion access where needed --------------
+  const clock = new THREE.Timer();
+  let boost = 0;
+  const target0 = opts.interactionTarget;
+  if (target0) {
+    target0.addEventListener(
+      "click",
+      (e) => {
+        if ((e.target as Element).closest("a, button, input, label, [role=button]")) return;
+        if (motionPermission === "needed") {
+          motionPermission = "asked";
+          DOE!.requestPermission!()
+            .then((state) => {
+              if (state === "granted") window.addEventListener("deviceorientation", onOrientation, { signal });
+            })
+            .catch(() => {
+              /* denied: keep the idle sway */
+            });
+        }
+        if (reducedMotion) return;
+        boost = 1;
+        release();
+        nextRelease = Math.max(nextRelease, clock.getElapsed() + 2);
+      },
+      { signal },
+    );
+  }
+
   // --- Render loop ----------------------------------------------------
   if (intro) nextRelease = INTRO.particles[0] + 0.3;
   let titleShown = false;
   let particlesShown = false;
+  let introOn = intro;
+  let introStart = 0;
+  let replaying = false;
   function runIntro(t: number) {
     if (!titleShown && (!intro || t >= INTRO.title)) {
       titleShown = true;
@@ -1168,12 +1248,13 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
       particlesShown = true;
       opts.onParticles?.();
     }
-    if (!intro) return { glow: 1, yaw: 0, pitch: 0, roll: 0 };
-    reveal.value = REVEAL_FROM + (REVEAL_TO - REVEAL_FROM) * easeInOutCubic(progress(t, INTRO.draw));
-    particleFade.value = smoothstep(0, 1, progress(t, INTRO.particles));
-    const away = 1 - easeInOutCubic(progress(t, INTRO.tilt));
+    if (!introOn) return { glow: 1, fade: 1, yaw: 0, pitch: 0, roll: 0 };
+    const it = t - introStart;
+    reveal.value = REVEAL_FROM + (REVEAL_TO - REVEAL_FROM) * easeInOutCubic(progress(it, INTRO.draw));
+    const away = 1 - easeInOutCubic(progress(it, INTRO.tilt));
     return {
-      glow: smoothstep(0, 1, progress(t, INTRO.glow)),
+      glow: smoothstep(0, 1, progress(it, INTRO.glow)),
+      fade: replaying ? 1 : smoothstep(0, 1, progress(it, INTRO.particles)),
       yaw: INTRO_YAW * away,
       pitch: INTRO_PITCH * away,
       roll: INTRO_ROLL * away,
@@ -1189,9 +1270,12 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     }
     updateSpecks(dt);
     pulse *= Math.exp(-dt * 1.6);
+    boost *= Math.exp(-dt * 1.4);
     const breathe = reducedMotion ? 0 : 0.5 + 0.5 * Math.sin(t * 0.7);
-    haloGlow.opacity = (0.15 + 0.04 * breathe + 0.06 * pulse) * introState.glow;
-    coreGlow.opacity = (0.16 + 0.05 * breathe + 0.14 * pulse) * introState.glow;
+    haloGlow.opacity = (0.15 + 0.04 * breathe + 0.06 * pulse) * introState.glow * (1 + 1.2 * boost);
+    coreGlow.opacity = (0.16 + 0.05 * breathe + 0.14 * pulse) * introState.glow * (1 + 1.6 * boost);
+    vesicleFade.value = introState.fade;
+    particleFade.value = introState.fade * (1 + 1.5 * boost);
     dustMat.uniforms.uTime.value = t;
     if (floaterMat) floaterMat.uniforms.uTime.value = t;
 
@@ -1200,8 +1284,17 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     current.y += (target.y - current.y) * ease;
     const idleX = reducedMotion ? 0 : Math.sin(t * 0.13) * 0.12;
     const idleY = reducedMotion ? 0 : Math.sin(t * 0.09 + 1) * 0.08;
-    const yaw = (current.x + idleX) * 0.16 + introState.yaw;
-    const pitch = (current.y + idleY) * 0.11 + introState.pitch;
+    let yaw: number;
+    let pitch: number;
+    if (spin) {
+      yaw = SPIN_YAW + idleX * 0.2 + introState.yaw;
+      pitch = SPIN_PITCH + idleY * 0.2 + introState.pitch;
+      axis.rotation.x = reducedMotion ? 0 : t * spin;
+    } else {
+      yaw = REST_YAW + (current.x + idleX) * TILT_YAW + introState.yaw;
+      pitch = REST_PITCH + (current.y + idleY) * TILT_PITCH + introState.pitch;
+      axis.rotation.x = (current.y + idleY) * AXIS_SPIN;
+    }
     camera.position.set(Math.sin(yaw) * distance, Math.sin(pitch) * distance, Math.cos(yaw) * Math.cos(pitch) * distance);
     camera.lookAt(0, 0, 0);
     camera.rotateZ(introState.roll);
@@ -1231,20 +1324,48 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     return dispose;
   }
 
-  const clock = new THREE.Timer();
+  // Frame-rate check over the frames actually shown: a paused loop (scrolled
+  // away, hidden tab) restarts the sample rather than counting as slow.
+  let fpsFrames = 0;
+  let fpsTime = 0;
+  let fpsDone = !opts.onSlow;
+  const resetFps = () => {
+    fpsFrames = 0;
+    fpsTime = 0;
+  };
+  document.addEventListener("visibilitychange", resetFps, { signal });
+  function sampleFps(dt: number) {
+    if (fpsDone) return;
+    if (++fpsFrames <= FPS_WARMUP_FRAMES) return;
+    fpsTime += Math.min(dt, 0.5);
+    if (fpsTime < FPS_SAMPLE_S) return;
+    fpsDone = true;
+    if ((fpsFrames - FPS_WARMUP_FRAMES) / fpsTime < SLOW_FPS) opts.onSlow?.();
+  }
+
   const loop = (now: number) => {
     clock.update(now);
-    render(clock.getElapsed(), Math.min(clock.getDelta(), 0.05));
+    const dt = clock.getDelta();
+    sampleFps(dt);
+    render(clock.getElapsed(), Math.min(dt, 0.05));
   };
   renderer.setAnimationLoop(loop);
   if (embedded) {
     // Pause while scrolled out of view; the clock skips the time spent away.
     const io = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) clock.reset();
+      resetFps();
       renderer.setAnimationLoop(entry.isIntersecting ? loop : null);
     });
     io.observe(canvas);
     observers.push(io);
   }
+  opts.onReady?.({
+    replay() {
+      introOn = true;
+      replaying = true;
+      introStart = clock.getElapsed();
+    },
+  });
   return dispose;
 }

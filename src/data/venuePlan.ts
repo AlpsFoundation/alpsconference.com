@@ -10,101 +10,67 @@ export const VENUE_PLAN_VIEW = { x: 84, y: 134, w: 1052, h: 432 };
 export type VenueSection = {
   id: string;
   title: string;
-  tagline: string;
-  color: string;
-  notes?: string[];
-  items: { n: number; label: string }[];
+  /** `upstairs` items sit on the floor above: their marker is a stairs pill on the staircase. */
+  items: { n: number; label: string; upstairs?: boolean }[];
 };
 
 export const VENUE_SECTIONS: VenueSection[] = [
   {
     id: "alps",
     title: "ALPS",
-    tagline: "Branding throughout",
-    color: "#ff5cc8",
     items: [
-      { n: 1, label: "Reception" },
+      { n: 1, label: "Check in" },
       { n: 2, label: "Merchandising" },
-      { n: 3, label: "ALPS Visuals" },
-      { n: 4, label: "Main stage" },
-      { n: 5, label: "ALPS Posters" },
-      { n: 6, label: "Stage" },
+      { n: 3, label: "Main Stage" },
+      { n: 4, label: "ALPS Posters" },
+      { n: 5, label: "Experiences (Saal 4)", upstairs: true },
     ],
   },
   {
     id: "lounges",
-    title: "Lounges",
-    tagline: "Aarau furniture",
-    color: "#c98bff",
-    notes: ["Illuminated Japanese walls", "ALPS posters"],
-    items: [{ n: 7, label: "3 × Lounges" }],
-  },
-  {
-    id: "catering",
-    title: "Catering",
-    tagline: "Central space",
-    color: "#b3c2ff",
-    items: [{ n: 8, label: "Catering and food installation" }],
-  },
-  {
-    id: "exhibitors",
-    title: "Exhibitors",
-    tagline: "Well surrounded",
-    color: "#ffb938",
+    title: "Lounges + Catering",
     items: [
-      { n: 9, label: "Exhibitor stand" },
-      { n: 10, label: "Exhibitor stand" },
-      { n: 11, label: "Exhibitor stand" },
+      { n: 6, label: "Lounges" },
+      { n: 7, label: "Catering and food installation" },
     ],
   },
   {
     id: "posters",
-    title: "Research Posters",
-    tagline: "A complete overview",
-    color: "#f3e25a",
-    items: [{ n: 12, label: "15 × Research posters" }],
+    title: "Research Posters + Info Tables",
+    items: [
+      { n: 8, label: "Research posters" },
+      { n: 9, label: "Info table" },
+      { n: 10, label: "Info table" },
+      { n: 11, label: "Info table" },
+    ],
   },
   {
-    id: "kevin",
-    title: "Kevin Barron Exhibition",
-    tagline: "A dedicated space",
-    color: "#5fd37a",
-    items: [{ n: 13, label: "14 × A0 display area + 1 table" }],
-  },
-  {
-    id: "hannah",
-    title: "Hannah Stanke Artwork",
-    tagline: "Close to people",
-    color: "#9bf28f",
-    items: [{ n: 14, label: "2 × A0 display area" }],
-  },
-  {
-    id: "meditation",
-    title: "Meditation Room",
-    tagline: "LED candle lights",
-    color: "#ff6b6b",
-    items: [],
+    id: "art",
+    title: "LSD Blotter Art Exhibition + Live Painting Art Corner",
+    items: [
+      { n: 12, label: "LSD Blotter Art Exhibition" },
+      { n: 13, label: "Live Painting Art Corner" },
+    ],
   },
 ];
 
-/** Centres of the numbers in the source drawing (user units). */
+/** Centres of the markers in the source drawing (user units). */
 export const VENUE_MARKERS: { n: number; x: number; y: number }[] = [
   { n: 1, x: 522, y: 469 },
   { n: 2, x: 505, y: 326 },
-  { n: 3, x: 651, y: 393 },
-  { n: 4, x: 992, y: 385 },
-  { n: 5, x: 178, y: 246 },
-  { n: 6, x: 236, y: 248 },
-  { n: 7, x: 465, y: 203 },
-  { n: 7, x: 320, y: 326 },
-  { n: 7, x: 344, y: 450 },
-  { n: 8, x: 419, y: 385 },
+  { n: 3, x: 992, y: 385 },
+  { n: 4, x: 178, y: 246 },
+  { n: 5, x: 566, y: 194 }, // on the staircase at the top of the plan
+  { n: 6, x: 465, y: 203 },
+  { n: 6, x: 320, y: 326 },
+  { n: 6, x: 344, y: 450 },
+  { n: 7, x: 419, y: 385 },
+  { n: 8, x: 159, y: 449 },
   { n: 9, x: 240, y: 314 },
   { n: 10, x: 175, y: 294 },
   { n: 11, x: 176, y: 325 },
-  { n: 12, x: 159, y: 449 },
-  { n: 13, x: 594, y: 390 },
-  { n: 14, x: 310, y: 439 },
+  { n: 12, x: 594, y: 390 },
+  { n: 13, x: 310, y: 439 },
 ];
 
 export type VenueColors = {

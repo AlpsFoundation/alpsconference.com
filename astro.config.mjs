@@ -3,6 +3,7 @@ import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
+import { readdirSync, rmSync } from "node:fs";
 
 const site = process.env.SITE_URL?.trim() || "https://alpsconference.com";
 
@@ -16,6 +17,34 @@ function normalizeBase(raw) {
 }
 
 const base = normalizeBase(process.env.BASE_PATH);
+
+/**
+ * One Vite cache per `astro dev` process. Several dev servers on this checkout
+ * (other terminals, agent previews) otherwise share node_modules/.vite and keep
+ * re-optimizing it under each other, so pages already open request dep chunks
+ * whose hash no longer exists and hydration fails with "Failed to fetch
+ * dynamically imported module". Caches of dev servers that have exited are
+ * removed on the next start.
+ */
+function devCacheDir() {
+  if (!process.argv.includes("dev")) return undefined;
+  const root = "node_modules/.vite";
+  let entries = [];
+  try {
+    entries = readdirSync(root);
+  } catch {}
+  for (const name of entries) {
+    const pid = Number(name.match(/^dev-(\d+)$/)?.[1]);
+    if (!pid || pid === process.pid) continue;
+    try {
+      process.kill(pid, 0);
+    } catch (err) {
+      if (err.code !== "ESRCH") continue;
+      rmSync(`${root}/${name}`, { recursive: true, force: true });
+    }
+  }
+  return `${root}/dev-${process.pid}`;
+}
 
 export default defineConfig({
   output: "static",
@@ -31,6 +60,10 @@ export default defineConfig({
   },
   site,
   base,
+  // The 3D landing page used to live here before it became the home page.
+  redirects: {
+    "/fancy": "/",
+  },
   integrations: [
     react(),
     sitemap({
@@ -39,15 +72,17 @@ export default defineConfig({
         !page.includes("/links") &&
         !page.includes("/map") &&
         !page.includes("/3d") &&
-        !page.includes("/fancy"),
+        !page.includes("/static") &&
+        !page.includes("/bingo") &&
+        !page.includes("/break"),
     }),
   ],
   vite: {
     plugins: [tailwindcss()],
+    cacheDir: devCacheDir(),
     // Pre-bundle three.js up front: otherwise Vite only discovers it when /3d is
     // first opened, re-optimizes, and invalidates the dep chunks of every page
-    // already loaded (and of any other dev server sharing node_modules/.vite),
-    // breaking React hydration with 404s on the old chunk hashes.
+    // already loaded, breaking React hydration with 404s on the old chunk hashes.
     optimizeDeps: {
       include: [
         "three",

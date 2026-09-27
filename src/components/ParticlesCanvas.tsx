@@ -162,11 +162,21 @@ export default function ParticlesCanvas({ variant, scale = 1 }: { variant: Parti
 
     resizeCanvas();
     createParticles();
-    animate();
+
+    // Only animate while on screen.
+    let running = false;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting === running) return;
+      running = entry.isIntersecting;
+      if (running) animate();
+      else cancelAnimationFrame(animationId);
+    });
+    observer.observe(canvas);
 
     window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", handleResize);
     };

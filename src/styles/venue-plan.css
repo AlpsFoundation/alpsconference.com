@@ -180,10 +180,6 @@
   --m: var(--vp-marker);
 }
 
-.vp[data-markers="sections"] .vp-marker {
-  --m: var(--sec);
-}
-
 .vp-marker-halo {
   fill: var(--vp-hot);
   opacity: 0;
@@ -218,6 +214,31 @@
   fill: #ffffff;
 }
 
+/* Upstairs markers: a pill with a solid staircase and an up arrow beside the number. */
+.vp-marker-icon .vp-stairs-steps {
+  fill: var(--m);
+  transition: fill 0.15s;
+}
+
+.vp-marker-icon .vp-stairs-arrow {
+  fill: none;
+  stroke: var(--m);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.15s;
+}
+
+.vp-marker.is-hot .vp-stairs-steps,
+.vp-marker:focus-visible .vp-stairs-steps {
+  fill: #ffffff;
+}
+
+.vp-marker.is-hot .vp-stairs-arrow,
+.vp-marker:focus-visible .vp-stairs-arrow {
+  stroke: #ffffff;
+}
+
 .vp-marker.is-hot .vp-marker-halo {
   opacity: 0.3;
   transform: scale(1);
@@ -230,14 +251,15 @@
 .vp-tip {
   position: absolute;
   z-index: 3;
-  transform: translate(-50%, calc(-100% - 10px));
+  max-width: min(260px, calc(100% - 16px));
+  width: max-content;
+  transform: translate(calc(-50% + var(--dx, 0px)), calc(-100% - 10px));
   padding: 0.45rem 0.7rem 0.5rem;
   background: #ffffff;
   color: var(--vp-navy);
   font-size: 0.84rem;
   font-weight: 550;
   line-height: 1.25;
-  white-space: nowrap;
   pointer-events: none;
   box-shadow: 0 10px 28px rgba(4, 24, 40, 0.35);
 }
@@ -269,12 +291,19 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
+/* Zoom buttons only on phones; elsewhere wheel, trackpad and double-click cover it. */
 .vp-zoom {
   position: absolute;
   left: 12px;
   bottom: 12px;
-  display: flex;
+  display: none;
   flex-direction: column;
+}
+
+@media (max-width: 767px) {
+  .vp-zoom {
+    display: flex;
+  }
 }
 
 .vp-zoom button {
@@ -512,28 +541,16 @@
 
 .vp-legend {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
   margin-top: clamp(14px, 2.5vw, 28px);
   border: 1px solid var(--vp-line);
   background: var(--vp-line);
 }
 
-@container (min-width: 340px) {
-  .vp-legend {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @container (min-width: 700px) {
   .vp-legend {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-@container (min-width: 1080px) {
-  .vp-legend {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 }
 
@@ -547,17 +564,9 @@
   background: color-mix(in srgb, var(--vp-hot) 12%, var(--vp-navy));
 }
 
-.vp-card--wide {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.4rem 1rem;
-}
-
 .vp-card h3 {
   margin: 0;
-  color: var(--sec);
+  color: #ffffff;
   font-size: 1.12rem;
   font-weight: 640;
   letter-spacing: -0.02em;
@@ -575,25 +584,6 @@
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
-}
-
-.vp-tagline,
-.vp-notes {
-  margin: 0.35rem 0 0;
-  color: var(--vp-muted);
-  font-size: 0.82rem;
-}
-
-.vp-card--wide .vp-tagline {
-  margin: 0;
-}
-
-.vp-notes {
-  margin-top: 0.1rem;
-}
-
-.vp-notes span {
-  display: block;
 }
 
 .vp-card ul {
@@ -633,9 +623,29 @@
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.vp[data-markers="sections"] .vp-badge {
-  border-color: var(--sec);
-  color: var(--sec);
+.vp-badge--stairs {
+  display: inline-flex;
+  gap: 3px;
+  width: auto;
+  padding: 0 6px 0 7px;
+  border-radius: 11px;
+}
+
+.vp-badge--stairs svg {
+  width: 11px;
+  height: 10px;
+}
+
+.vp-badge .vp-stairs-steps {
+  fill: currentColor;
+}
+
+.vp-badge .vp-stairs-arrow {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .vp-card li.is-hot,
@@ -651,27 +661,13 @@
   color: #ffffff;
 }
 
-/* Embedded (e.g. the /links accordion): a denser two-column legend. */
-@container (min-width: 260px) {
-  .vp--embed .vp-legend {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
+/* Embedded (e.g. the /links accordion): a denser legend. */
 .vp--embed .vp-card {
   padding: 0.75rem 0.7rem 0.85rem;
 }
 
 .vp--embed .vp-card h3 {
   font-size: 0.95rem;
-}
-
-.vp--embed .vp-tagline {
-  font-size: 0.75rem;
-}
-
-.vp--embed .vp-notes {
-  display: none;
 }
 
 .vp--embed .vp-card ul {
@@ -688,6 +684,10 @@
   width: 19px;
   height: 19px;
   font-size: 0.62rem;
+}
+
+.vp--embed .vp-badge--stairs {
+  width: auto;
 }
 
 /* ---------- full-screen modal ---------- */

@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { Calendar, Ticket, Mail, MapPin, Clock } from "lucide-react";
-import { animate } from "animejs";
+import { animate, stagger } from "animejs";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
 import ConferenceCountdown from "./ConferenceCountdown";
 import SynapseIllustration from "./SynapseIllustration";
 
 // "image": the static bones.png. "synapse": its 3D rendition, which draws itself
-// first and cues the title and the particles in (see the /fancy page).
+// first and cues the title and the particles in (see the home page; /static uses the image).
 export type HeroIllustration = "image" | "synapse";
 
 // Show the content anyway if the 3D intro never cues it (slow or failed load).
 const TITLE_FALLBACK_MS = 5000;
+
+// Title words, grouped into the runs that must not wrap; each letter animates in on its own.
+const TITLE = [["ALPS"], ["CONFERENCE", "2026"]];
 
 export default function Hero({ illustration = "image" }: { illustration?: HeroIllustration }) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -27,20 +30,39 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
     if (!el || contentShown.current) return;
     contentShown.current = true;
 
+    // Title letter by letter, then the details and buttons, the countdown last.
+    el.querySelector("h1")?.classList.remove("opacity-0");
+    animate(el.querySelectorAll("[data-letter]"), {
+      opacity: [0, 1],
+      translateY: ["0.3em", "0em"],
+      scale: [0.92, 1],
+      delay: stagger(38),
+      duration: 750,
+      ease: "outCubic",
+    });
+
     animate(el.querySelectorAll("[data-animate]"), {
       opacity: [0, 1],
       translateY: [20, 0],
-      delay: (_: unknown, i: number) => 140 + i * 90,
+      delay: stagger(160, { start: 380 }),
       duration: 700,
-      easing: "easeOutCubic",
+      ease: "outCubic",
     });
 
     animate(el.querySelectorAll("[data-animate-scale]"), {
       opacity: [0, 1],
       scale: [0.96, 1],
-      delay: (_: unknown, i: number) => 420 + i * 70,
+      delay: stagger(80, { start: 480 }),
       duration: 600,
-      easing: "easeOutCubic",
+      ease: "outCubic",
+    });
+
+    animate(el.querySelectorAll("[data-animate-last]"), {
+      opacity: [0, 1],
+      translateY: [-10, 0],
+      delay: 1150,
+      duration: 700,
+      ease: "outCubic",
     });
   };
 
@@ -127,6 +149,7 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
 
       {is3d && !synapseFailed && (
         <SynapseIllustration
+          interactionTarget={sectionRef}
           onTitle={showContent}
           onParticles={() => setParticlesOn(true)}
           onUnsupported={onSynapseUnsupported}
@@ -141,7 +164,8 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
             className="w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl px-2 opacity-0 will-change-transform"
             style={{ transformOrigin: "center center" }}
           >
-            <div className="origin-center scale-[2] sm:scale-100">
+            {/* Enlarged below sm; keep in step with the embedded framing in synapse3d.ts. */}
+            <div className="origin-center scale-[1.5] min-[480px]:scale-[1.75] sm:scale-100">
               <img
                 src={withBase("img/bones.png")}
                 alt=""
@@ -153,21 +177,42 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
       )}
 
       {/* Content: upper / middle / lower thirds to keep center clear for illustration */}
-      <div className="relative z-10 flex flex-1 flex-col min-h-0 max-w-5xl w-full mx-auto px-4 sm:px-6 text-center pt-20 sm:pt-24">
+      <div className="relative z-10 flex flex-1 flex-col min-h-0 max-w-5xl lg:max-w-6xl w-full mx-auto px-4 sm:px-6 text-center pt-20 sm:pt-24">
         <div className="flex-[1_1_0] flex flex-col items-center justify-start min-h-0">
-          <ConferenceCountdown />
+          <div data-animate-last className="opacity-0">
+            <ConferenceCountdown />
+          </div>
           <h1
-            data-animate
-            className="opacity-0 mt-4 text-4xl sm:max-md:text-7xl md:text-7xl lg:text-8xl font-bold tracking-[-0.035em] leading-[0.96] mb-4 sm:mb-6 max-w-5xl mx-auto bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent] [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
+            aria-label={TITLE.flat().join(" ")}
+            className="opacity-0 mt-4 text-[length:min(2.25rem,calc((100vw-2rem)/8.9))] sm:max-md:text-7xl md:text-7xl lg:whitespace-nowrap lg:text-[length:min(6rem,calc((100vw-3rem)/11.6))] font-bold tracking-[-0.035em] leading-[0.96] mb-4 sm:mb-6 mx-auto [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
           >
-            ALPS{" "}
-            <span className="whitespace-nowrap">CONFERENCE 2026</span>
+            {TITLE.map((run, r) => (
+              <span key={r} aria-hidden="true">
+                {r > 0 && " "}
+                <span className="whitespace-nowrap">
+                  {run.map((word, w) => (
+                    <span key={w}>
+                      {w > 0 && " "}
+                      {[...word].map((letter, l) => (
+                        <span
+                          key={l}
+                          data-letter
+                          className="inline-block opacity-0 will-change-transform bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent]"
+                        >
+                          {letter}
+                        </span>
+                      ))}
+                    </span>
+                  ))}
+                </span>
+              </span>
+            ))}
           </h1>
         </div>
 
         <div className="flex-[1_1_0] min-h-0 shrink-0" aria-hidden="true" />
 
-        <div className="flex-[1_1_0] flex flex-col items-center justify-end gap-4 sm:gap-5 min-h-0 pb-4 sm:pb-28">
+        <div className="flex-[1_1_0] flex flex-col items-center justify-end gap-4 sm:gap-5 min-h-0 pb-4 sm:pb-28 lg:pb-10">
           <div
             data-animate
             className="opacity-0 flex w-full max-w-full flex-wrap sm:flex-nowrap items-center justify-center gap-x-2 gap-y-1 min-[380px]:gap-x-3 sm:gap-6"
@@ -204,11 +249,11 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
               <li>Financial Support Compassion Fund available (see FAQ)</li>
             </ul>
 
-            <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch justify-center gap-2 sm:gap-3 w-full max-w-xs sm:max-w-full mx-auto">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
               <button
                 data-animate-scale
                 onClick={handleCalendar}
-                className="opacity-0 group flex w-full sm:w-auto sm:flex-initial min-w-0 items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 cursor-pointer leading-tight"
+                className="opacity-0 group flex min-w-0 items-center justify-center gap-1.5 sm:gap-2.5 px-2 min-[380px]:px-3 sm:px-5 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white text-[13px] min-[380px]:text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 cursor-pointer leading-tight"
               >
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <span className="whitespace-nowrap">Save the Date</span>
@@ -217,7 +262,7 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
               <a
                 data-animate-scale
                 href="#newsletter"
-                className="opacity-0 flex w-full sm:w-auto sm:flex-initial min-w-0 items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
+                className="opacity-0 flex min-w-0 items-center justify-center gap-1.5 sm:gap-2.5 px-2 min-[380px]:px-3 sm:px-5 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-[13px] min-[380px]:text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
               >
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <span className="whitespace-nowrap">Stay in Touch</span>

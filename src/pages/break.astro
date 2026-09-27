@@ -1,0 +1,34 @@
+---
+import "../styles/app.css";
+import "../styles/break.css";
+import BreakScreen from "../components/BreakScreen";
+import { withBase } from "../lib/withBase";
+
+const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const fontFaceCss = `@font-face {
+  font-family: "Switzer";
+  src: url("${switzerFont}") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Projector screen for the venue: not linked, not in the sitemap. -->
+    <meta name="robots" content="noindex" />
+    <title>Break | ALPS Conference 2026</title>
+    <meta name="description" content="Between-sessions screen for ALPS Conference 2026: what's on and what's next." />
+    <meta name="theme-color" content="#082f4a" />
+    <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
+    <style is:global set:html={fontFaceCss}></style>
+  </head>
+  <body>
+    <BreakScreen client:load />
+  </body>
+</html>

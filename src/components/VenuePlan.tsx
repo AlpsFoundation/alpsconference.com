@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -77,7 +78,6 @@ type Design = {
   preset: string;
   colors: VenueColors;
   walls: "hatched" | "solid" | "outline";
-  markers: "uniform" | "sections";
   size: number;
   grid: boolean;
 };
@@ -87,7 +87,6 @@ const defaultDesign = (): Design => ({
   preset: "blueprint",
   colors: { ...VENUE_PALETTES.blueprint.colors },
   walls: "hatched",
-  markers: "uniform",
   size: 1,
   grid: true,
 });
@@ -124,11 +123,23 @@ function useDesign(persist: boolean) {
 
 const sectionOf = new Map<number, (typeof VENUE_SECTIONS)[number]>();
 const labelOf = new Map<number, string>();
+const upstairs = new Set<number>();
 for (const s of VENUE_SECTIONS)
   for (const i of s.items) {
     sectionOf.set(i.n, s);
     labelOf.set(i.n, i.label);
+    if (i.upstairs) upstairs.add(i.n);
   }
+
+/** Solid staircase with an up arrow (13 × 12 box), drawn beside the number on upstairs markers. */
+function StairsGlyph() {
+  return (
+    <>
+      <path className="vp-stairs-steps" d="M4 12V8.5h3V5h3V1.5h3V12z" />
+      <path className="vp-stairs-arrow" d="M2 11.5V2.4M0 4.4l2-2 2 2" />
+    </>
+  );
+}
 
 type View = { x: number; y: number; w: number; h: number };
 const MAX_ZOOM = 14;
@@ -180,6 +191,7 @@ export default function VenuePlan({
   const sizeRef = useRef(design.size);
   sizeRef.current = design.size;
   const pinnedEl = useRef<SVGGElement | null>(null);
+  const lastPointer = useRef("mouse");
 
   const [hover, setHover] = useState<number[] | null>(null);
   const [pinned, setPinned] = useState<number | null>(null);
@@ -189,6 +201,18 @@ export default function VenuePlan({
   const [expanded, setExpanded] = useState(false);
 
   const hot = hover ?? (pinned ? [pinned] : null);
+
+  // Nudge the tooltip sideways so it never spills out of the stage (markers near the edges, narrow phones).
+  const tipRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = tipRef.current;
+    const stage = stageRef.current;
+    if (!el || !stage || !tip) return;
+    const half = el.offsetWidth / 2;
+    const pad = 8;
+    const left = Math.min(stage.clientWidth - pad - half, Math.max(pad + half, tip.left));
+    el.style.setProperty("--dx", `${left - tip.left}px`);
+  }, [tip]);
 
   /* --- view plumbing (direct DOM writes: pan/zoom runs every frame) --- */
 
@@ -368,7 +392,14 @@ export default function VenuePlan({
   const showTip = (el: SVGGElement) => setTip(tipFor(el));
   const restoreTip = () => setTip(pinnedEl.current ? tipFor(pinnedEl.current) : null);
 
-  const togglePin = (el: SVGGElement) => {
+  // Centre the plan on a point, zooming in to at least `zoom`× (never zooming back out).
+  const focusPoint = (p: { x: number; y: number }, zoom = 3.2) => {
+    const w = Math.min(view.current.w, VIEW.w / zoom);
+    const h = (w * VIEW.h) / VIEW.w;
+    animateTo({ x: p.x - w / 2, y: p.y - h / 2, w, h });
+  };
+
+  const togglePin = (el: SVGGElement, p: { x: number; y: number }, touch = false) => {
     if (moved.current > 4) return;
     const n = Number(el.dataset.n);
     if (pinned === n && pinnedEl.current === el) {
@@ -379,9 +410,12 @@ export default function VenuePlan({
       pinnedEl.current = el;
       setPinned(n);
       setTip(tipFor(el));
-      rootRef.current
-        ?.querySelector(`.vp-legend li[data-n="${n}"]`)
-        ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      focusPoint(p);
+      // On a phone the legend sits below the plan: scrolling to it would push the plan off screen.
+      if (!touch)
+        rootRef.current
+          ?.querySelector(`.vp-legend li[data-n="${n}"]`)
+          ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   };
 
@@ -430,7 +464,6 @@ export default function VenuePlan({
       className={`vp vp--${size} ${className}`}
       style={style}
       data-walls={design.walls}
-      data-markers={design.markers}
       data-grid={design.grid ? "on" : "off"}
       data-hot={hot ? "" : undefined}
     >
@@ -470,18 +503,18 @@ export default function VenuePlan({
             <g className="vp-markers">
               {VENUE_MARKERS.map((m, i) => {
                 const s = sectionOf.get(m.n)!;
+                const up = upstairs.has(m.n);
                 return (
                   <g
                     key={i}
-                    className={`vp-marker ${hotSet.has(m.n) ? "is-hot" : ""}`}
+                    className={`vp-marker ${up ? "vp-marker--stairs" : ""} ${hotSet.has(m.n) ? "is-hot" : ""}`}
                     data-n={m.n}
                     transform={`translate(${m.x} ${m.y})`}
-                    style={{ "--sec": s.color } as CSSProperties}
                     {...(interactive
                       ? {
                           tabIndex: 0,
                           role: "button",
-                          "aria-label": `${m.n}: ${labelOf.get(m.n)} (${s.title})`,
+                          "aria-label": `${m.n}: ${labelOf.get(m.n)} (${s.title})${up ? ", upstairs" : ""}`,
                           onPointerEnter: (e: ReactPointerEvent<SVGGElement>) => {
                             if (e.pointerType === "touch") return;
                             setHover([m.n]);
@@ -499,23 +532,42 @@ export default function VenuePlan({
                             setHover(null);
                             restoreTip();
                           },
-                          onClick: (e: ReactMouseEvent<SVGGElement>) => togglePin(e.currentTarget),
+                          onPointerDown: (e: ReactPointerEvent<SVGGElement>) => {
+                            lastPointer.current = e.pointerType;
+                          },
+                          onClick: (e: ReactMouseEvent<SVGGElement>) =>
+                            togglePin(e.currentTarget, m, lastPointer.current === "touch"),
                           onKeyDown: (e: ReactKeyboardEvent<SVGGElement>) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
                               moved.current = 0;
-                              togglePin(e.currentTarget);
+                              togglePin(e.currentTarget, m);
                             }
                           },
                         }
                       : { "aria-hidden": true })}
                   >
                     <g className="vp-marker-scale">
-                      <circle className="vp-marker-halo" r="15" />
-                      <circle className="vp-marker-dot" r="10.5" />
-                      <text className="vp-marker-num" textAnchor="middle" dy="0.36em">
-                        {m.n}
-                      </text>
+                      {up ? (
+                        <>
+                          <rect className="vp-marker-halo" x="-22.5" y="-15" width="45" height="30" rx="15" />
+                          <rect className="vp-marker-dot" x="-17.5" y="-10.5" width="35" height="21" rx="10.5" />
+                          <text className="vp-marker-num" x="-7" textAnchor="middle" dy="0.36em">
+                            {m.n}
+                          </text>
+                          <g className="vp-marker-icon" transform="translate(1.2 -5.6) scale(0.8)">
+                            <StairsGlyph />
+                          </g>
+                        </>
+                      ) : (
+                        <>
+                          <circle className="vp-marker-halo" r="15" />
+                          <circle className="vp-marker-dot" r="10.5" />
+                          <text className="vp-marker-num" textAnchor="middle" dy="0.36em">
+                            {m.n}
+                          </text>
+                        </>
+                      )}
                     </g>
                   </g>
                 );
@@ -527,9 +579,9 @@ export default function VenuePlan({
         {!plan && <div className="vp-loading" aria-hidden />}
 
         {tip && (
-          <div className="vp-tip" style={{ left: tip.left, top: tip.top }}>
+          <div ref={tipRef} className="vp-tip" style={{ left: tip.left, top: tip.top }}>
             <b>{tip.n}</b> {labelOf.get(tip.n)}
-            <small>{sectionOf.get(tip.n)?.title}</small>
+            <TipContext n={tip.n} />
           </div>
         )}
 
@@ -571,35 +623,18 @@ export default function VenuePlan({
               const ns = s.items.map((i) => i.n);
               const cardHot = s.items.some((i) => hotSet.has(i.n));
               return (
-                <article
-                  key={s.id}
-                  className={`vp-card ${s.items.length ? "" : "vp-card--wide"} ${cardHot ? "has-hot" : ""}`}
-                  style={{ "--sec": s.color } as CSSProperties}
-                >
+                <article key={s.id} className={`vp-card ${cardHot ? "has-hot" : ""}`}>
                   <h3
-                    {...(ns.length
-                      ? {
-                          tabIndex: 0,
-                          onPointerEnter: () => setHover(ns),
-                          onPointerLeave: () => setHover(null),
-                          onFocus: () => setHover(ns),
-                          onBlur: () => setHover(null),
-                          onClick: () => focusMarkers(ns),
-                          onKeyDown: (e: ReactKeyboardEvent) => e.key === "Enter" && focusMarkers(ns),
-                        }
-                      : {})}
+                    tabIndex={0}
+                    onPointerEnter={() => setHover(ns)}
+                    onPointerLeave={() => setHover(null)}
+                    onFocus={() => setHover(ns)}
+                    onBlur={() => setHover(null)}
+                    onClick={() => focusMarkers(ns)}
+                    onKeyDown={(e) => e.key === "Enter" && focusMarkers(ns)}
                   >
-                    {!ns.length && <span aria-hidden>+ </span>}
                     {s.title}
                   </h3>
-                  <p className="vp-tagline">{s.tagline}</p>
-                  {s.notes && (
-                    <p className="vp-notes">
-                      {s.notes.map((n) => (
-                        <span key={n}>+ {n}</span>
-                      ))}
-                    </p>
-                  )}
                   {s.items.length > 0 && (
                     <ul>
                       {s.items.map((i) => (
@@ -615,7 +650,14 @@ export default function VenuePlan({
                           onClick={() => focusMarkers([i.n])}
                           onKeyDown={(e) => e.key === "Enter" && focusMarkers([i.n])}
                         >
-                          <span className="vp-badge">{i.n}</span>
+                          <span className={`vp-badge ${i.upstairs ? "vp-badge--stairs" : ""}`}>
+                            {i.n}
+                            {i.upstairs && (
+                              <svg viewBox="-0.8 0.6 14.6 12.2" aria-label="upstairs">
+                                <StairsGlyph />
+                              </svg>
+                            )}
+                          </span>
                           <span>{i.label}</span>
                         </li>
                       ))}
@@ -631,6 +673,13 @@ export default function VenuePlan({
       {expandable && <VenuePlanModal open={expanded} onClose={() => setExpanded(false)} />}
     </div>
   );
+}
+
+/** Section name (skipped when it only repeats the label) and an upstairs hint, under the tooltip label. */
+function TipContext({ n }: { n: number }) {
+  const title = sectionOf.get(n)?.title ?? "";
+  const parts = [title.includes(labelOf.get(n) ?? "") ? "" : title, upstairs.has(n) ? "Upstairs" : ""].filter(Boolean);
+  return parts.length ? <small>{parts.join(" · ")}</small> : null;
 }
 
 /* ---------- design panel ---------- */
@@ -686,14 +735,6 @@ function DesignPanel({ design, setDesign }: { design: Design; setDesign: (d: Des
         </fieldset>
         <fieldset>
           <legend>Markers</legend>
-          <div className="vp-seg">
-            <button type="button" aria-pressed={design.markers === "uniform"} onClick={() => set({ markers: "uniform" })}>
-              Uniform
-            </button>
-            <button type="button" aria-pressed={design.markers === "sections"} onClick={() => set({ markers: "sections" })}>
-              By section
-            </button>
-          </div>
           <label className="vp-range">
             Size
             <input
@@ -772,7 +813,7 @@ export function VenuePlanCard() {
         <span className="vp-card-button__text">
           <span>
             <span className="vp-card-button__title">Venue floor plan</span>
-            <span className="vp-card-button__sub">Stages, lounges, catering, exhibitors and posters</span>
+            <span className="vp-card-button__sub">Stages, lounges, catering, posters and art</span>
           </span>
           <Expand aria-hidden />
         </span>
