@@ -58,6 +58,13 @@ const ICONS: Record<QuickLinkIcon, LucideIcon> = {
 const API = withBase("api/experience-signups");
 const STORAGE_KEY = "alps-links-signups";
 
+// TEMP (screencast): fake bookings client-side with a delay and pre-filled fields. Set to false before shipping.
+const DEMO_BOOKING = true;
+const DEMO_DELAY_MS = 1400;
+const DEMO_NAME = "Albert H";
+const DEMO_EMAIL = "hi@lsd85.ch";
+const demoDelay = () => new Promise((resolve) => window.setTimeout(resolve, DEMO_DELAY_MS));
+
 /** Parse an API response without surfacing raw parser errors (Safari: "The string did not match the expected pattern."). */
 async function readApiJson<T>(response: Response): Promise<T & { error?: string }> {
   try {
@@ -524,6 +531,20 @@ function SignupPanel({
     setPending(true);
     setError(null);
     try {
+      if (DEMO_BOOKING) {
+        await demoDelay();
+        setJustConfirmed(true);
+        onSignedUp({
+          experienceId: session.id,
+          signupId: Date.now(),
+          status: full ? "waitlist" : "confirmed",
+          waitlistPosition: full ? (availability?.waitlist ?? 0) + 1 : undefined,
+          cancelToken: "demo",
+          fullName,
+          email,
+        });
+        return;
+      }
       const response = await fetch(API, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -569,6 +590,12 @@ function SignupPanel({
     setPending(true);
     setError(null);
     try {
+      if (DEMO_BOOKING) {
+        await demoDelay();
+        setJustConfirmed(false);
+        onCancelled(session.id);
+        return;
+      }
       const response = await fetch(API, {
         method: "DELETE",
         headers: { "content-type": "application/json" },
@@ -638,6 +665,7 @@ function SignupPanel({
               required
               maxLength={120}
               autoComplete="name"
+              defaultValue={DEMO_BOOKING ? DEMO_NAME : undefined}
               disabled={pending}
               className="links-input"
             />
@@ -651,6 +679,7 @@ function SignupPanel({
               required
               maxLength={254}
               autoComplete="email"
+              defaultValue={DEMO_BOOKING ? DEMO_EMAIL : undefined}
               inputMode="email"
               disabled={pending}
               className="links-input"

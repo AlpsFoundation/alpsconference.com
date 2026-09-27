@@ -7,16 +7,18 @@ export const VENUE_PLAN_SRC = "img/venue-plan.svg";
 /** Crop of the export's 1190×842 artboard that holds the floor plan. */
 export const VENUE_PLAN_VIEW = { x: 84, y: 134, w: 1052, h: 432 };
 
-export type VenueIcon = "toilet" | "wardrobe";
+export type VenueIcon = "toilet" | "wardrobe" | "coffee";
 
 export type VenueSection = {
   id: string;
   title: string;
   /**
+   * An item without a `label` is the section itself: its badge sits in the heading.
    * `upstairs` items sit on the floor above: their marker is a stairs pill on the staircase.
    * `icon` items show a pictogram instead of their number, so their `n` is only an id.
+   * The same `n` may appear in a second section; the first one names its marker.
    */
-  items: { n: number; label: string; upstairs?: boolean; icon?: VenueIcon }[];
+  items: { n: number; label?: string; note?: string; upstairs?: boolean; icon?: VenueIcon }[];
 };
 
 /** Legend columns, left to right; each column stacks one or more sections. */
@@ -27,15 +29,26 @@ export const VENUE_LEGEND: VenueSection[][] = [
       title: "ALPS",
       items: [
         { n: 1, label: "Reception / Check in" },
-        { n: 2, label: "Merchandising" },
+        { n: 2, label: "ALPS Infotable / Shop" },
         { n: 3, label: "Main Stage" },
         { n: 4, label: "Experiences (Saal 4)", upstairs: true },
       ],
     },
   ],
   [
-    { id: "lounges", title: "Lounges", items: [{ n: 5, label: "Lounges" }] },
-    { id: "catering", title: "Catering", items: [{ n: 6, label: "Catering and food installation" }] },
+    {
+      id: "lounges",
+      title: "Lounges",
+      items: [{ n: 5 }, { n: 4, label: "Saal 4", note: "When no experience is on", upstairs: true }],
+    },
+    {
+      id: "catering",
+      title: "Catering",
+      items: [
+        { n: 6, label: "Food and drinks" },
+        { n: 103, label: "Coffee", icon: "coffee" },
+      ],
+    },
     {
       id: "facilities",
       title: "Facilities",
@@ -46,7 +59,7 @@ export const VENUE_LEGEND: VenueSection[][] = [
     },
   ],
   [
-    { id: "research-posters", title: "Research Posters", items: [{ n: 7, label: "Research posters" }] },
+    { id: "research-posters", title: "Research Posters", items: [{ n: 7 }] },
     {
       id: "info-tables",
       title: "Info Tables",
@@ -58,9 +71,9 @@ export const VENUE_LEGEND: VenueSection[][] = [
     },
   ],
   [
-    { id: "blotter-art", title: "LSD Blotter Art Exhibition", items: [{ n: 11, label: "LSD Blotter Art Exhibition" }] },
-    { id: "live-painting", title: "Live Painting Art Corner", items: [{ n: 12, label: "Live Painting Art Corner" }] },
-    { id: "alps-posters", title: "ALPS Posters", items: [{ n: 13, label: "ALPS Posters" }] },
+    { id: "blotter-art", title: "LSD Blotter Art Exhibition", items: [{ n: 11 }] },
+    { id: "live-painting", title: "Live Painting Art Corner", items: [{ n: 12 }] },
+    { id: "alps-posters", title: "ALPS Posters", items: [{ n: 13 }] },
   ],
 ];
 
@@ -76,6 +89,7 @@ export const VENUE_MARKERS: { n: number; x: number; y: number }[] = [
   { n: 5, x: 320, y: 326 },
   { n: 5, x: 344, y: 450 },
   { n: 6, x: 419, y: 385 },
+  { n: 6, x: 213, y: 384 }, // the eight tables below 8 and 10
   { n: 7, x: 159, y: 449 },
   { n: 8, x: 240, y: 314 },
   { n: 9, x: 175, y: 294 },
@@ -83,9 +97,10 @@ export const VENUE_MARKERS: { n: number; x: number; y: number }[] = [
   { n: 11, x: 594, y: 390 },
   { n: 12, x: 310, y: 439 },
   { n: 13, x: 178, y: 246 },
-  { n: 101, x: 627, y: 200 }, // the two rooms right of the staircase
-  { n: 101, x: 698, y: 200 },
-  { n: 102, x: 612, y: 272 }, // middle of the corridor wall facing the bathrooms
+  { n: 101, x: 635, y: 196 }, // the two rooms right of the staircase
+  { n: 101, x: 692, y: 196 },
+  { n: 102, x: 608, y: 272 }, // middle of the corridor wall facing the bathrooms
+  { n: 103, x: 349, y: 336 }, // the round (U-shaped) bar beside the lounge
 ];
 
 export type VenueColors = {

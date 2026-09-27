@@ -30,12 +30,12 @@ const fontFaceCss = `@font-face {
   </head>
   <body>
     <header class="map-head">
-      <div>
-        <p class="section-eyebrow">ALPS Conference 2026 · 9–10 October</p>
-        <h1 class="section-title">Venue map</h1>
-        <p class="map-sub">Kultur &amp; Kongresshaus Aarau: layout plan</p>
-      </div>
-      <p class="map-hint">Scroll or pinch to zoom · drag to pan · click a number</p>
+      <h1>
+        <a href={withBase("/")}>
+          <img src={withBase("img/logo.png")} alt="ALPS Research Conference" width="753" height="306" />
+        </a>
+        <span class="sr-only">Venue map</span>
+      </h1>
     </header>
     <main class="map-main">
       <VenuePlan client:load size="page" legend designControls />
@@ -52,39 +52,25 @@ const fontFaceCss = `@font-face {
   }
 
   .map-head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 16px;
-    padding-top: clamp(28px, 5vw, 64px);
-    padding-bottom: clamp(20px, 3vw, 32px);
+    padding-top: clamp(24px, 4vw, 48px);
+    padding-bottom: clamp(18px, 2.5vw, 28px);
+  }
+
+  .map-head h1 {
+    margin: 0;
+  }
+
+  .map-head a {
+    display: inline-block;
+  }
+
+  .map-head img {
+    display: block;
+    width: auto;
+    height: clamp(44px, 6vw, 64px);
   }
 
   .map-main {
     padding-bottom: clamp(48px, 6vw, 88px);
-  }
-
-  .map-sub {
-    margin: 0.75rem 0 0;
-    color: rgba(238, 244, 248, 0.68);
-    font-size: 1rem;
-  }
-
-  .map-hint {
-    margin: 0;
-    color: rgba(238, 244, 248, 0.68);
-    font-size: 0.8rem;
-    letter-spacing: 0.01em;
-    text-align: right;
-  }
-
-  @media (max-width: 640px) {
-    .map-head {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .map-hint {
-      text-align: left;
-    }
   }
 </style>

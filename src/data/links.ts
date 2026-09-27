@@ -97,7 +97,7 @@ export const QUICK_LINKS: QuickLink[] = [
   {
     id: "wifi",
     label: "Wifi",
-    summary: "KUK-Wifi · username and password ALPS-2026",
+    summary: "Connect to KUK-Wifi",
     icon: "wifi",
     media: "wifi",
   },

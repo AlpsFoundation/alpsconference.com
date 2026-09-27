@@ -139,6 +139,24 @@
   stroke-width: 0.7px;
 }
 
+/* Tilted view: the walls are stacked copies of the base layer. The sides take one
+   flat shade (every colour the wall rules use is pointed at it); the top copy keeps
+   the normal wall style. */
+.vp {
+  --vp-side: color-mix(in srgb, var(--vp-wall) 62%, var(--vp-ink));
+}
+
+.vp-walls {
+  pointer-events: none;
+}
+
+.vp-wall-side {
+  --vp-wall: var(--vp-side);
+  --vp-hatch: var(--vp-side);
+  --vp-ink: var(--vp-side);
+  --vp-paper: var(--vp-side);
+}
+
 .vp-hatch-bg {
   fill: var(--vp-wall);
 }
@@ -596,8 +614,20 @@
   cursor: pointer;
 }
 
-.vp-card h3[tabindex]:hover,
-.vp-card h3[tabindex]:focus-visible {
+/* A heading that is also its section's only marker carries the badge itself. */
+.vp-card h3[data-n] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+
+.vp-card h3[data-n] .vp-badge {
+  margin-top: 0;
+}
+
+/* Underline the title only, never the badge beside it. */
+.vp-card h3[tabindex]:hover > span:not(.vp-badge),
+.vp-card h3[tabindex]:focus-visible > span:not(.vp-badge) {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
@@ -676,8 +706,17 @@
   color: #ffffff;
 }
 
+.vp-note {
+  display: block;
+  margin-top: 0.1rem;
+  color: var(--vp-muted);
+  font-size: 0.76rem;
+  font-weight: 450;
+}
+
 .vp-card li.is-hot .vp-badge,
-.vp-card li:focus-visible .vp-badge {
+.vp-card li:focus-visible .vp-badge,
+.vp-card h3.is-hot .vp-badge {
   background: var(--vp-hot);
   border-color: var(--vp-hot);
   color: #ffffff;

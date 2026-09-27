@@ -3,6 +3,7 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -13,7 +14,7 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { ArrowUpRight, Expand, Maximize2, Minus, Plus, Shirt, Toilet, X, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Coffee, Expand, Maximize2, Minus, Plus, Shirt, Toilet, X, type LucideIcon } from "lucide-react";
 import {
   VENUE_COLOR_KNOBS,
   VENUE_LEGEND,
@@ -24,13 +25,16 @@ import {
   VENUE_SECTIONS,
   type VenueColors,
   type VenueIcon,
+  type VenueSection,
 } from "../data/venuePlan";
 import { withBase } from "../lib/withBase";
 import "../styles/venue-plan.css";
 
 /* ---------- drawing (fetched once, only when a plan scrolls into view) ---------- */
 
-let planPromise: Promise<string> | null = null;
+type Plan = { drawing: string; walls: string };
+
+let planPromise: Promise<Plan> | null = null;
 
 function loadPlan() {
   planPromise ??= fetch(withBase(VENUE_PLAN_SRC))
@@ -44,6 +48,12 @@ function loadPlan() {
         .replace(/<defs\s*\/>/, "")
         .replace(/<text\b[^>]*>[\s\S]*?<\/text>/g, ""),
     )
+    // The solid walls of the base layer, redrawn raised when the plan is tilted.
+    .then((drawing) => {
+      const base = drawing.match(/<g id="01_BASE_SIMPLIFIEE">([\s\S]*?)<\/g>/)?.[1] ?? "";
+      const walls = base.match(/<path\b[^>]*fill="#000000"[^>]*\/>/g)?.join("") ?? "";
+      return { drawing, walls };
+    })
     .catch((err) => {
       planPromise = null;
       throw err;
@@ -52,7 +62,7 @@ function loadPlan() {
 }
 
 function usePlanWhenVisible(ref: RefObject<HTMLElement | null>) {
-  const [plan, setPlan] = useState<string | null>(null);
+  const [plan, setPlan] = useState<Plan | null>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -82,6 +92,10 @@ type Design = {
   walls: "hatched" | "solid" | "outline";
   size: number;
   grid: boolean;
+  /** Isometric tilt, 0 (flat, top-down) to 1. */
+  tilt: number;
+  /** Wall height multiplier for the tilted view. */
+  height: number;
 };
 
 const DESIGN_KEY = "alps-venue-map-design";
@@ -91,6 +105,8 @@ const defaultDesign = (): Design => ({
   walls: "hatched",
   size: 1,
   grid: true,
+  tilt: 0.5,
+  height: 1,
 });
 
 const luminance = (hex: string) => {
@@ -129,13 +145,30 @@ const upstairs = new Set<number>();
 const iconOf = new Map<number, VenueIcon>();
 for (const s of VENUE_SECTIONS)
   for (const i of s.items) {
+    // A marker listed twice (Saal 4 under ALPS and Lounges) is named by its first section.
+    if (sectionOf.has(i.n)) continue;
     sectionOf.set(i.n, s);
-    labelOf.set(i.n, i.label);
+    labelOf.set(i.n, i.label ?? s.title);
     if (i.upstairs) upstairs.add(i.n);
     if (i.icon) iconOf.set(i.n, i.icon);
   }
 
-const ICONS: Record<VenueIcon, LucideIcon> = { toilet: Toilet, wardrobe: Shirt };
+const ICONS: Record<VenueIcon, LucideIcon> = { toilet: Toilet, wardrobe: Shirt, coffee: Coffee };
+
+/** Legend badge: the number (or pictogram), plus the stairs glyph for upstairs items. */
+function Badge({ item }: { item: VenueSection["items"][number] }) {
+  const Icon = item.icon ? ICONS[item.icon] : null;
+  return (
+    <span className={`vp-badge ${item.upstairs ? "vp-badge--stairs" : ""}`}>
+      {Icon ? <Icon aria-hidden strokeWidth={2.2} /> : item.n}
+      {item.upstairs && (
+        <svg viewBox="-0.8 0.6 14.6 12.2" aria-label="upstairs">
+          <StairsGlyph />
+        </svg>
+      )}
+    </span>
+  );
+}
 
 /** Solid staircase with an up arrow (13 × 12 box), drawn beside the number on upstairs markers. */
 function StairsGlyph() {
@@ -148,13 +181,58 @@ function StairsGlyph() {
 }
 
 type View = { x: number; y: number; w: number; h: number };
+type Point = { x: number; y: number };
 const MAX_ZOOM = 14;
 
-function clampView(v: View): View {
-  const w = Math.min(VIEW.w, Math.max(VIEW.w / MAX_ZOOM, v.w));
-  const h = (w * VIEW.h) / VIEW.w;
-  const cx = Math.min(VIEW.x + VIEW.w, Math.max(VIEW.x, v.x + v.w / 2));
-  const cy = Math.min(VIEW.y + VIEW.h, Math.max(VIEW.y, v.y + v.h / 2));
+/* ---------- isometric tilt ---------- */
+
+// Stacked copies of the walls between the floor and their raised tops.
+const WALL_LAYERS = 12;
+
+type Tilt = {
+  /** SVG transform that lays the drawing down: a rotation, then a vertical squash. */
+  matrix: string;
+  /** Where a point of the drawing lands once tilted (markers stay upright at that spot). */
+  project: (p: Point) => Point;
+  /** The tilted crop plus the raised walls: what "fit" shows. */
+  frame: View;
+  /** Wall height, in screen-aligned user units. */
+  lift: number;
+};
+
+function tiltFor(t: number, height: number): Tilt {
+  const angle = (-16 * t * Math.PI) / 180;
+  const squash = 1 - 0.32 * t;
+  const [a, b, c, d] = [Math.cos(angle), squash * Math.sin(angle), -Math.sin(angle), squash * Math.cos(angle)];
+  // Pivot on the middle of the crop so the plan stays centred.
+  const cx = VIEW.x + VIEW.w / 2;
+  const cy = VIEW.y + VIEW.h / 2;
+  const e = cx - (a * cx + c * cy);
+  const f = cy - (b * cx + d * cy);
+  const project = ({ x, y }: Point) => ({ x: a * x + c * y + e, y: b * x + d * y + f });
+  const lift = 9 * t * height;
+  const corners = [
+    project({ x: VIEW.x, y: VIEW.y }),
+    project({ x: VIEW.x + VIEW.w, y: VIEW.y }),
+    project({ x: VIEW.x, y: VIEW.y + VIEW.h }),
+    project({ x: VIEW.x + VIEW.w, y: VIEW.y + VIEW.h }),
+  ];
+  const xs = corners.map((p) => p.x);
+  const ys = corners.map((p) => p.y);
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  return {
+    matrix: `matrix(${[a, b, c, d, e, f].map((n) => +n.toFixed(5)).join(" ")})`,
+    project,
+    frame: { x: x0, y: y0 - lift, w: x1 - x0, h: y1 - y0 + lift },
+    lift,
+  };
+}
+
+function clampView(v: View, F: View): View {
+  const w = Math.min(F.w, Math.max(F.w / MAX_ZOOM, v.w));
+  const h = (w * F.h) / F.w;
+  const cx = Math.min(F.x + F.w, Math.max(F.x, v.x + v.w / 2));
+  const cy = Math.min(F.y + F.h, Math.max(F.y, v.y + v.h / 2));
   return { x: cx - w / 2, y: cy - h / 2, w, h };
 }
 
@@ -195,8 +273,11 @@ export default function VenuePlan({
     setShowDesign(designControls && new URLSearchParams(location.search).get("design") === "1");
   }, [designControls]);
   const [design, setDesign] = useDesign(showDesign);
+  const tilt = useMemo(() => tiltFor(design.tilt, design.height), [design.tilt, design.height]);
+  const frame = useRef(tilt.frame);
+  frame.current = tilt.frame;
 
-  const view = useRef<View>({ ...VIEW });
+  const view = useRef<View>({ ...tilt.frame });
   const anim = useRef(0);
   const moved = useRef(0);
   const sizeRef = useRef(design.size);
@@ -248,11 +329,11 @@ export default function VenuePlan({
 
   const applyView = useCallback(
     (v: View) => {
-      const next = clampView(v);
+      const next = clampView(v, frame.current);
       view.current = next;
       svgRef.current?.setAttribute("viewBox", `${next.x} ${next.y} ${next.w} ${next.h}`);
       scaleMarkers();
-      setZoomed(next.w < VIEW.w * 0.98);
+      setZoomed(next.w < frame.current.w * 0.98);
       if (pinnedEl.current) setTip(tipFor(pinnedEl.current));
     },
     [scaleMarkers, tipFor],
@@ -262,7 +343,7 @@ export default function VenuePlan({
     (target: View) => {
       cancelAnimationFrame(anim.current);
       const from = { ...view.current };
-      const to = clampView(target);
+      const to = clampView(target, frame.current);
       const t0 = performance.now();
       const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
       const step = (t: number) => {
@@ -291,6 +372,12 @@ export default function VenuePlan({
   );
 
   const centre = () => ({ x: view.current.x + view.current.w / 2, y: view.current.y + view.current.h / 2 });
+
+  // A new tilt changes the whole frame: start again from the fitted plan.
+  useEffect(() => {
+    cancelAnimationFrame(anim.current);
+    applyView({ ...tilt.frame });
+  }, [tilt, applyView]);
 
   // Keep markers sized when the stage appears (e.g. an accordion opens) or resizes.
   useEffect(() => {
@@ -405,8 +492,9 @@ export default function VenuePlan({
 
   // Centre the plan on a point, zooming in to at least `zoom`× (never zooming back out).
   const focusPoint = (p: { x: number; y: number }, zoom = 3.2) => {
-    const w = Math.min(view.current.w, VIEW.w / zoom);
-    const h = (w * VIEW.h) / VIEW.w;
+    const F = frame.current;
+    const w = Math.min(view.current.w, F.w / zoom);
+    const h = (w * F.h) / F.w;
     animateTo({ x: p.x - w / 2, y: p.y - h / 2, w, h });
   };
 
@@ -425,7 +513,7 @@ export default function VenuePlan({
       // On a phone the legend sits below the plan: scrolling to it would push the plan off screen.
       if (!touch)
         rootRef.current
-          ?.querySelector(`.vp-legend li[data-n="${n}"]`)
+          ?.querySelector(`.vp-legend [data-n="${n}"]`)
           ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   };
@@ -437,15 +525,16 @@ export default function VenuePlan({
   };
 
   const focusMarkers = (ns: number[]) => {
-    const pts = VENUE_MARKERS.filter((m) => ns.includes(m.n));
+    const pts = VENUE_MARKERS.filter((m) => ns.includes(m.n)).map(tilt.project);
     if (!pts.length) return;
     const pad = 70;
     const minX = Math.min(...pts.map((p) => p.x)) - pad;
     const maxX = Math.max(...pts.map((p) => p.x)) + pad;
     const minY = Math.min(...pts.map((p) => p.y)) - pad;
     const maxY = Math.max(...pts.map((p) => p.y)) + pad;
-    const w = Math.max(maxX - minX, ((maxY - minY) * VIEW.w) / VIEW.h);
-    const h = (w * VIEW.h) / VIEW.w;
+    const F = frame.current;
+    const w = Math.max(maxX - minX, ((maxY - minY) * F.w) / F.h);
+    const h = (w * F.h) / F.w;
     animateTo({ x: (minX + maxX) / 2 - w / 2, y: (minY + maxY) / 2 - h / 2, w, h });
     stageRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   };
@@ -487,7 +576,7 @@ export default function VenuePlan({
         <svg
           ref={svgRef}
           className="vp-svg"
-          viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`}
+          viewBox={`${tilt.frame.x} ${tilt.frame.y} ${tilt.frame.w} ${tilt.frame.h}`}
           role="img"
           aria-label="Floor plan of the Kultur & Kongresshaus Aarau with numbered areas"
           onClick={(e) => {
@@ -507,12 +596,28 @@ export default function VenuePlan({
               <rect width="3.2" height="3.2" className="vp-hatch-bg" />
               <path d="M0 0V3.2" className="vp-hatch-line" />
             </pattern>
+            {plan && <g id={`${uid}-walls`} className="vp-plan" dangerouslySetInnerHTML={{ __html: plan.walls }} />}
           </defs>
-          <rect className="vp-grid-rect" x="-2000" y="-2000" width="5200" height="4800" fill={`url(#${uid}-grid)`} />
-          {plan && <g className="vp-plan" dangerouslySetInnerHTML={{ __html: plan }} />}
+          <g transform={tilt.matrix}>
+            <rect className="vp-grid-rect" x="-2000" y="-2000" width="5200" height="4800" fill={`url(#${uid}-grid)`} />
+            {plan && <g className="vp-plan" dangerouslySetInnerHTML={{ __html: plan.drawing }} />}
+          </g>
+          {plan && tilt.lift > 0 && (
+            <g className="vp-walls" aria-hidden>
+              {Array.from({ length: WALL_LAYERS }, (_, i) => (
+                <use
+                  key={i}
+                  href={`#${uid}-walls`}
+                  className={i === WALL_LAYERS - 1 ? "vp-wall-top" : "vp-wall-side"}
+                  transform={`translate(0 ${(-tilt.lift * (i + 1)) / WALL_LAYERS}) ${tilt.matrix}`}
+                />
+              ))}
+            </g>
+          )}
           {plan && (
             <g className="vp-markers">
               {VENUE_MARKERS.map((m, i) => {
+                const p = tilt.project(m);
                 const s = sectionOf.get(m.n)!;
                 const up = upstairs.has(m.n);
                 const Icon = iconOf.has(m.n) ? ICONS[iconOf.get(m.n)!] : null;
@@ -521,12 +626,12 @@ export default function VenuePlan({
                     key={i}
                     className={`vp-marker ${up ? "vp-marker--stairs" : ""} ${hotSet.has(m.n) ? "is-hot" : ""}`}
                     data-n={m.n}
-                    transform={`translate(${m.x} ${m.y})`}
+                    transform={`translate(${p.x.toFixed(2)} ${p.y.toFixed(2)})`}
                     {...(interactive
                       ? {
                           tabIndex: 0,
                           role: "button",
-                          "aria-label": `${Icon ? "" : `${m.n}: `}${labelOf.get(m.n)} (${s.title})${up ? ", upstairs" : ""}`,
+                          "aria-label": `${Icon ? "" : `${m.n}: `}${labelOf.get(m.n)}${labelOf.get(m.n) === s.title ? "" : ` (${s.title})`}${up ? ", upstairs" : ""}`,
                           onPointerEnter: (e: ReactPointerEvent<SVGGElement>) => {
                             if (e.pointerType === "touch") return;
                             setHover([m.n]);
@@ -548,12 +653,12 @@ export default function VenuePlan({
                             lastPointer.current = e.pointerType;
                           },
                           onClick: (e: ReactMouseEvent<SVGGElement>) =>
-                            togglePin(e.currentTarget, m, lastPointer.current === "touch"),
+                            togglePin(e.currentTarget, p, lastPointer.current === "touch"),
                           onKeyDown: (e: ReactKeyboardEvent<SVGGElement>) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
                               moved.current = 0;
-                              togglePin(e.currentTarget, m);
+                              togglePin(e.currentTarget, p);
                             }
                           },
                         }
@@ -612,7 +717,7 @@ export default function VenuePlan({
               <button type="button" aria-label="Zoom out" onClick={() => zoomAt(1 / 1.6, centre(), true)}>
                 <Minus aria-hidden />
               </button>
-              <button type="button" aria-label="Fit plan" onClick={() => animateTo({ ...VIEW })}>
+              <button type="button" aria-label="Fit plan" onClick={() => animateTo({ ...frame.current })}>
                 <Maximize2 aria-hidden />
               </button>
             </div>
@@ -644,10 +749,15 @@ export default function VenuePlan({
               >
                 {column.map((s) => {
                   const ns = s.items.map((i) => i.n);
+                  // An unlabelled item is the section itself: its badge goes in the heading.
+                  const lead = s.items.find((i) => !i.label);
+                  const rows = s.items.filter((i) => i.label);
                   return (
                     <article key={s.id} className="vp-group">
                       <h3
                         tabIndex={0}
+                        data-n={lead?.n}
+                        className={lead && hotSet.has(lead.n) ? "is-hot" : ""}
                         onPointerEnter={() => setHover(ns)}
                         onPointerLeave={() => setHover(null)}
                         onFocus={() => setHover(ns)}
@@ -655,37 +765,31 @@ export default function VenuePlan({
                         onClick={() => focusMarkers(ns)}
                         onKeyDown={(e) => e.key === "Enter" && focusMarkers(ns)}
                       >
-                        {s.title}
+                        {lead && <Badge item={lead} />}
+                        <span>{s.title}</span>
                       </h3>
-                      {s.items.length > 0 && (
+                      {rows.length > 0 && (
                         <ul>
-                          {s.items.map((i) => {
-                            const Icon = i.icon ? ICONS[i.icon] : null;
-                            return (
-                              <li
-                                key={i.n}
-                                data-n={i.n}
-                                tabIndex={0}
-                                className={hotSet.has(i.n) ? "is-hot" : ""}
-                                onPointerEnter={() => setHover([i.n])}
-                                onPointerLeave={() => setHover(null)}
-                                onFocus={() => setHover([i.n])}
-                                onBlur={() => setHover(null)}
-                                onClick={() => focusMarkers([i.n])}
-                                onKeyDown={(e) => e.key === "Enter" && focusMarkers([i.n])}
-                              >
-                                <span className={`vp-badge ${i.upstairs ? "vp-badge--stairs" : ""}`}>
-                                  {Icon ? <Icon aria-hidden strokeWidth={2.2} /> : i.n}
-                                  {i.upstairs && (
-                                    <svg viewBox="-0.8 0.6 14.6 12.2" aria-label="upstairs">
-                                      <StairsGlyph />
-                                    </svg>
-                                  )}
-                                </span>
-                                <span>{i.label}</span>
-                              </li>
-                            );
-                          })}
+                          {rows.map((i) => (
+                            <li
+                              key={i.n}
+                              data-n={i.n}
+                              tabIndex={0}
+                              className={hotSet.has(i.n) ? "is-hot" : ""}
+                              onPointerEnter={() => setHover([i.n])}
+                              onPointerLeave={() => setHover(null)}
+                              onFocus={() => setHover([i.n])}
+                              onBlur={() => setHover(null)}
+                              onClick={() => focusMarkers([i.n])}
+                              onKeyDown={(e) => e.key === "Enter" && focusMarkers([i.n])}
+                            >
+                              <Badge item={i} />
+                              <span>
+                                {i.label}
+                                {i.note && <small className="vp-note">{i.note}</small>}
+                              </span>
+                            </li>
+                          ))}
                         </ul>
                       )}
                     </article>
@@ -772,6 +876,31 @@ function DesignPanel({ design, setDesign }: { design: Design; setDesign: (d: Des
               step="0.05"
               value={design.size}
               onChange={(e) => set({ size: Number(e.target.value) })}
+            />
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>3D</legend>
+          <label className="vp-range">
+            Tilt
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={design.tilt}
+              onChange={(e) => set({ tilt: Number(e.target.value) })}
+            />
+          </label>
+          <label className="vp-range">
+            Wall height
+            <input
+              type="range"
+              min="0"
+              max="2.5"
+              step="0.1"
+              value={design.height}
+              onChange={(e) => set({ height: Number(e.target.value) })}
             />
           </label>
         </fieldset>
