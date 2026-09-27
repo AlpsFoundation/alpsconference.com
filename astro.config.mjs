@@ -60,9 +60,11 @@ export default defineConfig({
   },
   site,
   base,
-  // The 3D landing page used to live here before it became the home page.
   redirects: {
+    // The 3D landing page used to live here before it became the home page.
     "/fancy": "/",
+    // Short alias for the venue map.
+    "/plan": "/map",
   },
   integrations: [
     react(),

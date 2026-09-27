@@ -384,8 +384,22 @@ function WifiDetails() {
 
   return (
     <div className="space-y-3">
+      <ol className="list-decimal space-y-1 pl-5 text-sm leading-relaxed text-white/75">
+        <li>Connect to <strong className="text-white">{WIFI.network}</strong>.</li>
+        {WIFI.username && (
+          <li>
+            Open your browser to reach the login page and use{" "}
+            {WIFI.username === WIFI.password ? (
+              <><strong className="text-white">{WIFI.username}</strong> as both username and password.</>
+            ) : (
+              "the username and password below."
+            )}
+          </li>
+        )}
+      </ol>
       <dl className="links-details">
         <div><dt>Network</dt><dd>{WIFI.network}</dd></div>
+        {WIFI.username && <div><dt>Username</dt><dd className="font-mono">{WIFI.username}</dd></div>}
         {WIFI.password && <div><dt>Password</dt><dd className="font-mono">{WIFI.password}</dd></div>}
       </dl>
       {WIFI.password && (

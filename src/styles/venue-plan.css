@@ -239,6 +239,18 @@
   stroke: #ffffff;
 }
 
+/* Pictogram markers (bathrooms, wardrobe): a lucide icon in place of the number. */
+.vp-marker-glyph {
+  color: var(--m);
+  pointer-events: none;
+  transition: color 0.15s;
+}
+
+.vp-marker.is-hot .vp-marker-glyph,
+.vp-marker:focus-visible .vp-marker-glyph {
+  color: #ffffff;
+}
+
 .vp-marker.is-hot .vp-marker-halo {
   opacity: 0.3;
   transform: scale(1);
@@ -564,6 +576,11 @@
   background: color-mix(in srgb, var(--vp-hot) 12%, var(--vp-navy));
 }
 
+/* A legend column can stack several sections. */
+.vp-group + .vp-group {
+  margin-top: 1.3rem;
+}
+
 .vp-card h3 {
   margin: 0;
   color: #ffffff;
@@ -636,6 +653,11 @@
   height: 10px;
 }
 
+.vp-badge > svg:only-child {
+  width: 12px;
+  height: 12px;
+}
+
 .vp-badge .vp-stairs-steps {
   fill: currentColor;
 }
@@ -672,6 +694,10 @@
 
 .vp--embed .vp-card ul {
   margin-top: 0.55rem;
+}
+
+.vp--embed .vp-group + .vp-group {
+  margin-top: 0.9rem;
 }
 
 .vp--embed .vp-card li {

@@ -39,10 +39,12 @@ export type QuickLink = {
 
 export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/JFUPCQluZWD46grwWefrjE";
 
-// TODO: fill in the venue wifi before the conference. Empty values show "Shared at the venue".
+// KuK guest network: after joining, a captive portal asks for the username and password.
+// Empty values show "Shared at the venue".
 export const WIFI = {
-  network: "",
-  password: "",
+  network: "KUK-Wifi",
+  username: "ALPS-2026",
+  password: "ALPS-2026",
 };
 
 const VENUE_MAPS_URL =
@@ -95,7 +97,7 @@ export const QUICK_LINKS: QuickLink[] = [
   {
     id: "wifi",
     label: "Wifi",
-    summary: "Network and password",
+    summary: "KUK-Wifi · username and password ALPS-2026",
     icon: "wifi",
     media: "wifi",
   },

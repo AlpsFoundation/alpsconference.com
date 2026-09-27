@@ -7,70 +7,85 @@ export const VENUE_PLAN_SRC = "img/venue-plan.svg";
 /** Crop of the export's 1190×842 artboard that holds the floor plan. */
 export const VENUE_PLAN_VIEW = { x: 84, y: 134, w: 1052, h: 432 };
 
+export type VenueIcon = "toilet" | "wardrobe";
+
 export type VenueSection = {
   id: string;
   title: string;
-  /** `upstairs` items sit on the floor above: their marker is a stairs pill on the staircase. */
-  items: { n: number; label: string; upstairs?: boolean }[];
+  /**
+   * `upstairs` items sit on the floor above: their marker is a stairs pill on the staircase.
+   * `icon` items show a pictogram instead of their number, so their `n` is only an id.
+   */
+  items: { n: number; label: string; upstairs?: boolean; icon?: VenueIcon }[];
 };
 
-export const VENUE_SECTIONS: VenueSection[] = [
-  {
-    id: "alps",
-    title: "ALPS",
-    items: [
-      { n: 1, label: "Check in" },
-      { n: 2, label: "Merchandising" },
-      { n: 3, label: "Main Stage" },
-      { n: 4, label: "ALPS Posters" },
-      { n: 5, label: "Experiences (Saal 4)", upstairs: true },
-    ],
-  },
-  {
-    id: "lounges",
-    title: "Lounges + Catering",
-    items: [
-      { n: 6, label: "Lounges" },
-      { n: 7, label: "Catering and food installation" },
-    ],
-  },
-  {
-    id: "posters",
-    title: "Research Posters + Info Tables",
-    items: [
-      { n: 8, label: "Research posters" },
-      { n: 9, label: "Info table" },
-      { n: 10, label: "Info table" },
-      { n: 11, label: "Info table" },
-    ],
-  },
-  {
-    id: "art",
-    title: "LSD Blotter Art Exhibition + Live Painting Art Corner",
-    items: [
-      { n: 12, label: "LSD Blotter Art Exhibition" },
-      { n: 13, label: "Live Painting Art Corner" },
-    ],
-  },
+/** Legend columns, left to right; each column stacks one or more sections. */
+export const VENUE_LEGEND: VenueSection[][] = [
+  [
+    {
+      id: "alps",
+      title: "ALPS",
+      items: [
+        { n: 1, label: "Reception / Check in" },
+        { n: 2, label: "Merchandising" },
+        { n: 3, label: "Main Stage" },
+        { n: 4, label: "Experiences (Saal 4)", upstairs: true },
+      ],
+    },
+  ],
+  [
+    { id: "lounges", title: "Lounges", items: [{ n: 5, label: "Lounges" }] },
+    { id: "catering", title: "Catering", items: [{ n: 6, label: "Catering and food installation" }] },
+    {
+      id: "facilities",
+      title: "Facilities",
+      items: [
+        { n: 101, label: "Bathrooms", icon: "toilet" },
+        { n: 102, label: "Wardrobe", icon: "wardrobe" },
+      ],
+    },
+  ],
+  [
+    { id: "research-posters", title: "Research Posters", items: [{ n: 7, label: "Research posters" }] },
+    {
+      id: "info-tables",
+      title: "Info Tables",
+      items: [
+        { n: 8, label: "OPEN Foundation" },
+        { n: 9, label: "Nachtschatten Verlag" },
+        { n: 10, label: "Info table" },
+      ],
+    },
+  ],
+  [
+    { id: "blotter-art", title: "LSD Blotter Art Exhibition", items: [{ n: 11, label: "LSD Blotter Art Exhibition" }] },
+    { id: "live-painting", title: "Live Painting Art Corner", items: [{ n: 12, label: "Live Painting Art Corner" }] },
+    { id: "alps-posters", title: "ALPS Posters", items: [{ n: 13, label: "ALPS Posters" }] },
+  ],
 ];
+
+export const VENUE_SECTIONS: VenueSection[] = VENUE_LEGEND.flat();
 
 /** Centres of the markers in the source drawing (user units). */
 export const VENUE_MARKERS: { n: number; x: number; y: number }[] = [
   { n: 1, x: 522, y: 469 },
   { n: 2, x: 505, y: 326 },
   { n: 3, x: 992, y: 385 },
-  { n: 4, x: 178, y: 246 },
-  { n: 5, x: 566, y: 194 }, // on the staircase at the top of the plan
-  { n: 6, x: 465, y: 203 },
-  { n: 6, x: 320, y: 326 },
-  { n: 6, x: 344, y: 450 },
-  { n: 7, x: 419, y: 385 },
-  { n: 8, x: 159, y: 449 },
-  { n: 9, x: 240, y: 314 },
-  { n: 10, x: 175, y: 294 },
-  { n: 11, x: 176, y: 325 },
-  { n: 12, x: 594, y: 390 },
-  { n: 13, x: 310, y: 439 },
+  { n: 4, x: 566, y: 194 }, // on the staircase at the top of the plan
+  { n: 5, x: 465, y: 203 },
+  { n: 5, x: 320, y: 326 },
+  { n: 5, x: 344, y: 450 },
+  { n: 6, x: 419, y: 385 },
+  { n: 7, x: 159, y: 449 },
+  { n: 8, x: 240, y: 314 },
+  { n: 9, x: 175, y: 294 },
+  { n: 10, x: 176, y: 325 },
+  { n: 11, x: 594, y: 390 },
+  { n: 12, x: 310, y: 439 },
+  { n: 13, x: 178, y: 246 },
+  { n: 101, x: 627, y: 200 }, // the two rooms right of the staircase
+  { n: 101, x: 698, y: 200 },
+  { n: 102, x: 612, y: 272 }, // middle of the corridor wall facing the bathrooms
 ];
 
 export type VenueColors = {

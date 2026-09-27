@@ -13,15 +13,17 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { ArrowUpRight, Expand, Maximize2, Minus, Plus, X } from "lucide-react";
+import { ArrowUpRight, Expand, Maximize2, Minus, Plus, Shirt, Toilet, X, type LucideIcon } from "lucide-react";
 import {
   VENUE_COLOR_KNOBS,
+  VENUE_LEGEND,
   VENUE_MARKERS,
   VENUE_PALETTES,
   VENUE_PLAN_SRC,
   VENUE_PLAN_VIEW as VIEW,
   VENUE_SECTIONS,
   type VenueColors,
+  type VenueIcon,
 } from "../data/venuePlan";
 import { withBase } from "../lib/withBase";
 import "../styles/venue-plan.css";
@@ -124,12 +126,16 @@ function useDesign(persist: boolean) {
 const sectionOf = new Map<number, (typeof VENUE_SECTIONS)[number]>();
 const labelOf = new Map<number, string>();
 const upstairs = new Set<number>();
+const iconOf = new Map<number, VenueIcon>();
 for (const s of VENUE_SECTIONS)
   for (const i of s.items) {
     sectionOf.set(i.n, s);
     labelOf.set(i.n, i.label);
     if (i.upstairs) upstairs.add(i.n);
+    if (i.icon) iconOf.set(i.n, i.icon);
   }
+
+const ICONS: Record<VenueIcon, LucideIcon> = { toilet: Toilet, wardrobe: Shirt };
 
 /** Solid staircase with an up arrow (13 × 12 box), drawn beside the number on upstairs markers. */
 function StairsGlyph() {
@@ -157,7 +163,7 @@ function clampView(v: View): View {
 export type VenuePlanProps = {
   /** Show the numbered legend under the plan. */
   legend?: boolean;
-  /** Show the palette/colour/wall/marker design panel (persisted per browser). */
+  /** Offer the palette/colour/wall/marker design panel (persisted per browser) when the URL has ?design=1. */
   designControls?: boolean;
   /** For plans inside a scrolling page: ctrl/⌘ + wheel zooms, one finger scrolls until zoomed in. */
   cooperative?: boolean;
@@ -183,7 +189,12 @@ export default function VenuePlan({
   const stageRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const plan = usePlanWhenVisible(rootRef);
-  const [design, setDesign] = useDesign(designControls);
+  // The design panel is a working tool: only offered with ?design=1 in the URL.
+  const [showDesign, setShowDesign] = useState(false);
+  useEffect(() => {
+    setShowDesign(designControls && new URLSearchParams(location.search).get("design") === "1");
+  }, [designControls]);
+  const [design, setDesign] = useDesign(showDesign);
 
   const view = useRef<View>({ ...VIEW });
   const anim = useRef(0);
@@ -504,6 +515,7 @@ export default function VenuePlan({
               {VENUE_MARKERS.map((m, i) => {
                 const s = sectionOf.get(m.n)!;
                 const up = upstairs.has(m.n);
+                const Icon = iconOf.has(m.n) ? ICONS[iconOf.get(m.n)!] : null;
                 return (
                   <g
                     key={i}
@@ -514,7 +526,7 @@ export default function VenuePlan({
                       ? {
                           tabIndex: 0,
                           role: "button",
-                          "aria-label": `${m.n}: ${labelOf.get(m.n)} (${s.title})${up ? ", upstairs" : ""}`,
+                          "aria-label": `${Icon ? "" : `${m.n}: `}${labelOf.get(m.n)} (${s.title})${up ? ", upstairs" : ""}`,
                           onPointerEnter: (e: ReactPointerEvent<SVGGElement>) => {
                             if (e.pointerType === "touch") return;
                             setHover([m.n]);
@@ -559,6 +571,12 @@ export default function VenuePlan({
                             <StairsGlyph />
                           </g>
                         </>
+                      ) : Icon ? (
+                        <>
+                          <circle className="vp-marker-halo" r="15" />
+                          <circle className="vp-marker-dot" r="10.5" />
+                          <Icon className="vp-marker-glyph" x={-6.5} y={-6.5} width={13} height={13} strokeWidth={2.2} />
+                        </>
                       ) : (
                         <>
                           <circle className="vp-marker-halo" r="15" />
@@ -580,7 +598,7 @@ export default function VenuePlan({
 
         {tip && (
           <div ref={tipRef} className="vp-tip" style={{ left: tip.left, top: tip.top }}>
-            <b>{tip.n}</b> {labelOf.get(tip.n)}
+            {!iconOf.has(tip.n) && <b>{tip.n}</b>} {labelOf.get(tip.n)}
             <TipContext n={tip.n} />
           </div>
         )}
@@ -613,59 +631,68 @@ export default function VenuePlan({
           </button>
         )}
 
-        {designControls && <DesignPanel design={design} setDesign={setDesign} />}
+        {showDesign && <DesignPanel design={design} setDesign={setDesign} />}
       </div>
 
       {legend && (
         <div className="vp-legend-wrap">
           <section className="vp-legend" aria-label="Legend">
-            {VENUE_SECTIONS.map((s) => {
-              const ns = s.items.map((i) => i.n);
-              const cardHot = s.items.some((i) => hotSet.has(i.n));
-              return (
-                <article key={s.id} className={`vp-card ${cardHot ? "has-hot" : ""}`}>
-                  <h3
-                    tabIndex={0}
-                    onPointerEnter={() => setHover(ns)}
-                    onPointerLeave={() => setHover(null)}
-                    onFocus={() => setHover(ns)}
-                    onBlur={() => setHover(null)}
-                    onClick={() => focusMarkers(ns)}
-                    onKeyDown={(e) => e.key === "Enter" && focusMarkers(ns)}
-                  >
-                    {s.title}
-                  </h3>
-                  {s.items.length > 0 && (
-                    <ul>
-                      {s.items.map((i) => (
-                        <li
-                          key={i.n}
-                          data-n={i.n}
-                          tabIndex={0}
-                          className={hotSet.has(i.n) ? "is-hot" : ""}
-                          onPointerEnter={() => setHover([i.n])}
-                          onPointerLeave={() => setHover(null)}
-                          onFocus={() => setHover([i.n])}
-                          onBlur={() => setHover(null)}
-                          onClick={() => focusMarkers([i.n])}
-                          onKeyDown={(e) => e.key === "Enter" && focusMarkers([i.n])}
-                        >
-                          <span className={`vp-badge ${i.upstairs ? "vp-badge--stairs" : ""}`}>
-                            {i.n}
-                            {i.upstairs && (
-                              <svg viewBox="-0.8 0.6 14.6 12.2" aria-label="upstairs">
-                                <StairsGlyph />
-                              </svg>
-                            )}
-                          </span>
-                          <span>{i.label}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </article>
-              );
-            })}
+            {VENUE_LEGEND.map((column) => (
+              <div
+                key={column[0].id}
+                className={`vp-card ${column.some((s) => s.items.some((i) => hotSet.has(i.n))) ? "has-hot" : ""}`}
+              >
+                {column.map((s) => {
+                  const ns = s.items.map((i) => i.n);
+                  return (
+                    <article key={s.id} className="vp-group">
+                      <h3
+                        tabIndex={0}
+                        onPointerEnter={() => setHover(ns)}
+                        onPointerLeave={() => setHover(null)}
+                        onFocus={() => setHover(ns)}
+                        onBlur={() => setHover(null)}
+                        onClick={() => focusMarkers(ns)}
+                        onKeyDown={(e) => e.key === "Enter" && focusMarkers(ns)}
+                      >
+                        {s.title}
+                      </h3>
+                      {s.items.length > 0 && (
+                        <ul>
+                          {s.items.map((i) => {
+                            const Icon = i.icon ? ICONS[i.icon] : null;
+                            return (
+                              <li
+                                key={i.n}
+                                data-n={i.n}
+                                tabIndex={0}
+                                className={hotSet.has(i.n) ? "is-hot" : ""}
+                                onPointerEnter={() => setHover([i.n])}
+                                onPointerLeave={() => setHover(null)}
+                                onFocus={() => setHover([i.n])}
+                                onBlur={() => setHover(null)}
+                                onClick={() => focusMarkers([i.n])}
+                                onKeyDown={(e) => e.key === "Enter" && focusMarkers([i.n])}
+                              >
+                                <span className={`vp-badge ${i.upstairs ? "vp-badge--stairs" : ""}`}>
+                                  {Icon ? <Icon aria-hidden strokeWidth={2.2} /> : i.n}
+                                  {i.upstairs && (
+                                    <svg viewBox="-0.8 0.6 14.6 12.2" aria-label="upstairs">
+                                      <StairsGlyph />
+                                    </svg>
+                                  )}
+                                </span>
+                                <span>{i.label}</span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            ))}
           </section>
         </div>
       )}
@@ -678,7 +705,8 @@ export default function VenuePlan({
 /** Section name (skipped when it only repeats the label) and an upstairs hint, under the tooltip label. */
 function TipContext({ n }: { n: number }) {
   const title = sectionOf.get(n)?.title ?? "";
-  const parts = [title.includes(labelOf.get(n) ?? "") ? "" : title, upstairs.has(n) ? "Upstairs" : ""].filter(Boolean);
+  const repeats = title.toLowerCase() === (labelOf.get(n) ?? "").toLowerCase();
+  const parts = [repeats ? "" : title, upstairs.has(n) ? "Upstairs" : ""].filter(Boolean);
   return parts.length ? <small>{parts.join(" · ")}</small> : null;
 }
 
