@@ -17,6 +17,15 @@
       "migrations_dir": "migrations"
     }
   ],
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
+  ],
+  "vars": {
+    "BOOKING_FROM_EMAIL": "bookings@alpsconference.com",
+    "BOOKING_FROM_NAME": "ALPS Conference"
+  },
   "observability": {
     "enabled": true
   }

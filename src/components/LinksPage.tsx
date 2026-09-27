@@ -1,4 +1,14 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+  type RefObject,
+} from "react";
+import { animate } from "animejs";
 import {
   ArrowUpRight,
   BookOpen,
@@ -9,6 +19,7 @@ import {
   Clock,
   Copy,
   History,
+  Loader2,
   MapPin,
   MessageCircle,
   MessageSquareHeart,
@@ -28,9 +39,10 @@ import {
   type TimelineEntry,
 } from "../data/conferenceTimeline";
 import { EXPERIENCE_PORTRAITS } from "../data/experiences";
-import { QUICK_LINKS, VENUE_MAP_IMAGE, WIFI, type QuickLinkAction, type QuickLinkIcon } from "../data/links";
+import { QUICK_LINKS, WIFI, type QuickLinkAction, type QuickLinkIcon } from "../data/links";
 import type { SignupAvailability, SignupResult } from "../lib/experienceSignups";
 import { withBase } from "../lib/withBase";
+import VenuePlan from "./VenuePlan";
 
 const ICONS: Record<QuickLinkIcon, LucideIcon> = {
   whatsapp: MessageCircle,
@@ -47,7 +59,57 @@ const ICONS: Record<QuickLinkIcon, LucideIcon> = {
 const API = withBase("api/experience-signups");
 const STORAGE_KEY = "alps-links-signups";
 
-type StoredSignup = SignupResult & { cancelToken: string; firstName: string; lastName: string };
+type StoredSignup = SignupResult & {
+  cancelToken: string;
+  fullName: string;
+  email: string;
+};
+
+/** Staggered fade/scale as accordion rows and cards enter the viewport. */
+function useRevealOnScroll(rootRef: RefObject<HTMLElement | null>, ready: boolean) {
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !ready) return;
+
+    const items = [...root.querySelectorAll<HTMLElement>("[data-reveal]")];
+    if (!items.length) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      for (const el of items) {
+        el.style.opacity = "1";
+        el.style.transform = "none";
+      }
+      return;
+    }
+
+    const revealed = new WeakSet<Element>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting || revealed.has(entry.target)) continue;
+          revealed.add(entry.target);
+          const el = entry.target as HTMLElement;
+          const delay = Number(el.dataset.revealDelay ?? 0);
+          const targetOpacity = el.classList.contains("links-acc--muted") ? 0.55 : 1;
+          animate(el, {
+            opacity: [0, targetOpacity],
+            scale: [0.97, 1],
+            translateY: [14, 0],
+            delay,
+            duration: 480,
+            easing: "easeOutCubic",
+          });
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.14, rootMargin: "0px 0px -6% 0px" },
+    );
+
+    for (const el of items) observer.observe(el);
+    return () => observer.disconnect();
+  }, [rootRef, ready]);
+}
 
 /* ---------- Clock (supports ?time=yyyy-mm-dd-hh-mm) ---------- */
 
@@ -259,20 +321,30 @@ function AccordionItem({
   summary,
   children,
   disabled,
+  revealDelay = 0,
 }: {
   id: string;
   group: string;
   summary: ReactNode;
   children: ReactNode;
   disabled?: boolean;
+  revealDelay?: number;
 }) {
   return (
-    <details id={id} name={group} className={`links-acc ${disabled ? "links-acc--muted" : ""}`}>
+    <details
+      id={id}
+      name={group}
+      data-reveal
+      data-reveal-delay={revealDelay}
+      className={`links-acc links-reveal ${disabled ? "links-acc--muted" : ""}`}
+    >
       <summary className="links-acc__summary">
         {summary}
         <ChevronDown className="links-acc__chevron h-4 w-4 shrink-0 text-white/45" aria-hidden />
       </summary>
-      <div className="links-acc__body">{children}</div>
+      <div className="links-acc__panel">
+        <div className="links-acc__body">{children}</div>
+      </div>
     </details>
   );
 }
@@ -294,25 +366,6 @@ function ActionLink({ action, secondary }: { action: QuickLinkAction; secondary?
       {action.label}
       {!action.internal && <ArrowUpRight className="h-4 w-4" aria-hidden />}
     </a>
-  );
-}
-
-function VenueMap() {
-  if (VENUE_MAP_IMAGE) {
-    return (
-      <img
-        src={withBase(VENUE_MAP_IMAGE)}
-        alt="Floor plan of the Kultur & Kongresshaus Aarau"
-        className="w-full rounded-xl border border-white/10"
-      />
-    );
-  }
-  return (
-    <div className="links-map-placeholder" role="img" aria-label="Venue floor plan coming soon">
-      <MapPin className="h-6 w-6 text-support-light" aria-hidden />
-      <span className="font-semibold text-white">Venue floor plan</span>
-      <span className="text-xs text-white/55">Coming soon — rooms, info table and facilities</span>
-    </div>
   );
 }
 
@@ -360,13 +413,14 @@ function QuickLinks({ now }: { now: Date }) {
     <section aria-labelledby="links-heading">
       <h2 id="links-heading" className="sr-only">Quick links</h2>
       <div className="space-y-2.5">
-        {links.map((link) => {
+        {links.map((link, index) => {
           const Icon = ICONS[link.icon];
           return (
             <AccordionItem
               key={link.id}
               id={link.id}
               group="quick-links"
+              revealDelay={index * 45}
               summary={
                 <>
                   <span className="links-icon"><Icon className="h-5 w-5" aria-hidden /></span>
@@ -378,7 +432,7 @@ function QuickLinks({ now }: { now: Date }) {
               }
             >
               <div className="space-y-4">
-                {link.media === "venue-map" && <VenueMap />}
+                {link.media === "venue-map" && <VenuePlan size="embed" cooperative expandable legend />}
                 {link.media === "wifi" && <WifiDetails />}
                 {link.body && <p className="text-sm leading-relaxed text-white/75">{link.body}</p>}
                 {link.details && (
@@ -448,12 +502,15 @@ function SignupPanel({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [justConfirmed, setJustConfirmed] = useState(false);
   const full = availability ? availability.confirmed >= availability.capacity : false;
   const fieldId = (name: string) => `${session.id}-${name}`;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const fullName = String(form.get("fullName") ?? "").trim();
+    const email = String(form.get("email") ?? "").trim();
     setPending(true);
     setError(null);
     try {
@@ -462,8 +519,8 @@ function SignupPanel({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           experienceId: session.id,
-          firstName: form.get("firstName"),
-          lastName: form.get("lastName"),
+          fullName,
+          email,
           company: form.get("company"),
         }),
       });
@@ -476,17 +533,18 @@ function SignupPanel({
       if (data.alreadySignedUp) {
         setNotice(
           data.status === "confirmed"
-            ? "This name is already on the list — the spot is confirmed."
-            : `This name is already on the waitlist, at position ${data.waitlistPosition}.`,
+            ? "This email is already on the list — the spot is confirmed. Check your inbox for the confirmation."
+            : `This email is already on the waitlist, at position ${data.waitlistPosition}.`,
         );
         onSignedUp({ ...data, alreadySignedUp: true });
         return;
       }
+      setJustConfirmed(true);
       onSignedUp({
         ...data,
         cancelToken: data.cancelToken ?? "",
-        firstName: String(form.get("firstName")),
-        lastName: String(form.get("lastName")),
+        fullName,
+        email,
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong, please try again.");
@@ -508,6 +566,7 @@ function SignupPanel({
       if (!response.ok && response.status !== 404) {
         throw new Error(((await response.json()) as { error?: string }).error ?? "Could not cancel, please try again.");
       }
+      setJustConfirmed(false);
       onCancelled(session.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not cancel, please try again.");
@@ -522,21 +581,31 @@ function SignupPanel({
 
       {own ? (
         <>
-          <div className="rounded-xl border border-white/15 bg-white/[0.06] p-4 text-sm text-white/85">
-            <p className="flex items-center gap-2 font-semibold text-white">
-              <Check className="h-4 w-4 text-support-light" aria-hidden />
-              {own.status === "confirmed" ? "Your spot is confirmed" : `You're #${own.waitlistPosition} on the waitlist`}
+          <div className={`links-confirm ${justConfirmed ? "links-confirm--fresh" : ""}`} role="status">
+            <span className="links-confirm__icon" aria-hidden>
+              <Check className="h-5 w-5" />
+            </span>
+            <p className="font-semibold text-white">
+              {own.status === "confirmed" ? "You're confirmed" : `You're #${own.waitlistPosition} on the waitlist`}
             </p>
-            <p className="mt-1">
-              Signed up as {own.firstName} {own.lastName}.
+            <p className="mt-1 text-sm text-white/75">
+              Signed up as {own.fullName}
+              {own.email ? ` · ${own.email}` : ""}.
               {own.status === "confirmed"
-                ? " Please arrive a few minutes early."
-                : " We move you up automatically when a spot frees — check back here."}
+                ? " A confirmation email is on its way — it includes a calendar link."
+                : " We'll move you up automatically when a spot frees, and email you if you're promoted."}
             </p>
           </div>
           {!closed && (
             <button type="button" onClick={cancel} disabled={pending} className="links-button links-button--ghost mt-2">
-              {pending ? "Cancelling…" : "Cancel my spot"}
+              {pending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  Cancelling…
+                </>
+              ) : (
+                "Cancel my spot"
+              )}
             </button>
           )}
         </>
@@ -545,25 +614,51 @@ function SignupPanel({
       ) : notice ? (
         <p className="rounded-xl border border-white/15 bg-white/[0.06] p-4 text-sm text-white/85">{notice}</p>
       ) : (
-        <form onSubmit={submit} className="space-y-3">
+        <form onSubmit={submit} className="space-y-3" aria-busy={pending}>
           <p className="flex items-center gap-2 text-sm text-white/65">
             <Users className="h-4 w-4" aria-hidden />
             {availabilityLabel(availability) ?? `${session.capacity} spots`}
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            <label htmlFor={fieldId("first")} className="block text-sm text-white/75">
-              First name
-              <input id={fieldId("first")} name="firstName" required maxLength={60} autoComplete="given-name" className="links-input" />
-            </label>
-            <label htmlFor={fieldId("last")} className="block text-sm text-white/75">
-              Last name
-              <input id={fieldId("last")} name="lastName" required maxLength={60} autoComplete="family-name" className="links-input" />
-            </label>
-          </div>
+          <label htmlFor={fieldId("name")} className="block text-sm text-white/75">
+            Full name
+            <input
+              id={fieldId("name")}
+              name="fullName"
+              required
+              maxLength={120}
+              autoComplete="name"
+              disabled={pending}
+              className="links-input"
+            />
+          </label>
+          <label htmlFor={fieldId("email")} className="block text-sm text-white/75">
+            Email
+            <input
+              id={fieldId("email")}
+              name="email"
+              type="email"
+              required
+              maxLength={254}
+              autoComplete="email"
+              inputMode="email"
+              disabled={pending}
+              className="links-input"
+            />
+          </label>
           <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
           <button type="submit" disabled={pending} className="links-button mt-2">
-            {pending ? "Saving…" : full ? "Join the waitlist" : "Save my spot"}
+            {pending ? (
+              <>
+                <Loader2 className="links-spinner h-4 w-4" aria-hidden />
+                Saving your spot…
+              </>
+            ) : full ? (
+              "Join the waitlist"
+            ) : (
+              "Save my spot"
+            )}
           </button>
+          <p className="text-xs text-white/45">We'll email a confirmation with a calendar link and a cancel link.</p>
         </form>
       )}
 
@@ -602,7 +697,7 @@ function ExperiencesSection({
     .filter(([, sessions]) => sessions.length > 0);
   const past = days.flatMap(([, sessions]) => sessions.filter(isPast));
 
-  const renderSession = (session: ExperienceSession) => {
+  const renderSession = (session: ExperienceSession, index = 0) => {
     const own = mine[session.id];
     const ended = isPast(session);
     const started = session.start ? now >= session.start : false;
@@ -614,6 +709,7 @@ function ExperiencesSection({
         id={session.id}
         group="experiences"
         disabled={ended}
+        revealDelay={index * 45}
         summary={
           <>
             {portrait ? (
@@ -666,7 +762,7 @@ function ExperiencesSection({
 
   return (
     <section aria-labelledby="experiences-heading" className="space-y-4">
-      <div>
+      <div data-reveal className="links-reveal">
         <p className="links-eyebrow">Experiences</p>
         <h2 id="experiences-heading" className="mt-1 text-2xl font-semibold text-white">Save your spot</h2>
         <p className="mt-1 text-sm text-white/65">
@@ -676,23 +772,28 @@ function ExperiencesSection({
 
       {upcomingDays.map(([day, sessions]) => (
         <div key={day}>
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-[0.14em] text-white/55">{day}</h3>
-          <div className="space-y-2">{sessions.map(renderSession)}</div>
+          <h3
+            data-reveal
+            className="links-reveal mb-2 text-sm font-semibold uppercase tracking-[0.14em] text-white/55"
+          >
+            {day}
+          </h3>
+          <div className="space-y-2">{sessions.map((session, i) => renderSession(session, i))}</div>
         </div>
       ))}
 
       {past.length > 0 && (
-        <details className="links-past">
+        <details className="links-past" data-reveal>
           <summary className="links-past__summary">
             <span>Past sessions ({past.length})</span>
             <ChevronDown className="links-acc__chevron h-4 w-4" aria-hidden />
           </summary>
-          <div className="mt-2 space-y-2">{past.map(renderSession)}</div>
+          <div className="mt-2 space-y-2">{past.map((session, i) => renderSession(session, i))}</div>
         </details>
       )}
 
       {dropIns.length > 0 && (
-        <div className="links-card">
+        <div className="links-card links-reveal" data-reveal>
           <p className="links-eyebrow">Drop in, no sign-up needed</p>
           <ul className="mt-3 space-y-2 text-sm">
             {dropIns.map((s) => (
@@ -711,10 +812,44 @@ function ExperiencesSection({
   );
 }
 
+function normalizeStored(raw: Record<string, unknown>): Record<string, StoredSignup> {
+  const next: Record<string, StoredSignup> = {};
+  for (const [id, value] of Object.entries(raw)) {
+    if (!value || typeof value !== "object") continue;
+    const entry = value as Partial<StoredSignup> & {
+      firstName?: string;
+      lastName?: string;
+    };
+    if (
+      typeof entry.signupId !== "number" ||
+      typeof entry.cancelToken !== "string" ||
+      typeof entry.experienceId !== "string"
+    ) {
+      continue;
+    }
+    const fullName =
+      typeof entry.fullName === "string" && entry.fullName
+        ? entry.fullName
+        : [entry.firstName, entry.lastName].filter(Boolean).join(" ");
+    next[id] = {
+      experienceId: entry.experienceId,
+      signupId: entry.signupId,
+      status: entry.status === "waitlist" ? "waitlist" : "confirmed",
+      waitlistPosition: entry.waitlistPosition,
+      cancelToken: entry.cancelToken,
+      fullName,
+      email: typeof entry.email === "string" ? entry.email : "",
+    };
+  }
+  return next;
+}
+
 export default function LinksPage() {
   const clock = useConferenceClock();
+  const pageRef = useRef<HTMLDivElement>(null);
   const [availability, setAvailability] = useState<SignupAvailability | null>(null);
   const [mine, setMine] = useState<Record<string, StoredSignup>>({});
+  useRevealOnScroll(pageRef, Boolean(clock));
 
   const refresh = useCallback(async () => {
     try {
@@ -728,8 +863,9 @@ export default function LinksPage() {
   }, []);
 
   useEffect(() => {
-    const stored = readStored();
+    const stored = normalizeStored(readStored() as Record<string, unknown>);
     setMine(stored);
+    writeStored(stored);
     refresh();
     const timer = window.setInterval(refresh, 60_000);
 
@@ -789,8 +925,8 @@ export default function LinksPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col gap-8 px-4 pb-12 pt-10">
-      <header className="text-center">
+    <div ref={pageRef} className="mx-auto flex min-h-screen max-w-md flex-col gap-8 px-4 pb-12 pt-10">
+      <header className="links-reveal text-center" data-reveal>
         <a href={withBase("/")} className="inline-block">
           <img src={withBase("img/logo.png")} alt="ALPS" className="mx-auto h-9 w-auto" />
         </a>
@@ -802,7 +938,9 @@ export default function LinksPage() {
       </header>
 
       {clock ? (
-        <StatusSection now={clock.now} travelling={clock.travelling} />
+        <div className="links-reveal" data-reveal data-reveal-delay="40">
+          <StatusSection now={clock.now} travelling={clock.travelling} />
+        </div>
       ) : (
         <div className="links-card h-32 animate-pulse" aria-hidden />
       )}
@@ -817,7 +955,7 @@ export default function LinksPage() {
         onCancelled={handleCancelled}
       />
 
-      <footer className="mt-auto text-center text-sm text-white/50">
+      <footer className="links-reveal mt-auto text-center text-sm text-white/50" data-reveal>
         <a href={withBase("/")} className="hover:text-white">alpsconference.com</a>
         {" · "}
         <a href="https://www.alps.foundation/" target="_blank" rel="noopener noreferrer" className="hover:text-white">

@@ -13,7 +13,7 @@ export const prerender = false;
 export const GET: APIRoute = async () =>
   json({ availability: await getAvailability(env.DB) });
 
-export const POST: APIRoute = ({ request }) => handleSignup(env.DB, request);
+export const POST: APIRoute = ({ request }) => handleSignup(env, request);
 
 export const DELETE: APIRoute = ({ request }) => handleCancel(env.DB, request);
 

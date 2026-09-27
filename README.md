@@ -85,8 +85,12 @@ Configure these in `.dev.vars`:
 | `INFOMANIAK_NEWSLETTER_DOMAIN` | Yes* | Infomaniak newsletter domain ID. Must be a positive integer. |
 | `INFOMANIAK_NEWSLETTER_GROUPS` | No | Optional comma-separated group IDs and/or group names to assign new subscribers to. |
 | `NEWSLETTER_DEBUG` | No | Set to `1` to include extra `debug` details in API error responses during local troubleshooting. |
+| `BOOKING_FROM_EMAIL` | No | From-address for experience booking confirmations. Defaults via `wrangler.jsonc` to `bookings@alpsconference.com`. |
+| `BOOKING_FROM_NAME` | No | Display name for booking confirmations. Defaults to `ALPS Conference`. |
 
 \* Required when you want to test the newsletter signup route. The static landing page itself does not require them.
+
+Experience booking emails use the Cloudflare Email Service `EMAIL` binding (`send_email` in `wrangler.jsonc`). Onboard `alpsconference.com` under **Email Sending** before relying on delivery in production.
 
 ### Runtime secrets in Cloudflare
 

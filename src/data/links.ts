@@ -37,17 +37,13 @@ export type QuickLink = {
   showUntil?: string;
 };
 
-// TODO: paste the WhatsApp community invite link.
-export const WHATSAPP_COMMUNITY_URL = "";
+export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/JFUPCQluZWD46grwWefrjE";
 
 // TODO: fill in the venue wifi before the conference. Empty values show "Shared at the venue".
 export const WIFI = {
   network: "",
   password: "",
 };
-
-// TODO: add a floor plan (e.g. "img/venue-map.png" in public/). Empty shows a placeholder.
-export const VENUE_MAP_IMAGE = "";
 
 const VENUE_MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=Kultur+%26+Kongresshaus+Aarau%2C+Schlossplatz+9%2C+5000+Aarau";

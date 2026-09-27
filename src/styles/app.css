@@ -888,12 +888,18 @@ button.links-row:not(:disabled):hover {
   color: white;
 }
 
+.links-reveal {
+  opacity: 0;
+  transform: translateY(14px) scale(0.97);
+  will-change: opacity, transform;
+}
+
 .links-acc {
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.05);
-  transition: background-color 150ms ease, border-color 150ms ease;
+  transition: background-color 180ms ease, border-color 180ms ease;
 }
 
 .links-acc:hover,
@@ -922,25 +928,119 @@ button.links-row:not(:disabled):hover {
   border-radius: 1rem;
 }
 
-.links-acc__chevron { transition: rotate 200ms ease; }
+.links-acc__chevron { transition: rotate 260ms ease; }
 .links-acc[open] .links-acc__chevron { rotate: 180deg; }
 
+.links-acc__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
+}
+
+.links-acc[open] > .links-acc__panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition-delay: 0ms, 40ms;
+}
+
 .links-acc__body {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 1rem;
+  transition: padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.links-acc[open] > .links-acc__panel > .links-acc__body {
   padding: 0.25rem 1rem 1rem;
 }
 
+/* Prefer the native details-content height tween when available; the grid
+   panel above is the fallback for browsers without interpolate-size. */
 @supports (interpolate-size: allow-keywords) {
   .links-acc { interpolate-size: allow-keywords; }
   .links-acc::details-content {
     height: 0;
     overflow: clip;
-    transition: height 220ms ease, content-visibility 220ms allow-discrete;
+    opacity: 0;
+    transition:
+      height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 220ms ease,
+      content-visibility 280ms allow-discrete;
   }
-  .links-acc[open]::details-content { height: auto; }
+  .links-acc[open]::details-content {
+    height: auto;
+    opacity: 1;
+  }
+  .links-acc__panel {
+    display: block;
+    opacity: 1;
+    transition: none;
+  }
+  .links-acc[open] > .links-acc__panel > .links-acc__body,
+  .links-acc__body {
+    padding: 0.25rem 1rem 1rem;
+  }
+}
+
+.links-spinner {
+  animation: links-spin 0.75s linear infinite;
+}
+
+@keyframes links-spin {
+  to { transform: rotate(360deg); }
+}
+
+.links-confirm {
+  display: grid;
+  justify-items: start;
+  gap: 0.15rem;
+  padding: 1rem 1.05rem;
+  border: 1px solid color-mix(in srgb, var(--color-support-light) 45%, transparent);
+  border-radius: 0.9rem;
+  background: rgba(46, 124, 199, 0.16);
+}
+
+.links-confirm__icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  margin-bottom: 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-support-light);
+}
+
+.links-confirm--fresh .links-confirm__icon {
+  animation: links-confirm-pop 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes links-confirm-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .links-acc::details-content, .links-acc__chevron { transition: none; }
+  .links-reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .links-acc::details-content,
+  .links-acc__chevron,
+  .links-acc__panel,
+  .links-acc__body {
+    transition: none;
+  }
+
+  .links-spinner,
+  .links-confirm--fresh .links-confirm__icon {
+    animation: none;
+  }
 }
 
 .links-details {
@@ -963,21 +1063,6 @@ button.links-row:not(:disabled):hover {
   color: rgba(255, 255, 255, 0.88);
 }
 
-.links-map-placeholder {
-  display: flex;
-  aspect-ratio: 4 / 3;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  border: 1px dashed rgba(255, 255, 255, 0.25);
-  border-radius: 0.9rem;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px) 0 0 / 1.5rem 1.5rem,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px) 0 0 / 1.5rem 1.5rem,
-    rgba(8, 47, 74, 0.5);
-  text-align: center;
-}
 
 .links-thumb {
   width: 3.5rem;

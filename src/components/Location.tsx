@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { animate } from "animejs";
 import { MapPin, Train, Building2, Utensils } from "lucide-react";
 import { withBase } from "../lib/withBase";
+import { VenuePlanCard } from "./VenuePlan";
 
 const FEATURES = [
   { icon: Building2, text: "1000m\u00B2 of flexible event space" },
@@ -142,6 +143,10 @@ export default function Location() {
                   <span className="text-white/78 leading-relaxed">{f.text}</span>
                 </div>
               ))}
+            </div>
+
+            <div data-fade-up className="opacity-0">
+              <VenuePlanCard />
             </div>
           </div>
         </div>
