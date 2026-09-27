@@ -26,244 +26,157 @@ const fontFaceCss = `@font-face {
 ---
 
 <!doctype html>
-<html lang="en" data-booklet-view="print" data-booklet-toc="closed">
+<html lang="en" data-toc="closed">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Conference Booklet | ALPS Conference 2026</title>
-    <meta
-      name="description"
-      content="Conference booklet for ALPS 2026 in Aarau, Switzerland."
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Conference booklet | ALPS Conference 2026</title>
+    <meta name="description" content="Conference booklet for ALPS 2026, 9–10 October in Aarau, Switzerland: program, speakers, experiences, venue map and partners." />
     <meta name="robots" content="noindex, nofollow, noarchive" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="ALPS 2026 conference booklet" />
     <meta property="og:image" content={ogImageUrl} />
-    <meta name="theme-color" content="#0B3C5D" />
+    <meta name="theme-color" content="#123e67" />
     <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
     <style is:global set:html={fontFaceCss}></style>
     <script is:inline>
-      (function () {
-        var key = "alps-booklet-view";
-        var view = "print";
-        try {
-          var param = new URLSearchParams(window.location.search).get("view");
-          if (param === "print" || param === "web") {
-            view = param;
-          } else {
-            var saved = window.localStorage.getItem(key);
-            if (saved === "print" || saved === "web") {
-              view = saved;
-            } else if (window.matchMedia("(max-width: 720px)").matches) {
-              view = "web";
-            }
-          }
-        } catch (error) {
-          view = "print";
-        }
-        document.documentElement.dataset.bookletView = view;
-      })();
+      // Scroll reveals only run when motion is welcome; without this class everything is simply visible.
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
+        document.documentElement.classList.add("bk-motion");
+      }
     </script>
   </head>
   <body>
-    <header class="booklet-chrome">
-      <div class="booklet-chrome__toggle">
-        <div class="booklet-view-toggle" role="group" aria-label="Booklet layout">
-          <button type="button" data-view="print" aria-pressed="true">Print (A4)</button>
-          <button type="button" data-view="web" aria-pressed="false">Web (responsive)</button>
-        </div>
-      </div>
-      <div class="booklet-chrome__nav">
-        <p class="booklet-chrome__title" id="booklet-current-section">ALPS 2026</p>
-        <button
-          type="button"
-          class="booklet-chrome__menu"
-          aria-expanded="false"
-          aria-controls="booklet-toc"
-          aria-label="Table of contents"
-        >
-          <span class="booklet-chrome__menu-icon" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-        </button>
-      </div>
+    <a class="bk-skip" href="#index">Skip to contents</a>
+    <header class="bk-chrome">
+      <a class="bk-chrome__home" href="#top" aria-label="Back to the cover">
+        <img src={withBase("img/booklet/alps-mark.png")} alt="" width="26" height="22" />
+        <span>Booklet</span>
+      </a>
+      <p class="bk-chrome__section" aria-live="polite"><span id="bk-current">ALPS 2026</span></p>
+      <button type="button" class="bk-chrome__menu" aria-expanded="false" aria-controls="bk-toc">
+        <span class="bk-chrome__menu-label">Contents</span>
+        <span class="bk-chrome__menu-icon" aria-hidden="true"><span></span><span></span></span>
+      </button>
     </header>
 
-    <button type="button" class="booklet-toc__backdrop" tabindex="-1" aria-label="Close table of contents" hidden></button>
-    <nav class="booklet-toc" id="booklet-toc" aria-label="Table of contents" hidden>
-      <p class="booklet-toc__kicker">ALPS 2026</p>
-      <p class="booklet-toc__heading">Contents</p>
+    <div class="bk-toc__backdrop" hidden></div>
+    <nav class="bk-toc" id="bk-toc" aria-label="Contents" hidden>
+      <p class="bk-toc__kicker">ALPS 2026 · Conference booklet</p>
       <ol>
         {BOOKLET_NAV.map((item) => (
-          <li>
-            <a href={`#${item.id}`}>{item.label}</a>
-          </li>
+          <li><a href={`#${item.id}`}>{item.label}</a></li>
         ))}
       </ol>
     </nav>
 
-    <div class="booklet-stage">
-      <div class="booklet-scale" id="booklet-scale">
-        <Booklet />
-      </div>
-    </div>
+    <main class="booklet">
+      <Booklet />
+    </main>
+
     <script>
-      const VIEW_KEY = "alps-booklet-view";
+      const root = document.documentElement;
+      const pages = [...document.querySelectorAll<HTMLElement>(".bk-page")];
 
-      function currentView() {
-        return document.documentElement.dataset.bookletView === "web" ? "web" : "print";
+      /* ------------------------------------------------ scroll reveals -- */
+      if (root.classList.contains("bk-motion")) {
+        // Each page's direct content blocks rise in one after another; lists and grids stagger their items.
+        const STAGGER = ".bk-schedule > li, .bk-team > li, .bk-partners li, .bk-poster-grid > li, .bk-tracks > *, .bk-events > *, .bk-panel > li, .bk-tiers > li, .bk-index > li";
+        for (const page of pages) {
+          const body = page.querySelector(".bk-body");
+          if (!body) continue;
+          page.querySelectorAll<HTMLElement>(STAGGER).forEach((item, index) => {
+            item.dataset.reveal = "item";
+            item.style.setProperty("--i", String(index % 12));
+          });
+          // Blocks fade in as a whole, unless they hold staggered items: then their other children do.
+          let order = 0;
+          const mark = (block: HTMLElement) => {
+            if (block.dataset.reveal) return;
+            if (block.querySelector("[data-reveal='item']")) {
+              for (const child of block.children) mark(child as HTMLElement);
+              return;
+            }
+            block.dataset.reveal = "";
+            block.style.setProperty("--i", String(Math.min(order++, 6)));
+          };
+          for (const block of body.children) mark(block as HTMLElement);
+        }
+
+        const revealer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.classList.add("is-in");
+              revealer.unobserve(entry.target);
+            }
+          },
+          { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
+        );
+        document.querySelectorAll("[data-reveal], .bk-art").forEach((el) => revealer.observe(el));
       }
 
-      function resetWebLayout() {
-        const stage = document.querySelector<HTMLElement>(".booklet-stage");
-        const scaleEl = document.querySelector<HTMLElement>("#booklet-scale");
-        if (!stage || !scaleEl) return;
-        scaleEl.style.removeProperty("--booklet-scale");
-        scaleEl.style.height = "";
-        stage.style.height = "";
+      /* --------------------------------------------- current section -- */
+      const current = document.getElementById("bk-current");
+      const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>(".bk-toc a")];
+      const firstPageOf = new Map<string, string>();
+      for (const link of tocLinks) {
+        const page = document.querySelector<HTMLElement>(link.hash);
+        if (page?.dataset.section) firstPageOf.set(page.dataset.section, link.hash);
       }
+      let active: HTMLElement | null = null;
+      const visible = new Map<Element, number>();
+      const tracker = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) visible.set(entry.target, entry.isIntersecting ? entry.intersectionRatio : 0);
+          // The page covering the band under the header wins.
+          let best: HTMLElement | null = null;
+          let bestRatio = 0;
+          for (const [el, ratio] of visible) {
+            if (ratio > bestRatio) {
+              best = el as HTMLElement;
+              bestRatio = ratio;
+            }
+          }
+          if (!best || best === active) return;
+          active = best;
+          const section = best.dataset.section ?? "ALPS 2026";
+          if (current && current.textContent !== section) current.textContent = section;
+          const hash = firstPageOf.get(section);
+          for (const link of tocLinks) {
+            const isCurrent = link.hash === hash;
+            link.classList.toggle("is-current", isCurrent);
+            if (isCurrent) link.setAttribute("aria-current", "location");
+            else link.removeAttribute("aria-current");
+          }
+        },
+        { rootMargin: "-64px 0px -55% 0px", threshold: [0, 0.01, 0.1, 0.25, 0.5, 0.75, 1] }
+      );
+      pages.forEach((page) => tracker.observe(page));
 
-      function fitPrintBooklet() {
-        const stage = document.querySelector<HTMLElement>(".booklet-stage");
-        const scaleEl = document.querySelector<HTMLElement>("#booklet-scale");
-        if (!stage || !scaleEl) return;
-        scaleEl.style.height = "auto";
-        stage.style.height = "auto";
-        const pageWidth = 210 * (96 / 25.4);
-        const nextScale = Math.min(1, stage.clientWidth / pageWidth);
-        scaleEl.style.setProperty("--booklet-scale", String(nextScale));
-        stage.style.height = `${scaleEl.scrollHeight * nextScale}px`;
-      }
-
-      function fitBooklet() {
-        if (currentView() === "web") resetWebLayout();
-        else fitPrintBooklet();
-      }
-
-      function syncViewToggle() {
-        const view = currentView();
-        document.querySelectorAll<HTMLButtonElement>(".booklet-view-toggle [data-view]").forEach((button) => {
-          button.setAttribute("aria-pressed", String(button.dataset.view === view));
-        });
-      }
+      /* ----------------------------------------------------- contents -- */
+      const menu = document.querySelector<HTMLButtonElement>(".bk-chrome__menu");
+      const toc = document.getElementById("bk-toc");
+      const backdrop = document.querySelector<HTMLElement>(".bk-toc__backdrop");
 
       function setTocOpen(open: boolean) {
-        const root = document.documentElement;
-        const button = document.querySelector<HTMLButtonElement>(".booklet-chrome__menu");
-        const nav = document.querySelector<HTMLElement>("#booklet-toc");
-        const backdrop = document.querySelector<HTMLButtonElement>(".booklet-toc__backdrop");
-        root.dataset.bookletToc = open ? "open" : "closed";
-        button?.setAttribute("aria-expanded", String(open));
-        button?.setAttribute("aria-label", open ? "Close table of contents" : "Table of contents");
-        nav?.toggleAttribute("hidden", !open);
+        root.dataset.toc = open ? "open" : "closed";
+        menu?.setAttribute("aria-expanded", String(open));
+        toc?.toggleAttribute("hidden", !open);
         backdrop?.toggleAttribute("hidden", !open);
+        if (open) toc?.querySelector<HTMLAnchorElement>("a.is-current, a")?.focus({ preventScroll: true });
       }
 
-      function setView(view: "print" | "web") {
-        document.documentElement.dataset.bookletView = view;
-        if (view === "print") setTocOpen(false);
-        syncViewToggle();
-        try {
-          localStorage.setItem(VIEW_KEY, view);
-        } catch {
-          /* ignore quota / private mode */
-        }
-        requestAnimationFrame(() => {
-          fitBooklet();
-          updateStickyTitle();
-          updateChromeHeight();
-        });
-      }
-
-      function updateChromeHeight() {
-        const chrome = document.querySelector<HTMLElement>(".booklet-chrome");
-        if (!chrome) return;
-        document.documentElement.style.setProperty("--booklet-chrome-h", `${chrome.offsetHeight}px`);
-      }
-
-      function updateStickyTitle() {
-        const titleEl = document.querySelector("#booklet-current-section");
-        if (!titleEl) return;
-        const chromeHeight =
-          parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--booklet-chrome-h")) || 56;
-        const probeY = Math.min(window.innerHeight - 8, chromeHeight + 24);
-        const probeX = Math.min(120, window.innerWidth / 2);
-        const hit = document.elementFromPoint(probeX, probeY);
-        const page = hit?.closest<HTMLElement>(".booklet-page");
-        const nextTitle = page?.dataset.section;
-        if (nextTitle && titleEl.textContent !== nextTitle) titleEl.textContent = nextTitle;
-
-        let activeId = page?.id ?? "";
-        if (!activeId && page?.dataset.section) {
-          document.querySelectorAll<HTMLElement>(".booklet-page[data-section]").forEach((candidate) => {
-            if (!activeId && candidate.dataset.section === page.dataset.section && candidate.id) {
-              activeId = candidate.id;
-            }
-          });
-        }
-        document.querySelectorAll<HTMLAnchorElement>(".booklet-toc a").forEach((link) => {
-          const isCurrent = activeId !== "" && link.hash === `#${activeId}`;
-          link.classList.toggle("is-current", isCurrent);
-          if (isCurrent) link.setAttribute("aria-current", "location");
-          else link.removeAttribute("aria-current");
-        });
-      }
-
-      const chrome = document.querySelector(".booklet-chrome");
-      if (chrome) {
-        updateChromeHeight();
-        new ResizeObserver(() => {
-          updateChromeHeight();
-          fitBooklet();
-        }).observe(chrome);
-      }
-
-      document.querySelectorAll<HTMLButtonElement>(".booklet-view-toggle [data-view]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const view = button.dataset.view === "web" ? "web" : "print";
-          setView(view);
-          const url = new URL(window.location.href);
-          url.searchParams.set("view", view);
-          history.replaceState(null, "", url);
-        });
-      });
-
-      document.querySelector(".booklet-chrome__menu")?.addEventListener("click", () => {
-        setTocOpen(document.documentElement.dataset.bookletToc !== "open");
-      });
-      document.querySelector(".booklet-toc__backdrop")?.addEventListener("click", () => setTocOpen(false));
-      document.querySelectorAll<HTMLAnchorElement>(".booklet-toc a").forEach((link) => {
-        link.addEventListener("click", () => setTocOpen(false));
-      });
+      menu?.addEventListener("click", () => setTocOpen(root.dataset.toc !== "open"));
+      backdrop?.addEventListener("click", () => setTocOpen(false));
+      tocLinks.forEach((link) => link.addEventListener("click", () => setTocOpen(false)));
       window.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") setTocOpen(false);
+        if (event.key === "Escape" && root.dataset.toc === "open") {
+          setTocOpen(false);
+          menu?.focus();
+        }
       });
-
-      let titleFrame = 0;
-      window.addEventListener(
-        "scroll",
-        () => {
-          if (titleFrame) return;
-          titleFrame = requestAnimationFrame(() => {
-            titleFrame = 0;
-            updateStickyTitle();
-          });
-        },
-        { passive: true }
-      );
-      window.addEventListener("pageshow", () => {
-        fitBooklet();
-        updateStickyTitle();
-      });
-      window.addEventListener("resize", fitBooklet);
-
-      syncViewToggle();
-      fitBooklet();
-      updateStickyTitle();
-      setTimeout(updateStickyTitle, 50);
     </script>
   </body>
 </html>

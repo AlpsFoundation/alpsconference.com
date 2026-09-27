@@ -1,63 +1,44 @@
 ---
 import { withBase } from "../../lib/withBase";
 
+/** One A4 page of the booklet: gradient wash, line-art layer, content, section word and folio. */
 interface Props {
   id?: string;
-  number?: string | number;
-  /** Large word set at the foot of the page. */
-  section?: string;
-  sectionStyle?: "bold" | "light";
-  /** Overrides the sticky title shown by the web chrome. */
-  stickyTitle?: string;
-  /** Corner the magenta wash rolls out of. */
-  wash?: "tl" | "tr" | "bl" | "br" | "none";
+  /** Page number printed in the corner and listed in the index. */
+  number?: number;
+  /** Section shown in the sticky header while this page is on screen. */
+  section: string;
+  /** Oversized word anchored to the foot of the page, as on the printed section openers. */
+  word?: string;
+  wordStyle?: "regular" | "light";
+  /** Corner the pink wash rolls out of. */
+  wash?: "tl" | "tr" | "bl" | "br";
   logo?: boolean;
-  cover?: boolean;
-  notes?: boolean;
-  /** Tightens body type for pages carrying a long abstract. */
-  dense?: boolean;
-  /** Drops the tall footer reserve on pages with no section word. */
-  tight?: boolean;
+  class?: string;
 }
 
 const {
   id,
   number,
   section,
-  sectionStyle = "bold",
-  stickyTitle,
+  word,
+  wordStyle = "regular",
   wash = "tl",
   logo = true,
-  cover = false,
-  notes = false,
-  dense = false,
-  tight = false,
+  class: className,
 } = Astro.props;
-
-const pageNumber = number == null ? "" : String(number).padStart(2, "0");
-const dataSection = stickyTitle ?? section;
-const logoSrc = withBase("img/booklet/alps-mark.png");
 ---
 
-<article
-  id={id}
-  data-section={dataSection}
-  class:list={[
-    "booklet-page",
-    `booklet-page--wash-${wash}`,
-    cover && "booklet-page--cover",
-    notes && "booklet-page--notes",
-    dense && "booklet-page--dense",
-    (tight || !section) && "booklet-page--tight",
-  ]}
->
-  <div class="bk-deco-layer" aria-hidden="true">
-    <slot name="deco" />
-  </div>
-  {logo && <img class="bk-logo" src={logoSrc} alt="ALPS" />}
+<section id={id} data-section={section} class:list={["bk-page", `bk-page--${wash}`, className]}>
+  {Astro.slots.has("art") && (
+    <div class="bk-art" aria-hidden="true">
+      <slot name="art" />
+    </div>
+  )}
+  {logo && <img class="bk-mark" src={withBase("img/booklet/alps-mark.png")} alt="" aria-hidden="true" />}
   <div class="bk-body">
     <slot />
+    {word && <p class="bk-word" data-style={wordStyle} aria-hidden="true">{word}</p>}
   </div>
-  {section && <p class="bk-section" data-style={sectionStyle}>{section}</p>}
-  {pageNumber && <p class="bk-number">{pageNumber}</p>}
-</article>
+  {number != null && <p class="bk-folio" aria-hidden="true">{String(number).padStart(2, "0")}</p>}
+</section>

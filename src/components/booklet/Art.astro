@@ -1,0 +1,37 @@
+---
+import { withBase } from "../../lib/withBase";
+
+/**
+ * A piece of the booklet's white line art, placed in page units: every length
+ * is a percentage of the page width (cqi), so the drawing keeps its position
+ * and bleed at any size, the way it sits on the printed A4 page.
+ */
+interface Props {
+  src: string;
+  width: number;
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+  rotate?: number;
+  flip?: boolean;
+  opacity?: number;
+}
+
+const { src, width, top, right, bottom, left, rotate = 0, flip = false, opacity = 0.5 } = Astro.props;
+
+const cqi = (value?: number) => (value == null ? undefined : `${value}cqi`);
+// Rotation and mirroring use the individual transform properties, leaving `translate` free for the reveal.
+const style = {
+  width: cqi(width),
+  top: cqi(top),
+  right: cqi(right),
+  bottom: cqi(bottom),
+  left: cqi(left),
+  rotate: rotate ? `${rotate}deg` : undefined,
+  scale: flip ? "-1 1" : undefined,
+  "--art-o": opacity,
+};
+---
+
+<img class="bk-art__img" src={withBase(`img/booklet/${src}`)} alt="" loading="lazy" decoding="async" style={style} />

@@ -1,8 +1,8 @@
 ---
 import BookletPage from "./BookletPage.astro";
-import Deco from "./Deco.astro";
-import { PROGRAM } from "../../data/program";
-import { PARTNERS } from "../../data/partners";
+import Art from "./Art.astro";
+import VenuePlan from "../VenuePlan";
+import { PROGRAM, type ProgramItem } from "../../data/program";
 import { WORKSHOP_DAY, WORKSHOP_TRACKS } from "../../data/workshops";
 import { EXPERIENCE_DAYS } from "../../data/experiences";
 import { EXPERIENCES } from "../../data/experienceProfiles";
@@ -13,8 +13,12 @@ import {
   FRIDAY_PANEL_SPEAKERS,
   SATURDAY_PANEL_SPEAKERS,
   speakerByName,
+  type Speaker,
 } from "../../data/speakers";
 import {
+  ADVISORY_BOARDS,
+  AFTERGLOW,
+  ALUMNI,
   BOOKLET_NAV,
   CORE_PROGRAMS,
   CREDITS,
@@ -23,97 +27,158 @@ import {
   INTRO_WELCOME,
   MEMBERSHIP,
   PALE_BLUE_DOT,
+  PARTNER_GROUPS,
+  PARTNERS_THANKS,
   PILLARS,
   POSTERS,
-  PRACTICAL_COPY,
   PROJECTS,
   SATURDAY_PANEL,
-  SPSN_COPY,
-  SPSN_GROUPS,
-  SWITZERLAND_COPY,
-  TEAM_SECTIONS,
-  VENUE_COPY,
+  SPSN,
+  SURVEY,
+  SWITZERLAND,
+  TEAM,
+  VENUE,
+  VENUE_MAP,
+  WORKSHOP_INTRO,
+  WORKSHOP_SUMMARIES,
+  type BookletNavId,
+  type TeamMember,
 } from "../../data/bookletContent";
 import { withBase } from "../../lib/withBase";
 
-const confirmedTalks = PROGRAM.flatMap((day) =>
-  day.items
-    .filter((item) => item.speakerName)
-    .map((item) => {
-      const speaker = speakerByName(item.speakerName!);
-      return speaker ? { speaker, item, day } : null;
-    })
-    .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
+const img = (path: string) => withBase(`img/${path}`);
+
+const DAY_STAMP: Record<string, string> = {
+  Thursday: "Thu 08.10.26",
+  Friday: "Fri 09.10.26",
+  Saturday: "Sat 10.10.26",
+};
+
+/* ------------------------------------------------------------- talks -- */
+
+type TalkEntry =
+  | { kind: "talk"; key: string; speaker: Speaker; item: ProgramItem; day: string }
+  | { kind: "panel"; key: string; panel: "friday" | "saturday"; item: ProgramItem; day: string };
+
+/** Talks and panels in running order, read straight from the conference program. */
+const talks: TalkEntry[] = PROGRAM.flatMap((day) =>
+  day.items.flatMap((item): TalkEntry[] => {
+    if (item.speakerName) {
+      const speaker = speakerByName(item.speakerName);
+      return speaker ? [{ kind: "talk", key: `talk-${speaker.name}`, speaker, item, day: day.day }] : [];
+    }
+    if (item.panel) return [{ kind: "panel", key: `panel-${item.panel}`, panel: item.panel, item, day: day.day }];
+    return [];
+  })
 );
 
-function handle(url?: string) {
-  if (!url) return undefined;
-  const slug = url.replace(/^.*instagram\.com\//, "").replace(/\/$/, "");
+function avatarStyle(image?: string) {
+  const crop = getImageCrop(image);
+  return `--crop-pos:${crop.position};--crop-scale:${crop.scale};--crop-origin:${getFaceCenter(crop.faceBox)}`;
+}
+
+function paragraphs(text?: string) {
+  return (text ?? "").split(/\n{2,}/).map((part) => part.trim()).filter(Boolean);
+}
+
+/** Short lines in an abstract ("Background", "Methods") are its section labels. */
+function isLabel(paragraph: string) {
+  return paragraph.length < 32 && !/[.:;!?]$/.test(paragraph);
+}
+
+function hasAbstract(abstract?: string) {
+  return Boolean(abstract && abstract !== "TBD" && abstract !== "To be announced");
+}
+
+/* ------------------------------------------------------- experiences -- */
+
+const startMinutes = (time: string) => {
+  const [h, m] = time.split(/[–-]/)[0].trim().split(":").map(Number);
+  return h * 60 + (m || 0);
+};
+
+/** Each day's sessions, one row per time slot ("11:00–12:00 & 14:30–15:30" becomes two rows). */
+const experienceDays = EXPERIENCE_DAYS.map((day) => ({
+  ...day,
+  rows: day.items
+    .filter((item) => item.kind !== "allday")
+    .flatMap((item) => item.time.split("&").map((time) => ({ ...item, time: time.trim() })))
+    .sort((a, b) => startMinutes(a.time) - startMinutes(b.time)),
+}));
+const allDayArt = EXPERIENCE_DAYS[0].items.find((item) => item.kind === "allday")?.credits ?? [];
+
+function handleOf(instagram?: string) {
+  if (!instagram) return undefined;
+  const slug = instagram.replace(/^.*instagram\.com\//, "").replace(/\/$/, "");
   return slug ? `@${slug}` : undefined;
 }
 
-/**
- * The booklet gives every artist and facilitator their own entry, so shared
- * cards (two painters on one site card) are flattened back into individuals.
- */
-const experienceProfiles = EXPERIENCES.map((category) => ({
-  category,
-  people: category.people.flatMap((person) =>
-    person.artists?.length
-      ? person.artists.map((artist) => ({
-          name: artist.name,
-          role: artist.sessions?.[0]?.title ?? person.role,
-          image: artist.image,
-          imagePosition: artist.imagePosition,
-          body: artist.sessions?.[0]?.description ?? artist.bio,
-          handle: handle(artist.links?.instagram),
-        }))
-      : [
-          {
-            name: person.name,
-            role: person.sessions?.[0]?.title ?? person.role,
-            image: person.image ?? person.gallery?.[0],
-            imagePosition: person.imagePosition,
-            body: person.sessions?.[0]?.description ?? person.bio,
-            handle: handle(person.links?.instagram),
-          },
-        ]
-  ),
-}));
+type Profile = {
+  name: string;
+  heading: string;
+  photos: { src: string; position?: string }[];
+  paragraphs: string[];
+  sessions: { title: string; paragraphs: string[] }[];
+  handle?: string;
+  website?: string;
+};
 
-/**
- * Experience profiles packed onto pages by estimated height, so a long profile
- * and two short ones can share a page without anything running past the trim.
- */
-const XP_PAGE_MM = 236;
-const XP_LABEL_MM = 14;
+type ProfileSource = {
+  name: string;
+  role?: string;
+  image?: string;
+  imagePosition?: string;
+  gallery?: string[];
+  bio?: string;
+  sessions?: { title: string; description: string }[];
+  links?: { website?: string; instagram?: string };
+};
 
-function experienceHeight(person: { body?: string }) {
-  const lines = Math.ceil((person.body?.length ?? 0) / 92);
-  return Math.max(50, 18 + lines * 3.9);
+function toProfile(person: ProfileSource, fallbackRole: string): Profile {
+  const sessions = person.sessions ?? [];
+  const single = sessions.length <= 1;
+  const photos = [person.image, ...(person.gallery?.length === 1 ? person.gallery : [])]
+    .filter((src): src is string => Boolean(src))
+    .map((src, index) => ({ src, position: index === 0 ? person.imagePosition : undefined }));
+  return {
+    name: person.name,
+    heading: single ? sessions[0]?.title ?? person.role ?? fallbackRole : person.role ?? fallbackRole,
+    photos,
+    paragraphs: [...paragraphs(person.bio), ...(single ? paragraphs(sessions[0]?.description) : [])],
+    sessions: single ? [] : sessions.map((session) => ({ title: session.title, paragraphs: paragraphs(session.description) })),
+    handle: handleOf(person.links?.instagram),
+    website: person.links?.website,
+  };
 }
 
-const experiencePages = experienceProfiles.flatMap(({ category, people }) => {
-  const pages: { category: typeof category; people: typeof people; first: boolean }[] = [];
-  let current: typeof people = [];
-  let used = XP_LABEL_MM;
-  for (const person of people) {
-    const height = experienceHeight(person);
-    if (current.length && used + height > XP_PAGE_MM) {
-      pages.push({ category, people: current, first: pages.length === 0 });
-      current = [];
-      used = 0;
-    }
-    current.push(person);
-    used += height;
+/** The booklet gives every artist and facilitator their own entry, two to a page. */
+const experiencePages = EXPERIENCES.flatMap((category) => {
+  const profiles = category.people.flatMap((person) =>
+    person.artists?.length
+      ? person.artists.map((artist) => toProfile(artist, person.role))
+      : [toProfile(person, person.role)]
+  );
+  const pages: { label: string; profiles: Profile[]; first: boolean }[] = [];
+  for (let i = 0; i < profiles.length; i += 2) {
+    pages.push({ label: category.title, profiles: profiles.slice(i, i + 2), first: i === 0 });
   }
-  if (current.length) pages.push({ category, people: current, first: pages.length === 0 });
   return pages;
 });
 
-const talkKeys = confirmedTalks.flatMap(({ speaker }) => [`talk-${speaker.name}`, `notes-${speaker.name}`]);
+/* -------------------------------------------------------------- team -- */
+
+const teamPages: { groups: { title: string; people: TeamMember[] }[]; heading: boolean }[] = [
+  {
+    heading: true,
+    groups: [TEAM[0], { title: TEAM[1].title, people: TEAM[1].people.slice(0, 8) }],
+  },
+  { heading: false, groups: [{ title: TEAM[1].title, people: TEAM[1].people.slice(8) }] },
+];
+
+/* ------------------------------------------------------------ folios -- */
 
 const PAGE_ORDER = [
+  "cover",
   "index",
   "welcome",
   "bridges",
@@ -122,47 +187,43 @@ const PAGE_ORDER = [
   "spsn",
   "switzerland",
   "venue",
-  "practical",
+  "map",
   "workshops",
-  ...PROGRAM.map((day) => `program-${day.day.toLowerCase()}`),
+  ...PROGRAM.map((day) => `program-${day.day}`),
   "experiences",
-  ...experiencePages.map((_, index) => `experiences-${index}`),
-  ...talkKeys,
-  "panel-friday",
-  "panel-saturday",
-  "team",
+  ...experiencePages.map((_, index) => `xp-${index}`),
+  "afterglow",
+  ...talks.map((entry) => entry.key),
+  ...teamPages.map((_, index) => `team-${index}`),
+  "boards",
   "partners",
+  "credits",
   "projects",
+  "research",
   "posters",
   "posters-grid",
   "membership",
+  "donations",
   "conclusions",
 ];
+const N = Object.fromEntries(PAGE_ORDER.map((key, index) => [key, index + 1])) as Record<string, number>;
 
-const PAGE = Object.fromEntries(PAGE_ORDER.map((key, index) => [key, index + 1])) as Record<string, number>;
-
-const TOC_PAGES: Record<(typeof BOOKLET_NAV)[number]["id"], number> = {
-  introduction: PAGE.welcome,
-  "who-we-are": PAGE.pillars,
-  venue: PAGE.venue,
-  workshops: PAGE.workshops,
-  program: PAGE["program-friday"],
-  experiences: PAGE.experiences,
-  talks: PAGE[talkKeys[0]],
-  team: PAGE.team,
-  partners: PAGE.partners,
-  projects: PAGE.projects,
-  posters: PAGE.posters,
-  membership: PAGE.membership,
-  conclusions: PAGE.conclusions,
+const TOC_PAGE: Record<BookletNavId, number> = {
+  introduction: N.welcome,
+  "who-we-are": N.pillars,
+  venue: N.venue,
+  workshops: N.workshops,
+  program: N[`program-${PROGRAM[0].day}`],
+  experiences: N.experiences,
+  talks: N[talks[0].key],
+  team: N["team-0"],
+  partners: N.partners,
+  projects: N.projects,
+  posters: N.posters,
+  membership: N.membership,
+  conclusions: N.conclusions,
 };
 
-const TOC = BOOKLET_NAV.map((item) => ({ ...item, page: TOC_PAGES[item.id] }));
-
-const kukInside = withBase("img/kuk-inside.jpg");
-const kukOutside = withBase("img/kuk-outside.jpg");
-const logoSrc = withBase("img/booklet/alps-wordmark.png");
-/** Colour marks for the white cover strip; the in-book pages use the white set. */
 const COVER_PARTNERS = [
   { file: "unibas.png", alt: "University of Basel" },
   { file: "unige.png", alt: "Université de Genève" },
@@ -171,230 +232,194 @@ const COVER_PARTNERS = [
   { file: "hug.png", alt: "Hôpitaux Universitaires de Genève" },
 ];
 
-function cropStyle(image?: string) {
-  const crop = getImageCrop(image);
-  return `--crop-pos:${crop.position};--crop-scale:${crop.scale};--crop-origin:${getFaceCenter(crop.faceBox)}`;
-}
-
-/** Long abstracts get a slightly tighter type size so the page still holds. */
-function isDense(speaker: { abstract?: string; bio?: string }) {
-  return (speaker.abstract?.length ?? 0) + (speaker.bio?.length ?? 0) > 2200;
-}
-
-function hasAbstract(abstract?: string) {
-  return Boolean(abstract && abstract !== "TBD" && abstract !== "To be announced");
-}
-
-function roleLine(speaker: { role?: string; institution?: string }) {
-  return [speaker.role, speaker.institution].filter(Boolean);
-}
-
-const dayStamp: Record<string, string> = {
-  Thursday: "THU 08.10.26",
-  Friday: "FRI 09.10.26",
-  Saturday: "SAT 10.10.26",
-};
+const ARROW = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>`;
 ---
 
-{/* ------------------------------------------------------------------ cover */}
-<BookletPage id="cover" cover wash="tl" logo={false} stickyTitle="ALPS 2026">
-  <Deco slot="deco" src="synapse.svg" w="300mm" top="-52mm" left="-118mm" opacity={0.3} />
-  <div class="bk-cover">
-    <div class="bk-cover__brand">
-      <img class="bk-cover__logo" src={logoSrc} alt="ALPS" />
-      <p class="bk-cover__tagline">Awareness<br />Lectures on<br />Psychedelic<br />Science</p>
-    </div>
-    <h1 class="bk-cover__title">Conference<br />booklet</h1>
-    <p class="bk-cover__meta">
-      9–10 October 2026<br />
-      Kultur &amp; Kongresshaus<br />
-      Aarau, Switzerland
-    </p>
+{/* ================================================================ cover */}
+<BookletPage id="top" section="ALPS 2026" logo={false} class="bk-cover" wash="tl">
+  <Art slot="art" src="mesh-synapse.webp" width={96} top={-18} left={-30} rotate={-8} opacity={0.62} />
+  <div class="bk-cover__brand">
+    <img class="bk-cover__logo" src={img("booklet/alps-wordmark.png")} alt="ALPS" />
+    <p class="bk-cover__tagline">Awareness<br />Lectures on<br />Psychedelic<br />Science</p>
   </div>
-  <div class="bk-cover__strip">
-    {COVER_PARTNERS.map((partner) => (
-      <img src={withBase(`img/booklet/academic/${partner.file}`)} alt={partner.alt} />
-    ))}
-  </div>
-</BookletPage>
-
-{/* ------------------------------------------------------------------ index */}
-<BookletPage id="index" number={PAGE.index} section="Index" wash="tl">
-  <Deco slot="deco" src="sphere.svg" w="150mm" top="-30mm" right="-50mm" opacity={0.15} />
-  <Deco slot="deco" src="sphere.svg" w="95mm" bottom="18mm" left="-28mm" opacity={0.13} />
-  <ol class="bk-index">
-    {TOC.map((item) => (
-      <li>
-        <a href={`#${item.id}`}>
-          <span>{item.printLabel}</span>
-          <span class="bk-index__leader"></span>
-          <span class="bk-index__page">{String(item.page).padStart(2, "0")}</span>
-        </a>
-      </li>
-    ))}
-  </ol>
-</BookletPage>
-
-{/* ----------------------------------------------------------- introduction */}
-<BookletPage id="introduction" number={PAGE.welcome} section="Introduction" wash="tl">
-  <Deco slot="deco" src="sphere.svg" w="120mm" bottom="30mm" left="-34mm" opacity={0.16} />
-  <h1 class="bk-h1">{INTRO_WELCOME.title}</h1>
-  <div class="bk-cols bk-copy">
-    {INTRO_WELCOME.columns.map((column) => (
-      <div>{column.map((paragraph) => <p>{paragraph}</p>)}</div>
-    ))}
-  </div>
-</BookletPage>
-
-<BookletPage number={PAGE.bridges} stickyTitle="Introduction" wash="tr" tight>
-  <Deco slot="deco" src="sphere.svg" w="110mm" bottom="-30mm" right="-30mm" opacity={0.12} />
-  <h1 class="bk-h1">{INTRO_BRIDGES.title}</h1>
-  <div class="bk-cols bk-copy">
-    {INTRO_BRIDGES.columns.map((column) => (
-      <div>{column.map((paragraph) => <p>{paragraph}</p>)}</div>
-    ))}
-  </div>
-</BookletPage>
-
-{/* ------------------------------------------------------------- who we are */}
-<BookletPage id="who-we-are" number={PAGE.pillars} section="Who we are" wash="bl">
-  <Deco slot="deco" src="sphere.svg" w="135mm" top="14mm" right="-45mm" opacity={0.14} />
-  <h1 class="bk-h1">{PILLARS.title}</h1>
-  <div class="bk-cols bk-copy">
-    {PILLARS.columns.map((column) => (
-      <div>{column.map((paragraph) => <p>{paragraph}</p>)}</div>
-    ))}
-  </div>
-</BookletPage>
-
-<BookletPage number={PAGE.programs} stickyTitle="Who we are" wash="tr" tight>
-  <Deco slot="deco" src="brain.svg" w="130mm" bottom="-32mm" left="-40mm" opacity={0.1} />
-  <h1 class="bk-h1">Our three core programs</h1>
-  <div class="bk-copy">
-    {CORE_PROGRAMS.map((program) => (
-      <>
-        <h2 class="bk-h2">{program.title}</h2>
-        <p>{program.body}</p>
-      </>
-    ))}
-  </div>
-</BookletPage>
-
-<BookletPage number={PAGE.spsn} stickyTitle="Who we are" wash="tl" tight>
-  <Deco slot="deco" src="sphere.svg" w="115mm" bottom="-26mm" left="-32mm" opacity={0.15} />
-  <h1 class="bk-h1">The Swiss Psychedelic Student Network (SPSN)</h1>
-  <div class="bk-spsn">
-    {SPSN_GROUPS.map((group) => (
-      <img src={withBase(`img/booklet/spsn/${group.file}`)} alt={`${group.name} — ${group.city}`} />
-    ))}
-  </div>
-  <div class="bk-cols bk-copy">
-    <div>{SPSN_COPY.slice(0, 2).map((paragraph) => <p>{paragraph}</p>)}</div>
-    <div>{SPSN_COPY.slice(2).map((paragraph) => <p>{paragraph}</p>)}</div>
-  </div>
-</BookletPage>
-
-<BookletPage number={PAGE.switzerland} stickyTitle="Who we are" wash="tr" tight>
-  <h1 class="bk-h1">Switzerland: a unique landscape for psychedelic science</h1>
-  <img
-    src={withBase("img/booklet/switzerland.svg")}
-    alt="Outline of Switzerland"
-    style="width: 110mm; margin: 4mm auto 8mm;"
-  />
-  <p class="bk-lede">{SWITZERLAND_COPY.lead}</p>
-  <div class="bk-cols bk-copy">
-    {SWITZERLAND_COPY.columns.map((paragraph) => <p>{paragraph}</p>)}
-  </div>
-  <div class="bk-push" style="width: 100mm; margin-left: auto;">
-    <figure class="bk-figure">
-      <img src={withBase("img/booklet/pat-authorisations.png")} alt="Swiss PAT authorisations delivered since 2016" />
-    </figure>
-    <p class="bk-caption">Liechti, 2025: Swiss authorisations delivered for PAT since 2016.</p>
-  </div>
-</BookletPage>
-
-{/* ------------------------------------------------------------------ venue */}
-<BookletPage id="venue" number={PAGE.venue} section="Venue" wash="tl">
-  <Deco slot="deco" src="sphere.svg" w="110mm" bottom="34mm" left="-30mm" opacity={0.14} />
-  <h1 class="bk-h1">{VENUE_COPY.title}</h1>
-  <div class="bk-cols" style="margin-bottom: 6mm;">
-    <div class="bk-photo bk-photo--venue"><img src={kukOutside} alt="Exterior of Kultur & Kongresshaus Aarau" /></div>
-    <div class="bk-photo bk-photo--venue"><img src={kukInside} alt="Interior of Kultur & Kongresshaus Aarau" /></div>
-  </div>
-  <div class="bk-copy">
-    {VENUE_COPY.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-  </div>
-</BookletPage>
-
-<BookletPage number={PAGE.practical} stickyTitle="Venue" wash="tr" tight>
-  <Deco slot="deco" src="sphere.svg" w="100mm" top="-24mm" right="-28mm" opacity={0.12} />
-  <h1 class="bk-h1">Practical information</h1>
-  <ul class="bk-bullets">
-    {PRACTICAL_COPY.map((item) => (
-      <li><strong>{item.title}.</strong>{" "}{item.body}</li>
-    ))}
-  </ul>
-  <div style="margin-top: 4mm;">
-    <div class="bk-facts">
-      {VENUE_COPY.facts.map((fact) => (
-        <div>
-          <strong>{fact.label}</strong>
-          <p>{fact.value}</p>
-        </div>
-      ))}
-    </div>
-  </div>
-</BookletPage>
-
-{/* -------------------------------------------------------- workshop day -- */}
-<BookletPage id="workshops" number={PAGE.workshops} wash="tl" tight>
-  <Deco slot="deco" src="neuron.svg" w="230mm" top="-10mm" right="-90mm" opacity={0.14} />
-  <p class="bk-pagetitle">Workshop<br />program</p>
-  <p class="bk-day">{dayStamp[WORKSHOP_DAY.day]}</p>
-  <h2 class="bk-h2">One afternoon, three parallel tracks</h2>
-  <p class="bk-lede">
-    Three parallel clinical training tracks reflecting Switzerland’s multilingual landscape, {WORKSHOP_DAY.time}. No
-    prior experience required.
+  <h1 class="bk-cover__title">Conference<br />booklet</h1>
+  <p class="bk-cover__meta">
+    9–10 October 2026<br />
+    Kultur &amp; Kongresshaus<br />
+    Aarau, Switzerland
   </p>
-  <div class="bk-copy">
-    {WORKSHOP_TRACKS.map((track) => (
-      <div class="bk-track">
-        <p class="bk-track__head">
-          <span class="bk-flag">{track.flag}</span>{track.language} — “{track.title}”
-        </p>
-        <p class="bk-track__people">Facilitators: {track.presenters} · {track.places} places</p>
-        <p>{track.abstract[0]}</p>
-      </div>
-    ))}
+  <div class="bk-cover__strip">
+    {COVER_PARTNERS.map((partner) => <img src={img(`booklet/academic/${partner.file}`)} alt={partner.alt} />)}
   </div>
 </BookletPage>
 
-{/* ---------------------------------------------------------------- program */}
+{/* ================================================================ index */}
+<BookletPage id="index" number={N.index} section="Index" word="Index" wash="tl">
+  <nav aria-label="Booklet contents">
+    <ol class="bk-index">
+      {BOOKLET_NAV.map((item) => (
+        <li>
+          <a href={`#${item.id}`}>
+            <span class="bk-index__label">{item.label.toLowerCase()}</span>
+            <span class="bk-index__leader" aria-hidden="true"></span>
+            <span class="bk-index__page">{String(TOC_PAGE[item.id]).padStart(2, "0")}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+</BookletPage>
+
+{/* ========================================================= introduction */}
+<BookletPage id="introduction" number={N.welcome} section="Introduction" word="Introduction" wash="tl">
+  <h2 class="bk-title">{INTRO_WELCOME.title}</h2>
+  <div class="bk-cols bk-copy">
+    {INTRO_WELCOME.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+    <p class="bk-signoff">{INTRO_WELCOME.signoff.map((line) => <>{line}<br /></>)}</p>
+  </div>
+</BookletPage>
+
+<BookletPage number={N.bridges} section="Introduction" wash="tr">
+  <Art slot="art" src="mesh-neuron.webp" width={125} top={74} left={-28} opacity={0.8} />
+  <h2 class="bk-title">{INTRO_BRIDGES.title}</h2>
+  <div class="bk-cols bk-copy">
+    {INTRO_BRIDGES.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </div>
+</BookletPage>
+
+{/* =========================================================== who we are */}
+<BookletPage id="who-we-are" number={N.pillars} section="Who we are" word="Who we are" wash="tl">
+  <Art slot="art" src="neuron.svg" width={190} top={50} left={-100} opacity={0.5} />
+  <h2 class="bk-title">{PILLARS.title}</h2>
+  <div class="bk-cols bk-copy">
+    {PILLARS.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </div>
+</BookletPage>
+
+<BookletPage number={N.programs} section="Who we are" wash="tr">
+  <h2 class="bk-title">{CORE_PROGRAMS.title}</h2>
+  {CORE_PROGRAMS.programs.map((program) => (
+    <section class="bk-block">
+      <h3 class="bk-subtitle">{program.title}</h3>
+      <div class="bk-copy">
+        {program.paragraphs.map((paragraph) => <p set:html={paragraph} />)}
+      </div>
+      {program.link && (
+        <p class="bk-actions">
+          <a class="bk-btn" href={program.link.href} target="_blank" rel="noopener">{program.link.label}<Fragment set:html={ARROW} /></a>
+        </p>
+      )}
+    </section>
+  ))}
+</BookletPage>
+
+<BookletPage number={N.spsn} section="Who we are" wash="tl">
+  <h2 class="bk-title">{SPSN.title}</h2>
+  <figure class="bk-spsn" aria-label="Member associations of the Swiss Psychedelic Student Network">
+    <img class="bk-spsn__hub" src={img(`booklet/spsn/${SPSN.hub.file}`)} alt={SPSN.hub.name} />
+    <ul class="bk-spsn__ring">
+      {SPSN.groups.map((group, index) => (
+        <li style={`--a:${-90 + (index * 360) / SPSN.groups.length}deg`}>
+          <img src={img(`booklet/spsn/${group.file}`)} alt="" loading="lazy" />
+          <span>{group.name}</span>
+        </li>
+      ))}
+    </ul>
+  </figure>
+  <div class="bk-cols bk-copy">
+    {SPSN.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </div>
+</BookletPage>
+
+<BookletPage number={N.switzerland} section="Who we are" wash="tr">
+  <h2 class="bk-title">{SWITZERLAND.title}</h2>
+  <img class="bk-swiss" src={img("booklet/switzerland.svg")} alt="Outline of Switzerland" loading="lazy" />
+  <p class="bk-lede">{SWITZERLAND.lead}</p>
+  <div class="bk-cols bk-copy">
+    {SWITZERLAND.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </div>
+  <figure class="bk-chart">
+    <img src={img("booklet/pat-authorisations.png")} alt="Bar chart: Swiss authorisations for psychedelic-assisted therapy with MDMA, LSD and psilocybin, rising from a handful in 2016 to about 350 psilocybin authorisations in 2024" loading="lazy" />
+    <figcaption>{SWITZERLAND.chartCaption}</figcaption>
+  </figure>
+</BookletPage>
+
+{/* ================================================================ venue */}
+<BookletPage id="venue" number={N.venue} section="Venue" word="Venue" wash="tl">
+  <h2 class="bk-title">{VENUE.title},<br /><span class="bk-title__soft">{VENUE.address}</span></h2>
+  <figure class="bk-photo bk-photo--wide">
+    <img src={img("kuk-outside.jpg")} alt="The neoclassical facade of the Kultur & Kongresshaus Aarau on Schlossplatz" loading="lazy" />
+  </figure>
+  <div class="bk-copy">
+    {VENUE.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+    <p>{VENUE.practicalIntro}</p>
+  </div>
+  <ul class="bk-list bk-copy">
+    {VENUE.practical.map((item) => <li><strong>{item.title}:</strong>{" "}{item.body}</li>)}
+  </ul>
+  <p class="bk-copy">{VENUE.signoff}</p>
+</BookletPage>
+
+<BookletPage number={N.map} section="Venue" wash="tr" class="bk-page--map">
+  <h2 class="bk-title">{VENUE_MAP.title}</h2>
+  <p class="bk-lede">{VENUE_MAP.intro}</p>
+  <div class="bk-map">
+    <VenuePlan client:visible size="embed" legend cooperative expandable />
+  </div>
+  <p class="bk-note">{VENUE_MAP.saal4}</p>
+</BookletPage>
+
+{/* ============================================================ workshops */}
+<BookletPage id="workshops" number={N.workshops} section="Workshop program" wash="tl">
+  <Art slot="art" src="neuron.svg" width={190} top={34} right={-92} rotate={-90} opacity={0.28} />
+  <h2 class="bk-display">Workshop<br />program</h2>
+  <p class="bk-stamp">{DAY_STAMP[WORKSHOP_DAY.day]} <span>· {WORKSHOP_DAY.time}</span></p>
+  <h3 class="bk-kicker">{WORKSHOP_INTRO.heading}</h3>
+  <p class="bk-lede">{WORKSHOP_INTRO.body}</p>
+  <div class="bk-tracks">
+    {WORKSHOP_TRACKS.map((track) => {
+      const summary = WORKSHOP_SUMMARIES[track.language];
+      const photos = track.sharedImage
+        ? [{ src: track.sharedImage.src, alt: track.sharedImage.alt }]
+        : track.speakers.filter((speaker) => speaker.image).map((speaker) => ({ src: speaker.image!, alt: speaker.name }));
+      return (
+        <article class="bk-track">
+          <div class:list={["bk-track__photos", photos.length === 1 && "is-single"]}>
+            {photos.map((photo) => <img src={img(`speakers/${photo.src}`)} alt={photo.alt} loading="lazy" />)}
+          </div>
+          <div>
+            <p class="bk-eyebrow">{track.language} · {track.places} places</p>
+            <h4 class="bk-track__title">“{summary?.title ?? track.title}”</h4>
+            <p class="bk-copy">{summary?.summary ?? track.abstract[0]}</p>
+          </div>
+        </article>
+      );
+    })}
+  </div>
+</BookletPage>
+
+{/* ============================================================== program */}
 {PROGRAM.map((day, dayIndex) => (
   <BookletPage
     id={dayIndex === 0 ? "program" : undefined}
-    number={PAGE[`program-${day.day.toLowerCase()}`]}
-    stickyTitle="Program"
-    wash={dayIndex === 0 ? "tl" : "tr"}
-    tight
+    number={N[`program-${day.day}`]}
+    section="Program"
+    wash={dayIndex === 0 ? "tr" : "tl"}
   >
-    <Deco
-      slot="deco"
-      src={dayIndex === 0 ? "neuron.svg" : "sphere.svg"}
-      w={dayIndex === 0 ? "240mm" : "140mm"}
-      top={dayIndex === 0 ? "10mm" : "40mm"}
-      left={dayIndex === 0 ? "-120mm" : "-40mm"}
-      opacity={0.13}
-    />
-    <p class="bk-pagetitle">Program</p>
-    <p class="bk-day">{dayStamp[day.day]}</p>
+    {dayIndex === 0 ? (
+      <Art slot="art" src="neuron.svg" width={130} top={62} left={-72} rotate={-90} opacity={0.26} />
+    ) : (
+      <Art slot="art" src="mesh-synapse.webp" width={54} top={38} left={-25} rotate={-6} opacity={0.72} />
+    )}
+    <h2 class="bk-display">Program</h2>
+    <p class="bk-stamp">{DAY_STAMP[day.day]}</p>
     <ol class="bk-schedule">
       {day.items.map((item) => (
         <li data-kind={item.kind ?? "session"}>
           <time>{item.time}</time>
           <div>
             <p class="bk-schedule__title">{item.title}</p>
-            {item.detail && <em class="bk-schedule__detail">{item.detail}</em>}
+            {item.detail && <p class="bk-schedule__detail">{item.detail}</p>}
           </div>
         </li>
       ))}
@@ -402,285 +427,407 @@ const dayStamp: Record<string, string> = {
   </BookletPage>
 ))}
 
-{/* ------------------------------------------------------------ experiences */}
-<BookletPage id="experiences" number={PAGE.experiences} wash="tr" tight>
-  <Deco slot="deco" src="sphere.svg" w="130mm" bottom="-34mm" left="-38mm" opacity={0.13} />
-  <p class="bk-pagetitle" style="margin-bottom: 8mm;">Experiences</p>
-  <div class="bk-cols">
-    {EXPERIENCE_DAYS.map((day) => (
-      <div>
-        <p class="bk-day" style="font-size: 17pt; margin-bottom: 5mm;">{dayStamp[day.day]}</p>
-        <ol class="bk-schedule">
-          {day.items.map((item) => (
+{/* ========================================================== experiences */}
+<BookletPage id="experiences" number={N.experiences} section="Experiences" wash="tr">
+  <Art slot="art" src="mesh-synapse.webp" width={74} top={-30} left={-44} flip opacity={0.55} />
+  <h2 class="bk-display">Experiences</h2>
+  {experienceDays.map((day, dayIndex) => (
+    <section class="bk-xday">
+      <p class="bk-stamp">{DAY_STAMP[day.day]}</p>
+      <ol class="bk-schedule bk-schedule--xp">
+        {day.rows.map((row) => (
+          <li>
+            <time>{row.time}</time>
+            <div>
+              <p class="bk-schedule__title">{row.personName ?? row.title}</p>
+              {row.venue && <p class="bk-schedule__venue">{row.venue}</p>}
+              <p class="bk-schedule__detail">{row.personName === row.title ? row.detail : row.title}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      {dayIndex === 0 && allDayArt.length > 0 && (
+        <ul class="bk-allday">
+          {allDayArt.map((credit) => (
             <li>
-              <time>{item.kind === "allday" ? "both days" : item.time}</time>
-              <div>
-                <p class="bk-schedule__title">
-                  {item.credits ? item.credits.map((credit) => credit.name).join(", ") : item.personName ?? item.title}
-                </p>
-                <em class="bk-schedule__detail">
-                  {item.credits ? item.title : item.title}
-                  {item.venue ? ` · ${item.venue}` : ""}
-                </em>
-              </div>
+              <span class="bk-allday__when">Both days</span>
+              <span class="bk-schedule__title">{credit.name}</span>
+              <span class="bk-schedule__detail">{credit.type}</span>
             </li>
           ))}
-        </ol>
-      </div>
-    ))}
-  </div>
+        </ul>
+      )}
+    </section>
+  ))}
 </BookletPage>
 
 {experiencePages.map((page, pageIndex) => (
-  <BookletPage number={PAGE[`experiences-${pageIndex}`]} stickyTitle="Experiences" wash={pageIndex % 2 ? "tr" : "tl"} tight>
-    <Deco slot="deco" src="sphere.svg" w="120mm" top="-24mm" right="-34mm" opacity={0.12} />
-    {page.first && <p class="bk-eyebrow" style="font-size: 17pt; margin-bottom: 6mm;">{page.category.title}</p>}
-    {page.people.map((person, personIndex) => (
-      <article class:list={["bk-xp", personIndex % 2 === 1 && "bk-xp--flip"]}>
-        <div class="bk-xp__figure">
-          {person.image && (
+  <BookletPage number={N[`xp-${pageIndex}`]} section="Experiences" wash={pageIndex % 2 ? "tr" : "tl"}>
+    <Art slot="art" src="sphere.svg" width={88} top={pageIndex % 2 ? 58 : 18} right={pageIndex % 2 ? undefined : -46} left={pageIndex % 2 ? -46 : undefined} opacity={0.1} />
+    <p class="bk-rubric">
+      <b>Experiences</b>
+      <span>{page.label}</span>
+    </p>
+    {page.profiles.map((profile, index) => (
+      <article class:list={["bk-profile", index % 2 === 1 && "bk-profile--flip"]}>
+        <div class:list={["bk-profile__photos", profile.photos.length > 1 && "is-pair"]}>
+          {profile.photos.map((photo) => (
             <img
-              src={withBase(`img/experiences/${person.image}`)}
-              alt={person.name}
-              style={person.imagePosition ? `object-position:${person.imagePosition}` : undefined}
+              src={img(`experiences/${photo.src}`)}
+              alt={profile.name}
+              loading="lazy"
+              style={photo.position ? `object-position:${photo.position}` : undefined}
             />
-          )}
+          ))}
         </div>
-        <div>
-          <h2 class="bk-xp__name">{person.name}</h2>
-          <p class="bk-xp__kind">{person.role}</p>
-          {person.body && <div class="bk-copy"><p>{person.body}</p></div>}
-          {person.handle && <p class="bk-xp__handle">{person.handle}</p>}
+        <div class="bk-profile__text">
+          <h3 class="bk-subtitle">{profile.heading}</h3>
+          <p class="bk-profile__name">{profile.name}</p>
+          <div class="bk-copy">
+            {profile.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+          {profile.sessions.map((session) => (
+            <section class="bk-profile__session">
+              <h4 class="bk-kicker">{session.title}</h4>
+              <div class="bk-copy">{session.paragraphs.map((paragraph) => <p>{paragraph}</p>)}</div>
+            </section>
+          ))}
+          {(profile.handle || profile.website) && (
+            <p class="bk-profile__links">
+              {profile.handle && <a href={`https://www.instagram.com/${profile.handle.slice(1)}/`} target="_blank" rel="noopener"><strong>{profile.handle}</strong></a>}
+              {profile.website && <a href={profile.website} target="_blank" rel="noopener">{profile.website.replace(/^https?:\/\/(www\.)?/, "")}</a>}
+            </p>
+          )}
         </div>
       </article>
     ))}
   </BookletPage>
 ))}
 
-{/* ------------------------------------------------------------------ talks */}
-{confirmedTalks.map(({ speaker, item, day }, talkIndex) => (
-  <>
-    <BookletPage
-      id={talkIndex === 0 ? "talks" : undefined}
-      number={PAGE[`talk-${speaker.name}`]}
-      stickyTitle="Talks & panels"
-      wash={talkIndex % 2 ? "tr" : "tl"}
-      dense={isDense(speaker)}
-      tight
-    >
-      <Deco slot="deco" src="sphere.svg" w="105mm" top="-18mm" right="-26mm" opacity={0.13} />
-      <Deco slot="deco" src="brain.svg" w="95mm" bottom="-18mm" right="-14mm" opacity={0.08} />
-      <header class="bk-talk__head">
-        <div class="bk-avatar" style={cropStyle(speaker.image)}>
-          {speaker.image && <img src={withBase(`img/speakers/${speaker.image}`)} alt={speaker.name} />}
-        </div>
-        <div>
-          <h1 class="bk-talk__name">{speaker.name}</h1>
-          <p class="bk-talk__role">
-            {roleLine(speaker).map((line) => <>{line}<br /></>)}
-            {day.day} · {item.time}
-          </p>
-        </div>
-      </header>
-      {speaker.bio && <div class="bk-copy"><p>{speaker.bio}</p></div>}
-      {speaker.talkTitle && <h2 class="bk-talk__title">{speaker.talkTitle}</h2>}
-      {hasAbstract(speaker.abstract) && (
-        <div class="bk-copy">
-          {speaker.abstract!.split("\n\n").map((paragraph) => <p>{paragraph}</p>)}
-        </div>
-      )}
-    </BookletPage>
-
-    <BookletPage
-      number={PAGE[`notes-${speaker.name}`]}
-      stickyTitle="Talks & panels"
-      notes
-      wash={talkIndex % 2 ? "tl" : "tr"}
-      tight
-    >
-      <Deco slot="deco" src="mushroom-pair.png" w="105mm" bottom="-14mm" right="-10mm" opacity={0.5} />
-      <div class="bk-notes">
-        <p class="bk-notes__label">Notes</p>
-        <div class="bk-notes__sheet"></div>
+<BookletPage number={N.afterglow} section="Experiences" wash="br">
+  <p class="bk-rubric"><b>Experiences</b><span>…and more</span></p>
+  <h2 class="bk-title">{AFTERGLOW.title}</h2>
+  <figure class="bk-poster-frame">
+    <img src={img("experiences/afterglow-banner.jpg")} alt="Afterglow poster: an SPSN afterparty for the ALPS Conference, 10.10.2026 from 21:30 till 04:00 at Aareal Flösserplatz, Aarau" loading="lazy" />
+  </figure>
+  <div class="bk-cols bk-cols--split">
+    <div class="bk-copy">
+      {AFTERGLOW.paragraphs.map((paragraph) => <p set:html={paragraph} />)}
+    </div>
+    <div class="bk-copy">
+      <p><strong>{AFTERGLOW.included}</strong></p>
+      {AFTERGLOW.external.map((paragraph) => <p>{paragraph}</p>)}
+      <div class="bk-cta">
+        <a class="bk-btn" href={AFTERGLOW.ticketUrl} target="_blank" rel="noopener">{AFTERGLOW.ticketLabel}<Fragment set:html={ARROW} /></a>
+        <img class="bk-qr" src={img("booklet/qr/afterglow.png")} alt="" loading="lazy" />
       </div>
+    </div>
+  </div>
+</BookletPage>
+
+{/* ======================================================== talks & panels */}
+{talks.map((entry, index) => {
+  if (entry.kind === "talk") {
+    const { speaker, item, day } = entry;
+    return (
+      <BookletPage id={index === 0 ? "talks" : undefined} number={N[entry.key]} section="Talks & panels" wash={index % 2 ? "tr" : "tl"}>
+        <Art slot="art" src="brain.svg" width={62} bottom={-10} right={-16} opacity={0.12} />
+        <header class="bk-talk">
+          <div class="bk-avatar" style={avatarStyle(speaker.image)}>
+            {speaker.image && <img src={img(`speakers/${speaker.image}`)} alt={speaker.name} loading="lazy" />}
+          </div>
+          <div class="bk-talk__who">
+            <p class="bk-eyebrow">{day} · {item.time}</p>
+            <h2 class="bk-talk__name">{speaker.name}</h2>
+            <p class="bk-talk__role">
+              {speaker.role}
+              {speaker.institution && <><br />{speaker.institution}</>}
+            </p>
+          </div>
+        </header>
+        {speaker.bio && <div class="bk-copy">{paragraphs(speaker.bio).map((paragraph) => <p>{paragraph}</p>)}</div>}
+        {speaker.talkTitle && <h3 class="bk-talk__title">{speaker.talkTitle}</h3>}
+        {hasAbstract(speaker.abstract) && (
+          <div class="bk-copy">
+            {paragraphs(speaker.abstract).map((paragraph) =>
+              isLabel(paragraph) ? <p class="bk-copy__label">{paragraph}</p> : <p>{paragraph}</p>
+            )}
+          </div>
+        )}
+      </BookletPage>
+    );
+  }
+  const friday = entry.panel === "friday";
+  const copy = friday ? FRIDAY_PANEL : SATURDAY_PANEL;
+  const people = (friday ? FRIDAY_PANEL_SPEAKERS : SATURDAY_PANEL_SPEAKERS).filter(isConfirmedSpeaker);
+  // Panellists without a talk of their own (Ricardo Morales) get their full profile here.
+  const guests = people.filter((person) => !talks.some((t) => t.kind === "talk" && t.speaker.name === person.name));
+  return (
+    <BookletPage number={N[entry.key]} section="Talks & panels" wash={friday ? "br" : "tr"}>
+      <Art slot="art" src="mesh-neuron.webp" width={130} bottom={-22} right={-48} flip={!friday} opacity={0.5} />
+      <p class="bk-eyebrow">Panel discussion · {entry.day} · {entry.item.time}</p>
+      <h2 class="bk-title">{copy.title}</h2>
+      {"subtitle" in copy && <p class="bk-lede bk-lede--italic">{copy.subtitle}</p>}
+      <div class="bk-copy"><p>{copy.body}</p></div>
+      <h3 class="bk-subtitle bk-panel__heading">Panel participants</h3>
+      <ul class="bk-panel">
+        {people.filter((person) => !guests.includes(person)).map((person) => (
+          <li>
+            <div class="bk-avatar" style={avatarStyle(person.image)}>
+              {person.image && <img src={img(`speakers/${person.image}`)} alt="" loading="lazy" />}
+            </div>
+            <p>{person.name}</p>
+          </li>
+        ))}
+      </ul>
+      {guests.map((guest) => (
+        <article class="bk-guest">
+          <header class="bk-talk">
+            <div class="bk-avatar" style={avatarStyle(guest.image)}>
+              {guest.image && <img src={img(`speakers/${guest.image}`)} alt={guest.name} loading="lazy" />}
+            </div>
+            <div class="bk-talk__who">
+              <h3 class="bk-talk__name">{guest.name}</h3>
+              <p class="bk-talk__role">{guest.role}<br />{guest.institution}</p>
+            </div>
+          </header>
+          <div class="bk-copy">{paragraphs(guest.bio).map((paragraph) => <p>{paragraph}</p>)}</div>
+        </article>
+      ))}
     </BookletPage>
-  </>
+  );
+})}
+
+{/* ================================================================= team */}
+{teamPages.map((page, pageIndex) => (
+  <BookletPage id={pageIndex === 0 ? "team" : undefined} number={N[`team-${pageIndex}`]} section="Team" wash={pageIndex % 2 ? "bl" : "br"}>
+    {page.heading && <h2 class="bk-display bk-display--bold">Meet the team</h2>}
+    {page.groups.map((group) => (
+      <section class="bk-team-group">
+        <h3 class="bk-rubric bk-rubric--team"><b>ALPS</b><span>{group.title}</span></h3>
+        <ul class="bk-team">
+          {group.people.map((person) => (
+            <li>
+              <img src={img(`booklet/team/${person.photo}.jpg`)} alt="" loading="lazy" />
+              <p><strong>{person.name}</strong>{person.role.split(" · ").map((line, i) => <>{i > 0 && <br />}{line}</>)}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </BookletPage>
 ))}
 
-{/* ----------------------------------------------------------------- panels */}
-<BookletPage number={PAGE["panel-friday"]} stickyTitle="Talks & panels" wash="tl" tight>
-  <Deco slot="deco" src="neurons.svg" w="150mm" bottom="-40mm" left="-46mm" opacity={0.12} />
-  <p class="bk-eyebrow">Friday · 18:15–19:15</p>
-  <h1 class="bk-h1">{FRIDAY_PANEL.title}</h1>
-  <p class="bk-lede" style="font-style: italic;">{FRIDAY_PANEL.subtitle}</p>
-  <div class="bk-copy"><p>{FRIDAY_PANEL.body}</p></div>
-  <div class="bk-push">
-    <h2 class="bk-h2">Panel participants</h2>
-    <div class="bk-cols">
-      {FRIDAY_PANEL_SPEAKERS.filter(isConfirmedSpeaker).map((person) => (
-        <div class="bk-xp" style="margin-bottom: 4mm; grid-template-columns: 24mm minmax(0, 1fr); gap: 4mm;">
-          <div class="bk-xp__figure" style="width: 24mm; height: 24mm;">
-            {person.image && <img src={withBase(`img/speakers/${person.image}`)} alt={person.name} />}
-          </div>
-          <div>
-            <h3 class="bk-h3">{person.name}</h3>
-            <p class="bk-xp__kind">{person.institution}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-</BookletPage>
-
-<BookletPage number={PAGE["panel-saturday"]} stickyTitle="Talks & panels" wash="tr" tight>
-  <Deco slot="deco" src="neurons.svg" w="150mm" bottom="-40mm" right="-46mm" opacity={0.12} flip />
-  <p class="bk-eyebrow">Saturday · 18:00–19:00</p>
-  <h1 class="bk-h1">{SATURDAY_PANEL.title}</h1>
-  <div class="bk-copy"><p>{SATURDAY_PANEL.body}</p></div>
-  <div class="bk-push">
-    <h2 class="bk-h2">Panel participants</h2>
-    <div class="bk-cols">
-      {SATURDAY_PANEL_SPEAKERS.filter(isConfirmedSpeaker).map((person) => (
-        <div class="bk-xp" style="margin-bottom: 4mm; grid-template-columns: 24mm minmax(0, 1fr); gap: 4mm;">
-          <div class="bk-xp__figure" style="width: 24mm; height: 24mm;">
-            {person.image && <img src={withBase(`img/speakers/${person.image}`)} alt={person.name} />}
-          </div>
-          <div>
-            <h3 class="bk-h3">{person.name}</h3>
-            <p class="bk-xp__kind">{person.institution}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-</BookletPage>
-
-{/* ------------------------------------------------------------------- team */}
-<BookletPage id="team" number={PAGE.team} wash="bl" tight>
-  <Deco slot="deco" src="sphere-pink.svg" w="130mm" bottom="-36mm" right="-40mm" opacity={0.2} />
-  <h1 class="bk-h1" style="font-size: 26pt; margin-bottom: 8mm;">Meet the team</h1>
-  {TEAM_SECTIONS.map((section) => (
-    <div class="bk-team-group">
-      <h2><b>ALPS</b>{" "}{section.title}</h2>
-      <div class="bk-team">
-        {section.people.map((person) => (
-          <p>
-            {person.name}
-            <span>{person.role}</span>
-          </p>
+<BookletPage number={N.boards} section="Team" wash="tr">
+  {ADVISORY_BOARDS.map((board) => (
+    <section class="bk-team-group">
+      <h3 class="bk-rubric bk-rubric--team"><b>ALPS</b><span>{board.title}</span></h3>
+      <ul class="bk-team">
+        {board.people.map((person) => (
+          <li>
+            <img src={img(`booklet/team/${person.photo}.jpg`)} alt="" loading="lazy" />
+            <p><strong>{person.name}</strong>{person.role.split(" · ").map((line, i) => <>{i > 0 && <br />}{line}</>)}</p>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   ))}
+  <section class="bk-team-group">
+    <h3 class="bk-rubric bk-rubric--team"><b>ALPS</b><span>Alumni</span></h3>
+    <ul class="bk-alumni">
+      {ALUMNI.map((name) => <li>{name}</li>)}
+    </ul>
+  </section>
 </BookletPage>
 
-{/* --------------------------------------------------------------- partners */}
-<BookletPage id="partners" number={PAGE.partners} section="Partners" sectionStyle="light" wash="br">
-  <Deco slot="deco" src="sphere-pink.svg" w="120mm" bottom="10mm" right="-34mm" opacity={0.18} />
-  {Object.entries(PARTNERS).map(([category, logos]) => (
-    <div class="bk-partner-group">
-      <h3>{category}</h3>
-      <div class="bk-partner-row">
-        {logos.map((partner) => (
-          <img src={withBase(partner.src.replace("/img/partners/", "img/booklet/partners/"))} alt={partner.alt} />
+{/* ============================================================= partners */}
+<BookletPage id="partners" number={N.partners} section="Partners" word="Partners" wordStyle="light" wash="bl">
+  {PARTNER_GROUPS.map((group) => (
+    <section class:list={["bk-partners", group.boxed && "bk-partners--boxed"]}>
+      <h3 class="bk-subtitle">{group.title}</h3>
+      <ul>
+        {group.logos.map((logo) => (
+          <li style={logo.h ? `--h:${logo.h}` : undefined}>
+            <img src={img(`booklet/logos/${logo.file}`)} alt={logo.name} title={logo.name} loading="lazy" />
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   ))}
-  <div class="bk-push">
-    <h2 class="bk-h2">Postgraduate training credits</h2>
-    <div class="bk-copy">
-      <p>{CREDITS.fsp}</p>
-      <p>{CREDITS.sgpp}</p>
-      <p>{CREDITS.note}</p>
-    </div>
-  </div>
+  <p class="bk-lede">{PARTNERS_THANKS}</p>
 </BookletPage>
 
-{/* --------------------------------------------------------------- projects */}
-<BookletPage id="projects" number={PAGE.projects} section="Our projects" sectionStyle="light" wash="tr">
-  <Deco slot="deco" src="mushrooms.png" w="105mm" bottom="4mm" right="-16mm" opacity={0.3} />
+<BookletPage number={N.credits} section="Partners" wash="tr">
+  <h2 class="bk-title">{CREDITS.title}</h2>
+  <p class="bk-copy">{CREDITS.intro}</p>
+  <ul class="bk-list bk-list--credits">
+    {CREDITS.items.map((item) => <li><strong>{item.who}</strong>{` (${item.body}): ${item.credits}`}</li>)}
+  </ul>
   <div class="bk-copy">
-    {PROJECTS.map((project) => (
-      <>
-        <h2 class="bk-h2">{project.title}</h2>
-        <p>{project.body}</p>
-      </>
+    {CREDITS.paragraphs.map((paragraph) => <p set:html={paragraph} />)}
+  </div>
+  <ul class="bk-credit-logos">
+    {CREDITS.logos.map((logo) => <li><img src={img(`booklet/logos/${logo.file}`)} alt={logo.name} loading="lazy" /></li>)}
+  </ul>
+  <section class="bk-block bk-survey">
+    <h2 class="bk-title">{SURVEY.title}</h2>
+    <div class="bk-survey__grid">
+      <div>
+        <ul class="bk-list">
+          {SURVEY.questions.map((question) => <li>{question}</li>)}
+        </ul>
+        <p class="bk-copy">{SURVEY.body}</p>
+        <p class="bk-actions">
+          <a class="bk-btn" href={SURVEY.url} target="_blank" rel="noopener">{SURVEY.label}<Fragment set:html={ARROW} /></a>
+        </p>
+      </div>
+      <img class="bk-qr bk-qr--large" src={img("booklet/qr/survey.png")} alt="" loading="lazy" />
+    </div>
+  </section>
+</BookletPage>
+
+{/* ============================================================= projects */}
+<BookletPage id="projects" number={N.projects} section="Our projects" word="Our projects" wordStyle="light" wash="bl">
+  <h2 class="bk-title">{PROJECTS.events.title}</h2>
+  <div class="bk-events">
+    {PROJECTS.events.items.map((event) => (
+      <article>
+        <img src={img(`booklet/projects/${event.photo}`)} alt={`${event.title} group photo`} loading="lazy" />
+        <h3 class="bk-eyebrow bk-eyebrow--caps">{event.title}</h3>
+        <p class="bk-copy">{event.body}</p>
+      </article>
     ))}
   </div>
 </BookletPage>
 
-{/* ---------------------------------------------------------------- posters */}
-<BookletPage id="posters" number={PAGE.posters} section="Posters" sectionStyle="light" wash="bl">
-  <Deco slot="deco" src="sphere-pink.svg" w="110mm" top="60mm" right="-30mm" opacity={0.2} />
-  <h1 class="bk-h1">{POSTERS.title}</h1>
-  <p class="bk-eyebrow">{POSTERS.subtitle}</p>
-  <h2 class="bk-h2">{POSTERS.collection}</h2>
-  <div class="bk-copy"><p>{POSTERS.body}</p></div>
-  <div style="margin-top: 6mm;">
-    <p class="bk-h3">Available formats</p>
-    <ul class="bk-bullets">
-      {POSTERS.formats.map((format) => <li>{format}</li>)}
-    </ul>
-    <div class="bk-copy"><p>{POSTERS.note}</p></div>
+<BookletPage number={N.research} section="Our projects" wash="tr">
+  <Art slot="art" src="mesh-neuron.webp" width={118} top={88} right={-42} opacity={0.6} />
+  <h2 class="bk-title">{PROJECTS.research.title}</h2>
+  <div class="bk-cols bk-cols--split">
+    {PROJECTS.research.columns.map((column) => (
+      <section>
+        <h3 class="bk-subtitle bk-subtitle--italic">{column.title}</h3>
+        {column.studies.map((study) => (
+          <div class="bk-study">
+            <h4 class="bk-eyebrow bk-eyebrow--caps">{study.title}</h4>
+            <p class="bk-copy">{study.body}</p>
+          </div>
+        ))}
+      </section>
+    ))}
   </div>
-  <ol class="bk-poster-list bk-push" style="padding-top: 6mm;">
+  <h2 class="bk-title bk-title--spaced">{PROJECTS.programs.title}</h2>
+  <div class="bk-cols bk-cols--split">
+    {PROJECTS.programs.groups.map((group) => (
+      <section>
+        <h4 class="bk-eyebrow bk-eyebrow--caps">{group.title}</h4>
+        <ul class="bk-list bk-copy">
+          {group.items.map((item) => <li>{item}</li>)}
+        </ul>
+      </section>
+    ))}
+  </div>
+</BookletPage>
+
+{/* ============================================================== posters */}
+<BookletPage id="posters" number={N.posters} section="Posters" word="Posters" wordStyle="light" wash="bl">
+  <h2 class="bk-title">{POSTERS.title}</h2>
+  <p class="bk-lede">{POSTERS.subtitle}</p>
+  <h3 class="bk-kicker">{POSTERS.collection}</h3>
+  <p class="bk-copy">{POSTERS.body}</p>
+  <div class="bk-cols bk-cols--split bk-posters-info">
+    <div>
+      <h4 class="bk-kicker">Available formats</h4>
+      <ul class="bk-list bk-copy">
+        {POSTERS.formats.map((format) => <li><strong>{format.name}:</strong>{" "}{format.detail}</li>)}
+      </ul>
+      <p class="bk-copy">{POSTERS.note}</p>
+    </div>
+    <ol class="bk-poster-list">
+      {POSTERS.works.map((work, index) => <li><span>{String(index + 1).padStart(2, "0")}</span>«{work}»</li>)}
+    </ol>
+  </div>
+  <div class="bk-cta">
+    <img class="bk-qr" src={img("booklet/qr/shop.png")} alt="" loading="lazy" />
+    <div>
+      <p class="bk-copy">{POSTERS.shop.body}</p>
+      <a class="bk-btn" href={POSTERS.shop.url} target="_blank" rel="noopener">{POSTERS.shop.label}<Fragment set:html={ARROW} /></a>
+    </div>
+  </div>
+</BookletPage>
+
+<BookletPage number={N["posters-grid"]} section="Posters" wash="tr">
+  <ol class="bk-poster-grid">
     {POSTERS.works.map((work, index) => (
-      <li><span>{String(index + 1).padStart(2, "0")}</span>«{work}»</li>
+      <li>
+        <img src={img(`booklet/posters/${String(index + 1).padStart(2, "0")}.jpg`)} alt={`Poster ${index + 1}: ${work}`} loading="lazy" />
+        <span>{String(index + 1).padStart(2, "0")}</span>
+      </li>
     ))}
   </ol>
 </BookletPage>
 
-<BookletPage number={PAGE["posters-grid"]} stickyTitle="Posters" wash="tr" tight>
-  <div class="bk-poster-grid">
-    {POSTERS.works.map((work, index) => (
-      <figure class="bk-poster">
-        <img src={withBase(`img/booklet/posters/${String(index + 1).padStart(2, "0")}.jpg`)} alt={work} />
-        <figcaption>{String(index + 1).padStart(2, "0")}</figcaption>
-      </figure>
-    ))}
+{/* =========================================================== membership */}
+<BookletPage id="membership" number={N.membership} section="Membership & donations" wash="bl" class="bk-page--support">
+  <div class="bk-support">
+    <ul class="bk-tiers">
+      {MEMBERSHIP.tiers.map((tier) => (
+        <li>
+          <span>{tier.name}<br />membership</span>
+          <strong>{tier.price}</strong>
+        </li>
+      ))}
+    </ul>
+    <p class="bk-vword" aria-hidden="true">Membership</p>
+    <div class="bk-support__text">
+      <h2 class="sr-only">Membership</h2>
+      <div class="bk-copy">
+        {MEMBERSHIP.membership.map((paragraph) => <p>{paragraph}</p>)}
+        <p>{MEMBERSHIP.thanks.map((line) => <>{line}<br /></>)}</p>
+      </div>
+      <div class="bk-cta">
+        <a class="bk-btn" href={MEMBERSHIP.membershipLink.url} target="_blank" rel="noopener">{MEMBERSHIP.membershipLink.label}<Fragment set:html={ARROW} /></a>
+        <img class="bk-qr" src={img("booklet/qr/membership.png")} alt="" loading="lazy" />
+      </div>
+    </div>
   </div>
 </BookletPage>
 
-{/* ------------------------------------------------------------- membership */}
-<BookletPage id="membership" number={PAGE.membership} wash="bl" tight>
-  <Deco slot="deco" src="sphere-pink.svg" w="115mm" bottom="-30mm" right="-32mm" opacity={0.2} />
-  <div class="bk-cols" style="align-items: start;">
-    <div class="bk-vsplit">
-      <p class="bk-vertical">Membership</p>
-      <div>
-        <ul class="bk-tiers">
-          {MEMBERSHIP.tiers.map((tier) => (
-            <li>
-              <strong>{tier.name}</strong>
-              {tier.price}
-            </li>
-          ))}
-        </ul>
-        <div class="bk-copy">
-          {MEMBERSHIP.membership.map((paragraph) => <p>{paragraph}</p>)}
-        </div>
-      </div>
-    </div>
-    <div class="bk-vsplit">
-      <p class="bk-vertical">Donations</p>
+<BookletPage number={N.donations} section="Membership & donations" wash="tr" class="bk-page--support">
+  <div class="bk-support bk-support--flip">
+    <div class="bk-support__text">
+      <h2 class="sr-only">Donations</h2>
       <div class="bk-copy">
         {MEMBERSHIP.donations.map((paragraph) => <p>{paragraph}</p>)}
       </div>
+      <div class="bk-cta">
+        <a class="bk-btn" href={MEMBERSHIP.donationLink.url} target="_blank" rel="noopener">{MEMBERSHIP.donationLink.label}<Fragment set:html={ARROW} /></a>
+        <img class="bk-qr" src={img("booklet/qr/donate.png")} alt="" loading="lazy" />
+      </div>
     </div>
+    <p class="bk-vword" aria-hidden="true">Donations</p>
   </div>
 </BookletPage>
 
-{/* ------------------------------------------------------------ conclusions */}
-<BookletPage id="conclusions" number={PAGE.conclusions} wash="bl" tight>
-  <Deco slot="deco" src="sphere-pink.svg" w="95mm" top="42%" right="-24mm" opacity={0.28} />
+{/* ========================================================== conclusions */}
+<BookletPage id="conclusions" number={N.conclusions} section="Conclusions" wash="bl">
   <div class="bk-quote">
-    <figure>
-      {PALE_BLUE_DOT.map((paragraph) => <p>{paragraph}</p>)}
-      <figcaption>Carl Sagan — Pale Blue Dot</figcaption>
+    <blockquote>
+      {PALE_BLUE_DOT.map((paragraph, index) => <p>{index === 0 && "“"}{paragraph}{index === PALE_BLUE_DOT.length - 1 && "”"}</p>)}
+      <footer>Carl Sagan — <cite>Pale Blue Dot</cite></footer>
+    </blockquote>
+    <figure class="bk-quote__photo">
+      <img src={img("booklet/pale-blue-dot.jpg")} alt="Voyager 1’s 1990 photograph of Earth, a pale blue dot inside a band of scattered sunlight" loading="lazy" />
     </figure>
-    <div class="bk-quote__photo">
-      <img src={withBase("img/booklet/pale-blue-dot.jpg")} alt="Voyager 1's photograph of Earth as a pale blue dot" />
-    </div>
+  </div>
+</BookletPage>
+
+<BookletPage section="ALPS 2026" logo={false} wash="bl" class="bk-back">
+  <Art slot="art" src="sphere.svg" width={130} top={-12} right={-52} opacity={0.34} />
+  <Art slot="art" src="sphere.svg" width={40} top={44} left={14} opacity={0.62} />
+  <Art slot="art" src="sphere.svg" width={110} bottom={-40} right={-30} opacity={0.24} />
+  <div class="bk-back__sign">
+    <img src={img("booklet/alps-wordmark.png")} alt="ALPS" />
+    <p>Awareness Lectures on Psychedelic Science<br /><a href="https://alps.foundation" target="_blank" rel="noopener">alps.foundation</a></p>
   </div>
 </BookletPage>
