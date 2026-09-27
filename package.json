@@ -23,6 +23,7 @@
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.186.0",
     "astro": "^6.1.3",
     "vitest": "^4.1.4",
     "wrangler": "^4.81.1"
@@ -35,6 +36,7 @@
     "neodisco": "^0.1.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "three": "^0.186.1"
   }
 }

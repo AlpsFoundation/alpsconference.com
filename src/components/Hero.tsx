@@ -1,17 +1,31 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Calendar, Ticket, Mail, MapPin, Clock } from "lucide-react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
 import ConferenceCountdown from "./ConferenceCountdown";
+import SynapseIllustration from "./SynapseIllustration";
 
-export default function Hero() {
+// "image": the static bones.png. "synapse": its 3D rendition, which draws itself
+// first and cues the title and the particles in (see the /fancy page).
+export type HeroIllustration = "image" | "synapse";
+
+// Show the content anyway if the 3D intro never cues it (slow or failed load).
+const TITLE_FALLBACK_MS = 5000;
+
+export default function Hero({ illustration = "image" }: { illustration?: HeroIllustration }) {
   const sectionRef = useRef<HTMLElement>(null);
   const bonesRef = useRef<HTMLDivElement>(null);
+  const contentShown = useRef(false);
+  const is3d = illustration === "synapse";
+  const [synapseFailed, setSynapseFailed] = useState(false);
+  const [particlesOn, setParticlesOn] = useState(!is3d);
+  const showImage = !is3d || synapseFailed;
 
-  useEffect(() => {
+  const showContent = () => {
     const el = sectionRef.current;
-    if (!el) return;
+    if (!el || contentShown.current) return;
+    contentShown.current = true;
 
     animate(el.querySelectorAll("[data-animate]"), {
       opacity: [0, 1],
@@ -28,7 +42,28 @@ export default function Hero() {
       duration: 600,
       easing: "easeOutCubic",
     });
+  };
 
+  const onSynapseUnsupported = () => {
+    setSynapseFailed(true);
+    setParticlesOn(true);
+    showContent();
+  };
+
+  useEffect(() => {
+    if (!is3d) {
+      showContent();
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      showContent();
+      setParticlesOn(true);
+    }, TITLE_FALLBACK_MS);
+    return () => window.clearTimeout(timer);
+  }, [is3d]);
+
+  useEffect(() => {
+    if (!showImage) return;
     const bones = bonesRef.current;
     if (bones) {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -44,7 +79,7 @@ export default function Hero() {
         });
       }
     }
-  }, []);
+  }, [showImage]);
 
   const handleCalendar = () => {
     const icsContent = [
@@ -83,25 +118,39 @@ export default function Hero() {
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-neutral-dark/50 via-neutral-dark/20 to-neutral-dark" />
-        <ParticlesCanvas variant="hero" />
-      </div>
-
-      {/* Bones illustration */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div
-          ref={bonesRef}
-          className="w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl px-2 opacity-0 will-change-transform"
-          style={{ transformOrigin: "center center" }}
+          className={`absolute inset-0 transition-opacity duration-[1600ms] ease-out ${particlesOn ? "opacity-100" : "opacity-0"}`}
         >
-          <div className="origin-center scale-[2] sm:scale-100">
-            <img
-              src={withBase("img/bones.png")}
-              alt=""
-              className="w-full h-auto object-contain opacity-60 mix-blend-screen drop-shadow-[0_0_3rem_rgba(5,8,22,0.45)]"
-            />
-          </div>
+          <ParticlesCanvas variant="hero" scale={is3d ? 1.6 : 1} />
         </div>
       </div>
+
+      {is3d && !synapseFailed && (
+        <SynapseIllustration
+          onTitle={showContent}
+          onParticles={() => setParticlesOn(true)}
+          onUnsupported={onSynapseUnsupported}
+        />
+      )}
+
+      {/* Bones illustration */}
+      {showImage && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div
+            ref={bonesRef}
+            className="w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl px-2 opacity-0 will-change-transform"
+            style={{ transformOrigin: "center center" }}
+          >
+            <div className="origin-center scale-[2] sm:scale-100">
+              <img
+                src={withBase("img/bones.png")}
+                alt=""
+                className="w-full h-auto object-contain opacity-60 mix-blend-screen drop-shadow-[0_0_3rem_rgba(5,8,22,0.45)]"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Content: upper / middle / lower thirds to keep center clear for illustration */}
       <div className="relative z-10 flex flex-1 flex-col min-h-0 max-w-5xl w-full mx-auto px-4 sm:px-6 text-center pt-20 sm:pt-24">

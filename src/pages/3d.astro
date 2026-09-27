@@ -1,0 +1,125 @@
+---
+import { withBase } from "../lib/withBase";
+
+const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const fallbackImage = withBase("img/bones.png");
+const fontFaceCss = `@font-face {
+  font-family: "Switzer";
+  src: url("${switzerFont}") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Experimental 3D synapse: not linked, not in the sitemap. -->
+    <meta name="robots" content="noindex" />
+    <title>Synapse | ALPS Conference 2026</title>
+    <meta name="description" content="An interactive 3D rendering of the ALPS Conference synapse illustration." />
+    <meta name="theme-color" content="#0B3C5D" />
+    <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
+    <style is:global set:html={fontFaceCss}></style>
+    <style is:global>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        color: #eef4f8;
+        font-family: "Switzer", system-ui, -apple-system, sans-serif;
+      }
+      /* Landing page palette: the hero's pink-to-blue radial (img/background.jpg)
+         under its neutral-dark veil, over the body gradient from app.css. */
+      body {
+        background:
+          linear-gradient(180deg, rgba(8, 47, 74, 0.5) 0%, rgba(8, 47, 74, 0.2) 50%, rgba(8, 47, 74, 0.85) 100%),
+          radial-gradient(circle at 50% 50%, rgba(243, 143, 191, 0.55) 0, rgba(243, 143, 191, 0.22) 12rem, transparent 26rem),
+          radial-gradient(ellipse 60% 70% at 50% 50%, rgba(46, 124, 199, 0.65) 0%, rgba(46, 124, 199, 0.18) 55%, transparent 100%),
+          linear-gradient(180deg, #104f79 0%, #0b3c5d 58%, #082f4a 100%);
+        background-attachment: fixed;
+      }
+      /* Same film grain as the landing page. */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.26;
+        mix-blend-mode: overlay;
+        filter: saturate(1.35) contrast(1.08);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.48' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='1.55'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23grain)' opacity='0.78'/%3E%3C/svg%3E");
+        background-size: 260px 260px;
+      }
+      #synapse {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        touch-action: none;
+      }
+      .synapse-fallback {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .synapse-caption {
+        position: fixed;
+        left: max(16px, env(safe-area-inset-left));
+        bottom: max(16px, env(safe-area-inset-bottom));
+        margin: 0;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(238, 244, 248, 0.6);
+        pointer-events: none;
+      }
+      .synapse-motion {
+        position: fixed;
+        top: max(16px, env(safe-area-inset-top));
+        right: max(16px, env(safe-area-inset-right));
+        padding: 0.55rem 0.9rem;
+        font: inherit;
+        font-size: 0.8rem;
+        color: #eef4f8;
+        background: rgba(8, 47, 74, 0.64);
+        border: 1px solid rgba(238, 244, 248, 0.24);
+        border-radius: 999px;
+        cursor: pointer;
+      }
+      .synapse-motion:focus-visible {
+        outline: 2px solid #f8acd0;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="synapse" role="img" aria-label="Two nerve terminals meeting at a synapse, with vesicles crossing the gap"></canvas>
+    <img class="synapse-fallback" src={fallbackImage} alt="Synapse illustration" hidden />
+    <p class="synapse-caption">ALPS Conference 2026 · 9–10 October</p>
+    <button class="synapse-motion" type="button" hidden>Enable motion tilt</button>
+
+    <script>
+      import { initSynapse } from "../scripts/synapse3d";
+
+      const canvas = document.getElementById("synapse") as HTMLCanvasElement;
+      initSynapse(canvas, {
+        motionButton: document.querySelector<HTMLButtonElement>(".synapse-motion") ?? undefined,
+        onUnsupported: () => {
+          canvas.hidden = true;
+          document.querySelector<HTMLImageElement>(".synapse-fallback")!.hidden = false;
+        },
+      });
+    </script>
+  </body>
+</html>

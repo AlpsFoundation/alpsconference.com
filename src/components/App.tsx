@@ -1,5 +1,5 @@
 import Navbar from "./Navbar";
-import Hero from "./Hero";
+import Hero, { type HeroIllustration } from "./Hero";
 import Conference from "./Conference";
 import Experiences from "./Experiences";
 import About from "./About";
@@ -14,12 +14,12 @@ import FAQ from "./FAQ";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
 
-export default function App() {
+export default function App({ illustration }: { illustration?: HeroIllustration }) {
   return (
     <>
       <Navbar />
       <main>
-        <Hero />
+        <Hero illustration={illustration} />
         {/* <Conference /> */}
         <About />
         <Program />

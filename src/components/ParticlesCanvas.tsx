@@ -26,7 +26,7 @@ const BASE_COLORS = [
 
 type ParticleVariant = "hero" | "footer" | "workshopHero";
 
-export default function ParticlesCanvas({ variant }: { variant: ParticleVariant }) {
+export default function ParticlesCanvas({ variant, scale = 1 }: { variant: ParticleVariant; scale?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -77,7 +77,7 @@ export default function ParticlesCanvas({ variant }: { variant: ParticleVariant 
           y,
           vx: (Math.random() - 0.5) * (isPinkCenter ? 0.1 : variant === "workshopHero" ? 0.22 : 0.3),
           vy: (Math.random() - 0.5) * (isPinkCenter ? 0.1 : variant === "workshopHero" ? 0.22 : 0.3) - 0.05,
-          radius: isLarge ? Math.random() * 4 + 3 : Math.random() * 2.1 + 0.65,
+          radius: (isLarge ? Math.random() * 4 + 3 : Math.random() * 2.1 + 0.65) * scale,
           opacity: isPinkCenter
             ? Math.random() * 0.55 + 0.36
             : variant === "workshopHero"
@@ -170,7 +170,7 @@ export default function ParticlesCanvas({ variant }: { variant: ParticleVariant 
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", handleResize);
     };
-  }, [variant]);
+  }, [variant, scale]);
 
   return (
     <canvas
