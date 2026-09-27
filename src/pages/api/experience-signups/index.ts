@@ -13,8 +13,18 @@ export const prerender = false;
 export const GET: APIRoute = async () =>
   json({ availability: await getAvailability(env.DB) });
 
-export const POST: APIRoute = ({ request }) => handleSignup(env, request);
+/** Always answer with JSON, so the client never has to parse an HTML error page. */
+async function safely(label: string, run: () => Promise<Response>): Promise<Response> {
+  try {
+    return await run();
+  } catch (error) {
+    console.error(`experience signup ${label} failed`, error);
+    return errorResponse("Something went wrong on our side, please try again in a moment.", 500);
+  }
+}
 
-export const DELETE: APIRoute = ({ request }) => handleCancel(env.DB, request);
+export const POST: APIRoute = ({ request }) => safely("create", () => handleSignup(env, request));
+
+export const DELETE: APIRoute = ({ request }) => safely("cancel", () => handleCancel(env.DB, request));
 
 export const ALL: APIRoute = () => errorResponse("Method not allowed.", 405);

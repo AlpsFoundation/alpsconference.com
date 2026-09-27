@@ -69,7 +69,11 @@ export default function Partners() {
                       <img
                         src={partner.src}
                         alt={partner.alt}
-                        style={partner.scale != null ? { transform: `scale(${partner.scale})` } : undefined}
+                        style={{
+                          ...(partner.scale != null && { transform: `scale(${partner.scale})` }),
+                          // Wide wordmarks lack the built-in margin of the square logos, so pad them to match.
+                          ...(partner.width != null && { width: partner.width, paddingInline: "0.75rem" }),
+                        }}
                         className="max-h-[6.75rem] sm:max-h-[7.5rem] md:max-h-[8.25rem] w-auto max-w-[min(100%,18rem)] sm:max-w-[20rem] object-contain object-center opacity-[0.88] hover:opacity-100 transition-opacity duration-200"
                         loading="lazy"
                         decoding="async"

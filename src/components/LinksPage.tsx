@@ -18,7 +18,6 @@ import {
   ChevronDown,
   Clock,
   Copy,
-  History,
   Loader2,
   MapPin,
   MessageCircle,
@@ -58,6 +57,15 @@ const ICONS: Record<QuickLinkIcon, LucideIcon> = {
 
 const API = withBase("api/experience-signups");
 const STORAGE_KEY = "alps-links-signups";
+
+/** Parse an API response without surfacing raw parser errors (Safari: "The string did not match the expected pattern."). */
+async function readApiJson<T>(response: Response): Promise<T & { error?: string }> {
+  try {
+    return (await response.json()) as T & { error?: string };
+  } catch {
+    return { error: "Something went wrong on our side, please try again in a moment." } as T & { error?: string };
+  }
+}
 
 type StoredSignup = SignupResult & {
   cancelToken: string;
@@ -114,12 +122,12 @@ function useRevealOnScroll(rootRef: RefObject<HTMLElement | null>, ready: boolea
 /* ---------- Clock (supports ?time=yyyy-mm-dd-hh-mm) ---------- */
 
 function useConferenceClock() {
-  const [state, setState] = useState<{ now: Date; travelling: boolean } | null>(null);
+  const [state, setState] = useState<{ now: Date } | null>(null);
 
   useEffect(() => {
     const travel = parseTimeTravel(new URLSearchParams(window.location.search).get("time"));
     const offset = travel ? travel.getTime() - Date.now() : 0;
-    const tick = () => setState({ now: new Date(Date.now() + offset), travelling: Boolean(travel) });
+    const tick = () => setState({ now: new Date(Date.now() + offset) });
     tick();
     const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
@@ -266,24 +274,12 @@ function EntryCard({
   );
 }
 
-function StatusSection({ now, travelling }: { now: Date; travelling: boolean }) {
+function StatusSection({ now }: { now: Date }) {
   const state = getConferenceState(now);
   const active = getActiveExperiences(now);
 
   return (
     <section aria-label="Conference status" className="space-y-3">
-      {travelling && (
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm text-white/85">
-          <span className="flex items-center gap-2">
-            <History className="h-4 w-4 text-accent-light" aria-hidden />
-            Viewing as {dayFormat.format(now)}, {timeFormat.format(now)}
-          </span>
-          <a href={withBase("links")} className="font-medium text-white underline underline-offset-4">
-            Back to now
-          </a>
-        </div>
-      )}
-
       {state.phase === "before" && (
         <Countdown target={CONFERENCE_START} now={now} label="Doors open in" />
       )}
@@ -524,11 +520,12 @@ function SignupPanel({
           company: form.get("company"),
         }),
       });
-      const data = (await response.json()) as SignupResult & {
-        error?: string;
-        alreadySignedUp?: true;
-        cancelToken?: string;
-      };
+      const data = await readApiJson<
+        SignupResult & {
+          alreadySignedUp?: true;
+          cancelToken?: string;
+        }
+      >(response);
       if (!response.ok) throw new Error(data.error ?? "Something went wrong, please try again.");
       if (data.alreadySignedUp) {
         setNotice(
@@ -564,7 +561,7 @@ function SignupPanel({
         body: JSON.stringify({ signupId: own.signupId, cancelToken: own.cancelToken }),
       });
       if (!response.ok && response.status !== 404) {
-        throw new Error(((await response.json()) as { error?: string }).error ?? "Could not cancel, please try again.");
+        throw new Error((await readApiJson<object>(response)).error ?? "Could not cancel, please try again.");
       }
       setJustConfirmed(false);
       onCancelled(session.id);
@@ -939,7 +936,7 @@ export default function LinksPage() {
 
       {clock ? (
         <div className="links-reveal" data-reveal data-reveal-delay="40">
-          <StatusSection now={clock.now} travelling={clock.travelling} />
+          <StatusSection now={clock.now} />
         </div>
       ) : (
         <div className="links-card h-32 animate-pulse" aria-hidden />

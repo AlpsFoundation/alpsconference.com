@@ -25,6 +25,6 @@ export const PARTNERS = {
     { src: "/img/partners/blossom.png", alt: "Blossom", url: "https://blossomanalysis.com/" },
     { src: "/img/partners/simepsi.png", alt: "SIMEPSI (Società Italiana Medicina Psichedelica)", url: "https://simepsi.it/" },
     { src: "/img/partners/psbe.png", alt: "PSBE (Psychedelic Society Belgium)", url: "https://psychedelicsocietybelgium.org/" },
-    { src: "/img/partners/psychedelics-design.png", alt: "Psychedelics Design", url: "https://www.psychedelics.design/" }
+    { src: "/img/partners/psychedelics-design.png", alt: "Psychedelics Design", url: "https://www.psychedelics.design/", width: "11.5rem" }
   ]
 };
