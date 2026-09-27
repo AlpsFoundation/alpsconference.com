@@ -35,6 +35,9 @@ import SynapseIllustration from "./SynapseIllustration";
 
 // Turns slowly about its axis in the upper right; the message sits below, on the left.
 const SYNAPSE_OPTIONS = { spin: 0.1, zoom: 0.7, shiftX: 0.2, shiftY: 0.2 };
+// The synapse's centre on screen; the background glow and the pink particle
+// cluster follow it.
+const GLOW_CENTER = [0.5 + SYNAPSE_OPTIONS.shiftX, 0.5 - SYNAPSE_OPTIONS.shiftY] as const;
 
 // Projector screen for between sessions and question rounds. It follows the
 // clock by default; the schedule drawer (hover to reveal its button) pins what
@@ -466,9 +469,15 @@ export default function BreakScreen() {
   return (
     <div ref={rootRef} className={`break-screen ${active || drawerOpen ? "" : "is-idle"}`}>
       <div className="absolute inset-0" aria-hidden>
-        <img src={withBase("img/background.jpg")} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        {/* Oversized so its radial glow can sit on the synapse and still cover the screen. */}
+        <img
+          src={withBase("img/background.jpg")}
+          alt=""
+          className="absolute h-[150%] w-[150%] max-w-none object-cover"
+          style={{ left: `${(GLOW_CENTER[0] - 0.75) * 100}%`, top: `${(GLOW_CENTER[1] - 0.75) * 100}%` }}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-neutral-dark/40 via-neutral-dark/10 to-neutral-dark/80" />
-        <ParticlesCanvas variant="hero" scale={1.6} />
+        <ParticlesCanvas variant="hero" scale={1.6} center={GLOW_CENTER} />
       </div>
       {synapseFailed ? (
         <div className="break-bones" aria-hidden>

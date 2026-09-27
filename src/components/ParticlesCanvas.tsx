@@ -26,7 +26,17 @@ const BASE_COLORS = [
 
 type ParticleVariant = "hero" | "footer" | "workshopHero";
 
-export default function ParticlesCanvas({ variant, scale = 1 }: { variant: ParticleVariant; scale?: number }) {
+export default function ParticlesCanvas({
+  variant,
+  scale = 1,
+  center,
+}: {
+  variant: ParticleVariant;
+  scale?: number;
+  /** Where the pink cluster sits, as fractions of the canvas (default: the middle). */
+  center?: readonly [number, number];
+}) {
+  const [cx, cy] = center ?? [0.5, variant === "workshopHero" ? 0.46 : 0.5];
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -65,8 +75,8 @@ export default function ParticlesCanvas({ variant, scale = 1 }: { variant: Parti
         if (isPinkCenter) {
           const clusterWidth = variant === "workshopHero" ? Math.min(canvas.width * 0.56, 520) : 400;
           const clusterHeight = variant === "workshopHero" ? Math.min(canvas.height * 0.7, 360) : 400;
-          x = canvas.width / 2 + (Math.random() - 0.5) * clusterWidth;
-          y = canvas.height * (variant === "workshopHero" ? 0.46 : 0.5) + (Math.random() - 0.5) * clusterHeight;
+          x = canvas.width * cx + (Math.random() - 0.5) * clusterWidth;
+          y = canvas.height * cy + (Math.random() - 0.5) * clusterHeight;
         } else if (isWorkshopAmbient) {
           x = canvas.width * (0.08 + Math.random() * 0.84);
           y = canvas.height * (0.08 + Math.random() * 0.76);
@@ -180,7 +190,7 @@ export default function ParticlesCanvas({ variant, scale = 1 }: { variant: Parti
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", handleResize);
     };
-  }, [variant, scale]);
+  }, [variant, scale, cx, cy]);
 
   return (
     <canvas
