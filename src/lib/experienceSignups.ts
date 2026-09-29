@@ -1,4 +1,11 @@
-import { EXPERIENCE_SESSIONS, findSignupSession } from "../data/conferenceTimeline";
+import {
+  EXPERIENCE_SESSIONS,
+  SIGNUPS_OPEN,
+  SIGNUPS_OPEN_LABEL,
+  findSignupSession,
+  parseTimeTravel,
+} from "../data/conferenceTimeline";
+import { sendBookingEmail, type MailerEnv } from "./bookingMailer";
 import { buildSessionIcal, icalFilename } from "./experienceIcal";
 import { buildSignupConfirmationEmail } from "./experienceSignupEmail";
 import { withBase } from "./withBase";
@@ -18,12 +25,10 @@ export type SignupResult = {
   waitlistPosition?: number;
 };
 
-export type SignupRuntimeEnv = {
-  DB: D1Database;
-  EMAIL?: SendEmail;
-  BOOKING_FROM_EMAIL?: string;
-  BOOKING_FROM_NAME?: string;
-};
+export type SignupRuntimeEnv = MailerEnv & { DB: D1Database };
+
+/** Keeps the Worker alive for work that finishes after the response, like sending email. */
+export type WaitUntil = (promise: Promise<unknown>) => void;
 
 const MAX_NAME_LENGTH = 120;
 const MAX_EMAIL_LENGTH = 254;
@@ -42,14 +47,14 @@ export function errorResponse(message: string, status: number): Response {
   return json({ error: message }, status);
 }
 
-function cleanFullName(value: unknown): string | null {
+export function cleanFullName(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const name = value.normalize("NFC").replace(/\s+/g, " ").trim();
   if (!name || name.length > MAX_NAME_LENGTH || !/\p{L}/u.test(name)) return null;
   return name;
 }
 
-function cleanEmail(value: unknown): string | null {
+export function cleanEmail(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const email = value.normalize("NFC").trim().toLowerCase();
   if (!email || email.length > MAX_EMAIL_LENGTH) return null;
@@ -57,7 +62,7 @@ function cleanEmail(value: unknown): string | null {
   return email;
 }
 
-function emailKey(email: string): string {
+export function emailKey(email: string): string {
   return email.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
@@ -70,7 +75,7 @@ async function readJson(request: Request): Promise<Record<string, unknown> | nul
   }
 }
 
-async function resultFor(db: D1Database, experienceId: string, signupId: number): Promise<SignupResult> {
+export async function resultFor(db: D1Database, experienceId: string, signupId: number): Promise<SignupResult> {
   const capacity = findSignupSession(experienceId)?.capacity ?? 0;
   const row = await db
     .prepare("SELECT COUNT(*) AS position FROM experience_signups WHERE experience_id = ? AND id <= ?")
@@ -105,8 +110,7 @@ function siteOrigin(request: Request): string {
   return url.origin;
 }
 
-function bookingUrls(request: Request, cancelToken: string) {
-  const origin = siteOrigin(request);
+function bookingUrls(origin: string, cancelToken: string) {
   const cancelPath = withBase(`links/cancel?token=${encodeURIComponent(cancelToken)}`);
   const icalPath = withBase(`api/experience-signups/ical?token=${encodeURIComponent(cancelToken)}`);
   return {
@@ -115,27 +119,25 @@ function bookingUrls(request: Request, cancelToken: string) {
   };
 }
 
-async function sendConfirmationEmail(
+export async function sendConfirmationEmail(
   env: SignupRuntimeEnv,
-  request: Request,
+  origin: string,
   params: {
     fullName: string;
     email: string;
     session: NonNullable<ReturnType<typeof findSignupSession>>;
-    result: SignupResult;
+    result: Pick<SignupResult, "status" | "waitlistPosition">;
     cancelToken: string;
+    promoted?: boolean;
   },
 ) {
-  if (!env.EMAIL) return;
-
-  const fromEmail = env.BOOKING_FROM_EMAIL?.trim() || "bookings@alpsconference.com";
-  const fromName = env.BOOKING_FROM_NAME?.trim() || "ALPS Conference";
-  const { cancelUrl, icalUrl } = bookingUrls(request, params.cancelToken);
+  const { cancelUrl, icalUrl } = bookingUrls(origin, params.cancelToken);
   const content = buildSignupConfirmationEmail({
     fullName: params.fullName,
     session: params.session,
     status: params.result.status,
     waitlistPosition: params.result.waitlistPosition,
+    promoted: params.promoted,
     cancelUrl,
     icalUrl,
   });
@@ -143,17 +145,15 @@ async function sendConfirmationEmail(
   const ics = buildSessionIcal(params.session, icalUrl);
 
   try {
-    await env.EMAIL.send({
-      from: { email: fromEmail, name: fromName },
+    await sendBookingEmail(env, {
       to: params.email,
       subject: content.subject,
       text: content.text,
       html: content.html,
       attachments: [
         {
-          disposition: "attachment",
           filename: icalFilename(params.session),
-          type: "text/calendar; charset=utf-8; method=PUBLISH",
+          mimeType: "text/calendar; charset=utf-8; method=PUBLISH",
           content: ics,
         },
       ],
@@ -164,7 +164,83 @@ async function sendConfirmationEmail(
   }
 }
 
-export async function handleSignup(env: SignupRuntimeEnv, request: Request): Promise<Response> {
+/** Emails whoever a cancelled confirmed spot moved up from the waitlist. */
+async function notifyPromotion(env: SignupRuntimeEnv, origin: string, experienceId: string) {
+  const session = findSignupSession(experienceId);
+  if (!session || (session.start && Date.now() >= session.start.getTime())) return;
+
+  const promoted = await env.DB
+    .prepare(
+      `SELECT full_name, email, cancel_token FROM experience_signups
+       WHERE experience_id = ? ORDER BY id LIMIT 1 OFFSET ?`,
+    )
+    .bind(experienceId, session.capacity - 1)
+    .first<{ full_name: string; email: string; cancel_token: string }>();
+  // Rows from before emails were collected have an empty address.
+  if (!promoted?.email) return;
+
+  await sendConfirmationEmail(env, origin, {
+    fullName: promoted.full_name,
+    email: promoted.email,
+    session,
+    result: { status: "confirmed" },
+    cancelToken: promoted.cancel_token,
+    promoted: true,
+  });
+}
+
+/** Deletes a booking. A confirmed spot going free moves the first person on the waitlist up. */
+export async function releaseSpot(
+  env: SignupRuntimeEnv,
+  origin: string,
+  row: { id: number; experience_id: string },
+  waitUntil: WaitUntil,
+): Promise<boolean> {
+  const before = await resultFor(env.DB, row.experience_id, row.id);
+  const { meta } = await env.DB.prepare("DELETE FROM experience_signups WHERE id = ?").bind(row.id).run();
+  if (!meta.changes) return false;
+
+  if (before.status === "confirmed") {
+    waitUntil(
+      notifyPromotion(env, origin, row.experience_id).catch((error) =>
+        console.error("experience waitlist promotion email failed", error),
+      ),
+    );
+  }
+  return true;
+}
+
+/** Inserts a booking at the end of the list, or returns null when that email already holds one. */
+export async function insertSignup(
+  db: D1Database,
+  row: { experienceId: string; fullName: string; email: string; emailKey: string; addedBy?: string },
+): Promise<{ id: number; cancelToken: string } | null> {
+  const cancelToken = crypto.randomUUID();
+  const values = [row.experienceId, row.fullName, row.email, row.emailKey, cancelToken];
+  // /links bookings leave out `added_by`, so they keep working on a database without migration 0003.
+  const staff = row.addedBy ? ", added_by" : "";
+  const inserted = await db
+    .prepare(
+      `INSERT INTO experience_signups (experience_id, full_name, email, email_key, cancel_token${staff})
+       VALUES (?, ?, ?, ?, ?${staff ? ", ?" : ""})
+       ON CONFLICT (experience_id, email_key) DO NOTHING
+       RETURNING id`,
+    )
+    .bind(...values, ...(row.addedBy ? [row.addedBy] : []))
+    .first<{ id: number }>();
+  return inserted ? { id: inserted.id, cancelToken } : null;
+}
+
+/** The API honours the page's `?time=` override, so time-travelled previews book for real. */
+function requestTime(request: Request): Date {
+  return parseTimeTravel(new URL(request.url).searchParams.get("time")) ?? new Date();
+}
+
+export async function handleSignup(
+  env: SignupRuntimeEnv,
+  request: Request,
+  waitUntil: WaitUntil,
+): Promise<Response> {
   const body = await readJson(request);
   if (!body) return errorResponse("Invalid request.", 400);
   // Honeypot field, hidden from people.
@@ -175,7 +251,9 @@ export async function handleSignup(env: SignupRuntimeEnv, request: Request): Pro
   const experienceId = typeof body.experienceId === "string" ? body.experienceId : "";
   const session = findSignupSession(experienceId);
   if (!session) return errorResponse("This experience does not take sign-ups.", 404);
-  if (session.start && Date.now() >= session.start.getTime()) {
+  const now = requestTime(request);
+  if (now < SIGNUPS_OPEN) return errorResponse(`Sign-ups open on ${SIGNUPS_OPEN_LABEL}.`, 403);
+  if (session.start && now >= session.start) {
     return errorResponse("Sign-up for this session has closed.", 409);
   }
 
@@ -193,16 +271,7 @@ export async function handleSignup(env: SignupRuntimeEnv, request: Request): Pro
   }
 
   const key = emailKey(email);
-  const cancelToken = crypto.randomUUID();
-  const inserted = await env.DB
-    .prepare(
-      `INSERT INTO experience_signups (experience_id, full_name, email, email_key, cancel_token)
-       VALUES (?, ?, ?, ?, ?)
-       ON CONFLICT (experience_id, email_key) DO NOTHING
-       RETURNING id`,
-    )
-    .bind(experienceId, fullName, email, key, cancelToken)
-    .first<{ id: number }>();
+  const inserted = await insertSignup(env.DB, { experienceId, fullName, email, emailKey: key });
 
   if (!inserted) {
     // Same email already signed up: report their place, but never hand out their cancel token.
@@ -215,13 +284,14 @@ export async function handleSignup(env: SignupRuntimeEnv, request: Request): Pro
   }
 
   const result = await resultFor(env.DB, experienceId, inserted.id);
-  await sendConfirmationEmail(env, request, {
+  const { cancelToken } = inserted;
+  waitUntil(sendConfirmationEmail(env, siteOrigin(request), {
     fullName,
     email,
     session,
     result,
     cancelToken,
-  });
+  }));
 
   return json({ ...result, cancelToken }, 201);
 }
@@ -263,7 +333,11 @@ export async function handleOwnStatus(db: D1Database, request: Request): Promise
   return json({ signups: results });
 }
 
-export async function handleCancel(db: D1Database, request: Request): Promise<Response> {
+export async function handleCancel(
+  env: SignupRuntimeEnv,
+  request: Request,
+  waitUntil: WaitUntil,
+): Promise<Response> {
   const body = await readJson(request);
   if (!body) return errorResponse("Invalid request.", 400);
 
@@ -271,12 +345,19 @@ export async function handleCancel(db: D1Database, request: Request): Promise<Re
   const signupId = Number.isInteger(body.signupId) ? (body.signupId as number) : null;
   if (!cancelToken) return errorResponse("Invalid request.", 400);
 
-  const statement = signupId != null
-    ? db.prepare("DELETE FROM experience_signups WHERE id = ? AND cancel_token = ?").bind(signupId, cancelToken)
-    : db.prepare("DELETE FROM experience_signups WHERE cancel_token = ?").bind(cancelToken);
+  const row = await (signupId != null
+    ? env.DB
+        .prepare("SELECT id, experience_id FROM experience_signups WHERE id = ? AND cancel_token = ?")
+        .bind(signupId, cancelToken)
+    : env.DB
+        .prepare("SELECT id, experience_id FROM experience_signups WHERE cancel_token = ?")
+        .bind(cancelToken)
+  ).first<{ id: number; experience_id: string }>();
+  if (!row) return errorResponse("Sign-up not found.", 404);
 
-  const { meta } = await statement.run();
-  if (!meta.changes) return errorResponse("Sign-up not found.", 404);
+  if (!(await releaseSpot(env, siteOrigin(request), row, waitUntil))) {
+    return errorResponse("Sign-up not found.", 404);
+  }
   return json({ cancelled: true });
 }
 

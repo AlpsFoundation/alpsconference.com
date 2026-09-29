@@ -12,6 +12,8 @@ type BuildSignupEmailParams = {
   session: ExperienceSession;
   status: SignupStatus;
   waitlistPosition?: number;
+  /** Moved up from the waitlist after someone cancelled. */
+  promoted?: boolean;
   cancelUrl: string;
   icalUrl: string;
 };
@@ -24,17 +26,22 @@ export function buildSignupConfirmationEmail({
   session,
   status,
   waitlistPosition,
+  promoted = false,
   cancelUrl,
   icalUrl,
 }: BuildSignupEmailParams): SignupEmailContent {
   const confirmed = status === "confirmed";
-  const subject = confirmed
-    ? `You're in — ${session.title} · ALPS 2026`
-    : `Waitlist — ${session.title} · ALPS 2026`;
+  const subject = promoted
+    ? `A spot opened up — ${session.title} · ALPS 2026`
+    : confirmed
+      ? `You're in — ${session.title} · ALPS 2026`
+      : `Waitlist — ${session.title} · ALPS 2026`;
 
-  const statusLine = confirmed
-    ? "Your spot is confirmed."
-    : `You're on the waitlist${waitlistPosition ? ` at position ${waitlistPosition}` : ""}. We'll email you if a place opens.`;
+  const statusLine = promoted
+    ? "A spot opened up, so you're off the waitlist and your place is confirmed."
+    : confirmed
+      ? "Your spot is confirmed."
+      : `You're on the waitlist${waitlistPosition ? ` at position ${waitlistPosition}` : ""}. We'll email you if a place opens.`;
 
   const when = `${session.day} · ${session.time}`;
   const where = session.venue

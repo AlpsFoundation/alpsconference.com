@@ -35,6 +35,9 @@ importers:
       three:
         specifier: ^0.186.1
         version: 0.186.1
+      worker-mailer:
+        specifier: 1.2.1
+        version: 1.2.1
     devDependencies:
       '@astrojs/cloudflare':
         specifier: ^13.1.8
@@ -2301,6 +2304,9 @@ packages:
     resolution: {integrity: sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==}
     engines: {node: '>=8'}
     hasBin: true
+
+  worker-mailer@1.2.1:
+    resolution: {integrity: sha512-gS2ei/mrpRqNs+AHmqxhT6vFPwCLw2qnz5ShmyGD0ULaU0Q9hxnFAcx9jhAip/MnD6+MjgnQu6hQQgA8mlOkVA==}
 
   workerd@1.20260409.1:
     resolution: {integrity: sha512-kuWP20fAaqaLBqLbvUfY9nCF6c3C78L60G9lS6eVwBf+v8trVFIsAdLB/FtrnKm7vgVvpDzvFAfB80VIiVj95w==}
@@ -4687,6 +4693,8 @@ snapshots:
     dependencies:
       siginfo: 2.0.0
       stackback: 0.0.2
+
+  worker-mailer@1.2.1: {}
 
   workerd@1.20260409.1:
     optionalDependencies:

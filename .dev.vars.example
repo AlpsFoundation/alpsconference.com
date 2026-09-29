@@ -11,3 +11,11 @@ INFOMANIAK_NEWSLETTER_DOMAIN=
 
 # Optional debug payloads on API errors
 # NEWSLETTER_DEBUG=1
+
+# Booking emails from /links, sent over SMTP from the booking Gmail mailbox.
+# SMTP_PASS is a Google app password (Google Account → Security → App passwords).
+# Leave both empty to skip sending in local dev.
+SMTP_USER=
+SMTP_PASS=
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=465

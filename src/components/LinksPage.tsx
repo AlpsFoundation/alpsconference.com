@@ -31,6 +31,8 @@ import {
 import {
   CONFERENCE_START,
   EXPERIENCE_SESSIONS,
+  SIGNUPS_OPEN,
+  SIGNUPS_OPEN_LABEL,
   getActiveExperiences,
   getConferenceState,
   parseTimeTravel,
@@ -58,12 +60,11 @@ const ICONS: Record<QuickLinkIcon, LucideIcon> = {
 const API = withBase("api/experience-signups");
 const STORAGE_KEY = "alps-links-signups";
 
-// TEMP (screencast): fake bookings client-side with a delay and pre-filled fields. Set to false before shipping.
-const DEMO_BOOKING = true;
-const DEMO_DELAY_MS = 1400;
-const DEMO_NAME = "Albert H";
-const DEMO_EMAIL = "hi@lsd85.ch";
-const demoDelay = () => new Promise((resolve) => window.setTimeout(resolve, DEMO_DELAY_MS));
+/** Passes the page's `?time=` override on to the API, which applies the same sign-up window. */
+function withTimeTravel(url: string) {
+  const time = new URLSearchParams(window.location.search).get("time");
+  return time ? `${url}?time=${encodeURIComponent(time)}` : url;
+}
 
 /** Parse an API response without surfacing raw parser errors (Safari: "The string did not match the expected pattern."). */
 async function readApiJson<T>(response: Response): Promise<T & { error?: string }> {
@@ -505,6 +506,7 @@ function SignupPanel({
   session,
   availability,
   own,
+  notYetOpen,
   closed,
   onSignedUp,
   onCancelled,
@@ -512,6 +514,7 @@ function SignupPanel({
   session: ExperienceSession;
   availability?: SignupAvailability[string];
   own?: StoredSignup;
+  notYetOpen: boolean;
   closed: boolean;
   onSignedUp: (signup: StoredSignup | (SignupResult & { alreadySignedUp: true })) => void;
   onCancelled: (experienceId: string) => void;
@@ -531,21 +534,7 @@ function SignupPanel({
     setPending(true);
     setError(null);
     try {
-      if (DEMO_BOOKING) {
-        await demoDelay();
-        setJustConfirmed(true);
-        onSignedUp({
-          experienceId: session.id,
-          signupId: Date.now(),
-          status: full ? "waitlist" : "confirmed",
-          waitlistPosition: full ? (availability?.waitlist ?? 0) + 1 : undefined,
-          cancelToken: "demo",
-          fullName,
-          email,
-        });
-        return;
-      }
-      const response = await fetch(API, {
+      const response = await fetch(withTimeTravel(API), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -590,12 +579,6 @@ function SignupPanel({
     setPending(true);
     setError(null);
     try {
-      if (DEMO_BOOKING) {
-        await demoDelay();
-        setJustConfirmed(false);
-        onCancelled(session.id);
-        return;
-      }
       const response = await fetch(API, {
         method: "DELETE",
         headers: { "content-type": "application/json" },
@@ -649,6 +632,11 @@ function SignupPanel({
         </>
       ) : closed ? (
         <p className="text-sm text-white/60">Sign-up for this session has closed.</p>
+      ) : notYetOpen ? (
+        <p className="flex items-center gap-2 text-sm text-white/65">
+          <Users className="h-4 w-4 shrink-0" aria-hidden />
+          {session.capacity} spots · sign-ups open on {SIGNUPS_OPEN_LABEL}.
+        </p>
       ) : notice ? (
         <p className="rounded-xl border border-white/15 bg-white/[0.06] p-4 text-sm text-white/85">{notice}</p>
       ) : (
@@ -665,7 +653,6 @@ function SignupPanel({
               required
               maxLength={120}
               autoComplete="name"
-              defaultValue={DEMO_BOOKING ? DEMO_NAME : undefined}
               disabled={pending}
               className="links-input"
             />
@@ -679,7 +666,6 @@ function SignupPanel({
               required
               maxLength={254}
               autoComplete="email"
-              defaultValue={DEMO_BOOKING ? DEMO_EMAIL : undefined}
               inputMode="email"
               disabled={pending}
               className="links-input"
@@ -732,6 +718,7 @@ function ExperiencesSection({
     return [...byDay.entries()];
   }, []);
   const isPast = (session: ExperienceSession) => (session.end ? now >= session.end : false);
+  const notYetOpen = now < SIGNUPS_OPEN;
   const upcomingDays = days
     .map(([day, sessions]) => [day, sessions.filter((session) => !isPast(session))] as const)
     .filter(([, sessions]) => sessions.length > 0);
@@ -771,7 +758,17 @@ function ExperiencesSection({
               </span>
               {session.personName && <span className="block text-sm text-white/60">{session.personName}</span>}
               <span className="mt-1 block text-xs text-white/50">
-                {ended ? "Ended" : started ? "Happening now" : own ? label : label ? `${label} · Sign up` : "Sign up"}
+                {ended
+                  ? "Ended"
+                  : started
+                    ? "Happening now"
+                    : own
+                      ? label
+                      : notYetOpen
+                        ? `Sign-ups open ${SIGNUPS_OPEN_LABEL}`
+                        : label
+                          ? `${label} · Sign up`
+                          : "Sign up"}
               </span>
             </span>
             {own && (
@@ -787,6 +784,7 @@ function ExperiencesSection({
           session={session}
           availability={availability?.[session.id]}
           own={own}
+          notYetOpen={notYetOpen}
           closed={started}
           onSignedUp={onSignedUp}
           onCancelled={onCancelled}
@@ -806,6 +804,7 @@ function ExperiencesSection({
         <p className="links-eyebrow">Experiences</p>
         <h2 id="experiences-heading" className="mt-1 text-2xl font-semibold text-white">Save your spot</h2>
         <p className="mt-1 text-sm text-white/65">
+          {notYetOpen && `Sign-ups open on ${SIGNUPS_OPEN_LABEL}. `}
           Places are limited. When a session is full, join the waitlist and we move you up as spots free.
         </p>
       </div>

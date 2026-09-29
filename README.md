@@ -85,12 +85,24 @@ Configure these in `.dev.vars`:
 | `INFOMANIAK_NEWSLETTER_DOMAIN` | Yes* | Infomaniak newsletter domain ID. Must be a positive integer. |
 | `INFOMANIAK_NEWSLETTER_GROUPS` | No | Optional comma-separated group IDs and/or group names to assign new subscribers to. |
 | `NEWSLETTER_DEBUG` | No | Set to `1` to include extra `debug` details in API error responses during local troubleshooting. |
-| `BOOKING_FROM_EMAIL` | No | From-address for experience booking confirmations. Defaults via `wrangler.jsonc` to `bookings@alpsconference.com`. |
-| `BOOKING_FROM_NAME` | No | Display name for booking confirmations. Defaults to `ALPS Conference`. |
+| `SMTP_USER` | Yes** | Address of the booking mailbox (a Gmail account). |
+| `SMTP_PASS` | Yes** | A Google app password for that account (Google Account → Security → 2-Step Verification → App passwords). Spaces are ignored. |
+| `SMTP_HOST` | No | Defaults to `smtp.gmail.com`. |
+| `SMTP_PORT` | No | Defaults to `465` (implicit TLS); `587` uses STARTTLS. |
+| `BOOKING_FROM_EMAIL` | No | From-address for booking emails. Defaults to `SMTP_USER`; Gmail only sends as the account itself or one of its verified "Send mail as" aliases. |
+| `BOOKING_FROM_NAME` | No | Display name for booking emails. Defaults via `wrangler.jsonc` to `ALPS Conference`. |
 
 \* Required when you want to test the newsletter signup route. The static landing page itself does not require them.
 
-Experience booking emails use the Cloudflare Email Service `EMAIL` binding (`send_email` in `wrangler.jsonc`). Onboard `alpsconference.com` under **Email Sending** before relying on delivery in production.
+\*\* Without them, bookings still work and the emails are skipped (logged as a warning).
+
+### Experience bookings
+
+`/links` takes experience sign-ups into the `alpsconference-signups` D1 database (`pnpm db:migrate:local` once before `pnpm dev`). Each booking sends a confirmation with a calendar file and a cancel link; when a confirmed spot is cancelled, the first person on the waitlist moves up and gets a "spot opened up" email. The emails go out over SMTP from the booking Gmail mailbox (`src/lib/bookingMailer.ts`, [worker-mailer](https://github.com/zou-yu/worker-mailer) over Cloudflare TCP sockets).
+
+Staff manage bookings at [tools.alps.foundation/experiences](https://tools.alps.foundation/experiences/) (Google sign-in, `AlpsFoundation/tools.alps.foundation`, package `experiences`): per session, who is confirmed and waiting, add someone at the desk, remove a booking, and door check-in. That tool reaches the bookings through the `ExperienceBookings` RPC entrypoint in `src/worker.ts` (logic in `src/lib/experienceAdmin.ts`), which only a service binding can call — it has no public URL. Apply migration `0003_experience_signups_staff.sql` (`pnpm db:migrate:remote`) before that tool goes live; bookings from `/links` work with or without it.
+
+Sign-ups open on **8 October 2026 at 00:00 in Aarau** (`SIGNUPS_OPEN` in `src/data/conferenceTimeline.ts`); until then the page shows the opening date and the API refuses bookings. `?time=yyyy-mm-dd-hh-mm` on `/links` moves the page's clock, and the API follows it, so `/links?time=2026-10-08-10-00` books for real before opening — cancel those test bookings from their email before 8 October.
 
 ### Runtime secrets in Cloudflare
 
@@ -101,6 +113,8 @@ wrangler secret put INFOMANIAK_TOKEN
 wrangler secret put INFOMANIAK_NEWSLETTER_DOMAIN
 wrangler secret put INFOMANIAK_NEWSLETTER_GROUPS
 wrangler secret put NEWSLETTER_DEBUG
+wrangler secret put SMTP_USER
+wrangler secret put SMTP_PASS
 ```
 
 ## Calendar feeds

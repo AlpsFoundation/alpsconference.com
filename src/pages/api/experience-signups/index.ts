@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { env } from "cloudflare:workers";
+import { env, waitUntil } from "cloudflare:workers";
 import {
   errorResponse,
   getAvailability,
@@ -23,8 +23,8 @@ async function safely(label: string, run: () => Promise<Response>): Promise<Resp
   }
 }
 
-export const POST: APIRoute = ({ request }) => safely("create", () => handleSignup(env, request));
+export const POST: APIRoute = ({ request }) => safely("create", () => handleSignup(env, request, waitUntil));
 
-export const DELETE: APIRoute = ({ request }) => safely("cancel", () => handleCancel(env.DB, request));
+export const DELETE: APIRoute = ({ request }) => safely("cancel", () => handleCancel(env, request, waitUntil));
 
 export const ALL: APIRoute = () => errorResponse("Method not allowed.", 405);

@@ -48,4 +48,19 @@ describe("experience signup confirmation email", () => {
     expect(email.text).toContain("position 3");
     expect(email.html).toContain("You're on the waitlist");
   });
+
+  it("says a spot opened up when promoted from the waitlist", () => {
+    const email = buildSignupConfirmationEmail({
+      fullName: "Ada Example",
+      session,
+      status: "confirmed",
+      promoted: true,
+      cancelUrl: "https://example.com/cancel",
+      icalUrl: "https://example.com/ical",
+    });
+
+    expect(email.subject).toContain("A spot opened up");
+    expect(email.text).toContain("you're off the waitlist");
+    expect(email.html).toContain("Cancel this booking");
+  });
 });

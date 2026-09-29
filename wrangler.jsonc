@@ -1,6 +1,7 @@
 {
   "name": "alpsconference-com",
-  "main": "@astrojs/cloudflare/entrypoints/server",
+  // Astro's server entry plus the ExperienceBookings RPC entrypoint for tools.alps.foundation.
+  "main": "./src/worker.ts",
   "compatibility_date": "2026-04-11",
   "compatibility_flags": ["nodejs_compat"],
   "preview_urls": true,
@@ -25,13 +26,7 @@
       "database_id": "c366e6b4-1e12-4785-8a09-777ab95d6177"
     }
   ],
-  "send_email": [
-    {
-      "name": "EMAIL"
-    }
-  ],
   "vars": {
-    "BOOKING_FROM_EMAIL": "bookings@alpsconference.com",
     "BOOKING_FROM_NAME": "ALPS Conference"
   },
   "observability": {
