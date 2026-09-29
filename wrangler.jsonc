@@ -15,6 +15,14 @@
       "database_name": "alpsconference-signups",
       "database_id": "0c956347-25be-4019-a0ed-2d8d6d4169ff",
       "migrations_dir": "migrations"
+    },
+    {
+      // Build crew sign-ups and ticks for /volunteers (Thursday setup, Saturday teardown).
+      // Shared with the tools-conf26-setup Worker; its migrations live in
+      // AlpsFoundation/tools.alps.foundation, packages/conf26-setup.
+      "binding": "CREW_DB",
+      "database_name": "conf26-setup",
+      "database_id": "c366e6b4-1e12-4785-8a09-777ab95d6177"
     }
   ],
   "send_email": [

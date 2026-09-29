@@ -1,8 +1,11 @@
 /**
  * Per-person crew calendar: every shift, plus the loading, power circles and
- * dismantling that person is part of. Rebuilt from `src/data/volunteers.ts` on
- * every build, so subscribers pick up plan changes on their next refresh.
+ * dismantling that person is part of, plus what they signed up for in the build
+ * (setup on Thursday, teardown and packing the truck on Saturday). Served on demand,
+ * so subscribers pick up plan changes and new sign-ups on their next refresh.
  */
+import { BUILD_PHASES } from "../data/crewBuild";
+import type { PersonBuildEntry } from "./crewBuild";
 import { CREW_CONTACTS, SHIFT_DAYS, VOLUNTEER_TASKS } from "../data/volunteers";
 import { serializeCalendar, VENUE, type CalendarEvent } from "./ical";
 import {
@@ -18,7 +21,12 @@ import { withBase } from "./withBase";
 
 const UID_DOMAIN = "alpsconference.com";
 
-export function buildVolunteerCalendar(person: string, site: URL | undefined, builtAt = new Date()) {
+export function buildVolunteerCalendar(
+  person: string,
+  site: URL | undefined,
+  builtAt = new Date(),
+  build: PersonBuildEntry[] = []
+) {
   const origin = site?.href ?? "https://alpsconference.com/";
   const slug = volunteerSlug(person);
   const pageUrl = `${new URL(withBase("volunteers"), origin).href}?person=${slug}`;
@@ -53,6 +61,12 @@ export function buildVolunteerCalendar(person: string, site: URL | undefined, bu
     })
   );
 
+  // Teardown sign-ups go into the plan's own dismantling entry rather than doubling it.
+  const teardown = build.find((entry) => entry.phase === "teardown");
+  const dismantling = crewEventsFor(person).some((event) => event.id === "dismantling");
+  const taskLines = (entry: PersonBuildEntry) =>
+    entry.items.map((item) => `• ${item.name}${item.what ? `\n  ${item.what}` : ""}`).join("\n");
+
   const crew: CalendarEvent[] = crewEventsFor(person).map((event) => ({
     uid: `crew-${slug}-${event.id}@${UID_DOMAIN}`,
     date: event.dateTime,
@@ -60,12 +74,39 @@ export function buildVolunteerCalendar(person: string, site: URL | undefined, bu
     summary: `ALPS crew: ${event.title}`,
     description: [
       event.people ? `With ${event.people.filter((name) => name !== person).join(", ")}` : "The whole crew",
+      event.id === "dismantling" && teardown ? `Your teardown tasks:\n${taskLines(teardown)}` : undefined,
       `Starts ${event.approximate ? "around " : ""}${event.start}. The plan gives no end time, so the end of this entry is only a placeholder.`,
       ...footer,
-    ].join("\n\n"),
+    ]
+      .filter(Boolean)
+      .join("\n\n"),
     location: event.place === "Bern" ? "Bern, Switzerland" : VENUE,
     url: pageUrl,
   }));
+
+  const teardownStart = toMinutes(BUILD_PHASES.teardown.start ?? "21:30");
+  const buildEvents: CalendarEvent[] = build.filter((entry) => !(dismantling && entry.phase === "teardown")).map((entry) => {
+    const info = BUILD_PHASES[entry.phase];
+    // Packing the truck has no time yet: it follows the teardown.
+    const start = entry.start ?? teardownStart + 60;
+    const end = entry.end ?? start + 60;
+    return {
+      uid: `crew-${slug}-build-${entry.phase}@${UID_DOMAIN}`,
+      date: entry.dateTime,
+      range: { start: formatTime(start), end: formatTime(end) },
+      summary: `ALPS build: ${info.label}`,
+      description: [
+        taskLines(entry),
+        entry.start === null ? "The time is still to be confirmed; this entry is a placeholder after the teardown." : undefined,
+        !info.end && entry.start !== null ? "The plan gives no end time, so the end of this entry is only a placeholder." : undefined,
+        ...footer,
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
+      location: VENUE,
+      url: pageUrl,
+    };
+  });
 
   return serializeCalendar(
     {
@@ -73,7 +114,7 @@ export function buildVolunteerCalendar(person: string, site: URL | undefined, bu
       description: `${person}’s crew shifts at ALPS Conference 2026, 9–10 October 2026 at the Kultur & Kongresshaus Aarau.`,
       source: new URL(volunteerCalendarPath(person), origin).href,
     },
-    [...crew, ...shifts].sort((a, b) =>
+    [...crew, ...shifts, ...buildEvents].sort((a, b) =>
       `${a.date}${a.range?.start}`.localeCompare(`${b.date}${b.range?.start}`)
     ),
     builtAt
