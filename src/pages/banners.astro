@@ -1,0 +1,42 @@
+---
+import "../styles/app.css";
+import BannersPage from "../components/BannersPage";
+import { withBase } from "../lib/withBase";
+
+const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const ogImagePath = withBase("og/banners.jpg");
+const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
+const fontFaceCss = `@font-face {
+  font-family: "Switzer";
+  src: url("${switzerFont}") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Internal: banners for the newsletter and other channels. Not linked, not in the sitemap. -->
+    <meta name="robots" content="noindex" />
+    <title>Banners | ALPS Conference 2026</title>
+    <meta name="description" content="Downloadable ALPS Conference 2026 banners for the newsletter and other channels." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Banners — ALPS Conference 2026" />
+    <meta property="og:description" content="Downloadable banners for the newsletter and other channels." />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#082f4a" />
+    <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
+    <style is:global set:html={fontFaceCss}></style>
+  </head>
+  <body>
+    <BannersPage client:load />
+  </body>
+</html>

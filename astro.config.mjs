@@ -79,6 +79,7 @@ export default defineConfig({
         !page.includes("/static") &&
         !page.includes("/bingo") &&
         !page.includes("/slides") &&
+        !page.includes("/banners") &&
         !page.includes("/volunteers"),
     }),
   ],
