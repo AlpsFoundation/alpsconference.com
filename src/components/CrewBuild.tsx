@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Check, ChevronUp, Maximize2, MapPin, Minimize2, Plus, Users, X } from "lucide-react";
+import { Check, ChevronUp, HandHeart, Maximize2, MapPin, Minimize2, Plus, Users, X } from "lucide-react";
 import { BUILD_PHASES, BUILD_ZONES, type BuildItem, type BuildPhase, type BuildSection } from "../data/crewBuild";
 import {
   assigneesOf,
@@ -17,6 +17,27 @@ import "../styles/crewBuild.css";
 
 const MAP_KEY = "alps-volunteer-build-map";
 type MapSize = "fit" | "large" | "hidden";
+
+/** Which tasks to list: those that still need people, those not ticked yet, or all. */
+const SHOW_KEY = "alps-volunteer-build-show";
+type Show = "needs" | "open" | "all";
+const SHOWS: { id: Show; label: string }[] = [
+  { id: "needs", label: "Needs people" },
+  { id: "open", label: "Not done yet" },
+  { id: "all", label: "All" },
+];
+
+/** `?show=needs|open|all` wins, so a link can open straight on the tasks that need help. */
+function readShow(): Show {
+  const fromUrl = new URLSearchParams(window.location.search).get("show");
+  if (fromUrl === "needs" || fromUrl === "open" || fromUrl === "all") return fromUrl;
+  try {
+    const stored = localStorage.getItem(SHOW_KEY);
+    return stored === "needs" || stored === "open" ? stored : "all";
+  } catch {
+    return "all";
+  }
+}
 /** The part of public/img/venue-plan.svg that holds the ground floor. */
 const VIEW = { x: 84, y: 134, w: 1052, h: 432 };
 
@@ -39,6 +60,11 @@ function phaseTime(phase: BuildPhase) {
   if (!info.start) return "Time to be confirmed";
   if (info.end) return `${info.start}–${info.end}`;
   return phase === "teardown" ? `From ${info.start}` : info.start;
+}
+
+/** Tasks are "done"; "Arrived" and "On the truck" belong to the material checklist. */
+function taskDoneLabel(phase: BuildPhase) {
+  return phase === "unload" || phase === "load" ? "Done" : BUILD_PHASES[phase].doneLabel;
 }
 
 function readMapSize(): MapSize {
@@ -89,7 +115,21 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   const scrollRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  useEffect(() => setMapSize(readMapSize()), []);
+  const [show, setShow] = useState<Show>("all");
+
+  useEffect(() => {
+    setMapSize(readMapSize());
+    setShow(readShow());
+  }, []);
+
+  const chooseShow = (next: Show) => {
+    setShow(next);
+    try {
+      localStorage.setItem(SHOW_KEY, next);
+    } catch {
+      // Blocked storage: the choice holds until the page is left.
+    }
+  };
 
   // The map pins under the sticky person picker, whatever its height on this screen.
   useEffect(() => {
@@ -146,18 +186,48 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
     (assigneesOf(state, item.id, phase).includes(person!) ||
       (phase === "teardown" && assigneesOf(state, item.id, "setup").includes(person!)));
 
+  /** Still short of people: fewer than needed, or no headcount yet and nobody on it. Ticked tasks are not. */
+  const needsPeople = (item: BuildItem, phase: BuildPhase) => {
+    if (tickOf(state, item.id, phase)) return false;
+    const signed = assigneesOf(state, item.id, phase).length;
+    const need = neededFor(item);
+    return need ? signed < need : signed === 0;
+  };
+
+  const shows = (item: BuildItem, phase: BuildPhase) =>
+    show === "needs" ? needsPeople(item, phase) : show === "open" ? !tickOf(state, item.id, phase) : true;
+
   const visible = useMemo(
     () =>
       (phases ?? []).map((phase) => ({
         phase,
         tasks: taskSections(phase)
-          .map((section) => ({ ...section, items: section.items.filter((item) => !onlyMine || mine(item, phase)) }))
+          .map((section) => ({
+            ...section,
+            items: section.items.filter((item) => (!onlyMine || mine(item, phase)) && shows(item, phase)),
+          }))
           .filter((section) => section.items.length),
-        material: onlyMine ? [] : materialSections(phase),
+        // The checklist has no headcount, so "Needs people" leaves it out.
+        material:
+          onlyMine || show === "needs"
+            ? []
+            : materialSections(phase)
+                .map((section) => ({ ...section, items: section.items.filter((item) => shows(item, phase)) }))
+                .filter((section) => section.items.length),
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [phases, onlyMine, person, state]
+    [phases, onlyMine, person, state, show]
   );
+
+  // Counts on the switch: tasks of this day, whatever the current choice.
+  const dayTasks = (phases ?? []).flatMap((phase) =>
+    taskSections(phase).flatMap((section) => section.items.map((item) => ({ item, phase })))
+  );
+  const showCounts: Record<Show, number> = {
+    needs: dayTasks.filter(({ item, phase }) => needsPeople(item, phase)).length,
+    open: dayTasks.filter(({ item, phase }) => !tickOf(state, item.id, phase)).length,
+    all: dayTasks.length,
+  };
 
   if (!phases) return null;
 
@@ -202,7 +272,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
           className="cb-tick"
           role="checkbox"
           aria-checked={Boolean(done)}
-          aria-label={`${info.doneLabel}: ${item.name}`}
+          aria-label={`${taskDoneLabel(phase)}: ${item.name}`}
           onClick={() => build.tick(item.id, phase, !done, person)}
         >
           <Check size={20} aria-hidden="true" />
@@ -267,7 +337,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
           </div>
           {done && (
             <p className="cb-status">
-              {info.doneLabel}
+              {taskDoneLabel(phase)}
               {done.by ? ` by ${done.by}` : ""} · {done.done_at.slice(11, 16)} UTC
             </p>
           )}
@@ -420,16 +490,35 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
         </div>
 
         <div className="cb-main">
+          <div className="cb-filter" role="radiogroup" aria-label="Show tasks">
+            {SHOWS.map(({ id, label }) => (
+              <button key={id} type="button" role="radio" aria-checked={show === id} onClick={() => chooseShow(id)}>
+                {label}
+                <span className="cb-filter__count">{showCounts[id]}</span>
+              </button>
+            ))}
+          </div>
+          {show === "needs" && (
+            <p className="cb-invite">
+              <HandHeart size={18} aria-hidden="true" />
+              <span>
+                <strong>Help needed.</strong> These tasks still need people. Pick your name at the top, then sign up on
+                any task below. Every pair of hands counts.
+              </span>
+            </p>
+          )}
           {build.error && <p className="cb-error">{build.error}</p>}
           {visible.map(({ phase, tasks, material }) => {
             const info = BUILD_PHASES[phase];
-            const all = tasks.flatMap((section) => section.items);
+            // Stats always cover the whole part, whatever the switch shows.
+            const all = taskSections(phase).flatMap((section) => section.items);
             const needSum = all.reduce((sum, item) => sum + (item.people ?? 0), 0);
             const filled = all.reduce((sum, item) => sum + (item.people ? Math.min(assigneesOf(state, item.id, phase).length, item.people) : 0), 0);
             const unset = all.filter((item) => !item.people).length;
             const done = all.filter((item) => tickOf(state, item.id, phase)).length;
             const materialItems = material.flatMap((section) => section.items);
-            const materialDone = materialItems.filter((item) => tickOf(state, item.id, phase)).length;
+            const materialAll = materialSections(phase).flatMap((section) => section.items);
+            const materialDone = materialAll.filter((item) => tickOf(state, item.id, phase)).length;
             return (
               <div key={phase} id={`vol-build-${phase}`} className="cb-phase">
                 <header className="cb-phase__head">
@@ -437,7 +526,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                   <h3 className="cb-phase__title">{info.label}</h3>
                   {info.timeNote && <p className="cb-phase__note">{info.timeNote}</p>}
                   <p className="cb-phase__stats">
-                    <strong>{done}</strong>/{all.length} {info.doneLabel.toLowerCase()}
+                    <strong>{done}</strong>/{all.length} {taskDoneLabel(phase).toLowerCase()}
                     {needSum > 0 && (
                       <>
                         {" · "}
@@ -448,7 +537,17 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                   </p>
                 </header>
 
-                {tasks.length === 0 && <p className="cb-empty">{onlyMine ? "Nothing signed up here yet." : "No tasks."}</p>}
+                {tasks.length === 0 && (
+                  <p className="cb-empty">
+                    {onlyMine
+                      ? "Nothing signed up here yet."
+                      : show === "needs"
+                        ? "Every task here has enough people for now. Thank you!"
+                        : show === "open"
+                          ? "Everything here is done."
+                          : "No tasks."}
+                  </p>
+                )}
                 {tasks.map((section) => {
                   const counts = sectionCounts(section, phase);
                   return (
@@ -474,7 +573,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                     <summary>
                       <span>Material checklist</span>
                       <span className="cb-material__count">
-                        {materialDone}/{materialItems.length} {info.doneLabel.toLowerCase()}
+                        {materialDone}/{materialAll.length} {info.doneLabel.toLowerCase()}
                       </span>
                     </summary>
                     <p className="cb-section__note">

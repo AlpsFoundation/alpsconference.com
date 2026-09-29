@@ -741,3 +741,118 @@
   background: var(--vl-ink);
   color: white;
 }
+
+/* ---------- which tasks to list: needs people / not done yet / all ---------- */
+.cb-filter {
+  display: flex;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem;
+  border: 1px solid var(--vol-line);
+  border-radius: 999px;
+  background: rgba(4, 30, 49, 0.6);
+}
+
+.cb-filter button {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.4rem;
+  padding: 0.35rem 0.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--vol-muted);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.cb-filter button:hover {
+  color: white;
+}
+
+.cb-filter button[aria-checked="true"] {
+  background: white;
+  color: var(--color-neutral-dark);
+}
+
+.cb-filter__count {
+  min-width: 1.5rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cb-filter button[aria-checked="true"] .cb-filter__count {
+  background: rgba(8, 47, 74, 0.12);
+}
+
+@media (max-width: 380px) {
+  .cb-filter button {
+    padding-inline: 0.35rem;
+    font-size: 0.8rem;
+  }
+}
+
+.cb-invite {
+  display: flex;
+  gap: 0.6rem;
+  margin: 0 0 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.cb-invite svg {
+  flex: none;
+  margin-top: 0.1rem;
+  color: var(--color-accent);
+}
+
+.cb-invite strong {
+  color: white;
+}
+
+:root[data-vol-theme="light"] .cb-filter {
+  border-color: var(--vl-line);
+  background: var(--vl-surface);
+}
+
+:root[data-vol-theme="light"] .cb-filter button:hover {
+  color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .cb-filter button[aria-checked="true"] {
+  background: var(--vl-ink);
+  color: white;
+}
+
+:root[data-vol-theme="light"] .cb-filter__count {
+  background: var(--vl-chip);
+}
+
+:root[data-vol-theme="light"] .cb-filter button[aria-checked="true"] .cb-filter__count {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+:root[data-vol-theme="light"] .cb-invite {
+  background: var(--vl-pink-soft);
+}
+
+:root[data-vol-theme="light"] .cb-invite svg {
+  color: #c2185b;
+}
+
+:root[data-vol-theme="light"] .cb-invite strong {
+  color: var(--vl-ink);
+}
