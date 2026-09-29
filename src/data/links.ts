@@ -37,8 +37,6 @@ export type QuickLink = {
   showUntil?: string;
 };
 
-export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/JFUPCQluZWD46grwWefrjE";
-
 // KuK guest network: after joining, a captive portal asks for the username and password.
 // Empty values show "Shared at the venue".
 export const WIFI = {
@@ -57,11 +55,14 @@ const AFTERPARTY_TICKETS_URL =
 export const QUICK_LINKS: QuickLink[] = [
   {
     id: "whatsapp",
-    label: "WhatsApp community",
-    summary: "Announcements and chat with other attendees",
+    label: "WhatsApp group",
+    summary: "Join at the welcome desk",
     icon: "whatsapp",
-    body: "Join the attendee community for last-minute changes, lift shares and meeting up during the breaks.",
-    actions: [{ label: "Join the community", href: WHATSAPP_COMMUNITY_URL }],
+    body: "The attendee group for last-minute changes, lift shares and meeting up during the breaks. It is for ticket holders only, so you join it in person at the welcome desk.",
+    details: [
+      { label: "How to join", value: "At the welcome desk, open WhatsApp, go to Settings and tap the QR icon next to your name. A volunteer scans your code and adds you." },
+      { label: "Who can join", value: "Conference ticket holders" },
+    ],
   },
   {
     id: "program",
