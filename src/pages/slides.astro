@@ -5,6 +5,8 @@ import BreakScreen from "../components/BreakScreen";
 import { withBase } from "../lib/withBase";
 
 const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const ogImagePath = withBase("og/slides.jpg");
+const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
 const fontFaceCss = `@font-face {
   font-family: "Switzer";
   src: url("${switzerFont}") format("woff2");
@@ -23,6 +25,13 @@ const fontFaceCss = `@font-face {
     <meta name="robots" content="noindex" />
     <title>Break | ALPS Conference 2026</title>
     <meta name="description" content="Between-sessions screen for ALPS Conference 2026: what's on and what's next." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Intermission Slides — ALPS Conference 2026" />
+    <meta property="og:description" content="What's on and what's next, between sessions." />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#082f4a" />
     <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />

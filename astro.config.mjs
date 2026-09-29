@@ -65,6 +65,8 @@ export default defineConfig({
     "/fancy": "/",
     // Short alias for the venue map.
     "/plan": "/map",
+    // Renamed to /slides.
+    "/break": "/slides",
   },
   integrations: [
     react(),
@@ -76,7 +78,7 @@ export default defineConfig({
         !page.includes("/3d") &&
         !page.includes("/static") &&
         !page.includes("/bingo") &&
-        !page.includes("/break") &&
+        !page.includes("/slides") &&
         !page.includes("/volunteers"),
     }),
   ],
