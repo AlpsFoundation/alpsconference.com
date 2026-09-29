@@ -16,6 +16,13 @@ const TITLE_FALLBACK_MS = 5000;
 // Title words, grouped into the runs that must not wrap; each letter animates in on its own.
 const TITLE = [["ALPS"], ["CONFERENCE", "2026"]];
 
+// On short desktop windows the illustration shrinks to keep the boutons between
+// the title and the event details, which take about 510px of the hero's height
+// between them. Keep in step with the bones box's lg:max-w below.
+const illustrationMaxWidth = (_w: number, h: number) =>
+  window.innerWidth >= 1024 ? Math.max(320, 3.3 * (h - 510)) : Infinity;
+const SYNAPSE_OPTIONS = { maxWidth: illustrationMaxWidth };
+
 export default function Hero({ illustration = "image" }: { illustration?: HeroIllustration }) {
   const sectionRef = useRef<HTMLElement>(null);
   const bonesRef = useRef<HTMLDivElement>(null);
@@ -150,6 +157,7 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
       {is3d && !synapseFailed && (
         <SynapseIllustration
           interactionTarget={sectionRef}
+          options={SYNAPSE_OPTIONS}
           onTitle={showContent}
           onParticles={() => setParticlesOn(true)}
           onUnsupported={onSynapseUnsupported}
@@ -158,14 +166,14 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
 
       {/* Bones illustration */}
       {showImage && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none [container-type:size]">
           <div
             ref={bonesRef}
             className="w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl px-2 opacity-0 will-change-transform"
             style={{ transformOrigin: "center center" }}
           >
             {/* Enlarged below sm; keep in step with the embedded framing in synapse3d.ts. */}
-            <div className="origin-center scale-[1.5] min-[480px]:scale-[1.75] sm:scale-100">
+            <div className="origin-center scale-[1.5] min-[480px]:scale-[1.75] sm:scale-100 lg:mx-auto lg:max-w-[max(320px,calc((100cqh-510px)*3.3))]">
               <img
                 src={withBase("img/bones.png")}
                 alt=""

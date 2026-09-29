@@ -711,6 +711,9 @@ export type SynapseOptions = {
   zoom?: number;
   shiftX?: number;
   shiftY?: number;
+  // Embedded framing: the widest the PNG's box may be for a canvas of this
+  // size (the hero shrinks it on short windows).
+  maxWidth?: (w: number, h: number) => number;
   // Receives controls once running: replay() draws the mesh in again (the
   // opening sequence without the particle fade).
   onReady?: (controls: { replay(): void }) => void;
@@ -1120,7 +1123,10 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
       // Match the hero's PNG: 8.9 units across its box, which is capped by the
       // Tailwind max-widths and enlarged below the sm breakpoint (1.75x, and
       // 1.5x on phones under 480px; keep in step with Hero.tsx).
-      const illoW = w < 480 ? 1.5 * w : w < 640 ? 1.75 * w : Math.min(w - 16, w >= 1280 ? 1280 : w >= 1024 ? 1152 : 1024);
+      const illoW = Math.min(
+        w < 480 ? 1.5 * w : w < 640 ? 1.75 * w : Math.min(w - 16, w >= 1280 ? 1280 : w >= 1024 ? 1152 : 1024),
+        opts.maxWidth?.(w, h) ?? Infinity,
+      );
       distance = (8.9 * (w / illoW)) / 2 / (tanHalf * camera.aspect) / zoom;
     } else {
       // Landscape frames it like the source (fibres fading out near the edges);

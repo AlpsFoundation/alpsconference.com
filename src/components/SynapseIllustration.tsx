@@ -11,7 +11,7 @@ type Props = {
   interactionTarget?: RefObject<HTMLElement | null>;
   className?: string;
   // Extra options for initSynapse (spin, framing), read once on mount.
-  options?: Pick<SynapseOptions, "spin" | "zoom" | "shiftX" | "shiftY">;
+  options?: Pick<SynapseOptions, "spin" | "zoom" | "shiftX" | "shiftY" | "maxWidth">;
   // Changing this draws the mesh in again (not its first value: the intro plays anyway).
   replayKey?: string;
 };
