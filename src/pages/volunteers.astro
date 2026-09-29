@@ -38,6 +38,36 @@ const fontFaceCss = `@font-face {
     <meta name="twitter:card" content="summary_large_image" />
 
     <meta name="theme-color" content="#0B3C5D" />
+    <!--
+      Applies the saved colour theme before first paint, so the light theme never flashes dark.
+      data-vol-theme-pref is the choice (auto, light, dark); data-vol-theme is what it resolves to.
+      The theme switch in VolunteersPage calls window.alpsVolunteerTheme.set().
+    -->
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const media = window.matchMedia("(prefers-color-scheme: light)");
+        let pref = "auto";
+        try {
+          const saved = localStorage.getItem("alps-volunteer-theme");
+          if (saved === "light" || saved === "dark") pref = saved;
+        } catch {}
+        const apply = () => {
+          const theme = pref === "auto" ? (media.matches ? "light" : "dark") : pref;
+          root.dataset.volThemePref = pref;
+          root.dataset.volTheme = theme;
+          document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "light" ? "#F4F6F9" : "#0B3C5D");
+        };
+        media.addEventListener("change", apply);
+        window.alpsVolunteerTheme = {
+          set(next) {
+            pref = next;
+            apply();
+          },
+        };
+        apply();
+      })();
+    </script>
     <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
     <style is:global set:html={fontFaceCss}></style>

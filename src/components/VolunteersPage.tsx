@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { CircleHelp, Info, MapPin, Users } from "lucide-react";
+import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { CircleHelp, Info, MapPin, Moon, Sun, SunMoon, Users, type LucideIcon } from "lucide-react";
 import CalendarSubscribe from "./CalendarSubscribe";
 import { parseTimeTravel } from "../data/conferenceTimeline";
 import {
@@ -36,8 +36,24 @@ import { withBase } from "../lib/withBase";
 import "../styles/volunteers.css";
 
 const STORAGE_KEY = "alps-volunteer-2026";
+const THEME_KEY = "alps-volunteer-theme";
 const TZID = "Europe/Zurich";
 const DEFAULT_DAY = "2026-10-09";
+
+type ThemePref = "auto" | "light" | "dark";
+
+declare global {
+  interface Window {
+    /** Set up by the inline script in volunteers.astro, which applies the theme before first paint. */
+    alpsVolunteerTheme?: { set(pref: ThemePref): void };
+  }
+}
+
+const THEMES: { id: ThemePref; label: string; icon: LucideIcon }[] = [
+  { id: "auto", label: "Auto", icon: SunMoon },
+  { id: "light", label: "Light", icon: Sun },
+  { id: "dark", label: "Dark", icon: Moon },
+];
 
 /** Date and minute of the day at the venue. */
 type Clock = { date: string; minutes: number };
@@ -170,6 +186,37 @@ function involves(row: PlanRow, person: string) {
 
 function crewTime(event: CrewEvent) {
   return `${event.approximate ? "≈ " : ""}${event.start}`;
+}
+
+function ThemeSwitch() {
+  const [pref, setPref] = useState<ThemePref>("auto");
+
+  useEffect(() => {
+    const current = document.documentElement.dataset.volThemePref;
+    if (current === "light" || current === "dark") setPref(current);
+  }, []);
+
+  const choose = (next: ThemePref) => {
+    setPref(next);
+    try {
+      if (next === "auto") localStorage.removeItem(THEME_KEY);
+      else localStorage.setItem(THEME_KEY, next);
+    } catch {
+      // Blocked storage: the choice still holds until the page is left.
+    }
+    window.alpsVolunteerTheme?.set(next);
+  };
+
+  return (
+    <div className="vol-theme" role="radiogroup" aria-label="Theme">
+      {THEMES.map(({ id, label, icon: Icon }) => (
+        <button key={id} type="button" role="radio" aria-checked={pref === id} onClick={() => choose(id)}>
+          <Icon size={14} aria-hidden="true" />
+          <span className="vol-theme__label">{label}</span>
+        </button>
+      ))}
+    </div>
+  );
 }
 
 function Avatar({ name, size = 20 }: { name: string; size?: number }) {
@@ -448,9 +495,17 @@ export default function VolunteersPage() {
   return (
     <div className="vol-page">
       <header className="vol-head">
-        <a className="vol-logo" href={withBase("/")}>
-          <img src={withBase("img/logo.png")} alt="ALPS Research Conference" width="753" height="306" />
-        </a>
+        <div className="vol-topbar">
+          {/* The logo is also a mask, so the light theme can paint it navy. */}
+          <a
+            className="vol-logo"
+            href={withBase("/")}
+            style={{ "--vol-logo": `url("${withBase("img/logo.png")}")` } as CSSProperties}
+          >
+            <img src={withBase("img/logo.png")} alt="ALPS Research Conference" width="753" height="306" />
+          </a>
+          <ThemeSwitch />
+        </div>
         <p className="section-eyebrow">ALPS Conference 2026 · Crew</p>
         <h1 className="section-title">Volunteer portal</h1>
         <p className="vol-sub">
