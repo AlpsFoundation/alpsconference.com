@@ -11,6 +11,7 @@ import {
   type ShiftDay,
   type VolunteerTask,
 } from "../data/volunteers";
+import { BUILD_PEOPLE } from "../data/crewBuild";
 import { withBase } from "./withBase";
 
 export type ShiftPart = { task: VolunteerTask; start: number; end: number };
@@ -52,13 +53,14 @@ export function volunteerSlug(name: string) {
     .replace(/^-|-$/g, "");
 }
 
-/** Everyone on the crew: shift grid plus loading and unloading lists. */
+/** Everyone on the crew: shift grid, loading and unloading lists, and the build crew. */
 export const CREW: string[] = [
   ...new Set([
     ...SHIFT_DAYS.flatMap((day) =>
       day.slots.flatMap((slot) => VOLUNTEER_TASK_ORDER.flatMap((task) => slot[task]))
     ),
     ...CREW_EVENTS.flatMap((event) => event.people ?? []),
+    ...BUILD_PEOPLE,
   ]),
 ].sort((a, b) => a.localeCompare(b, "en"));
 
@@ -72,6 +74,14 @@ export function teamPhoto(name: string) {
 }
 
 const BY_SLUG = new Map(CREW.map((name) => [volunteerSlug(name), name]));
+
+/** Names people added on the page to sign up for the build (from the build database). */
+export function registerAddedPeople(names: string[]) {
+  for (const name of names) {
+    const slug = volunteerSlug(name);
+    if (slug && !BY_SLUG.has(slug)) BY_SLUG.set(slug, name);
+  }
+}
 
 export function volunteerFromSlug(slug: string | null | undefined) {
   return (slug && BY_SLUG.get(slug)) || null;

@@ -1,6 +1,10 @@
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { CircleHelp, Info, MapPin, Moon, Sun, SunMoon, Users, type LucideIcon } from "lucide-react";
 import CalendarSubscribe from "./CalendarSubscribe";
+import CrewBuild from "./CrewBuild";
+import { useCrewBuild } from "./useCrewBuild";
+import { BUILD_PHASES } from "../data/crewBuild";
+import { BUILD_DAYS, personBuild, type PersonBuildEntry } from "../lib/crewBuild";
 import { parseTimeTravel } from "../data/conferenceTimeline";
 import {
   COUNTING_RULE,
@@ -21,6 +25,7 @@ import {
   formatDuration,
   formatTime,
   PLAN_DAYS,
+  registerAddedPeople,
   shiftBlocks,
   slotPrograms,
   teamPhoto,
@@ -39,6 +44,8 @@ const STORAGE_KEY = "alps-volunteer-2026";
 const THEME_KEY = "alps-volunteer-theme";
 const TZID = "Europe/Zurich";
 const DEFAULT_DAY = "2026-10-09";
+/** `?day=thu` (or a date) opens that tab, e.g. from the old setup page's address. */
+const DAY_PARAMS: Record<string, string> = { thu: "2026-10-08", fri: "2026-10-09", sat: "2026-10-10", sun: "2026-10-11" };
 
 type ThemePref = "auto" | "light" | "dark";
 
@@ -61,7 +68,8 @@ type Timing = "past" | "now" | "next";
 
 type AgendaItem =
   | { kind: "shift"; key: string; date: string; start: number; end: number; block: ShiftBlock }
-  | { kind: "crew"; key: string; date: string; start: number; end: number; event: CrewEvent };
+  | { kind: "crew"; key: string; date: string; start: number; end: number; event: CrewEvent; build?: PersonBuildEntry }
+  | { kind: "build"; key: string; date: string; start: number; end: number; entry: PersonBuildEntry };
 
 type PlanRow =
   | { kind: "slot"; key: string; start: number; end: number; slot: ShiftSlot; program: string }
@@ -133,7 +141,7 @@ function storePerson(person: string | null) {
   }
 }
 
-function agendaFor(person: string): AgendaItem[] {
+function agendaFor(person: string, build: PersonBuildEntry[] = []): AgendaItem[] {
   const shifts: AgendaItem[] = PLAN_DAYS.flatMap(({ shiftDay }) =>
     shiftDay
       ? shiftBlocks(shiftDay, person).map((block) => ({
@@ -146,6 +154,8 @@ function agendaFor(person: string): AgendaItem[] {
         }))
       : []
   );
+  // Teardown sign-ups ride on the plan's own dismantling entry rather than doubling it.
+  const teardown = build.find((entry) => entry.phase === "teardown");
   const crew: AgendaItem[] = crewEventsFor(person).map((event) => ({
     kind: "crew" as const,
     key: event.id,
@@ -153,8 +163,16 @@ function agendaFor(person: string): AgendaItem[] {
     start: toMinutes(event.start),
     end: crewEventEnd(event),
     event,
+    build: event.id === "dismantling" ? teardown : undefined,
   }));
-  return [...shifts, ...crew].sort((a, b) => a.date.localeCompare(b.date) || a.start - b.start);
+  const folded = crew.some((item) => item.kind === "crew" && item.build);
+  // Packing the truck has no time yet: it sorts right after the teardown.
+  const teardownStart = toMinutes(BUILD_PHASES.teardown.start ?? "21:30");
+  const building: AgendaItem[] = build.filter((entry) => !(folded && entry.phase === "teardown")).map((entry) => {
+    const start = entry.start ?? teardownStart + 60;
+    return { kind: "build" as const, key: `build-${entry.phase}`, date: entry.dateTime, start, end: entry.end ?? start + 60, entry };
+  });
+  return [...shifts, ...crew, ...building].sort((a, b) => a.date.localeCompare(b.date) || a.start - b.start);
 }
 
 /** Crew events go before the slot that starts at the same time. */
@@ -311,8 +329,20 @@ function CrewEventLine({ event, person }: { event: CrewEvent; person: string | n
   );
 }
 
-function MyShifts({ person, clock, onPickDay }: { person: string; clock: Clock | null; onPickDay: (date: string) => void }) {
-  const items = useMemo(() => agendaFor(person), [person]);
+function MyShifts({
+  person,
+  clock,
+  onPickDay,
+  build,
+}: {
+  person: string;
+  clock: Clock | null;
+  onPickDay: (date: string) => void;
+  build: PersonBuildEntry[];
+}) {
+  const buildKey = build.map((entry) => `${entry.phase}:${entry.items.map((item) => item.id).join(",")}`).join("|");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const items = useMemo(() => agendaFor(person, build), [person, buildKey]);
   const blocks = items.flatMap((item) => (item.kind === "shift" ? [item.block] : []));
   const dates = [...new Set(items.map((item) => item.date))];
 
@@ -336,7 +366,7 @@ function MyShifts({ person, clock, onPickDay }: { person: string; clock: Clock |
                   shift · <strong>{formatDuration(countedMinutes(blocks))} counted</strong>
                 </>
               ) : (
-                "No shifts in the grid, only the crew times below."
+                "No shifts in the grid, only the crew and build times below."
               )}
             </p>
           </div>
@@ -372,10 +402,21 @@ function MyShifts({ person, clock, onPickDay }: { person: string; clock: Clock |
                             </span>
                             <small>{formatDuration(item.end - item.start)}</small>
                           </>
-                        ) : (
+                        ) : item.kind === "crew" ? (
                           <>
                             <span>{crewTime(item.event)}</span>
                             <small>Crew</small>
+                          </>
+                        ) : (
+                          <>
+                            <span>
+                              {item.entry.start === null
+                                ? "Time tbc"
+                                : BUILD_PHASES[item.entry.phase].end
+                                  ? `${formatTime(item.start)}–${formatTime(item.end)}`
+                                  : formatTime(item.start)}
+                            </span>
+                            <small>Build</small>
                           </>
                         )}
                         <StateBadge timing={timing} clock={clock} />
@@ -399,9 +440,29 @@ function MyShifts({ person, clock, onPickDay }: { person: string; clock: Clock |
                               <p className="vol-agenda__program">On stage: {item.block.program.join(" · ")}</p>
                             )}
                           </>
-                        ) : (
+                        ) : item.kind === "crew" ? (
                           <div className="vol-crew">
                             <CrewEventLine event={item.event} person={person} />
+                            {item.build && (
+                              <ul className="vol-build-list" aria-label="Your teardown tasks">
+                                {item.build.items.map((entryItem) => (
+                                  <li key={entryItem.id}>{entryItem.name}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="vol-crew">
+                            <span className="vol-crew__title">{BUILD_PHASES[item.entry.phase].label}</span>
+                            <span className="vol-crew__meta">
+                              <MapPin size={13} aria-hidden="true" />
+                              Kultur &amp; Kongresshaus Aarau
+                            </span>
+                            <ul className="vol-build-list">
+                              {item.entry.items.map((entryItem) => (
+                                <li key={entryItem.id}>{entryItem.name}</li>
+                              ))}
+                            </ul>
                           </div>
                         )}
                       </div>
@@ -423,6 +484,10 @@ export default function VolunteersPage() {
   const [openTask, setOpenTask] = useState<VolunteerTask | null>(null);
   const headRef = useRef<HTMLDivElement>(null);
   const clock = useVenueClock();
+  const build = useCrewBuild();
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [needName, setNeedName] = useState(false);
 
   useEffect(() => {
     const fromUrl = volunteerFromSlug(new URLSearchParams(window.location.search).get("person"));
@@ -432,6 +497,29 @@ export default function VolunteersPage() {
   // Open the schedule on today's tab during the conference. Only the first reading decides,
   // so later ticks never undo a tab the reader picked.
   const dayPicked = useRef(false);
+  useEffect(() => {
+    const raw = new URLSearchParams(window.location.search).get("day")?.toLowerCase() ?? "";
+    const date = DAY_PARAMS[raw] ?? raw;
+    if (PLAN_DAYS.some((day) => day.dateTime === date)) {
+      dayPicked.current = true;
+      setDayDate(date);
+    }
+  }, []);
+
+  // Names added on the page to sign up for the build: make them pickable, and restore
+  // one chosen earlier once the list has loaded.
+  const addedNames = build.state?.added ?? [];
+  const addedKey = addedNames.join("|");
+  useEffect(() => {
+    if (!addedNames.length) return;
+    registerAddedPeople(addedNames);
+    setPerson((current) => {
+      if (current) return current;
+      const fromUrl = volunteerFromSlug(new URLSearchParams(window.location.search).get("person"));
+      return fromUrl ?? readStoredPerson();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addedKey]);
   useEffect(() => {
     if (!clock || dayPicked.current) return;
     dayPicked.current = true;
@@ -462,6 +550,7 @@ export default function VolunteersPage() {
     else url.searchParams.delete("person");
     window.history.replaceState(null, "", url);
     if (!next) setOnlyMine(false);
+    if (next) setNeedName(false);
     if (scroll) {
       requestAnimationFrame(() =>
         document.getElementById("vol-picker")?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -469,6 +558,24 @@ export default function VolunteersPage() {
     }
   };
   const chooseAndScroll = (name: string) => choose(name, true);
+
+  const needPerson = () => {
+    setNeedName(true);
+    const select = document.getElementById("vol-person");
+    select?.scrollIntoView({ behavior: "smooth", block: "center" });
+    select?.focus({ preventScroll: true });
+  };
+
+  const saveNewName = async () => {
+    const typed = newName.replace(/\s+/g, " ").trim();
+    if (typed.length < 2) return;
+    const saved = await build.addPerson(typed);
+    if (!saved) return;
+    registerAddedPeople([saved]);
+    setAdding(false);
+    setNewName("");
+    choose(saved);
+  };
 
   const pickDay = (date: string) => {
     setDayDate(date);
@@ -510,7 +617,8 @@ export default function VolunteersPage() {
         <h1 className="section-title">Volunteer portal</h1>
         <p className="vol-sub">
           Shifts and crew times for ALPS Conference 2026, from loading on Thursday 8 to unloading on Sunday 11 October.
-          Pick your name to see your shifts and add them to your calendar.
+          Pick your name to see your shifts and add them to your calendar. Sign up for the setup on Thursday and the
+          teardown on Saturday in those tabs.
         </p>
       </header>
 
@@ -522,7 +630,13 @@ export default function VolunteersPage() {
           <select
             id="vol-person"
             value={person ? volunteerSlug(person) : ""}
-            onChange={(event) => choose(volunteerFromSlug(event.target.value))}
+            onChange={(event) => {
+              if (event.target.value === "__add") {
+                setAdding(true);
+                return;
+              }
+              choose(volunteerFromSlug(event.target.value));
+            }}
           >
             <option value="">Everyone</option>
             <optgroup label="ALPS team members">
@@ -539,11 +653,45 @@ export default function VolunteersPage() {
                 </option>
               ))}
             </optgroup>
+            {addedNames.length > 0 && (
+              <optgroup label="Added for the build">
+                {addedNames.map((name) => (
+                  <option key={name} value={volunteerSlug(name)}>
+                    {name}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            <option value="__add">Not on the list? Add my name…</option>
           </select>
         </div>
+        {adding && (
+          <form
+            className="vol-addname"
+            onSubmit={(event) => {
+              event.preventDefault();
+              saveNewName();
+            }}
+          >
+            <input
+              type="text"
+              value={newName}
+              onChange={(event) => setNewName(event.target.value)}
+              placeholder="Your first name"
+              autoComplete="given-name"
+              maxLength={40}
+              autoFocus
+            />
+            <button type="submit">Save</button>
+            <button type="button" onClick={() => setAdding(false)}>
+              Cancel
+            </button>
+          </form>
+        )}
+        {needName && !person && <p className="vol-addname__hint">Pick your name first, then sign up.</p>}
       </section>
 
-      {person && <MyShifts person={person} clock={clock} onPickDay={pickDay} />}
+      {person && <MyShifts person={person} clock={clock} onPickDay={pickDay} build={personBuild(build.state, person)} />}
 
       <section id="vol-plan" className="vol-section" aria-labelledby="vol-plan-title">
         <div className="vol-plan__bar">
@@ -654,6 +802,15 @@ export default function VolunteersPage() {
             {nowLineAt === rows.length && nowLine}
           </ol>
         </div>
+        {BUILD_DAYS[day.dateTime] && (
+          <CrewBuild
+            dateTime={day.dateTime}
+            person={person}
+            build={build}
+            onlyMine={onlyMine}
+            onNeedPerson={needPerson}
+          />
+        )}
       </section>
 
       <footer className="vol-foot">

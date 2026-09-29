@@ -240,24 +240,31 @@ export const CREW_EVENTS: CrewEvent[] = [
 export const TEAM_PHOTOS: Record<string, string | null> = {
   Abigail: "abigail-calder",
   Akram: "akram-elrhaoussi",
+  "Ana-Mateea": "ana-mateea-cerchez",
   // Two Andreas on the team (Bacconi, Sader): no photo until we know which one is on shift.
   Andrea: null,
   Cyril: "cyril-petignat",
   Dave: "david-wennberg",
   Ece: "ece-baloglu",
+  Fabian: "fabian-velazquez-macias",
   Federico: "federico-seragnoli",
   Gerel: "gerel-jargalsaikhan",
+  Jonathan: "jonathan-moy-de-vitry",
+  Justine: "justine-jones",
   Lennert: "lennert-van-de-kreeke",
   Maria: "maria-tudor",
   Marina: "marina-millan",
   Matthias: "matthias-leitner",
   Michel: "michel-huissoud",
+  Morten: "morten-lietz",
   Mourad: "mourad-chouaki",
   Noor: "noor-charkhi",
   Parsa: "parsa-yousefi",
   Philipp: "philipp-hampel",
+  Raphaël: "raphael-saunier",
   Régis: "regis-paroz",
   Valentin: "valentin-rieder",
+  Vincent: "vincent-diehl",
 };
 
 export const CREW_CONTACTS = {
