@@ -1,19 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, CalendarPlus, Check, ChevronDown, Copy, Download } from "lucide-react";
 import { CALENDAR_FILES, type CalendarFeed } from "../lib/ical";
+import { useKeepInViewport } from "../lib/keepInViewport";
 import { withBase } from "../lib/withBase";
 
 // Subscriptions have to point at the canonical site: a preview URL would expire under people's feet.
 const SITE = import.meta.env.SITE ?? "https://alpsconference.com";
 
-export default function CalendarSubscribe({ feed, label }: { feed: CalendarFeed; label: string }) {
+type CalendarSubscribeProps = {
+  label: string;
+  /** Replaces the default note about subscribing versus downloading. */
+  note?: string;
+} & ({ feed: CalendarFeed; path?: never } | { path: string; feed?: never });
+
+export default function CalendarSubscribe({ feed, path: feedPath, label, note }: CalendarSubscribeProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useKeepInViewport(menuRef, open);
 
-  const file = CALENDAR_FILES[feed];
-  const path = withBase(file);
+  const path = feedPath ?? withBase(CALENDAR_FILES[feed!]);
+  const file = path.slice(path.lastIndexOf("/") + 1);
   const feedUrl = new URL(path, SITE).href;
   const webcalUrl = feedUrl.replace(/^https?:/, "webcal:");
   // Google's `cid` only accepts a webcal URL; an https one is rejected outright with
@@ -68,7 +77,7 @@ export default function CalendarSubscribe({ feed, label }: { feed: CalendarFeed;
         <ChevronDown size={15} aria-hidden="true" className={open ? "calendar-subscribe__chevron is-open" : "calendar-subscribe__chevron"} />
       </button>
       {open && (
-        <div className="calendar-subscribe__menu" role="menu">
+        <div ref={menuRef} className="calendar-subscribe__menu" role="menu">
           <a role="menuitem" href={googleUrl} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
             Google Calendar
             <ArrowUpRight size={14} aria-hidden="true" />
@@ -87,8 +96,8 @@ export default function CalendarSubscribe({ feed, label }: { feed: CalendarFeed;
             <Download size={14} aria-hidden="true" />
           </a>
           <p className="calendar-subscribe__note">
-            Subscribing keeps the schedule in sync as the program changes; Google Calendar can take a
-            few hours for its first sync. A downloaded file stays as it is today.
+            {note ??
+              "Subscribing keeps the schedule in sync as the program changes; Google Calendar can take a few hours for its first sync. A downloaded file stays as it is today."}
           </p>
         </div>
       )}

@@ -31,7 +31,7 @@ const FEED_META: Record<CalendarFeed, { name: string; description: string }> = {
 
 const TZID = "Europe/Zurich";
 const UID_DOMAIN = "alpsconference.com";
-const VENUE = "Kultur & Kongresshaus Aarau, Schlossplatz, Aarau, Switzerland";
+export const VENUE = "Kultur & Kongresshaus Aarau, Schlossplatz, Aarau, Switzerland";
 
 /** Europe/Zurich rules, so clients that do not ship a tz database still place the events correctly. */
 const VTIMEZONE = [
@@ -55,7 +55,7 @@ const VTIMEZONE = [
   "END:VTIMEZONE",
 ];
 
-type CalendarEvent = {
+export type CalendarEvent = {
   uid: string;
   summary: string;
   /** `YYYY-MM-DD` of the schedule day the entry belongs to. */
@@ -222,10 +222,23 @@ function buildSequence(builtAt: Date) {
 export function buildCalendar(feed: CalendarFeed, site: URL | undefined, builtAt = new Date()) {
   const origin = site?.href ?? "https://alpsconference.com/";
   const home = new URL(withBase(""), origin).href;
-  const meta = FEED_META[feed];
+  const events = feed === "talks" ? talkEvents(home) : experienceEvents(home);
+
+  return serializeCalendar(
+    { ...FEED_META[feed], source: new URL(withBase(CALENDAR_FILES[feed]), origin).href },
+    events,
+    builtAt
+  );
+}
+
+/** One subscribable VCALENDAR; `source` is the feed's own canonical URL. */
+export function serializeCalendar(
+  meta: { name: string; description: string; source: string },
+  events: CalendarEvent[],
+  builtAt = new Date()
+) {
   const stamp = `${builtAt.toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`;
   const sequence = buildSequence(builtAt);
-  const events = feed === "talks" ? talkEvents(home) : experienceEvents(home);
 
   const lines = [
     "BEGIN:VCALENDAR",
@@ -240,7 +253,7 @@ export function buildCalendar(feed: CalendarFeed, site: URL | undefined, builtAt
     `X-WR-TIMEZONE:${TZID}`,
     "REFRESH-INTERVAL;VALUE=DURATION:PT6H",
     "X-PUBLISHED-TTL:PT6H",
-    `SOURCE;VALUE=URI:${new URL(withBase(CALENDAR_FILES[feed]), origin).href}`,
+    `SOURCE;VALUE=URI:${meta.source}`,
     ...VTIMEZONE,
     ...events.flatMap((event) => eventLines(event, stamp, sequence)),
     "END:VCALENDAR",

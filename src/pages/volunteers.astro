@@ -1,0 +1,46 @@
+---
+import "../styles/app.css";
+import VolunteersPage from "../components/VolunteersPage";
+import { withBase } from "../lib/withBase";
+
+const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const ogImagePath = withBase("img/opengraph.jpg");
+const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
+
+const fontFaceCss = `@font-face {
+  font-family: "Switzer";
+  src: url("${switzerFont}") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Crew page: public, but not linked from the site and not in the sitemap. -->
+    <meta name="robots" content="noindex" />
+    <title>Volunteer portal | ALPS Conference 2026</title>
+    <meta
+      name="description"
+      content="Crew shifts, tasks and times for ALPS Conference 2026, 9–10 October 2026 at the Kultur & Kongresshaus Aarau."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ALPS Conference 2026 — volunteer portal" />
+    <meta property="og:description" content="Crew shifts, tasks and times for 9–10 October 2026." />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#0B3C5D" />
+    <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
+    <style is:global set:html={fontFaceCss}></style>
+  </head>
+  <body>
+    <VolunteersPage client:load />
+  </body>
+</html>

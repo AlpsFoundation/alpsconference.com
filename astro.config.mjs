@@ -76,7 +76,8 @@ export default defineConfig({
         !page.includes("/3d") &&
         !page.includes("/static") &&
         !page.includes("/bingo") &&
-        !page.includes("/break"),
+        !page.includes("/break") &&
+        !page.includes("/volunteers"),
     }),
   ],
   vite: {

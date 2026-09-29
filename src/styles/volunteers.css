@@ -1,0 +1,947 @@
+/* /volunteers — crew shift portal. Palette from app.css @theme tokens; pink is kept for crew times. */
+.vol-page {
+  --vol-line: rgba(255, 255, 255, 0.14);
+  --vol-panel: rgba(8, 47, 74, 0.62);
+  --vol-muted: rgba(238, 244, 248, 0.68);
+  --vol-checkin: var(--color-support-light);
+  --vol-info: #8f8fca;
+  --vol-mic: #c197cd;
+  --vol-helper: var(--color-secondary);
+  --vol-crew: var(--color-accent);
+
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 56px) 16px clamp(48px, 6vw, 88px);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 640px) {
+  .vol-page {
+    padding-inline: clamp(16px, 3vw, 40px);
+  }
+}
+
+[data-task="checkin"] { --vol-task: var(--vol-checkin); }
+[data-task="info"] { --vol-task: var(--vol-info); }
+[data-task="mic"] { --vol-task: var(--vol-mic); }
+[data-task="helper"] { --vol-task: var(--vol-helper); }
+.vol-slot--crew,
+.vol-agenda__item--crew { --vol-task: var(--vol-crew); }
+
+/* Header */
+.vol-logo {
+  display: inline-block;
+  margin-bottom: clamp(20px, 3vw, 32px);
+}
+
+.vol-logo img {
+  display: block;
+  width: auto;
+  height: clamp(40px, 6vw, 56px);
+}
+
+.vol-sub {
+  max-width: 40rem;
+  margin: 0.85rem 0 0;
+  color: var(--vol-muted);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.vol-h2 {
+  margin: 0;
+  color: white;
+  font-size: clamp(1.3rem, 2.4vw, 1.65rem);
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.vol-note {
+  margin: 0.35rem 0 0;
+  color: var(--vol-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.vol-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: color-mix(in srgb, var(--color-support-light) 88%, white);
+  font-size: 0.76rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Clears the sticky person picker when a section is jumped to. */
+.vol-section {
+  margin-top: clamp(36px, 5vw, 56px);
+  scroll-margin-top: 7.5rem;
+}
+
+@media (min-width: 640px) {
+  .vol-section {
+    scroll-margin-top: 6rem;
+  }
+}
+
+/* Person picker */
+.vol-picker {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin: 1.75rem -16px 0;
+  padding: 0.85rem 16px;
+  border-bottom: 1px solid var(--vol-line);
+  background: rgba(8, 47, 74, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  scroll-margin-top: 0;
+}
+
+@media (min-width: 640px) {
+  .vol-picker {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-inline: 0;
+    padding: 0.85rem 1.1rem;
+    border: 1px solid var(--vol-line);
+    border-radius: 1rem;
+  }
+
+  .vol-picker .vol-label {
+    margin: 0;
+    white-space: nowrap;
+  }
+}
+
+.vol-select {
+  position: relative;
+  flex: 1;
+  max-width: 22rem;
+}
+
+.vol-select::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid rgba(255, 255, 255, 0.72);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.72);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.vol-select select {
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0.6rem 2.6rem 0.6rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(4, 30, 49, 0.72);
+  color: white;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  appearance: none;
+  cursor: pointer;
+}
+
+.vol-select select:hover {
+  border-color: rgba(82, 169, 236, 0.55);
+}
+
+.vol-select select:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 3px;
+}
+
+.vol-select option,
+.vol-select optgroup {
+  background: var(--color-neutral-dark);
+  color: white;
+}
+
+/* Switzer's figures are already equal width; ask for tabular ones anyway in case the font changes. */
+.vol-agenda__time,
+.vol-parts__time,
+.vol-slot__time,
+.vol-state,
+.vol-tabs button,
+.vol-mine__stats {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Time states: past rows fade, the current one is outlined in white. */
+[data-state="past"] {
+  opacity: 0.4;
+}
+
+[data-state="past"] .vol-avatar {
+  filter: grayscale(1);
+}
+
+.vol-state {
+  display: inline-block;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  background: white;
+  color: var(--color-neutral-dark);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.vol-state--next {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  color: white;
+}
+
+/* Avatars */
+.vol-avatar {
+  display: block;
+  flex-shrink: 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* My shifts */
+.vol-mine {
+  margin-top: clamp(24px, 4vw, 36px);
+}
+
+.vol-mine__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 1.1rem;
+}
+
+.vol-mine__who {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.vol-mine__who .vol-avatar {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.28);
+}
+
+.vol-mine__stats {
+  margin: 0.4rem 0 0;
+  color: var(--vol-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.vol-mine__stats strong {
+  color: white;
+  font-weight: 650;
+}
+
+.vol-mine__days {
+  display: grid;
+  gap: 0.9rem;
+}
+
+@media (min-width: 768px) {
+  .vol-mine__days {
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    align-items: start;
+  }
+}
+
+.vol-day {
+  overflow: hidden;
+  border: 1px solid var(--vol-line);
+  border-radius: 1.1rem;
+  background: var(--vol-panel);
+}
+
+.vol-day__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--vol-line);
+}
+
+.vol-day__head h3 {
+  margin: 0;
+  color: white;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.vol-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-support-light);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-support-light) 45%, transparent);
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.vol-link:hover {
+  color: white;
+}
+
+.vol-agenda {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vol-agenda__item {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: 0.9rem;
+  padding: 0.85rem 1.1rem;
+}
+
+.vol-agenda__item + .vol-agenda__item {
+  border-top: 1px solid var(--vol-line);
+}
+
+.vol-agenda__item--crew {
+  box-shadow: inset 3px 0 0 var(--vol-crew);
+  background: rgba(243, 143, 191, 0.07);
+}
+
+.vol-agenda__item[data-state="now"] {
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: inset 3px 0 0 white;
+}
+
+.vol-agenda__time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.vol-agenda__time small {
+  color: var(--vol-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.vol-agenda__item--crew .vol-agenda__time small {
+  color: var(--color-accent-light);
+  font-weight: 600;
+}
+
+.vol-agenda__time .vol-state {
+  margin-top: 0.15rem;
+}
+
+.vol-agenda__program {
+  margin: 0.5rem 0 0;
+  color: var(--vol-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.vol-parts {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vol-parts li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vol-parts__time {
+  flex-shrink: 0;
+  width: 2.6rem;
+  color: var(--vol-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.vol-tag {
+  display: inline-flex;
+  align-items: baseline;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--vol-task) 55%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--vol-task) 16%, transparent);
+  color: white;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.vol-crew {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.9rem;
+  color: var(--vol-muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.vol-crew__title {
+  flex-basis: 100%;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.vol-crew__meta {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.vol-crew__meta svg {
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+/* Schedule */
+.vol-plan__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.vol-plan__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+.vol-tabs {
+  display: inline-flex;
+  padding: 0.25rem;
+  border: 1px solid var(--vol-line);
+  border-radius: 999px;
+  background: rgba(4, 30, 49, 0.6);
+}
+
+.vol-tabs button {
+  min-height: 2.4rem;
+  padding: 0.4rem 0.95rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--vol-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.vol-tabs button:hover {
+  color: white;
+}
+
+.vol-tabs button[data-past] {
+  color: rgba(238, 244, 248, 0.4);
+}
+
+.vol-tabs button[aria-selected="true"] {
+  background: white;
+  color: var(--color-neutral-dark);
+}
+
+@media (max-width: 480px) {
+  .vol-plan__controls,
+  .vol-tabs {
+    width: 100%;
+  }
+
+  .vol-tabs button {
+    flex: 1;
+    padding-inline: 0.4rem;
+    font-size: 0.85rem;
+  }
+}
+
+.vol-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(238, 244, 248, 0.86);
+  font-size: 0.9rem;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.vol-toggle input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: white;
+}
+
+.vol-grid {
+  position: relative;
+  border: 1px solid var(--vol-line);
+  border-radius: 1.1rem;
+  background: var(--vol-panel);
+}
+
+/* On phones and tablets the header is a row of task buttons; from 1100px it becomes the column header. */
+.vol-grid__head {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--vol-line);
+}
+
+.vol-grid__col {
+  display: none;
+}
+
+.vol-taskhead__button {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  line-height: 1.3;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--vol-task) 45%, transparent);
+  /* A capsule on one line, a rounded rectangle if a narrow column makes it wrap. */
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--vol-task) 12%, transparent);
+  color: rgba(238, 244, 248, 0.92);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.vol-taskhead__button::before {
+  content: "";
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: calc((1.3em - 0.5rem) / 2);
+  border-radius: 999px;
+  background: var(--vol-task);
+}
+
+.vol-taskhead__last {
+  white-space: nowrap;
+}
+
+.vol-taskhead__button svg {
+  display: inline-block;
+  margin-left: 0.3rem;
+  vertical-align: -0.15em;
+  opacity: 0.7;
+}
+
+.vol-taskhead__button:hover,
+.vol-taskhead__button[aria-expanded="true"] {
+  border-color: var(--vol-task);
+  background: color-mix(in srgb, var(--vol-task) 24%, transparent);
+}
+
+.vol-taskhead__button:hover svg,
+.vol-taskhead__button[aria-expanded="true"] svg {
+  opacity: 1;
+}
+
+/* Phones: anchored to the whole header, so it never runs off-screen. */
+.vol-popover {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 0.4rem);
+  left: 0.5rem;
+  right: 0.5rem;
+  max-width: 26rem;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--vol-task) 55%, transparent);
+  border-top: 3px solid var(--vol-task);
+  border-radius: 0.9rem;
+  background: var(--color-neutral-dark);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  color: rgba(238, 244, 248, 0.88);
+  font-size: 0.88rem;
+  font-weight: 450;
+  letter-spacing: normal;
+  line-height: 1.45;
+  text-transform: none;
+}
+
+.vol-popover__title {
+  margin: 0 0 0.5rem;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.vol-popover ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding-left: 1.05rem;
+}
+
+.vol-popover li::marker {
+  color: var(--vol-task);
+}
+
+.vol-popover__note {
+  margin: 0.6rem 0 0;
+  color: var(--vol-muted);
+  font-size: 0.8rem;
+}
+
+.vol-grid__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vol-slot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.35rem;
+  padding: 0.8rem 1rem;
+}
+
+.vol-grid__rows > li + li {
+  border-top: 1px solid var(--vol-line);
+}
+
+.vol-grid__rows > li:last-child {
+  border-radius: 0 0 1.1rem 1.1rem;
+}
+
+.vol-grid__rows > li:first-child:last-child,
+.vol-grid__rows:first-child > li:first-child {
+  border-top-left-radius: 1.1rem;
+  border-top-right-radius: 1.1rem;
+}
+
+.vol-slot[data-me] {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.vol-slot--crew {
+  background: rgba(243, 143, 191, 0.1);
+  box-shadow: inset 3px 0 0 var(--vol-crew);
+}
+
+.vol-slot--crew[data-me] {
+  background: rgba(243, 143, 191, 0.16);
+}
+
+.vol-slot[data-state="now"] {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 3px 0 0 white;
+}
+
+/* Crew times stay pink while they are happening. */
+.vol-slot--crew[data-state="now"],
+.vol-agenda__item--crew[data-state="now"] {
+  background: rgba(243, 143, 191, 0.2);
+  box-shadow: inset 3px 0 0 var(--vol-crew);
+}
+
+.vol-slot__time {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.vol-slot__program {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+  color: var(--vol-muted);
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.vol-slot__program strong {
+  color: white;
+  font-weight: 600;
+}
+
+.vol-slot--crew .vol-slot__program strong {
+  color: var(--color-accent-light);
+}
+
+.vol-slot__place {
+  color: var(--vol-muted);
+}
+
+.vol-slot__cell {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.vol-slot__cell[data-empty] {
+  display: none;
+}
+
+.vol-slot__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--vol-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.vol-slot__label::before {
+  content: "";
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--vol-task);
+}
+
+.vol-slot__names,
+.vol-slot__crew {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.vol-slot__none {
+  color: rgba(238, 244, 248, 0.3);
+}
+
+.vol-slot__everyone {
+  padding: 0.18rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--vol-crew) 55%, transparent);
+  border-radius: 999px;
+  background: rgba(243, 143, 191, 0.16);
+  color: white;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.vol-name {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.55rem;
+  white-space: nowrap;
+  border: 1px solid color-mix(in srgb, var(--vol-task) 40%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--vol-task) 10%, transparent);
+  color: rgba(238, 244, 248, 0.92);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 550;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.vol-name[data-photo] {
+  gap: 0.3rem;
+  padding-block: 0.125rem;
+  padding-left: 0.125rem;
+}
+
+.vol-name .vol-avatar {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.vol-name:hover {
+  border-color: var(--vol-task);
+  background: color-mix(in srgb, var(--vol-task) 22%, transparent);
+}
+
+.vol-name[data-me] {
+  border-color: white;
+  background: white;
+  color: var(--color-neutral-dark);
+  font-weight: 700;
+}
+
+.vol-nowline {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0.35rem 1rem;
+}
+
+.vol-nowline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 2px solid white;
+}
+
+.vol-nowline .vol-state {
+  position: relative;
+}
+
+/* Below 1100px the columns get too narrow for the task names, so phones and tablets get cards. */
+@media (min-width: 1100px) {
+  .vol-grid__head,
+  .vol-slot {
+    display: grid;
+    grid-template-columns: 7rem minmax(7.5rem, 1fr) minmax(0, 1.3fr) repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .vol-grid__head {
+    position: sticky;
+    top: 4.6rem;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    border-radius: 1.1rem 1.1rem 0 0;
+    background: rgba(8, 47, 74, 0.97);
+  }
+
+  .vol-grid__col {
+    display: block;
+    color: var(--vol-muted);
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+
+  .vol-taskhead {
+    position: relative;
+  }
+
+  .vol-taskhead__button {
+    padding: 0.25rem 0.5rem;
+    border-color: transparent;
+    background: none;
+    color: var(--vol-muted);
+    font-size: 0.8rem;
+  }
+
+  .vol-taskhead__button:hover,
+  .vol-taskhead__button[aria-expanded="true"] {
+    color: white;
+  }
+
+  /* Under its own column, the last two opening leftwards. */
+  .vol-popover {
+    left: 0;
+    right: auto;
+    width: min(19rem, calc(100vw - 2rem));
+  }
+
+  .vol-taskhead:nth-last-child(-n + 2) .vol-popover {
+    left: auto;
+    right: 0;
+  }
+
+  .vol-slot {
+    padding: 0.6rem 1rem;
+  }
+
+  .vol-slot__crew {
+    grid-column: 3 / -1;
+  }
+
+  .vol-slot__program {
+    flex-direction: column;
+  }
+
+  .vol-slot__cell,
+  .vol-slot__cell[data-empty] {
+    display: block;
+  }
+
+  .vol-slot__label {
+    display: none;
+  }
+}
+
+/* Footer */
+.vol-foot {
+  margin-top: clamp(36px, 5vw, 56px);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--vol-line);
+  color: rgba(238, 244, 248, 0.82);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.vol-foot p {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.vol-foot p svg {
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  color: var(--color-support-light);
+}
+
+.vol-foot .vol-note {
+  margin-top: 0.5rem;
+}
+
+/* The shared calendar menu opens to the right edge; on narrow screens span the width. */
+@media (max-width: 480px) {
+  .vol-mine__head .calendar-subscribe {
+    width: 100%;
+  }
+
+  .vol-mine__head .calendar-subscribe__trigger {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .vol-mine__head .calendar-subscribe__menu {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+}
