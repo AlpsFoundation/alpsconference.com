@@ -507,6 +507,15 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
               </span>
             </p>
           )}
+          {show === "open" && (
+            <p className="cb-invite">
+              <HandHeart size={18} aria-hidden="true" />
+              <span>
+                <strong>Thank you! Done with your own task?</strong> Pick any task below that isn’t ticked yet and lend a
+                hand. Stay until it’s ticked off, or until the people on it say they have enough help.
+              </span>
+            </p>
+          )}
           {build.error && <p className="cb-error">{build.error}</p>}
           {visible.map(({ phase, tasks, material }) => {
             const info = BUILD_PHASES[phase];
