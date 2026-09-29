@@ -1,0 +1,265 @@
+<!doctype html>
+<!--
+  Open Graph card, 1200 × 630. Renders the card from cards.mjs named by
+  ?slug= (the first one without it). Served and screenshotted by generate.mjs;
+  `pnpm og --preview` serves it for editing in a browser.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Open Graph card</title>
+    <link rel="preload" href="/public/fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face {
+        font-family: "Switzer";
+        src: url("/public/fonts/Switzer-Variable.woff2") format("woff2");
+        font-style: normal;
+        font-weight: 100 900;
+      }
+
+      :root {
+        --navy: #0b3c5d;
+        --navy-dark: #082f4a;
+        --support: #2e7cc7;
+        --support-light: #52a9ec;
+        --accent: #f38fbf;
+        --gutter: 72px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      html,
+      body {
+        margin: 0;
+        background: var(--navy-dark);
+      }
+
+      .card {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        color: #fff;
+        font-family: "Switzer", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        /* The hero's pink-to-blue glow, moved right to sit in the synapse's cleft. */
+        background:
+          radial-gradient(circle at 78% 50%, rgba(243, 143, 191, 0.85) 0, rgba(243, 143, 191, 0.35) 120px, transparent 270px),
+          radial-gradient(ellipse 44% 80% at 78% 50%, rgba(46, 124, 199, 0.75) 0%, rgba(46, 124, 199, 0.22) 58%, transparent 100%),
+          linear-gradient(180deg, #104f79 0%, var(--navy) 58%, var(--navy-dark) 100%);
+      }
+
+      .layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      /* bones.png is square with the cleft at about (52%, 48%). */
+      .bones {
+        position: absolute;
+        width: 1120px;
+        left: calc(78% - 0.52 * 1120px);
+        top: calc(50% - 0.48 * 1120px);
+        opacity: 0.42;
+        mix-blend-mode: screen;
+        filter: drop-shadow(0 0 3rem rgba(5, 8, 22, 0.45));
+      }
+
+      /* Settles the left half into navy so the title reads over the illustration. */
+      .veil {
+        background:
+          linear-gradient(90deg, rgba(8, 47, 74, 0.82) 0%, rgba(8, 47, 74, 0.55) 42%, rgba(8, 47, 74, 0) 72%),
+          linear-gradient(180deg, rgba(8, 47, 74, 0.35) 0%, rgba(8, 47, 74, 0) 30%, rgba(8, 47, 74, 0) 70%, rgba(8, 47, 74, 0.6) 100%);
+      }
+
+      /* The site's film grain. */
+      .grain {
+        opacity: 0.22;
+        mix-blend-mode: overlay;
+        filter: saturate(1.35) contrast(1.08);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.48' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='1.55'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23grain)' opacity='0.78'/%3E%3C/svg%3E");
+        background-size: 260px 260px;
+      }
+
+      .content {
+        position: absolute;
+        inset: 60px var(--gutter) 60px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo {
+        display: block;
+        height: 92px;
+        width: auto;
+      }
+
+      .url {
+        font-size: 24px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .headline {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        max-width: 760px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 104px;
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.035em;
+        text-wrap: balance;
+        text-shadow:
+          0 0 1px rgba(255, 255, 255, 0.6),
+          0 0 28px rgba(255, 255, 255, 0.28);
+      }
+
+      .subtitle {
+        margin: 22px 0 0;
+        max-width: 700px;
+        font-size: 30px;
+        font-weight: 400;
+        line-height: 1.3;
+        color: rgba(255, 255, 255, 0.8);
+        text-wrap: pretty;
+      }
+
+      .facts {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        font-size: 26px;
+        font-weight: 600;
+      }
+
+      .fact {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        white-space: nowrap;
+      }
+
+      .fact svg {
+        width: 28px;
+        height: 28px;
+        flex: none;
+        color: var(--support-light);
+      }
+
+      .rule {
+        width: 1px;
+        height: 26px;
+        background: rgba(255, 255, 255, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <img class="bones" src="/public/img/bones.png" alt="" />
+      <div class="layer veil"></div>
+      <div class="content">
+        <div class="top">
+          <img class="logo" src="/public/img/logo.png" alt="ALPS Research Conference" />
+          <span class="url" data-field="url"></span>
+        </div>
+        <div class="headline">
+          <h1 data-field="title"></h1>
+          <p class="subtitle" data-field="subtitle"></p>
+        </div>
+        <div class="facts">
+          <span class="fact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8 2v4" />
+              <path d="M16 2v4" />
+              <rect width="18" height="18" x="3" y="4" rx="2" />
+              <path d="M3 10h18" />
+            </svg>
+            <span data-field="date"></span>
+          </span>
+          <span class="rule"></span>
+          <span class="fact">
+            <svg data-icon="map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <svg data-icon="clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+            <span data-field="place"></span>
+          </span>
+        </div>
+      </div>
+      <div class="layer grain"></div>
+    </main>
+
+    <script type="module">
+      import { CARDS, CONFERENCE_DATE, CONFERENCE_PLACE } from "./cards.mjs";
+
+      const slug = new URLSearchParams(location.search).get("slug");
+      const card = CARDS.find((c) => c.slug === slug) ?? CARDS[0];
+      const fields = {
+        url: `alpsconference.com${card.path === "/" ? "" : card.path}`,
+        title: card.title,
+        subtitle: card.subtitle ?? "",
+        date: card.date ?? CONFERENCE_DATE,
+        place: card.place ?? CONFERENCE_PLACE,
+      };
+      for (const [name, value] of Object.entries(fields)) {
+        document.querySelector(`[data-field="${name}"]`).textContent = value;
+      }
+      document.querySelector(".subtitle").hidden = !fields.subtitle;
+      const placeIcon = card.placeIcon ?? "map-pin";
+      for (const icon of document.querySelectorAll(".fact svg[data-icon]")) {
+        icon.toggleAttribute("hidden", icon.dataset.icon !== placeIcon);
+      }
+      document.title = `${card.title} | Open Graph card`;
+
+      await document.fonts.ready;
+      await Promise.all([...document.images].map((img) => img.decode()));
+
+      // A title that wraps steps down a size, then shrinks further until it fits on two lines.
+      // Line-height is 1, so each line is one font size tall.
+      const h1 = document.querySelector("h1");
+      const lines = (el) => Math.round(el.offsetHeight / parseFloat(getComputedStyle(el).lineHeight));
+      let size = 104;
+      if (lines(h1) > 1) {
+        size = 84;
+        h1.style.fontSize = `${size}px`;
+      }
+      while (size > 60 && lines(h1) > 2) {
+        size -= 2;
+        h1.style.fontSize = `${size}px`;
+      }
+
+      // Read back by generate.mjs, which prints them.
+      const subtitle = document.querySelector(".subtitle");
+      window.cardWarnings = [
+        lines(h1) > 2 && "title needs more than two lines, shorten it",
+        !subtitle.hidden && lines(subtitle) > 2 && "subtitle needs more than two lines, shorten it",
+      ].filter(Boolean);
+
+      window.cardReady = true;
+    </script>
+  </body>
+</html>

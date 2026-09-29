@@ -4,7 +4,7 @@ import PosterPage from "../components/PosterPage";
 import { withBase } from "../lib/withBase";
 
 const switzerFont = withBase("fonts/Switzer-Variable.woff2");
-const ogImagePath = withBase("img/opengraph.jpg");
+const ogImagePath = withBase("og/poster.jpg");
 const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
 
 const fontFaceCss = `@font-face {
@@ -35,6 +35,8 @@ const fontFaceCss = `@font-face {
       content="Submit your psychedelic science research poster. Applications open 4 May – 18 September 2026, midnight (exceptionally extended by one week)."
     />
     <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Theme -->

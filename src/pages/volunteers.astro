@@ -4,7 +4,7 @@ import VolunteersPage from "../components/VolunteersPage";
 import { withBase } from "../lib/withBase";
 
 const switzerFont = withBase("fonts/Switzer-Variable.woff2");
-const ogImagePath = withBase("img/opengraph.jpg");
+const ogImagePath = withBase("og/volunteers.jpg");
 const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
 
 const fontFaceCss = `@font-face {
@@ -33,6 +33,8 @@ const fontFaceCss = `@font-face {
     <meta property="og:title" content="ALPS Conference 2026 — volunteer portal" />
     <meta property="og:description" content="Crew shifts, tasks and times for 9–10 October 2026." />
     <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
 
     <meta name="theme-color" content="#0B3C5D" />

@@ -15,6 +15,7 @@ pnpm install         # Install dependencies (also regenerates worker-configurati
 pnpm dev             # Development server with hot reload
 pnpm build           # Production build to dist/
 pnpm preview         # Preview production build locally
+pnpm og              # Regenerate the Open Graph cards in public/og/ (needs Google Chrome)
 ```
 
 For production builds with absolute metadata URLs:
@@ -36,6 +37,22 @@ This is a minimal Astro static site (`output: "static"`) with a single page:
 - **`reference/`** — Historical 2024/2025 versions for design reference; not part of the build.
 
 The site has no server-side logic, no external JS dependencies, and no build-time data fetching.
+
+## Open Graph images
+
+Every page's `og:image` points at its own 1200 × 630 card in `public/og/<slug>.jpg`. The cards are committed, not rendered by the build. They come from one template:
+
+- **`scripts/og/cards.mjs`** — one entry per page: `slug` (file name), `path` (URL printed on the card), `title` (Title Case), `subtitle` (a sentence), and optional `date` / `place` / `placeIcon` for the footer (defaults: the conference dates and venue). `WITHOUT_CARD` lists the pages that deliberately have none (`/3d`, `/links/cancel`).
+- **`scripts/og/template.html`** — the card design (site gradient, synapse illustration, logo, Switzer, Lucide icons). A title that wraps steps down a size; the script warns when a title or subtitle needs more than two lines.
+- **`scripts/og/generate.mjs`** — screenshots each card in headless Chrome through `playwright-core`. Uses the installed Google Chrome; set `CHROME_PATH` for another Chromium build.
+
+```bash
+pnpm og              # Regenerate every card
+pnpm og bingo map    # Regenerate only these slugs
+pnpm og --preview    # Serve the template to edit it in a browser (?slug=<slug>)
+```
+
+To add a page, append an entry to `cards.mjs`, point the page's `og:image` at `og/<slug>.jpg` (keep the `og:image:width`/`height` tags), and run `pnpm og <slug>`. The script lists any page whose `og:image` is not a card and that is not in `WITHOUT_CARD`.
 
 ## Slack-driven changes (traceability and previews)
 

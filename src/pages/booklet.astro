@@ -6,7 +6,7 @@ import { withBase } from "../lib/withBase";
 
 const switzerFont = withBase("fonts/Switzer-Variable.woff2");
 const switzerItalic = withBase("fonts/Switzer-VariableItalic.woff2");
-const ogImagePath = withBase("img/opengraph.jpg");
+const ogImagePath = withBase("og/booklet.jpg");
 const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
 
 const fontFaceCss = `@font-face {
@@ -36,6 +36,9 @@ const fontFaceCss = `@font-face {
     <meta property="og:type" content="website" />
     <meta property="og:title" content="ALPS 2026 conference booklet" />
     <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#123e67" />
     <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />

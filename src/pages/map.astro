@@ -4,6 +4,8 @@ import VenuePlan from "../components/VenuePlan";
 import { withBase } from "../lib/withBase";
 
 const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const ogImagePath = withBase("og/map.jpg");
+const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
 const fontFaceCss = `@font-face {
   font-family: "Switzer";
   src: url("${switzerFont}") format("woff2");
@@ -22,6 +24,13 @@ const fontFaceCss = `@font-face {
     <meta name="robots" content="noindex" />
     <title>Venue map | ALPS Conference 2026</title>
     <meta name="description" content="Layout plan of the Kultur & Kongresshaus Aarau for ALPS Conference 2026." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Venue Map — ALPS Conference 2026" />
+    <meta property="og:description" content="Layout plan of the Kultur & Kongresshaus Aarau." />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#0B3C5D" />
     <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={withBase("img/venue-plan.svg")} as="fetch" type="image/svg+xml" crossorigin />
