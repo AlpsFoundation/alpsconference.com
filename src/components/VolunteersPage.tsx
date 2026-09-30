@@ -11,12 +11,16 @@ import {
   CREW_CONTACTS,
   VOLUNTEER_TASK_ORDER,
   VOLUNTEER_TASKS,
+  type CateringShift,
   type CrewEvent,
   type ShiftSlot,
   type VolunteerTask,
 } from "../data/volunteers";
 import {
   blockMinutes,
+  CATERING_DAYS,
+  cateringFor,
+  cateringRows,
   countedMinutes,
   CREW_TEAM,
   CREW_VOLUNTEERS,
@@ -33,6 +37,7 @@ import {
   volunteerCalendarPath,
   volunteerFromSlug,
   volunteerSlug,
+  type CateringRow,
   type PlanDay,
   type ShiftBlock,
 } from "../lib/volunteers";
@@ -45,7 +50,15 @@ const THEME_KEY = "alps-volunteer-theme";
 const TZID = "Europe/Zurich";
 const DEFAULT_DAY = "2026-10-09";
 /** `?day=thu` (or a date) opens that tab, e.g. from the old setup page's address. */
-const DAY_PARAMS: Record<string, string> = { thu: "2026-10-08", fri: "2026-10-09", sat: "2026-10-10", sun: "2026-10-11" };
+const DAY_PARAMS: Record<string, string> = {
+  thu: "2026-10-08",
+  fri: "2026-10-09",
+  sat: "2026-10-10",
+  sun: "2026-10-11",
+  "fri-catering": "2026-10-09-catering",
+  "sat-catering": "2026-10-10-catering",
+};
+const CATERING_SUFFIX = "-catering";
 
 type ThemePref = "auto" | "light" | "dark";
 
@@ -69,11 +82,19 @@ type Timing = "past" | "now" | "next";
 type AgendaItem =
   | { kind: "shift"; key: string; date: string; start: number; end: number; block: ShiftBlock }
   | { kind: "crew"; key: string; date: string; start: number; end: number; event: CrewEvent; build?: PersonBuildEntry }
+  | { kind: "catering"; key: string; date: string; start: number; end: number; shift: CateringShift }
   | { kind: "build"; key: string; date: string; start: number; end: number; entry: PersonBuildEntry };
 
 type PlanRow =
   | { kind: "slot"; key: string; start: number; end: number; slot: ShiftSlot; program: string }
-  | { kind: "crew"; key: string; start: number; end: number; event: CrewEvent };
+  | { kind: "crew"; key: string; start: number; end: number; event: CrewEvent }
+  | { kind: "catering"; key: string; start: number; end: number; row: CateringRow };
+
+/** Schedule tabs: one per plan day, then one per catering day. */
+const PLAN_TABS = [
+  ...PLAN_DAYS.map((day) => ({ id: day.dateTime, date: day.dateTime, catering: false })),
+  ...CATERING_DAYS.map((date) => ({ id: `${date}${CATERING_SUFFIX}`, date, catering: true })),
+];
 
 const dateLabelFormat = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 const tabLabelFormat = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", timeZone: "UTC" });
@@ -172,7 +193,15 @@ function agendaFor(person: string, build: PersonBuildEntry[] = []): AgendaItem[]
     const start = entry.start ?? teardownStart + 60;
     return { kind: "build" as const, key: `build-${entry.phase}`, date: entry.dateTime, start, end: entry.end ?? start + 60, entry };
   });
-  return [...shifts, ...crew, ...building].sort((a, b) => a.date.localeCompare(b.date) || a.start - b.start);
+  const catering: AgendaItem[] = cateringFor(person).map((shift) => ({
+    kind: "catering" as const,
+    key: `catering-${shift.dateTime}-${shift.from}-${shift.station}`,
+    date: shift.dateTime,
+    start: toMinutes(shift.from),
+    end: toMinutes(shift.to),
+    shift,
+  }));
+  return [...shifts, ...crew, ...catering, ...building].sort((a, b) => a.date.localeCompare(b.date) || a.start - b.start);
 }
 
 /** Crew events go before the slot that starts at the same time. */
@@ -196,7 +225,18 @@ function planRows(day: PlanDay): PlanRow[] {
   return [...crew, ...slots].sort((a, b) => a.start - b.start);
 }
 
+function cateringPlanRows(date: string): PlanRow[] {
+  return cateringRows(date).map((row) => ({
+    kind: "catering",
+    key: `${row.from}-${row.to}-${row.station}`,
+    start: toMinutes(row.from),
+    end: toMinutes(row.to),
+    row,
+  }));
+}
+
 function involves(row: PlanRow, person: string) {
+  if (row.kind === "catering") return row.row.people.includes(person);
   return row.kind === "crew"
     ? !row.event.people || row.event.people.includes(person)
     : VOLUNTEER_TASK_ORDER.some((task) => row.slot[task].includes(person));
@@ -344,6 +384,7 @@ function MyShifts({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const items = useMemo(() => agendaFor(person, build), [person, buildKey]);
   const blocks = items.flatMap((item) => (item.kind === "shift" ? [item.block] : []));
+  const cateringMinutes = items.reduce((sum, item) => sum + (item.kind === "catering" ? item.end - item.start : 0), 0);
   const dates = [...new Set(items.map((item) => item.date))];
 
   const timings = new Map(items.map((item) => [item.key, timingOf(clock, item.date, item.start, item.end)]));
@@ -364,7 +405,10 @@ function MyShifts({
                 <>
                   {blocks.length} shift{blocks.length === 1 ? "" : "s"} · {formatDuration(blockMinutes(blocks))} on
                   shift · <strong>{formatDuration(countedMinutes(blocks))} counted</strong>
+                  {cateringMinutes > 0 && <> · {formatDuration(cateringMinutes)} catering</>}
                 </>
+              ) : cateringMinutes > 0 ? (
+                <>{formatDuration(cateringMinutes)} catering · no shifts in the grid</>
               ) : (
                 "No shifts in the grid, only the crew and build times below."
               )}
@@ -393,7 +437,11 @@ function MyShifts({
                 .map((item) => {
                   const timing = timings.get(item.key);
                   return (
-                    <li key={item.key} className={`vol-agenda__item vol-agenda__item--${item.kind}`} data-state={timing}>
+                    <li
+                      key={item.key}
+                      className={`vol-agenda__item vol-agenda__item--${item.kind === "catering" ? "crew" : item.kind}`}
+                      data-state={timing}
+                    >
                       <div className="vol-agenda__time">
                         {item.kind === "shift" ? (
                           <>
@@ -401,6 +449,13 @@ function MyShifts({
                               {formatTime(item.start)}–{formatTime(item.end)}
                             </span>
                             <small>{formatDuration(item.end - item.start)}</small>
+                          </>
+                        ) : item.kind === "catering" ? (
+                          <>
+                            <span>
+                              {item.shift.from}–{item.shift.to}
+                            </span>
+                            <small>Catering</small>
                           </>
                         ) : item.kind === "crew" ? (
                           <>
@@ -440,6 +495,14 @@ function MyShifts({
                               <p className="vol-agenda__program">On stage: {item.block.program.join(" · ")}</p>
                             )}
                           </>
+                        ) : item.kind === "catering" ? (
+                          <div className="vol-crew">
+                            <span className="vol-crew__title">{item.shift.station}</span>
+                            <span className="vol-crew__meta">
+                              <Users size={13} aria-hidden="true" />
+                              Catering team · not counted
+                            </span>
+                          </div>
                         ) : item.kind === "crew" ? (
                           <div className="vol-crew">
                             <CrewEventLine event={item.event} person={person} />
@@ -500,7 +563,7 @@ export default function VolunteersPage() {
   useEffect(() => {
     const raw = new URLSearchParams(window.location.search).get("day")?.toLowerCase() ?? "";
     const date = DAY_PARAMS[raw] ?? raw;
-    if (PLAN_DAYS.some((day) => day.dateTime === date)) {
+    if (PLAN_TABS.some((tab) => tab.id === date)) {
       dayPicked.current = true;
       setDayDate(date);
     }
@@ -582,12 +645,14 @@ export default function VolunteersPage() {
     document.getElementById("vol-plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const day = PLAN_DAYS.find((entry) => entry.dateTime === dayDate) ?? PLAN_DAYS[0];
-  const rows = planRows(day).filter((row) => !onlyMine || !person || involves(row, person));
-  const rowTimings = rows.map((row) => timingOf(clock, day.dateTime, row.start, row.end));
+  const tab = PLAN_TABS.find((entry) => entry.id === dayDate) ?? PLAN_TABS[0];
+  const day = PLAN_DAYS.find((entry) => entry.dateTime === tab.date) ?? PLAN_DAYS[0];
+  const cateringTab = tab.catering;
+  const rows = (cateringTab ? cateringPlanRows(tab.date) : planRows(day)).filter((row) => !onlyMine || !person || involves(row, person));
+  const rowTimings = rows.map((row) => timingOf(clock, tab.date, row.start, row.end));
   // Between rows (or before or after them all) on the day itself, a line marks the time.
   const nowLineAt =
-    clock?.date === day.dateTime && !rowTimings.includes("now")
+    clock?.date === tab.date && !rowTimings.includes("now")
       ? (() => {
           const index = rows.findIndex((row) => row.start > clock.minutes);
           return index === -1 ? rows.length : index;
@@ -700,19 +765,25 @@ export default function VolunteersPage() {
           </h2>
           <div className="vol-plan__controls">
             <div className="vol-tabs" role="tablist" aria-label="Day">
-              {PLAN_DAYS.map((entry) => (
-                <button
-                  key={entry.dateTime}
-                  type="button"
-                  role="tab"
-                  id={`vol-tab-${entry.dateTime}`}
-                  aria-selected={entry.dateTime === dayDate}
-                  aria-controls="vol-grid"
-                  data-past={(clock && entry.dateTime < clock.date) || undefined}
-                  onClick={() => setDayDate(entry.dateTime)}
-                >
-                  {tabLabel(entry.dateTime)}
-                </button>
+              {PLAN_TABS.map((entry, index) => (
+                <Fragment key={entry.id}>
+                  {/* On phones the catering tabs start a second row. */}
+                  {entry.catering && !PLAN_TABS[index - 1]?.catering && (
+                    <span className="vol-tabs__break" aria-hidden="true" />
+                  )}
+                  <button
+                    type="button"
+                    role="tab"
+                    id={`vol-tab-${entry.id}`}
+                    aria-selected={entry.id === tab.id}
+                    aria-controls="vol-grid"
+                    data-past={(clock && entry.date < clock.date) || undefined}
+                    onClick={() => setDayDate(entry.id)}
+                  >
+                    {tabLabel(entry.date)}
+                    {entry.catering && " Catering"}
+                  </button>
+                </Fragment>
               ))}
             </div>
             {person && (
@@ -724,8 +795,8 @@ export default function VolunteersPage() {
           </div>
         </div>
 
-        <div id="vol-grid" className="vol-grid" role="tabpanel" aria-labelledby={`vol-tab-${day.dateTime}`}>
-          {day.shiftDay && (
+        <div id="vol-grid" className="vol-grid" role="tabpanel" aria-labelledby={`vol-tab-${tab.id}`}>
+          {!cateringTab && day.shiftDay && (
             <div ref={headRef} className="vol-grid__head">
               <span className="vol-grid__col">Time</span>
               <span className="vol-grid__col">On stage</span>
@@ -746,7 +817,23 @@ export default function VolunteersPage() {
               return (
                 <Fragment key={row.key}>
                   {index === nowLineAt && nowLine}
-                  {row.kind === "crew" ? (
+                  {row.kind === "catering" ? (
+                    <li className="vol-slot vol-slot--crew" data-me={hasMe || undefined} data-state={timing}>
+                      <div className="vol-slot__time">
+                        {row.row.from}–{row.row.to}
+                        <StateBadge timing={timing} clock={clock} />
+                      </div>
+                      <div className="vol-slot__program">
+                        <strong>{row.row.station}</strong>
+                        <span className="vol-slot__place">Catering</span>
+                      </div>
+                      <div className="vol-slot__crew">
+                        {row.row.people.map((name) => (
+                          <NamePill key={name} name={name} person={person} onChoose={chooseAndScroll} />
+                        ))}
+                      </div>
+                    </li>
+                  ) : row.kind === "crew" ? (
                     <li className="vol-slot vol-slot--crew" data-me={hasMe || undefined} data-state={timing}>
                       <div className="vol-slot__time">
                         {crewTime(row.event)}
@@ -802,7 +889,10 @@ export default function VolunteersPage() {
             {nowLineAt === rows.length && nowLine}
           </ol>
         </div>
-        {BUILD_DAYS[day.dateTime] && (
+        {cateringTab && (
+          <p className="vol-note">Catering team (Volunteer A–J), from the catering plan. Not counted in the hours.</p>
+        )}
+        {!cateringTab && BUILD_DAYS[day.dateTime] && (
           <CrewBuild
             dateTime={day.dateTime}
             person={person}
