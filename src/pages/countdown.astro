@@ -1,0 +1,42 @@
+---
+import "../styles/app.css";
+import CountdownPage from "../components/CountdownPage";
+import { withBase } from "../lib/withBase";
+
+const switzerFont = withBase("fonts/Switzer-Variable.woff2");
+const ogImagePath = withBase("og/countdown.jpg");
+const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
+const fontFaceCss = `@font-face {
+  font-family: "Switzer";
+  src: url("${switzerFont}") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Internal: countdown carousels for social media. Not linked, not in the sitemap. -->
+    <meta name="robots" content="noindex" />
+    <title>Countdown | ALPS Conference 2026</title>
+    <meta name="description" content="Seven downloadable countdown carousels for the last week before ALPS Conference 2026." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Countdown to ALPS 2026" />
+    <meta property="og:description" content="Seven carousels for the last week before the conference." />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#082f4a" />
+    <link rel="preload" href={switzerFont} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
+    <style is:global set:html={fontFaceCss}></style>
+  </head>
+  <body>
+    <CountdownPage client:load />
+  </body>
+</html>
