@@ -9,6 +9,7 @@ import { parseTimeTravel } from "../data/conferenceTimeline";
 import {
   COUNTING_RULE,
   CREW_CONTACTS,
+  CREW_ROLES,
   VOLUNTEER_TASK_ORDER,
   VOLUNTEER_TASKS,
   type CateringShift,
@@ -30,6 +31,7 @@ import {
   formatTime,
   PLAN_DAYS,
   registerAddedPeople,
+  rolesFor,
   shiftBlocks,
   slotPrograms,
   teamPhoto,
@@ -384,6 +386,7 @@ function MyShifts({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const items = useMemo(() => agendaFor(person, build), [person, buildKey]);
   const blocks = items.flatMap((item) => (item.kind === "shift" ? [item.block] : []));
+  const roles = rolesFor(person);
   const cateringMinutes = items.reduce((sum, item) => sum + (item.kind === "catering" ? item.end - item.start : 0), 0);
   const dates = [...new Set(items.map((item) => item.date))];
 
@@ -413,6 +416,11 @@ function MyShifts({
                 "No shifts in the grid, only the crew and build times below."
               )}
             </p>
+            {roles.length > 0 && (
+              <p className="vol-mine__stats">
+                Role, Fri &amp; Sat: <strong>{roles.join(" · ")}</strong> · not counted
+              </p>
+            )}
           </div>
         </div>
         <CalendarSubscribe
@@ -890,7 +898,7 @@ export default function VolunteersPage() {
           </ol>
         </div>
         {cateringTab && (
-          <p className="vol-note">Catering team (Volunteer A–J), from the catering plan. Not counted in the hours.</p>
+          <p className="vol-note">Catering team, from the catering plan. Not counted in the hours.</p>
         )}
         {!cateringTab && BUILD_DAYS[day.dateTime] && (
           <CrewBuild
@@ -910,6 +918,9 @@ export default function VolunteersPage() {
             Changes? Tell {CREW_CONTACTS.changes}. Not sure on the day? Ask a Happy Helper,{" "}
             {CREW_CONTACTS.onSite.join(" or ")}.
           </span>
+        </p>
+        <p className="vol-note">
+          Roles (Fri &amp; Sat): {CREW_ROLES.map((role) => `${role.role} – ${role.people.join(" & ")}`).join(" · ")}.
         </p>
         <p className="vol-note">Counted hours: {COUNTING_RULE}</p>
       </footer>
