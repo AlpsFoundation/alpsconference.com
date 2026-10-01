@@ -1,6 +1,6 @@
 /**
- * Per-person crew calendar: every shift, plus the loading, power circles and
- * dismantling that person is part of, plus what they signed up for in the build
+ * Per-person crew calendar: every shift and catering shift, plus the loading,
+ * morning circles and dismantling that person is part of, plus what they signed up for in the build
  * (setup on Thursday, teardown and packing the truck on Saturday). Served on demand,
  * so subscribers pick up plan changes and new sign-ups on their next refresh.
  */
@@ -10,6 +10,7 @@ import { CREW_CONTACTS, SHIFT_DAYS, VOLUNTEER_TASKS } from "../data/volunteers";
 import { serializeCalendar, VENUE, type CalendarEvent } from "./ical";
 import {
   blockTasks,
+  cateringFor,
   crewEventsFor,
   formatTime,
   shiftBlocks,
@@ -60,6 +61,16 @@ export function buildVolunteerCalendar(
       };
     })
   );
+
+  const catering: CalendarEvent[] = cateringFor(person).map((shift) => ({
+    uid: `crew-${slug}-catering-${shift.dateTime}-${shift.from.replace(":", "")}@${UID_DOMAIN}`,
+    date: shift.dateTime,
+    range: { start: shift.from, end: shift.to },
+    summary: `ALPS catering: ${shift.station}`,
+    description: ["Catering team · not counted in the hours.", ...footer].join("\n\n"),
+    location: VENUE,
+    url: pageUrl,
+  }));
 
   // Teardown sign-ups go into the plan's own dismantling entry rather than doubling it.
   const teardown = build.find((entry) => entry.phase === "teardown");
@@ -114,7 +125,7 @@ export function buildVolunteerCalendar(
       description: `${person}’s crew shifts at ALPS Conference 2026, 9–10 October 2026 at the Kultur & Kongresshaus Aarau.`,
       source: new URL(volunteerCalendarPath(person), origin).href,
     },
-    [...crew, ...shifts, ...buildEvents].sort((a, b) =>
+    [...crew, ...shifts, ...catering, ...buildEvents].sort((a, b) =>
       `${a.date}${a.range?.start}`.localeCompare(`${b.date}${b.range?.start}`)
     ),
     builtAt

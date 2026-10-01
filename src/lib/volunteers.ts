@@ -2,11 +2,14 @@
  * Shift logic shared by the /volunteers page and the per-person calendar feeds.
  */
 import {
+  CATERING_SHIFTS,
   CREW_EVENTS,
+  CREW_ROLES,
   SHIFT_DAYS,
   TEAM_PHOTOS,
   VOLUNTEER_TASK_ORDER,
   VOLUNTEER_TASKS,
+  type CateringShift,
   type CrewEvent,
   type ShiftDay,
   type VolunteerTask,
@@ -53,12 +56,14 @@ export function volunteerSlug(name: string) {
     .replace(/^-|-$/g, "");
 }
 
-/** Everyone on the crew: shift grid, loading and unloading lists, and the build crew. */
+/** Everyone on the crew: shift grid, catering team, roles, loading and unloading lists, and the build crew. */
 export const CREW: string[] = [
   ...new Set([
     ...SHIFT_DAYS.flatMap((day) =>
       day.slots.flatMap((slot) => VOLUNTEER_TASK_ORDER.flatMap((task) => slot[task]))
     ),
+    ...CATERING_SHIFTS.map((shift) => shift.person),
+    ...CREW_ROLES.flatMap((role) => role.people),
     ...CREW_EVENTS.flatMap((event) => event.people ?? []),
     ...BUILD_PEOPLE,
   ]),
@@ -165,3 +170,34 @@ export const PLAN_DAYS: PlanDay[] = [
     shiftDay: SHIFT_DAYS.find((day) => day.dateTime === dateTime),
     crew: CREW_EVENTS.filter((event) => event.dateTime === dateTime),
   }));
+
+export function rolesFor(person: string) {
+  return CREW_ROLES.filter((role) => role.people.includes(person)).map((role) => role.role);
+}
+
+export function cateringFor(person: string): CateringShift[] {
+  return CATERING_SHIFTS.filter((shift) => shift.person === person);
+}
+
+/** One catering station at one time, with everyone on it. */
+export type CateringRow = { from: string; to: string; station: string; people: string[] };
+
+export function cateringRows(dateTime: string): CateringRow[] {
+  const rows = new Map<string, CateringRow>();
+  for (const shift of CATERING_SHIFTS) {
+    if (shift.dateTime !== dateTime) continue;
+    const key = `${shift.from}|${shift.to}|${shift.station}`;
+    const row = rows.get(key) ?? { from: shift.from, to: shift.to, station: shift.station, people: [] };
+    row.people.push(shift.person);
+    rows.set(key, row);
+  }
+  return [...rows.values()]
+    .map((row) => ({ ...row, people: row.people.sort((a, b) => a.localeCompare(b, "en")) }))
+    .sort(
+      (a, b) =>
+        toMinutes(a.from) - toMinutes(b.from) || toMinutes(a.to) - toMinutes(b.to) || a.station.localeCompare(b.station)
+    );
+}
+
+/** Days with a catering plan, each shown in its own schedule tab. */
+export const CATERING_DAYS: string[] = [...new Set(CATERING_SHIFTS.map((shift) => shift.dateTime))].sort();
