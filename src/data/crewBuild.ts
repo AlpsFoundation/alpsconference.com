@@ -93,7 +93,8 @@ export const BUILD_PHASES: Record<BuildPhase, BuildPhaseInfo> = {
     dateTime: "2026-10-10",
     start: "21:30",
     calendarMinutes: 60,
-    timeNote: "After the apéro, from 21:30, everyone helps. Whoever set a thing up tears it down.",
+    timeNote:
+      "After the apéro, from 21:30, everyone helps. Whoever set a thing up tears it down. Philipp's rented backups (extension cords, cable drums, walkie-talkies, Régis's extra lights and disco ball) go back into the bags they came in, packed by whoever unpacked them.",
     doneLabel: "Torn down",
     joinLabel: "I'll tear this down",
   },
@@ -823,6 +824,43 @@ const DATA: BuildData = {
           "name": "Printer, toner, paper",
           "who": "Philipp",
           "status": "Toner and paper need to be checked on quantity"
+        }
+      ]
+    },
+    {
+      "id": "rented",
+      "title": "Rented backups: each back into the bag it came in",
+      "kind": "material",
+      "items": [
+        {
+          "id": "rented-extension-cords",
+          "name": "Extension cords",
+          "who": "Rented by Philipp",
+          "status": "Back into its own bag at teardown"
+        },
+        {
+          "id": "rented-cable-drums",
+          "name": "Cable drums",
+          "who": "Rented by Philipp",
+          "status": "Back into its own bag at teardown"
+        },
+        {
+          "id": "rented-walkie-talkies",
+          "name": "Walkie-talkies",
+          "who": "Rented by Philipp",
+          "status": "Back into its own bag at teardown"
+        },
+        {
+          "id": "rented-lights",
+          "name": "Extra lights for Régis",
+          "who": "Rented by Philipp, used by Régis",
+          "status": "Back into its own bag at teardown"
+        },
+        {
+          "id": "rented-disco-ball",
+          "name": "Disco ball for Régis",
+          "who": "Rented by Philipp, used by Régis",
+          "status": "Back into its own bag at teardown"
         }
       ]
     },
