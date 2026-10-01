@@ -158,8 +158,8 @@ function AfterpartyModal({
               conference ticket.
             </p>
             <p className="mt-2 text-xs text-white/65 leading-relaxed">
-              The party is guestlist only — message somebody from the psychedelic community to be
-              put on the guestlist, then buy a ticket on{" "}
+              Show your conference badge at the door. Everyone else, friends and family included,
+              gets in with a ticket from{" "}
               <a
                 href={EVENTFROG_URL}
                 target="_blank"
