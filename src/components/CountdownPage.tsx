@@ -659,7 +659,7 @@ function SlideCard({
   const save = (type: ImageType) => canvasRef.current && downloadCanvas(canvasRef.current, fileName(carousel, index), type);
 
   return (
-    <figure className="w-60 shrink-0 snap-start space-y-2 sm:w-72">
+    <figure className="w-60 shrink-0 snap-start space-y-2 sm:w-auto">
       <canvas
         ref={canvasRef}
         width={W * SCALE}
@@ -727,7 +727,8 @@ function CarouselSection({ carousel }: { carousel: Carousel }) {
           Download {carousel.slides.length} slides
         </button>
       </div>
-      <div className="-mx-4 flex snap-x scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6">
+      {/* A swipeable strip on phones; a grid that fits the column from sm up. */}
+      <div className="-mx-4 flex snap-x scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
         {carousel.slides.map((slide, index) => (
           <SlideCard key={index} carousel={carousel} slide={slide} index={index} onCanvas={onCanvas} />
         ))}
