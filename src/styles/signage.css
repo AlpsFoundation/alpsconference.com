@@ -1521,18 +1521,6 @@ button {
   visibility: hidden;
 }
 
-.sg-blast-btn {
-  display: none;
-}
-
-.sg[data-shooter="on"] .sg-blast-btn {
-  display: inline-flex;
-}
-
-.sg[data-shooter="on"] .sg-card__controls .sg-blast-btn {
-  visibility: visible;
-}
-
 .sg-shake {
   animation: sg-shake 380ms var(--sg-ease) 1;
 }

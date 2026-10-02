@@ -4,7 +4,6 @@ import {
   Check,
   ChevronDown,
   Copy,
-  Crosshair,
   Eye,
   Minus,
   Pencil,
@@ -278,13 +277,6 @@ const Card = memo(function Card({
     onOpen(sign.id);
   };
 
-  const blast = () => {
-    const el = previewRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    onShoot(sign.id, el, rect.left + rect.width / 2, rect.top + rect.height / 2);
-  };
-
   return (
     <article className={`sg-card ${copies ? "is-selected" : ""}`}>
       <button ref={previewRef} type="button" className="sg-card__preview" onClick={handlePreview} aria-label={`${name}: open a large preview`}>
@@ -327,10 +319,6 @@ const Card = memo(function Card({
         )}
         <button type="button" className="sg-icon-btn" onClick={() => onEdit(sign.id)} title="Edit" aria-label={`Edit ${name}`}>
           <Pencil size={16} strokeWidth={1.75} aria-hidden="true" />
-        </button>
-        <button type="button" className="sg-btn sg-btn--small sg-btn--accent sg-blast-btn" onClick={blast}>
-          <Crosshair size={14} strokeWidth={1.75} aria-hidden="true" />
-          Blast
         </button>
       </div>
     </article>
