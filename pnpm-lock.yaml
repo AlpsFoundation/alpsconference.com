@@ -35,6 +35,9 @@ importers:
       three:
         specifier: ^0.186.1
         version: 0.186.1
+      uqr:
+        specifier: ^0.1.3
+        version: 0.1.3
       worker-mailer:
         specifier: 1.2.1
         version: 1.2.1
@@ -2194,6 +2197,9 @@ packages:
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
+
+  uqr@0.1.3:
+    resolution: {integrity: sha512-0rjE8iEJe4YmT9TOhwsZtqCMRLc5DXZUI2UEYUUg63ikBkqqE5EYWaI0etFe/5KUcmcYwLih2RND1kq+hrUJXA==}
 
   vfile-location@5.0.3:
     resolution: {integrity: sha512-5yXvWDEgqeiYiBe1lbxYF7UMAIm/IcopxMHrMQDq3nvKcjPKIhZklUKL+AE7J7uApI4kwe2snsK+eI6UTj9EHg==}
@@ -4624,6 +4630,8 @@ snapshots:
       browserslist: 4.28.2
       escalade: 3.2.0
       picocolors: 1.1.1
+
+  uqr@0.1.3: {}
 
   vfile-location@5.0.3:
     dependencies:

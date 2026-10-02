@@ -83,4 +83,10 @@ export const CARDS = [
     title: "Banners",
     subtitle: "Downloadable banners for the newsletter and other channels.",
   },
+  {
+    slug: "signage",
+    path: "/signage",
+    title: "Conference Signage",
+    subtitle: "Print-ready A4 signs for the venue, from wayfinding to waste sorting.",
+  },
 ];
