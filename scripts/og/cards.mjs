@@ -83,4 +83,10 @@ export const CARDS = [
     title: "Banners",
     subtitle: "Downloadable banners for the newsletter and other channels.",
   },
+  {
+    slug: "countdown",
+    path: "/countdown",
+    title: "Countdown to ALPS 2026",
+    subtitle: "Seven carousels for the last week before the conference.",
+  },
 ];

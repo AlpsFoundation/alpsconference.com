@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Download } from "lucide-react";
+import { downloadCanvas, drawCover, loadImage } from "../lib/canvasImage";
 import { withBase } from "../lib/withBase";
 
 // Fixed-size banners for the newsletter and other channels. Each one is drawn
@@ -16,44 +17,6 @@ type Banner = {
 };
 
 type TextRun = { text: string; weight: number; opacity?: number };
-
-const imageCache = new Map<string, Promise<HTMLImageElement>>();
-
-function loadImage(path: string) {
-  let image = imageCache.get(path);
-  if (!image) {
-    image = new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error(`Could not load ${path}`));
-      img.src = withBase(path);
-    });
-    imageCache.set(path, image);
-  }
-  return image;
-}
-
-/**
- * Fills the canvas like `object-fit: cover`, `zoom` times closer. The focus
- * point (0–1 across the photo) lands in the middle of the frame, as far as the
- * photo's edges allow.
- */
-function drawCover(
-  ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
-  width: number,
-  height: number,
-  { zoom = 1, focusX = 0.5, focusY = 0.5 } = {}
-) {
-  const iw = img.naturalWidth;
-  const ih = img.naturalHeight;
-  const scale = Math.max(width / iw, height / ih) * zoom;
-  const sw = width / scale;
-  const sh = height / scale;
-  const sx = Math.min(Math.max(iw * focusX - sw / 2, 0), iw - sw);
-  const sy = Math.min(Math.max(ih * focusY - sh / 2, 0), ih - sh);
-  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
-}
 
 /** One line of Switzer in several weights, centred on x. */
 function drawCentredLine(ctx: CanvasRenderingContext2D, runs: TextRun[], x: number, y: number, size: number) {
@@ -141,22 +104,6 @@ const BANNERS: Banner[] = [
   },
 ];
 
-function download(canvas: HTMLCanvasElement, name: string, type: "image/jpeg" | "image/png") {
-  canvas.toBlob(
-    (blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${name}.${type === "image/jpeg" ? "jpg" : "png"}`;
-      link.click();
-      URL.revokeObjectURL(url);
-    },
-    type,
-    0.9
-  );
-}
-
 function BannerCard({ banner }: { banner: Banner }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<"drawing" | "ready" | "error">("drawing");
@@ -210,7 +157,7 @@ function BannerCard({ banner }: { banner: Banner }) {
           type="button"
           className={`${buttonClass} bg-white text-primary hover:bg-white/85`}
           disabled={status !== "ready"}
-          onClick={() => canvasRef.current && download(canvasRef.current, fileName, "image/jpeg")}
+          onClick={() => canvasRef.current && downloadCanvas(canvasRef.current, fileName, "image/jpeg")}
         >
           <Download size={16} strokeWidth={1.75} />
           Download JPG
@@ -219,7 +166,7 @@ function BannerCard({ banner }: { banner: Banner }) {
           type="button"
           className={buttonClass}
           disabled={status !== "ready"}
-          onClick={() => canvasRef.current && download(canvasRef.current, fileName, "image/png")}
+          onClick={() => canvasRef.current && downloadCanvas(canvasRef.current, fileName, "image/png")}
         >
           <Download size={16} strokeWidth={1.75} />
           Download PNG
