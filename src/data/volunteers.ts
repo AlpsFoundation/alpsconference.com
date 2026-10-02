@@ -266,7 +266,7 @@ export const CREW_EVENTS: CrewEvent[] = [
     approximate: true,
     calendarMinutes: 120,
     place: "Bern",
-    people: ["Philipp", "Matthias", "Parsa", "Federico", "Mourad", "Régis"],
+    people: ["Philipp", "Matthias", "Parsa", "Federico", "Mourad", "Régis", "Justine", "Andrea", "Akram"],
   },
 ];
 
