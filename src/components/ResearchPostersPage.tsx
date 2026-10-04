@@ -66,7 +66,7 @@ function PosterPreview({ poster }: { poster: ResearchPoster }) {
           <div key={i} className="h-8 rounded-sm bg-white/15" />
         ))}
       </div>
-      <p className="text-[0.65rem] uppercase tracking-[0.16em] text-white/40">PDF coming soon</p>
+      <p className="text-[0.65rem] uppercase tracking-[0.16em] text-white/40">Coming soon</p>
     </div>
   );
 }

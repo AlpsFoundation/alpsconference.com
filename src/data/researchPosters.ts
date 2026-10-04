@@ -39,7 +39,7 @@ export const POSTERS: ResearchPoster[] = [
   {
     slug: "amos-lau",
     name: "Amos Lau",
-    credentials: "MD · Medical doctor",
+    credentials: "MD",
     affiliation: "Monash University",
     title: "Seeing with ‘Fresh Eyes’: Development and Validation of the Fresh Experiences Scale",
     summary: [
@@ -122,7 +122,7 @@ export const POSTERS: ResearchPoster[] = [
   {
     slug: "sven-kaufmann",
     name: "Sven Kaufmann",
-    credentials: "Founder · Self-employed",
+    credentials: "Founder",
     affiliation: "Apeiron & Nous Foundation",
     title: "Beyond the Known: Can Extreme States of Consciousness Reveal Recurring Informational Structures?",
     summary: [
@@ -156,8 +156,8 @@ export const POSTERS: ResearchPoster[] = [
   {
     slug: "miguel-benjamin-cervera-sanchez",
     name: "Miguel Benjamin Cervera-Sanchez",
-    credentials: "MD · Research fellow at the time of the study",
-    affiliation: "National Institute of Neurology and Neurosurgery “Manuel Velasco Suárez”, Mexico City (at the time of the study)",
+    credentials: "MD · Research fellow",
+    affiliation: "National Institute of Neurology and Neurosurgery “Manuel Velasco Suárez”, Mexico City",
     title: "Psilocybin as serotonergic therapy in epilepsy: Narrative review of potentials and limitations",
     summary: [
       "Our clinical research group at the National Institute of Neurology and Neurosurgery ‘Manuel Velasco Suárez’ focuses on improving the quality of life for patients with epilepsy by exploring novel therapeutic approaches for Drug-Resistant Epilepsy. The main focus of our current work is the exploration of psilocybin, a substance historically ignored in epileptology and widely presumed to be proconvulsive.",
