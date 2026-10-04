@@ -76,13 +76,6 @@ export const POSTERS: ResearchPoster[] = [
     hasPdf: true,
   },
   {
-    slug: "beatrice-dal-bianco",
-    name: "Beatrice Dal Bianco",
-    credentials: "MSc · Doctor, resident in psychiatry",
-    affiliation: "Società Italiana di Medicina Psichedelica (SIMEPSI)",
-    title: "Motivation, stigma and post-acute psychological outcomes after psychedelic use: insights from the Italian Global Psychedelic Survey 2025",
-  },
-  {
     slug: "sonya-faber",
     name: "Sonya Faber",
     credentials: "PhD · Adjunct Professor",
