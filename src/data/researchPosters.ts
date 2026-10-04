@@ -62,13 +62,6 @@ export const POSTERS: ResearchPoster[] = [
     hasPdf: true,
   },
   {
-    slug: "mauro-cavarra",
-    name: "Mauro Cavarra",
-    credentials: "PhD · Researcher, psychotherapist",
-    affiliation: "Maastricht University",
-    title: "Breathe Hard to Breathe Easy: preliminary results of the breathwork-assisted therapy for social anxiety",
-  },
-  {
     slug: "beatrice-dal-bianco",
     name: "Beatrice Dal Bianco",
     credentials: "MSc · Doctor, resident in psychiatry",
@@ -81,6 +74,13 @@ export const POSTERS: ResearchPoster[] = [
     credentials: "PhD · Adjunct Professor",
     affiliation: "Psychedelia Stiftung",
     title: "Sustained Abstinence in Severe Ketamine Use Disorder Following Ibogaine Treatment",
+    summary: [
+      "Substance use disorders involving ketamine, cocaine, and alcohol are clinically challenging, with high relapse rates and few effective pharmacological options. We report a 30-year-old man with a five-year history of severe polysubstance dependence, including daily intranasal ketamine use of 2–3 g/day, cocaine, alcohol, nicotine, and recurrent depressive disorder. Despite conventional psychiatric treatment, severe craving persisted and the patient sought medically supervised ibogaine-assisted treatment in Mexico.",
+      "The patient completed a structured 13-day residential program. Following medical screening, he received an 800 mg ibogaine HCl flood dose (10.1 mg/kg), followed by supplementary doses under continuous ECG and vital-sign monitoring. Treatment was associated with rapid cessation of craving for previously misused substances. Longitudinal follow-up over approximately 17 months, including serial toxicology and standardized psychometric assessments, was consistent with continued abstinence from ketamine, cocaine, alcohol, and other previously misused substances. Depressive symptoms remained minimal (PHQ-9 0–3), anxiety improved, and quality of life increased substantially (WHOQOL-BREF 55 to 71). A medically supervised fractionated ibogaine intervention was administered approximately 11 months after the initial treatment in the context of bereavement, representing an important confounding factor in interpreting longer-term outcomes.",
+      "To our knowledge, this is the first longitudinally documented case of sustained abstinence in severe ketamine use disorder following ibogaine treatment supported by serial toxicology and standardized psychometric outcomes. The findings extend an evidence base that has focused largely on opioid use disorder and suggest that ketamine use disorder warrants systematic investigation. Possible mechanisms include ibogaine and noribogaine effects on monoaminergic, glutamatergic, opioid, and neuroplasticity-related pathways; however, causal mechanisms cannot be established from a single case. This report highlights both the therapeutic potential and the medical complexity of ibogaine and supports further prospective research within rigorous clinical and cardiovascular safety frameworks. Particular attention should be given to cardiac risk, patient selection, standardized monitoring, and durability of outcomes.",
+    ],
+    hasPhoto: true,
+    hasPdf: true,
   },
   {
     slug: "sven-kaufmann",
