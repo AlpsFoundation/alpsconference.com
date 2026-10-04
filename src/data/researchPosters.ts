@@ -26,7 +26,7 @@ export const POSTERS: ResearchPoster[] = [
     slug: "anna-breitenmoser",
     name: "Anna Breitenmoser",
     credentials: "MSc · Student",
-    affiliation: "University of Geneva, Oxford University",
+    affiliation: "University and Hospital of Geneva, Switzerland",
     title: "Mystical Experience in Psychedelic-Assisted Psychotherapy: Clinical Findings and Methodological Reflections on the MEQ30",
     summary: [
       "Mystical experiences are altered states of consciousness characterized by a profound sense of unity, transcendence of time and space, ineffability, and deeply felt noetic or sacred qualities. Historically associated with spiritual and religious traditions, these experiences have become a growing subject of scientific investigation within contemporary psychedelic research. In psychedelic-assisted psychotherapy (PAP), mystical-type experiences are frequently proposed as key mediators of therapeutic improvement and are commonly assessed using the Mystical Experience Questionnaire (MEQ30). However, the phenomenology, historical foundations, and methodological limitations of this construct remain insufficiently discussed.",
@@ -40,7 +40,7 @@ export const POSTERS: ResearchPoster[] = [
     slug: "amos-lau",
     name: "Amos Lau",
     credentials: "MD",
-    affiliation: "Monash University",
+    affiliation: "Monash University, Australia",
     title: "Seeing with ‘Fresh Eyes’: Development and Validation of the Fresh Experiences Scale",
     summary: [
       "Background: Psychedelic-assisted therapy (PAT) shows promise for a range of psychopathologies, with acute subjective effects predicting long-term therapeutic outcomes. One commonly reported but under-measured phenomenon is the experience of perceiving familiar thoughts, emotions, and experiences from a novel “child-like” perspective during acute psychedelic states.",
@@ -55,8 +55,8 @@ export const POSTERS: ResearchPoster[] = [
     slug: "giovanna-saad-gimenes",
     name: "Giovanna Saad Gimenes",
     credentials: "MA, PhD candidate · PhD researcher, part-time psychotherapist",
-    affiliation: "University of Bristol",
-    title: "The Missing Population: Post-Traumatic Growth in Domestic Violence and Sexual Abuse Survivors Receiving Psychedelic/psychoactive-Assisted Therapy",
+    affiliation: "University of Bristol, UK",
+    title: "The Missing Population: Post-Traumatic Growth in Domestic Violence and Sexual Abuse Survivors Receiving Psychedelic/Psychoactive-Assisted Therapy",
     summary: [
       "Background. Survivors of domestic violence (DV) and sexual abuse (SA) form one of the largest trauma populations worldwide, yet are largely absent from psychedelic/psychoactive-assisted therapy trials; where present, they are typically subsumed within heterogeneous PTSD samples. DV and SA produce a distinctive, interpersonal trauma organised around betrayal, shame and disrupted identity — features that symptom-reduction frameworks capture poorly. Post-traumatic growth (PTG), the positive psychological change that can emerge through the struggle with trauma, is rarely measured or treated as a legitimate therapeutic target in this field.",
       "Aim. To examine PTG in DV and SA survivors receiving psychedelic/psychoactive-assisted therapy, foregrounding survivors' lived experience.",
@@ -69,7 +69,7 @@ export const POSTERS: ResearchPoster[] = [
   {
     slug: "ortal-shinikamin",
     name: "Ortal Shinikamin",
-    credentials: "MD-PhD candidate · Incoming psychiatry resident, Geha Mental Health Center, Israel",
+    credentials: "MD-PhD candidate · Incoming psychiatry resident",
     affiliation: "Gray Faculty of Medical and Health Sciences, Tel Aviv University, Israel",
     title: "Holding the Insight Lightly: An Epistemic Framework for Psychedelic-Assisted Therapy, Built from Dialectical Behaviour Therapy",
     summary: [
@@ -84,7 +84,7 @@ export const POSTERS: ResearchPoster[] = [
     slug: "anna-boeker",
     name: "Anna L. Boeker",
     credentials: "MSc · PhD student in clinical research",
-    affiliation: "University of Basel and University Psychiatric Clinic Basel (UPK)",
+    affiliation: "University of Basel and University Psychiatric Clinic Basel (UPK), Switzerland",
     title: "Efficacy and Safety of Psilocybin-Assisted Therapy for Alcohol Use Disorder",
     summary: [
       "Our clinical research group for substance-assisted therapy at the UPK Basel includes professionals from the fields of psychiatry, psychology, and clinical research. The main focus of our work is research on the effects of LSD, which we have been studying since 2014 in several studies. We examine efficacy, safety and possible positive long-term effects of LSD in mental health conditions such as anxiety and depression. In the LYTA trial, together with the University of Bern, we will investigate LSD assisted therapy for alcohol use disorder in a multicenter, double-blind, randomized, active-placebo controlled phase II neuroimaging trial with a consecutive open-label phase.",
@@ -109,7 +109,7 @@ export const POSTERS: ResearchPoster[] = [
     slug: "sonya-faber",
     name: "Sonya Faber",
     credentials: "PhD · Adjunct Professor",
-    affiliation: "Psychedelia Stiftung",
+    affiliation: "Psychedelia Stiftung, Germany",
     title: "Sustained Abstinence in Severe Ketamine Use Disorder Following Ibogaine Treatment",
     summary: [
       "Substance use disorders involving ketamine, cocaine, and alcohol are clinically challenging, with high relapse rates and few effective pharmacological options. We report a 30-year-old man with a five-year history of severe polysubstance dependence, including daily intranasal ketamine use of 2–3 g/day, cocaine, alcohol, nicotine, and recurrent depressive disorder. Despite conventional psychiatric treatment, severe craving persisted and the patient sought medically supervised ibogaine-assisted treatment in Mexico.",
@@ -157,8 +157,8 @@ export const POSTERS: ResearchPoster[] = [
     slug: "miguel-benjamin-cervera-sanchez",
     name: "Miguel Benjamin Cervera-Sanchez",
     credentials: "MD · Research fellow",
-    affiliation: "National Institute of Neurology and Neurosurgery “Manuel Velasco Suárez”, Mexico City",
-    title: "Psilocybin as serotonergic therapy in epilepsy: Narrative review of potentials and limitations",
+    affiliation: "National Institute of Neurology and Neurosurgery “Manuel Velasco Suárez”, Mexico",
+    title: "Psilocybin as Serotonergic Therapy in Epilepsy: Narrative Review of Potentials and Limitations",
     summary: [
       "Our clinical research group at the National Institute of Neurology and Neurosurgery ‘Manuel Velasco Suárez’ focuses on improving the quality of life for patients with epilepsy by exploring novel therapeutic approaches for Drug-Resistant Epilepsy. The main focus of our current work is the exploration of psilocybin, a substance historically ignored in epileptology and widely presumed to be proconvulsive.",
       "At this conference, we present our narrative review examining the literature on psilocybin and its relationship with epilepsy across both clinical and preclinical models. We specifically delve into its serotonergic mechanisms, highlighting how predominant 5-HT2A modulation has the potential to reduce cortical hyperexcitability and disrupt pathological neural synchrony under controlled conditions. Furthermore, we address the ‘psilocybin paradox’, an apparent inverted U-shaped dose-response relationship where low doses may offer antiseizure effects, while high exposure could exacerbate seizures.",

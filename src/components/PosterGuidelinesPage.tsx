@@ -155,7 +155,7 @@ export default function PosterGuidelinesPage() {
                 <BulletList items={[
                   "Your research poster as a print-ready PDF.",
                   "A short summary of your research.",
-                  "A profile picture and short biography.",
+                  "A profile picture.",
                 ]} />
                 <p className="mt-5 text-white/50 text-sm leading-relaxed">
                   These will be uploaded on the ALPS 2026 conference website with your consent. By presenting a research poster, presenters agree to allow their work to be displayed and published in conference materials and online platforms.
