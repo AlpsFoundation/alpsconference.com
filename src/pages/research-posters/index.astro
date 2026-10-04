@@ -1,10 +1,10 @@
 ---
-import "../styles/app.css";
-import PostersPage from "../components/PostersPage";
-import { withBase } from "../lib/withBase";
+import "../../styles/app.css";
+import ResearchPostersPage from "../../components/ResearchPostersPage";
+import { withBase } from "../../lib/withBase";
 
 const switzerFont = withBase("fonts/Switzer-Variable.woff2");
-const ogImagePath = withBase("og/posters.jpg");
+const ogImagePath = withBase("og/research-posters.jpg");
 const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
 
 const fontFaceCss = `@font-face {
@@ -51,6 +51,6 @@ const fontFaceCss = `@font-face {
     <style is:global set:html={fontFaceCss}></style>
   </head>
   <body>
-    <PostersPage client:load />
+    <ResearchPostersPage client:load />
   </body>
 </html>

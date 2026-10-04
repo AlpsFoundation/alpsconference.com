@@ -36,16 +36,16 @@ export const CARDS = [
     subtitle: "PhD candidates, clinicians and researchers present their work on psychedelic science.",
   },
   {
-    slug: "poster",
-    path: "/poster",
-    title: "Call for Research Posters",
-    subtitle: "Psychedelic science research, presented as posters at the conference.",
+    slug: "research-poster-guidelines",
+    path: "/research-posters/guidelines",
+    title: "Research Poster Guidelines",
+    subtitle: "Content, format, setting up and presenting your research poster at the conference.",
   },
   {
-    slug: "posters",
-    path: "/posters",
+    slug: "research-posters",
+    path: "/research-posters",
     title: "Research Posters",
-    subtitle: "Psychedelic science research presented at the conference, with the full posters to read.",
+    subtitle: "Psychedelic science research presented at the conference, with every research poster to read.",
   },
   {
     slug: "booklet",

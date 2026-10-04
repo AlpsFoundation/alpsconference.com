@@ -67,6 +67,8 @@ export default defineConfig({
     "/plan": "/map",
     // Renamed to /slides.
     "/break": "/slides",
+    // The call for research posters closed; its guidelines moved here.
+    "/poster": "/research-posters/guidelines",
   },
   integrations: [
     react(),

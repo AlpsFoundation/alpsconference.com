@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
-import { Download, FileText } from "lucide-react";
+import { BookOpen, Download, FileText } from "lucide-react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
 import { withBase } from "../lib/withBase";
-import { POSTERS, type ResearchPoster } from "../data/posters";
+import { POSTERS, type ResearchPoster } from "../data/researchPosters";
 
 function useScrollFade(ref: React.RefObject<HTMLElement | null>) {
   const hasAnimated = useRef(false);
@@ -47,8 +47,8 @@ function PosterPreview({ poster }: { poster: ResearchPoster }) {
   if (poster.hasPdf) {
     return (
       <img
-        src={withBase(`posters/${poster.slug}/poster.jpg`)}
-        alt={`First page of the poster “${poster.title}”`}
+        src={withBase(`research-posters/${poster.slug}/poster.jpg`)}
+        alt={`First page of the research poster “${poster.title}”`}
         loading="lazy"
         className="h-full w-full object-cover object-top"
       />
@@ -72,7 +72,7 @@ function PosterPreview({ poster }: { poster: ResearchPoster }) {
 }
 
 function PosterCard({ poster }: { poster: ResearchPoster }) {
-  const pdfHref = withBase(`posters/${poster.slug}/poster.pdf`);
+  const pdfHref = withBase(`research-posters/${poster.slug}/poster.pdf`);
 
   return (
     <article
@@ -100,7 +100,7 @@ function PosterCard({ poster }: { poster: ResearchPoster }) {
         <div className="mb-5 flex items-center gap-4">
           {poster.hasPhoto ? (
             <img
-              src={withBase(`posters/${poster.slug}/photo.jpg`)}
+              src={withBase(`research-posters/${poster.slug}/photo.jpg`)}
               alt={poster.name}
               loading="lazy"
               className="h-16 w-16 shrink-0 rounded-full border border-white/10 object-cover"
@@ -130,12 +130,12 @@ function PosterCard({ poster }: { poster: ResearchPoster }) {
               className="inline-flex items-center gap-2 rounded-sm bg-support px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-support-light"
             >
               <Download className="h-4 w-4" />
-              View poster (PDF)
+              View research poster (PDF)
             </a>
           ) : (
             <span className="inline-flex items-center gap-2 rounded-sm border border-white/10 px-5 py-3 text-sm font-semibold text-white/40">
               <FileText className="h-4 w-4" />
-              PDF coming soon
+              Research poster coming soon
             </span>
           )}
         </div>
@@ -144,7 +144,7 @@ function PosterCard({ poster }: { poster: ResearchPoster }) {
   );
 }
 
-export default function PostersPage() {
+export default function ResearchPostersPage() {
   const heroRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLElement>(null);
 
@@ -166,8 +166,16 @@ export default function PostersPage() {
             </h1>
             <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
               Meet the researchers presenting their work in psychedelic science at the conference, 9–10 October
-              2026 in Aarau. Find them by their posters during the breaks, or read the full posters here.
+              2026 in Aarau. Find them by their research posters during the breaks, or read them in full here.
             </p>
+            <a
+              data-fade-up
+              href={withBase("/research-posters/guidelines")}
+              className="opacity-0 mt-10 inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-white/5 hover:bg-white/[0.08] border border-white/10 hover:border-white/25 rounded-sm transition-colors duration-200"
+            >
+              <BookOpen className="h-4 w-4" />
+              Guidelines for presenters
+            </a>
           </div>
         </section>
 

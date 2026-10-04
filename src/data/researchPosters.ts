@@ -1,7 +1,7 @@
 /**
  * Research posters presented at ALPS 2026, published with the presenters' consent.
  *
- * Files live in public/posters/<slug>/:
+ * Files live in public/research-posters/<slug>/:
  *   poster.pdf   the print-ready PDF
  *   poster.jpg   first-page preview (pdftoppm -jpeg -r 40 -singlefile poster.pdf poster)
  *   photo.jpg    presenter portrait (square crop works best)

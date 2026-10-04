@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
-import { Calendar, FileText, CheckCircle, Printer, ImageIcon } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, CheckCircle, Printer, ImageIcon } from "lucide-react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
+import { withBase } from "../lib/withBase";
 
 function Section({
   icon: Icon,
@@ -65,16 +66,12 @@ function useScrollFade(ref: React.RefObject<HTMLElement | null>) {
   }, []);
 }
 
-export default function PosterPage() {
+export default function PosterGuidelinesPage() {
   const heroRef = useRef<HTMLElement>(null);
-  const timelineRef = useRef<HTMLElement>(null);
   const guidelinesRef = useRef<HTMLElement>(null);
-  const formRef = useRef<HTMLElement>(null);
 
   useScrollFade(heroRef);
-  useScrollFade(timelineRef);
   useScrollFade(guidelinesRef);
-  useScrollFade(formRef);
 
   return (
     <>
@@ -82,57 +79,36 @@ export default function PosterPage() {
 
       <main>
         {/* ── Hero ── */}
-        <section ref={heroRef} className="relative pt-40 pb-24 sm:pt-48 sm:pb-32 overflow-hidden">
+        <section ref={heroRef} className="relative pt-40 pb-16 sm:pt-48 sm:pb-20 overflow-hidden">
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
             <p data-fade-up className="opacity-0 text-base tracking-[0.2em] uppercase text-support-light font-medium mb-4">
               ALPS Conference 2026
             </p>
             <h1 data-fade-up className="opacity-0 text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
-              Call for Research Posters
+              Research Poster Guidelines
             </h1>
-            <p data-fade-up className="opacity-0 inline-block text-sm font-medium text-support-light bg-support/10 border border-support/20 rounded-full px-4 py-2 mb-6">
-              Applications exceptionally open for one more week — now closing midnight, 18 September 2026
-            </p>
             <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed mb-10">
-              Present your psychedelic science research at the sixth edition of the ALPS
-              Conference, 9–10 October 2026, Aarau, Switzerland.
+              Everything research poster presenters need to know: content, format, setting up and
+              presenting your research poster at the conference, 9–10 October 2026, Aarau, Switzerland.
             </p>
             <a
               data-fade-up
-              href="https://forms.gle/kFE4LkUcwsVeejDSA"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="opacity-0 inline-block px-8 py-4 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
+              href={withBase("/research-posters")}
+              className="opacity-0 inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white bg-white/5 hover:bg-white/[0.08] border border-white/10 hover:border-white/25 rounded-sm transition-colors duration-200"
             >
-              Submit Your Poster
+              <ArrowLeft className="h-4 w-4" />
+              All research posters
             </a>
           </div>
         </section>
 
-        {/* ── Key dates ── */}
-        <section ref={timelineRef} className="relative py-24 sm:py-32 bg-white/[0.02]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-            <p data-fade-up className="opacity-0 text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
-              Key dates
-            </p>
-            <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Research poster applications are exceptionally open until 18 September 2026, with final decisions communicated on 19 September 2026.
-            </p>
-          </div>
-        </section>
-
         {/* ── Guidelines ── */}
-        <section ref={guidelinesRef} className="relative py-24 sm:py-32">
+        <section ref={guidelinesRef} className="relative pb-24 sm:pb-32">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div data-fade-up className="opacity-0 mb-14">
-              <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">Requirements</p>
-              <h2 className="text-3xl font-semibold text-white">Submission Guidelines</h2>
-            </div>
-
-            <div className="space-y-6">
+                        <div className="space-y-6">
 
               {/* Poster content */}
-              <Section icon={FileText} title="Poster Content">
+              <Section icon={FileText} title="Research Poster Content">
                 <BulletList items={[
                   "Posters must be relevant to the field of psychedelic science.",
                   "The paper title, all authors, and affiliations must be displayed at the top of the poster.",
@@ -143,7 +119,7 @@ export default function PosterPage() {
               </Section>
 
               {/* Format */}
-              <Section icon={Printer} title="Poster Format">
+              <Section icon={Printer} title="Research Poster Format">
                 <BulletList items={[
                   "Size: A0 portrait format, 84.1 cm × 118.9 cm (33.1 × 46.8 in).",
                   "Orientation: Portrait only. There will be no possibility for horizontal display.",
@@ -152,7 +128,7 @@ export default function PosterPage() {
               </Section>
 
               {/* Setting up */}
-              <Section icon={Calendar} title="Setting Up Your Poster">
+              <Section icon={Calendar} title="Setting Up Your Research Poster">
                 <BulletList items={[
                   "In order to present your poster at the conference, you must hold a valid conference ticket.",
                   "All presenters are encouraged to put up their posters at the beginning of the conference on Friday, 9 October 2026 at 9:00 if possible.",
@@ -161,7 +137,7 @@ export default function PosterPage() {
               </Section>
 
               {/* Presenting */}
-              <Section icon={CheckCircle} title="Presenting Your Poster">
+              <Section icon={CheckCircle} title="Presenting Your Research Poster">
                 <BulletList items={[
                   "Each poster presenter is responsible for printing their poster and bringing it to the conference.",
                   "The poster must be printed in vertical (portrait) format. Horizontal display is not possible.",
@@ -172,17 +148,17 @@ export default function PosterPage() {
               </Section>
 
               {/* PDF / website */}
-              <Section icon={ImageIcon} title="PDF Submission for the Website">
+              <Section icon={ImageIcon} title="Your Research Poster on the Website">
                 <p className="text-white/65 text-base mb-4 leading-relaxed">
-                  If your application is selected, you will be contacted and asked for:
+                  To publish your research poster on the website, please send us:
                 </p>
                 <BulletList items={[
-                  "Your poster as a print-ready PDF.",
+                  "Your research poster as a print-ready PDF.",
                   "A short summary of your research.",
                   "A profile picture and short biography.",
                 ]} />
                 <p className="mt-5 text-white/50 text-sm leading-relaxed">
-                  These will be uploaded on the ALPS 2026 conference website with your consent. By submitting a poster and being selected, presenters agree to allow their work to be displayed and published in conference materials and online platforms.
+                  These will be uploaded on the ALPS 2026 conference website with your consent. By presenting a research poster, presenters agree to allow their work to be displayed and published in conference materials and online platforms.
                 </p>
               </Section>
 
@@ -197,47 +173,6 @@ export default function PosterPage() {
           </div>
         </section>
 
-        {/* ── Form ── */}
-        <section ref={formRef} className="relative py-24 sm:py-32 bg-white/[0.02]">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div data-fade-up className="opacity-0 text-center mb-12">
-              <p className="text-base tracking-[0.2em] uppercase text-support-light font-medium mb-3">
-                Ready to apply?
-              </p>
-              <h2 className="text-3xl font-semibold text-white mb-4">Submit Your Poster Application</h2>
-              <p className="text-support-light text-sm font-medium mb-3">
-                Exceptionally extended by one week — now open until midnight, 18 September 2026.
-              </p>
-              <p className="text-white/60 text-base max-w-xl mx-auto">
-                Applications are open until <strong className="text-white/80">midnight, 18 September 2026</strong>.
-                The application takes approximately 10–15 minutes to complete.
-              </p>
-            </div>
-
-            <div data-fade-up className="opacity-0">
-              <div className="bg-white/[0.03] border border-white/[0.08] rounded-sm p-10 sm:p-16 text-center">
-                <div className="max-w-md mx-auto">
-                  <div className="w-14 h-14 rounded-full bg-support/15 border border-support/20 flex items-center justify-center mx-auto mb-6">
-                    <FileText className="w-6 h-6 text-support-light" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-3">Poster Application Form</h3>
-                  <p className="text-white/60 text-base mb-8 leading-relaxed">
-                    Submit your abstract, author information, and research details via our online application form.
-                  </p>
-                  <a
-                    href="https://forms.gle/kFE4LkUcwsVeejDSA"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
-                  >
-                    Apply Now ↗
-                  </a>
-                  <p className="mt-5 text-white/40 text-sm">Opens in a new tab · Google Forms</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <div className="relative overflow-hidden">
