@@ -88,6 +88,17 @@ export const POSTERS: ResearchPoster[] = [
     credentials: "Founder · Self-employed",
     affiliation: "Apeiron & Nous Foundation",
     title: "Beyond the Known: Can Extreme States of Consciousness Reveal Recurring Informational Structures?",
+    summary: [
+      "Psychedelic science has substantially advanced our understanding of therapeutic applications and neural correlates, yet extreme psychedelic states remain comparatively unexplored. In particular, ultra-high-dose states characterized by profound ego dissolution, timelessness, experiences of the “void,” seemingly autonomous entities, and radically altered perceptions of self and reality raise fundamental questions about consciousness that have rarely been investigated systematically.",
+      "The Apeiron & Nous Foundation is developing a long-term interdisciplinary research program dedicated to the systematic investigation of these extreme states of consciousness. Moving beyond the therapeutic paradigm, the project explores high- and ultra-high-dose psilocybin states as a largely uncharted domain of consciousness research. Rather than testing a predefined theoretical or metaphysical interpretation, the research treats detailed first-person phenomenology as structured data and asks whether recurring experiential patterns can be identified across individuals and sessions.",
+      "The research framework combines structured phenomenological mapping with multimodal measurements, including physiological metrics and EEG where appropriate. Artificial intelligence methods—including large language models, machine learning, and pattern recognition—are used to analyze complex phenomenological datasets, identify recurring motifs and latent structures, integrate experiential and physiological data, and generate testable hypotheses.",
+      "A central objective is to determine whether extreme states exhibit reproducible structures that can be systematically documented and compared. The project further asks whether AI-assisted exploration of these datasets can reveal relationships, phenomena, and scientific questions that may not be apparent through conventional analysis alone.",
+      "The research is inherently exploratory. Experiences are documented without assuming that their apparent content represents external, metaphysical, or non-human realities. Alternative explanations remain open, and recurring observations are treated as phenomena to be investigated rather than conclusions.",
+      "The long-term objective is to establish an open and standardized research framework for the reproducible study of extreme consciousness and interdisciplinary collaboration across psychedelic science, neuroscience, phenomenology, psychology, philosophy, and artificial intelligence.",
+      "By transforming extreme conscious experiences from predominantly anecdotal reports into structured, comparable data, the project aims to expand the empirical study of consciousness and generate new questions about the nature and structure of conscious experience.",
+    ],
+    hasPhoto: true,
+    hasPdf: true,
   },
   {
     slug: "amos-lau",
