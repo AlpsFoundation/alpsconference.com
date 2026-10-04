@@ -133,8 +133,15 @@ export const POSTERS: ResearchPoster[] = [
   {
     slug: "ortal-shinikamin",
     name: "Ortal Shinikamin",
-    credentials: "MD-PhD candidate · Psychiatry",
-    affiliation: "Tel Aviv University",
+    credentials: "MD-PhD candidate · Incoming psychiatry resident, Geha Mental Health Center, Israel",
+    affiliation: "Gray Faculty of Medical and Health Sciences, Tel Aviv University, Israel",
     title: "Holding the Insight Lightly: An Epistemic Framework for Psychedelic-Assisted Therapy, Built from Dialectical Behaviour Therapy",
+    summary: [
+      "Psychedelic experiences can produce insights that arrive with complete conviction - felt not as conclusions reached, but as truths already known. This noetic certainty can be understood as a metacognitive feeling of epistemic gain: a felt signal that understanding has occurred even when the cognitive work that would ordinarily warrant it has not, leaving the mind to draw on available memories, interpretations and contextual cues to explain a certainty already felt. This conceptual work argues that the therapeutic mechanism and the central epistemic hazard are one event: the same felt certainty that appears to carry therapeutic change can also confer epistemic authority on convictions before that authority has been earned. Therapeutic benefit and epistemic hazard therefore cannot simply be tuned apart.",
+      "We propose dialectical behaviour therapy (DBT) as an epistemic technology for psychedelic-assisted therapy: a framework for metabolising conviction without either surrendering to it or dismissing it. We map DBT skills onto the distinct epistemic demands of preparation, dosing and integration, drawing on skills such as behavioural chain analysis, mindfulness, distress tolerance and Check the Facts to ground intentions in evidence, sustain non-judgemental monitoring, tolerate uncertainty and test what emerges once deliberate evaluation returns. The resulting model, psychedelic-assisted DBT (PA-DBT), aims to preserve the transformative force of the experience while subjecting the convictions it produces to disciplined testing before they are acted on.",
+      "The same discipline extends beyond the patient. Psychedelic “eureka” moments in clinicians and researchers are vulnerable to the same confusion between felt knowing and knowledge, and we apply that principle to the founding conviction behind this paper itself. PA-DBT is offered not as a new orthodoxy but as a testable proposal, with comparator designs asking whether the drug is necessary and whether DBT specifically is.",
+    ],
+    hasPhoto: true,
+    hasPdf: true,
   },
 ];
