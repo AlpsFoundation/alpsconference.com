@@ -42,6 +42,12 @@ export const CARDS = [
     subtitle: "Psychedelic science research, presented as posters at the conference.",
   },
   {
+    slug: "posters",
+    path: "/posters",
+    title: "Research Posters",
+    subtitle: "Psychedelic science research presented at the conference, with the full posters to read.",
+  },
+  {
     slug: "booklet",
     path: "/booklet",
     title: "Conference Booklet",
