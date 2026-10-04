@@ -1,6 +1,9 @@
 /** Shared partner logos used by the conference site and the print booklet. */
 
 export const PARTNERS = {
+  "Sponsor": [
+    { src: "/img/partners/csm.png", alt: "Fondation Conscience et Santé Mentale", url: "https://fondationcsm.org/" }
+  ],
   "Academic Partners": [
     { src: "/img/partners/hug.png", alt: "Hôpitaux Universitaires de Genève (HUG)", url: "https://www.hug.ch/" },
     { src: "/img/partners/unige.png", alt: "Université de Genève (UNIGE)", url: "https://www.unige.ch/" },
