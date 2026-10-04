@@ -25,7 +25,7 @@ export const POSTERS: ResearchPoster[] = [
   {
     slug: "angelica-angaramo-chumachenko",
     name: "Angélica Angaramo Chumachenko",
-    credentials: "Master’s Degree in Law · Hypnotherapist, independent practitioner",
+    credentials: "Hypnotherapist, independent practitioner",
     affiliation: "Angelux Hypnose, France",
     title: "A Hypnosis-Informed Framework for Post-Psychedelic Integration: Stability, Autonomy and Referral Boundaries",
     summary: [
@@ -48,6 +48,13 @@ export const POSTERS: ResearchPoster[] = [
     credentials: "MSc · Student",
     affiliation: "University of Geneva, Oxford University",
     title: "Mystical Experience in Psychedelic-Assisted Psychotherapy: Clinical Findings and Methodological Reflections on the MEQ30",
+    summary: [
+      "Mystical experiences are altered states of consciousness characterized by a profound sense of unity, transcendence of time and space, ineffability, and deeply felt noetic or sacred qualities. Historically associated with spiritual and religious traditions, these experiences have become a growing subject of scientific investigation within contemporary psychedelic research. In psychedelic-assisted psychotherapy (PAP), mystical-type experiences are frequently proposed as key mediators of therapeutic improvement and are commonly assessed using the Mystical Experience Questionnaire (MEQ30). However, the phenomenology, historical foundations, and methodological limitations of this construct remain insufficiently discussed.",
+      "This poster presents a retrospective sub-analysis conducted within the PAP program at the Hôpitaux Universitaires de Genève under the Swiss compassionate-use framework. Fifty-seven participants who received LSD or psilocybin completed the MEQ30 and the State-Trait Anxiety Inventory (STAI) before and after treatment. Results demonstrated a significant reduction in anxiety symptoms following treatment, independently of the psychedelic substance administered. However, no significant linear association was observed between mystical experience intensity and anxiety reduction outcomes. Approximately 48% of participants met MEQ30 criteria for a “complete mystical experience.”",
+      "Building upon these findings, the poster explores how mystical experiences are conceptualized and measured in psychedelic research. It briefly reviews the historical development of the construct, from William James and Walter Terence Stace to the MEQ43 and later MEQ30. Particular attention is given to the psychometric reduction of highly subjective and often ineffable experiences into standardized quantitative scales. Finally, the poster discusses limitations of current approaches and proposes complementary perspectives, including phenomenological interviews, qualitative narratives, mixed-methods designs, and neurophenomenological frameworks, to better capture the complexity of altered states of consciousness.",
+    ],
+    hasPhoto: true,
+    hasPdf: true,
   },
   {
     slug: "mauro-cavarra",
