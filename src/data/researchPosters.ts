@@ -143,6 +143,14 @@ export const POSTERS: ResearchPoster[] = [
     credentials: "MA, PhD candidate · PhD researcher, part-time psychotherapist",
     affiliation: "University of Bristol",
     title: "The Missing Population: Post-Traumatic Growth in Domestic Violence and Sexual Abuse Survivors Receiving Psychedelic/psychoactive-Assisted Therapy",
+    summary: [
+      "Background. Survivors of domestic violence (DV) and sexual abuse (SA) form one of the largest trauma populations worldwide, yet are largely absent from psychedelic/psychoactive-assisted therapy trials; where present, they are typically subsumed within heterogeneous PTSD samples. DV and SA produce a distinctive, interpersonal trauma organised around betrayal, shame and disrupted identity — features that symptom-reduction frameworks capture poorly. Post-traumatic growth (PTG), the positive psychological change that can emerge through the struggle with trauma, is rarely measured or treated as a legitimate therapeutic target in this field.",
+      "Aim. To examine PTG in DV and SA survivors receiving psychedelic/psychoactive-assisted therapy, foregrounding survivors' lived experience.",
+      "Methods. A qualitative-led, multiple-case embedded convergent mixed-methods design, nested within a programme of parent clinical trials (not named here, for confidentiality). In-depth semi-structured interviews with confirmed active-drug participants form the primary data; each account is triangulated 1:1 against that participant's own Post-Traumatic Growth Inventory (PTGI) subscale scores, examining convergence, complementarity and divergence. A systematic scoping review (currently underway) maps existing evidence on participant experience and growth in this context.",
+      "Status and contribution. Data collection is commencing in October and the scoping review is in progress. This will be the first mixed-methods examination of PTG specifically in DV and SA survivors receiving psychedelic or psychoactive-assisted therapy, and it models an approach in which lived experience is treated as primary evidence, read against validated measures.",
+    ],
+    hasPhoto: true,
+    hasPdf: true,
   },
   {
     slug: "ortal-shinikamin",
