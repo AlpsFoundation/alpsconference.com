@@ -134,7 +134,7 @@ function PosterCard({ poster }: { poster: ResearchPoster }) {
           )}
           <div>
             <p className="font-semibold text-white">{poster.name}</p>
-            <p className="text-sm text-support-light">{poster.credentials}</p>
+            {poster.credentials && <p className="text-sm text-support-light">{poster.credentials}</p>}
             <p className="text-sm text-white/55">{poster.affiliation}</p>
           </div>
         </div>

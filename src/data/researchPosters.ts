@@ -11,7 +11,7 @@ export type ResearchPoster = {
   slug: string;
   name: string;
   /** Highest degree and profession, e.g. "MSc · PhD student". */
-  credentials: string;
+  credentials?: string;
   affiliation: string;
   title: string;
   /** One string per paragraph, in the presenter's own words. */
@@ -57,6 +57,19 @@ export const POSTERS: ResearchPoster[] = [
       "Mystical experiences are altered states of consciousness characterized by a profound sense of unity, transcendence of time and space, ineffability, and deeply felt noetic or sacred qualities. Historically associated with spiritual and religious traditions, these experiences have become a growing subject of scientific investigation within contemporary psychedelic research. In psychedelic-assisted psychotherapy (PAP), mystical-type experiences are frequently proposed as key mediators of therapeutic improvement and are commonly assessed using the Mystical Experience Questionnaire (MEQ30). However, the phenomenology, historical foundations, and methodological limitations of this construct remain insufficiently discussed.",
       "This poster presents a retrospective sub-analysis conducted within the PAP program at the Hôpitaux Universitaires de Genève under the Swiss compassionate-use framework. Fifty-seven participants who received LSD or psilocybin completed the MEQ30 and the State-Trait Anxiety Inventory (STAI) before and after treatment. Results demonstrated a significant reduction in anxiety symptoms following treatment, independently of the psychedelic substance administered. However, no significant linear association was observed between mystical experience intensity and anxiety reduction outcomes. Approximately 48% of participants met MEQ30 criteria for a “complete mystical experience.”",
       "Building upon these findings, the poster explores how mystical experiences are conceptualized and measured in psychedelic research. It briefly reviews the historical development of the construct, from William James and Walter Terence Stace to the MEQ43 and later MEQ30. Particular attention is given to the psychometric reduction of highly subjective and often ineffable experiences into standardized quantitative scales. Finally, the poster discusses limitations of current approaches and proposes complementary perspectives, including phenomenological interviews, qualitative narratives, mixed-methods designs, and neurophenomenological frameworks, to better capture the complexity of altered states of consciousness.",
+    ],
+    hasPhoto: true,
+    hasPdf: true,
+  },
+  {
+    slug: "miguel-benjamin-cervera-sanchez",
+    name: "Miguel Benjamin Cervera-Sanchez",
+    affiliation: "National Institute of Neurology and Neurosurgery “Manuel Velasco Suárez”, Mexico City",
+    title: "Psilocybin as serotonergic therapy in epilepsy: Narrative review of potentials and limitations",
+    summary: [
+      "Our clinical research group at the National Institute of Neurology and Neurosurgery ‘Manuel Velasco Suárez’ focuses on improving the quality of life for patients with epilepsy by exploring novel therapeutic approaches for Drug-Resistant Epilepsy. The main focus of our current work is the exploration of psilocybin, a substance historically ignored in epileptology and widely presumed to be proconvulsive.",
+      "At this conference, we present our narrative review examining the literature on psilocybin and its relationship with epilepsy across both clinical and preclinical models. We specifically delve into its serotonergic mechanisms, highlighting how predominant 5-HT2A modulation has the potential to reduce cortical hyperexcitability and disrupt pathological neural synchrony under controlled conditions. Furthermore, we address the ‘psilocybin paradox’, an apparent inverted U-shaped dose-response relationship where low doses may offer antiseizure effects, while high exposure could exacerbate seizures.",
+      "Ultimately, these findings suggest that while psilocybin offers a potential novel therapeutic paradigm, its proconvulsant risks warrant extreme caution. Our work reinforces the need for carefully controlled Phase I/IIa clinical trials to determine if these theoretical mechanisms can safely translate into clinical practice.",
     ],
     hasPhoto: true,
     hasPdf: true,
