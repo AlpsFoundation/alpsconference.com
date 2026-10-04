@@ -37,10 +37,15 @@ export const POSTERS: ResearchPoster[] = [
   },
   {
     slug: "anna-boeker",
-    name: "Anna Boeker",
-    credentials: "MSc · PhD student",
-    affiliation: "University of Basel",
+    name: "Anna L. Boeker",
+    credentials: "MSc · PhD student in clinical research",
+    affiliation: "University of Basel and University Psychiatric Clinic Basel (UPK)",
     title: "Efficacy and Safety of Psilocybin-Assisted Therapy for Alcohol Use Disorder",
+    summary: [
+      "Our clinical research group for substance-assisted therapy at the UPK Basel includes professionals from the fields of psychiatry, psychology, and clinical research. The main focus of our work is research on the effects of LSD, which we have been studying since 2014 in several studies. We examine efficacy, safety and possible positive long-term effects of LSD in mental health conditions such as anxiety and depression. In the LYTA trial, together with the University of Bern, we will investigate LSD assisted therapy for alcohol use disorder in a multicenter, double-blind, randomized, active-placebo controlled phase II neuroimaging trial with a consecutive open-label phase.",
+    ],
+    hasPhoto: true,
+    hasPdf: true,
   },
   {
     slug: "anna-breitenmoser",
