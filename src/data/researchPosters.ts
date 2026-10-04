@@ -120,6 +120,14 @@ export const POSTERS: ResearchPoster[] = [
     credentials: "MD · Medical doctor",
     affiliation: "Monash University",
     title: "Seeing with ‘Fresh Eyes’: Development and Validation of the Fresh Experiences Scale",
+    summary: [
+      "Background: Psychedelic-assisted therapy (PAT) shows promise for a range of psychopathologies, with acute subjective effects predicting long-term therapeutic outcomes. One commonly reported but under-measured phenomenon is the experience of perceiving familiar thoughts, emotions, and experiences from a novel “child-like” perspective during acute psychedelic states.",
+      "Aim: This study introduces the Fresh Experiences Scale (FES), a self-report measure designed to assess this phenomenon, and evaluates its preliminary psychometric properties.",
+      "Methods: Following item generation and an expert group review (n=5), a retrospective online survey collected responses from 410 participants reflecting on a past psychedelic experience. Exploratory factor analysis (EFA; n = 260) was used to refine the initial 51-item pool, followed by confirmatory factor analysis (CFA; n = 150) to evaluate model fit. Test–retest reliability was assessed in a follow-up sample (n = 120).",
+      "Results: Factor analyses refined the FES to a 15-item two-factor scale comprising Fresh Framing, reflecting cognitive reframing and perspectival shifts, and Fresh Feeling, reflecting heightened emotional salience and experiential richness during psychedelic experiences. The FES demonstrated strong internal consistency (α = .93) and good test–retest reliability (ICC = .81). Convergent and discriminant validity were supported via correlations with related constructs. Higher FES scores predicted improvements in positive mood, self-esteem, prosocial behaviour and health-related behaviour change, as well as reductions in negative mood and problematic behaviours (p < .001). The factor structure was stable across age, gender, and psychiatric history.",
+      "Conclusion: These preliminary results suggest the FES is a reliable, construct-valid instrument that operationalises the acute, metacognitive feeling of insight and psychological reframing. The FES provides a context-independent psychometric tool to explore how these acute perspectival shifts translate into lasting therapeutic changes.",
+    ],
+    hasPhoto: true,
   },
   {
     slug: "tulio-pereira-alvarenga-castro",
