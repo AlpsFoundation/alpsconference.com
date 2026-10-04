@@ -10,7 +10,7 @@
 export type ResearchPoster = {
   slug: string;
   name: string;
-  /** Degrees and role, e.g. "MSc, PhD candidate". */
+  /** Highest degree and profession, e.g. "MSc · PhD student". */
   credentials: string;
   affiliation: string;
   title: string;
@@ -19,42 +19,83 @@ export type ResearchPoster = {
   hasPdf?: boolean;
 };
 
-// MOCKUP: placeholder entries to show the page structure. Replace with the real presenters.
+// Sorted by surname. Set hasPhoto / hasPdf once the files are in public/research-posters/<slug>/.
 export const POSTERS: ResearchPoster[] = [
   {
-    slug: "placeholder-1",
-    name: "Presenter Name",
-    credentials: "MSc, PhD candidate",
-    affiliation: "University of Geneva",
-    title: "Psilocybin-assisted therapy for treatment-resistant depression: a pilot study",
-    summary:
-      "A short summary of the research, two or three sentences long, giving visitors the question, the method and the main finding before they open the full poster.",
+    slug: "angelica-angaramo-chumachenko",
+    name: "Angelica Angaramo Chumachenko",
+    credentials: "Master’s Degree in Law · Hypnotherapist, independent practitioner",
+    affiliation: "Angelux Hypnose, France",
+    title: "A Hypnosis-Informed Framework for Post-Psychedelic Integration: Stability, Autonomy and Referral Boundaries",
   },
   {
-    slug: "placeholder-2",
-    name: "Presenter Name",
-    credentials: "MD",
-    affiliation: "University Hospital Zurich",
-    title: "Set and setting in clinical trials: a systematic review",
-    summary:
-      "A short summary of the research, two or three sentences long, giving visitors the question, the method and the main finding before they open the full poster.",
-  },
-  {
-    slug: "placeholder-3",
-    name: "Presenter Name",
-    credentials: "BSc, Master's student",
+    slug: "anna-boeker",
+    name: "Anna Boeker",
+    credentials: "MSc · PhD student",
     affiliation: "University of Basel",
-    title: "Changes in default mode network connectivity after a single dose of LSD",
-    summary:
-      "A short summary of the research, two or three sentences long, giving visitors the question, the method and the main finding before they open the full poster.",
+    title: "Efficacy and Safety of Psilocybin-Assisted Therapy for Alcohol Use Disorder",
   },
   {
-    slug: "placeholder-4",
-    name: "Presenter Name",
-    credentials: "PhD, Postdoctoral researcher",
-    affiliation: "EPFL",
-    title: "Integration practices after psychedelic experiences: a qualitative study",
-    summary:
-      "A short summary of the research, two or three sentences long, giving visitors the question, the method and the main finding before they open the full poster.",
+    slug: "anna-breitenmoser",
+    name: "Anna Breitenmoser",
+    credentials: "MSc · Student",
+    affiliation: "University of Geneva, Oxford University",
+    title: "Mystical Experience in Psychedelic-Assisted Psychotherapy: Clinical Findings and Methodological Reflections on the MEQ30",
+  },
+  {
+    slug: "mauro-cavarra",
+    name: "Mauro Cavarra",
+    credentials: "PhD · Researcher, psychotherapist",
+    affiliation: "Maastricht University",
+    title: "Breathe Hard to Breathe Easy: preliminary results of the breathwork-assisted therapy for social anxiety",
+  },
+  {
+    slug: "beatrice-dal-bianco",
+    name: "Beatrice Dal Bianco",
+    credentials: "MSc · Doctor, resident in psychiatry",
+    affiliation: "Società Italiana di Medicina Psichedelica (SIMEPSI)",
+    title: "Motivation, stigma and post-acute psychological outcomes after psychedelic use: insights from the Italian Global Psychedelic Survey 2025",
+  },
+  {
+    slug: "sonya-faber",
+    name: "Sonya Faber",
+    credentials: "PhD · Adjunct Professor",
+    affiliation: "Psychedelia Stiftung",
+    title: "Sustained Abstinence in Severe Ketamine Use Disorder Following Ibogaine Treatment",
+  },
+  {
+    slug: "sven-kaufmann",
+    name: "Sven Kaufmann",
+    credentials: "Founder · Self-employed",
+    affiliation: "Apeiron & Nous Foundation",
+    title: "Beyond the Known: Can Extreme States of Consciousness Reveal Recurring Informational Structures?",
+  },
+  {
+    slug: "amos-lau",
+    name: "Amos Lau",
+    credentials: "MD · Medical doctor",
+    affiliation: "Monash University",
+    title: "Seeing with ‘Fresh Eyes’: Development and Validation of the Fresh Experiences Scale",
+  },
+  {
+    slug: "tulio-pereira-alvarenga-e-castro",
+    name: "Túlio Pereira Alvarenga e Castro",
+    credentials: "MD · Physician",
+    affiliation: "Department of Addiction, CHU Nîmes; Faculty of Medicine, Federal University of Vale do Jequitinhonha e Mucuri (UFVJM)",
+    title: "Psychedelics as a Dual Therapy: Exploring Their Potential in Treating Addictive Disorders and Inflammation",
+  },
+  {
+    slug: "giovanna-saad-gimenes",
+    name: "Giovanna Saad Gimenes",
+    credentials: "MA, PhD candidate · PhD researcher, part-time psychotherapist",
+    affiliation: "University of Bristol",
+    title: "The Missing Population: Post-Traumatic Growth in Domestic Violence and Sexual Abuse Survivors Receiving Psychedelic/psychoactive-Assisted Therapy",
+  },
+  {
+    slug: "ortal-shinikamin",
+    name: "Ortal Shinikamin",
+    credentials: "MD-PhD candidate · Psychiatry",
+    affiliation: "Tel Aviv University",
+    title: "Holding the Insight Lightly: An Epistemic Framework for Psychedelic-Assisted Therapy, Built from Dialectical Behaviour Therapy",
   },
 ];
