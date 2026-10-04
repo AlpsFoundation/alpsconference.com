@@ -3,7 +3,7 @@
  *
  * Files live in public/research-posters/<slug>/:
  *   poster.pdf   the print-ready PDF
- *   poster.jpg   first-page preview (pdftoppm -jpeg -r 40 -singlefile poster.pdf poster)
+ *   poster.jpg   first-page preview (pdftoppm -jpeg -scale-to-x 600 -scale-to-y -1 -singlefile poster.pdf poster)
  *   photo.jpg    presenter portrait (square crop works best)
  */
 
@@ -14,7 +14,8 @@ export type ResearchPoster = {
   credentials: string;
   affiliation: string;
   title: string;
-  summary?: string;
+  /** One string per paragraph, in the presenter's own words. */
+  summary?: string[];
   hasPhoto?: boolean;
   hasPdf?: boolean;
 };
@@ -23,10 +24,16 @@ export type ResearchPoster = {
 export const POSTERS: ResearchPoster[] = [
   {
     slug: "angelica-angaramo-chumachenko",
-    name: "Angelica Angaramo Chumachenko",
+    name: "Angélica Angaramo Chumachenko",
     credentials: "Master’s Degree in Law · Hypnotherapist, independent practitioner",
     affiliation: "Angelux Hypnose, France",
     title: "A Hypnosis-Informed Framework for Post-Psychedelic Integration: Stability, Autonomy and Referral Boundaries",
+    summary: [
+      "Drawing on two anonymised situations from my independent practice, this poster explores hypnosis-informed integration and prevention. The first focuses on building a new internal foundation through work in a hypnotic state to integrate the experience into everyday life. The second raises concerns about easy access, fashionable labels and perceived lower costs overshadowing preparation, qualified support and follow-up. I encountered this person when significant instability was already present and recommended urgent psychiatric assessment.",
+      "The central message is to make the framework of care as visible as the substances themselves, supporting informed choices beyond promises of easy transformation. This practice-based perspective does not establish clinical efficacy. I do not administer psychedelic substances.",
+    ],
+    hasPhoto: true,
+    hasPdf: true,
   },
   {
     slug: "anna-boeker",

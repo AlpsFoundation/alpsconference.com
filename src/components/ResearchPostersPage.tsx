@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
 import { BookOpen, Download, FileText } from "lucide-react";
 import Navbar from "./Navbar";
@@ -71,6 +71,28 @@ function PosterPreview({ poster }: { poster: ResearchPoster }) {
   );
 }
 
+function Summary({ paragraphs }: { paragraphs: string[] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="mb-6">
+      <div className={`space-y-3 text-base leading-relaxed text-white/65 ${open ? "" : "line-clamp-4"}`}>
+        {(open ? paragraphs : paragraphs.slice(0, 1)).map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        className="mt-2 text-sm font-semibold text-support-light transition-colors hover:text-white"
+      >
+        {open ? "Show less" : "Read more"}
+      </button>
+    </div>
+  );
+}
+
 function PosterCard({ poster }: { poster: ResearchPoster }) {
   const pdfHref = withBase(`research-posters/${poster.slug}/poster.pdf`);
 
@@ -117,9 +139,7 @@ function PosterCard({ poster }: { poster: ResearchPoster }) {
           </div>
         </div>
 
-        {poster.summary && (
-          <p className="mb-6 text-base leading-relaxed text-white/65">{poster.summary}</p>
-        )}
+        {poster.summary && <Summary paragraphs={poster.summary} />}
 
         <div className="mt-auto">
           {poster.hasPdf ? (
