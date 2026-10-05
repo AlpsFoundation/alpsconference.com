@@ -13,7 +13,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
 import { withBase } from "../lib/withBase";
-import { WORKSHOP_TRACKS, type WorkshopSpeaker as Speaker, type WorkshopTrack } from "../data/workshops";
+import { WORKSHOP_BUNDLE, WORKSHOP_TRACKS, type WorkshopSpeaker as Speaker, type WorkshopTrack } from "../data/workshops";
 
 const LOGISTICS = [
   {
@@ -290,6 +290,27 @@ export default function WorkshopPage() {
               >
                 Buy Workshop Tickets
               </a>
+            </div>
+            <div id="bundle" data-fade-up className="opacity-0 mt-10 rounded-sm border border-white/[0.07] bg-white/[0.03] px-5 py-6 text-center">
+              <p className="text-white font-semibold">
+                Workshop + Conference Bundle · {WORKSHOP_BUNDLE.price} instead of {WORKSHOP_BUNDLE.separately}
+              </p>
+              <p className="text-sm text-white/55 mt-1">
+                A seat in your workshop track plus the two-day conference ticket. Limited number.
+              </p>
+              <div className="flex flex-wrap justify-center gap-3 mt-5">
+                {WORKSHOP_BUNDLE.tracks.map((track) => (
+                  <a
+                    key={track.language}
+                    href={track.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center rounded-md bg-white/10 hover:bg-white/20 border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition-colors"
+                  >
+                    Bundle · {track.language} track
+                  </a>
+                ))}
+              </div>
             </div>
             <p data-fade-up className="opacity-0 text-sm text-white/55 mt-8 mb-3">
               When purchasing, please indicate your preferred workshop track in the order notes so we can plan accordingly.

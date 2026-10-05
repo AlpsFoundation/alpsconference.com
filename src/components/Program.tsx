@@ -446,6 +446,10 @@ function WorkshopDayNotice() {
             Buy a workshop ticket
             <ArrowUpRight size={14} aria-hidden="true" />
           </a>
+          <a href={withBase("/workshops#bundle")}>
+            Workshop + conference bundle
+            <ArrowUpRight size={14} aria-hidden="true" />
+          </a>
         </span>
       </div>
     </div>

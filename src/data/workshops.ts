@@ -31,6 +31,21 @@ export const WORKSHOP_DAY = {
   ticketUrl: "https://infomaniak.events/fr-ch/shop/alps-conference-2026-RQNBE4WPQY/event/1629286/",
 } as const;
 
+/**
+ * Workshop + Conference bundle: a Workshop Day seat plus the two-day conference ticket.
+ * Infomaniak sells it as one pass per track, because a pass hands the buyer every ticket linked to it.
+ * Limited number; each pass draws on its track's real seats.
+ */
+export const WORKSHOP_BUNDLE = {
+  price: "CHF 699",
+  separately: "CHF 799",
+  tracks: [
+    { language: "English", url: "https://infomaniak.events/en-ch/shop/alps-conference-2026-RQNBE4WPQY/abo/5905174" },
+    { language: "German", url: "https://infomaniak.events/en-ch/shop/alps-conference-2026-RQNBE4WPQY/abo/5905160" },
+    { language: "French", url: "https://infomaniak.events/en-ch/shop/alps-conference-2026-RQNBE4WPQY/abo/5905176" },
+  ],
+} as const;
+
 export const WORKSHOP_TRACKS: WorkshopTrack[] = [
   {
     language: "English",
