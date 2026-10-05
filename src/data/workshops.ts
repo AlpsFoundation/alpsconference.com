@@ -120,7 +120,7 @@ export const WORKSHOP_TRACKS: WorkshopTrack[] = [
     speakers: [
       {
         name: "Catherine Duffour",
-        bio: "Originaire de Corée du Sud et ayant grandi en Suisse, Catherine Duffour est psychiatre, thérapeute systémique et hypnothérapeute. Fondatrice de CXIO et cofondatrice de la Société suisse de médecine psychédélique, elle forme des psychiatres à la PAP depuis 2021 et a publié « Ketamine Consciousness Therapy » en 2025.",
+        bio: "Originaire de Corée du Sud et ayant grandi en Suisse, Catherine Duffour est psychiatre, thérapeute systémique et hypnothérapeute. Fondatrice de CXIO et cofondatrice de la Société suisse de médecine psychédélique, elle forme des psychiatres à la PAP depuis 2021 et a publié « Kétamine, Conscience, Thérapie » en 2025.",
       },
       {
         name: "Hervé Duffour",
