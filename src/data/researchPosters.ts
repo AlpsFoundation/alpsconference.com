@@ -59,7 +59,7 @@ export const POSTERS: ResearchPoster[] = [
     slug: "ortal-shinikamin",
     name: "Ortal Shinikamin",
     credentials: "MD-PhD candidate · Incoming psychiatry resident",
-    affiliation: "Gray Faculty of Medical and Health Sciences, Tel Aviv University, Israel",
+    affiliation: "Gili Adar Institute for Learning and Intervention in Adolescence Mental Health Crisis and Suicide (G.I.L.I.), Geha Mental Health Center and Gray Faculty of Medical and Health Sciences, Tel Aviv University, Israel",
     title: "Holding the Insight Lightly: An Epistemic Framework for Psychedelic-Assisted Therapy, Built from Dialectical Behaviour Therapy",
     summary: [
       "Psychedelic experiences can produce insights that arrive with complete conviction - felt not as conclusions reached, but as truths already known. This noetic certainty can be understood as a metacognitive feeling of epistemic gain: a felt signal that understanding has occurred even when the cognitive work that would ordinarily warrant it has not, leaving the mind to draw on available memories, interpretations and contextual cues to explain a certainty already felt. This conceptual work argues that the therapeutic mechanism and the central epistemic hazard are one event: the same felt certainty that appears to carry therapeutic change can also confer epistemic authority on convictions before that authority has been earned. Therapeutic benefit and epistemic hazard therefore cannot simply be tuned apart.",
