@@ -200,6 +200,15 @@ export const CREW_EVENTS: CrewEvent[] = [
     people: ["Philipp", "Matthias", "Ece", "Andrea", "Olga", "Myriam", "Abel", "José", "Akram"],
   },
   {
+    id: "crushed-ice-thu",
+    title: "Bring 2 packs of crushed ice from Migros",
+    dateTime: "2026-10-08",
+    start: "18:00",
+    calendarMinutes: 30,
+    place: "Kultur & Kongresshaus Aarau",
+    people: ["Ece"],
+  },
+  {
     id: "power-circle-fri",
     title: "Morning Love & Compassion Circle",
     dateTime: "2026-10-09",
