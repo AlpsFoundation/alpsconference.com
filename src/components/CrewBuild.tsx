@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Check, ChevronUp, HandHeart, Maximize2, MapPin, Minimize2, Plus, Users, X } from "lucide-react";
+import { Check, ChevronUp, HandHeart, Maximize2, MapPin, Minimize2, Plus, UserPlus, Users, X } from "lucide-react";
 import { BUILD_PHASES, BUILD_ZONES, type BuildItem, type BuildPhase, type BuildSection } from "../data/crewBuild";
 import {
   assigneesOf,
@@ -11,6 +11,7 @@ import {
   zoneGroupKey,
   zoneOf,
 } from "../lib/crewBuild";
+import { CREW, volunteerFromSlug, volunteerSlug } from "../lib/volunteers";
 import { withBase } from "../lib/withBase";
 import type { CrewBuildApi } from "./useCrewBuild";
 import "../styles/crewBuild.css";
@@ -116,6 +117,15 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   const svgRef = useRef<SVGSVGElement>(null);
 
   const [show, setShow] = useState<Show>("all");
+  /** The task whose "Add someone" field is open, as `phase:id`, and what is typed in it. */
+  const [adding, setAdding] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+
+  /** Everyone who can be tagged: the crew plus names added on the page. */
+  const names = useMemo(
+    () => [...new Set([...CREW, ...(state?.added ?? [])])].sort((a, b) => a.localeCompare(b, "en")),
+    [state?.added]
+  );
 
   useEffect(() => {
     setMapSize(readMapSize());
@@ -251,6 +261,21 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
     build.assign(item.id, person, phase, true);
   };
 
+  const openAdding = (key: string) => {
+    setAdding(key);
+    setDraft("");
+  };
+
+  /** Tag anyone on a task: a known name in any spelling case, or a new one as typed. */
+  const tag = (item: BuildItem, phase: BuildPhase) => {
+    const typed = draft.replace(/\s+/g, " ").trim();
+    if (!typed) return;
+    const name = volunteerFromSlug(volunteerSlug(typed)) ?? names.find((n) => n.toLowerCase() === typed.toLowerCase()) ?? typed;
+    if (!assigneesOf(state, item.id, phase).includes(name)) build.assign(item.id, name, phase, true);
+    setAdding(null);
+    setDraft("");
+  };
+
   const renderTask = (item: BuildItem, phase: BuildPhase) => {
     const info = BUILD_PHASES[phase];
     const people = assigneesOf(state, item.id, phase);
@@ -258,6 +283,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
     const done = tickOf(state, item.id, phase);
     const open = need ? Math.max(0, need - people.length) : 0;
     const setupBy = phase === "teardown" ? assigneesOf(state, item.id, "setup") : [];
+    const addKey = `${phase}:${item.id}`;
     return (
       <article
         key={item.id}
@@ -316,11 +342,14 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
             {people.map((name) => (
               <span key={name} className="cb-person" data-me={name === person || undefined}>
                 {name}
-                {name === person && (
-                  <button type="button" aria-label="Remove me" onClick={() => build.assign(item.id, name, phase, false)}>
-                    <X size={14} aria-hidden="true" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  aria-label={name === person ? "Remove me" : `Remove ${name}`}
+                  title={name === person ? "Remove me" : `Remove ${name}`}
+                  onClick={() => build.assign(item.id, name, phase, false)}
+                >
+                  <X size={14} aria-hidden="true" />
+                </button>
               </span>
             ))}
             {open > 0 && (
@@ -334,7 +363,44 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                 {info.joinLabel}
               </button>
             )}
+            {adding !== addKey && (
+              <button type="button" className="cb-add" onClick={() => openAdding(addKey)}>
+                <UserPlus size={15} aria-hidden="true" />
+                {person ? "Add someone" : "Add a name"}
+              </button>
+            )}
           </div>
+          {adding === addKey && (
+            <form
+              className="cb-addform"
+              onSubmit={(event) => {
+                event.preventDefault();
+                tag(item, phase);
+              }}
+            >
+              <input
+                type="text"
+                list="cb-names"
+                autoFocus
+                autoComplete="off"
+                maxLength={40}
+                placeholder="First name: yours or someone else's"
+                aria-label={`Who helps with ${item.name}`}
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") setAdding(null);
+                }}
+              />
+              <button type="submit" className="cb-join" disabled={!draft.trim()}>
+                <Plus size={15} aria-hidden="true" />
+                Add
+              </button>
+              <button type="button" className="cb-addform__cancel" aria-label="Cancel" onClick={() => setAdding(null)}>
+                <X size={16} aria-hidden="true" />
+              </button>
+            </form>
+          )}
           {done && (
             <p className="cb-status">
               {taskDoneLabel(phase)}
@@ -395,6 +461,11 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
 
   return (
     <section ref={rootRef} className="cb" aria-label="Build crew" style={{ "--cb-top": `${stickTop}px` } as CSSProperties}>
+      <datalist id="cb-names">
+        {names.map((name) => (
+          <option key={name} value={name} />
+        ))}
+      </datalist>
       <div className="cb-layout">
         <div className="cb-mapcol">
           <div className="cb-map" data-size={mapSize}>
@@ -502,8 +573,8 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
             <p className="cb-invite">
               <HandHeart size={18} aria-hidden="true" />
               <span>
-                <strong>Help needed.</strong> These tasks still need people. Pick your name at the top, then sign up on
-                any task below. Every pair of hands counts.
+                <strong>Help needed.</strong> These tasks still need people. Sign yourself up on any task below, or add
+                someone who is helping. Every pair of hands counts.
               </span>
             </p>
           )}
