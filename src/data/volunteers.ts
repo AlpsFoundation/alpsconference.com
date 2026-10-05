@@ -132,7 +132,8 @@ export const SHIFT_DAYS: ShiftDay[] = [
     dateTime: "2026-10-10",
     slots: [
       { from: "08:00", to: "08:30", program: "Doors open", checkin: ["Abigail"], info: ["José", "Maria"], mic: [], helper: ["Dave", "Gerel"] },
-      { from: "08:30", to: "09:00", checkin: ["Abigail", "Andrea"], info: ["José", "Maria"], mic: [], helper: ["Dave", "Gerel"] },
+      // Andrea Bacconi leads yoga 08:10–08:50, so Parsa starts his check-in shift here instead.
+      { from: "08:30", to: "09:00", checkin: ["Abigail", "Parsa"], info: ["José", "Maria"], mic: [], helper: ["Dave", "Gerel"] },
       { from: "09:00", to: "09:30", program: "Pablo Mallaroni", checkin: ["Parsa"], info: ["Maria"], mic: [], helper: ["Dave", "Gerel"] },
       { from: "09:30", to: "09:45", checkin: ["Parsa"], info: ["Maria"], mic: ["Andrea", "Lennert"], helper: ["Dave", "Gerel"] },
       { from: "09:45", to: "10:00", checkin: ["Parsa"], info: ["Maria"], mic: ["Andrea", "Lennert"], helper: ["Dave", "Valentin"] },

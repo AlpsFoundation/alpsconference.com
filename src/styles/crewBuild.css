@@ -493,6 +493,61 @@
   cursor: pointer;
 }
 
+.cb-join:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Tag anyone on a task: yourself or someone else. */
+.cb-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2rem;
+  padding: 0.3rem 0.85rem;
+  border: 1px dashed var(--vol-line);
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.84rem;
+  cursor: pointer;
+}
+
+.cb-add:hover {
+  border-style: solid;
+}
+
+.cb-addform {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.cb-addform input {
+  flex: 1 1 12rem;
+  min-width: 0;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--vol-line);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px; /* 16px keeps iOS from zooming into the field */
+}
+
+.cb-addform__cancel {
+  display: inline-flex;
+  padding: 0.3rem;
+  border: 0;
+  background: none;
+  color: var(--vol-muted);
+  cursor: pointer;
+}
+
 .cb-status {
   margin: 0.5rem 0 0;
   color: var(--vol-muted);
