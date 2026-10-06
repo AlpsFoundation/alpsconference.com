@@ -824,7 +824,10 @@ export default function VolunteersPage() {
                 ))}
               </optgroup>
             )}
-            <option value="__add">Not on the list? Add my name…</option>
+            {/* Added names live in the build database: paused while it is unreachable. */}
+            <option value="__add" disabled={build.status === "offline"}>
+              {build.status === "offline" ? "Adding a name is paused (no connection)" : "Not on the list? Add my name…"}
+            </option>
           </select>
         </div>
         {adding && (
@@ -844,12 +847,15 @@ export default function VolunteersPage() {
               maxLength={40}
               autoFocus
             />
-            <button type="submit">Save</button>
+            <button type="submit" disabled={build.status === "offline"}>
+              Save
+            </button>
             <button type="button" onClick={() => setAdding(false)}>
               Cancel
             </button>
           </form>
         )}
+        {adding && build.error && <p className="vol-addname__hint">{build.error}</p>}
         {needName && !person && <p className="vol-addname__hint">Pick your name first, then sign up.</p>}
       </section>
 

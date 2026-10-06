@@ -102,6 +102,10 @@ Configure these in `.dev.vars`:
 
 Staff manage bookings at [tools.alps.foundation/experiences](https://tools.alps.foundation/experiences/) (Google sign-in, `AlpsFoundation/tools.alps.foundation`, package `experiences`): per session, who is confirmed and waiting, add someone at the desk, remove a booking, and door check-in. That tool reaches the bookings through the `ExperienceBookings` RPC entrypoint in `src/worker.ts` (logic in `src/lib/experienceAdmin.ts`), which only a service binding can call — it has no public URL. Apply migration `0003_experience_signups_staff.sql` (`pnpm db:migrate:remote`) before that tool goes live; bookings from `/links` work with or without it.
 
+### Volunteer build crew
+
+`/volunteers` keeps build sign-ups, ticks and added names in the `conf26-setup` D1 database (binding `CREW_DB`), shared with the old tools-conf26-setup page; its migrations live in `AlpsFoundation/tools.alps.foundation`, package `conf26-setup`. For `pnpm dev`, run `pnpm db:crew:local` once to create its tables locally. When the database can't be reached, the API answers 503 and the page stays readable: it pauses signing up, ticking and adding names, and turns them back on once a poll gets through.
+
 Sign-ups open on **8 October 2026 at 00:00 in Aarau** (`SIGNUPS_OPEN` in `src/data/conferenceTimeline.ts`); until then the page shows the opening date and the API refuses bookings. `?time=yyyy-mm-dd-hh-mm` on `/links` moves the page's clock, and the API follows it, so `/links?time=2026-10-08-10-00` books for real before opening — cancel those test bookings from their email before 8 October.
 
 ### Runtime secrets in Cloudflare

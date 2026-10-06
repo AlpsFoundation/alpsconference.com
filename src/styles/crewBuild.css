@@ -352,6 +352,14 @@
   color: #082f4a;
 }
 
+/* Paused while the build database is unreachable. */
+.cb-tick:disabled,
+.cb-add:disabled,
+.cb-person button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .cb-task__top {
   display: flex;
   align-items: flex-start;
@@ -514,7 +522,7 @@
   cursor: pointer;
 }
 
-.cb-add:hover {
+.cb-add:hover:not(:disabled) {
   border-style: solid;
 }
 
@@ -780,6 +788,11 @@
   color: var(--color-neutral-dark);
 }
 
+.vol-addname button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .vol-addname__hint {
   margin: 0.5rem 0 0;
   color: var(--color-accent);
@@ -878,6 +891,28 @@
   color: white;
 }
 
+.cb-offline {
+  display: flex;
+  gap: 0.6rem;
+  margin: 0 0 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--cb-short) 55%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--cb-short) 12%, transparent);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.cb-offline svg {
+  flex: none;
+  margin-top: 0.1rem;
+  color: var(--cb-short);
+}
+
+.cb-offline strong {
+  color: white;
+}
+
 :root[data-vol-theme="light"] .cb-filter {
   border-color: var(--vl-line);
   background: var(--vl-surface);
@@ -908,6 +943,11 @@
   color: #c2185b;
 }
 
-:root[data-vol-theme="light"] .cb-invite strong {
+:root[data-vol-theme="light"] .cb-invite strong,
+:root[data-vol-theme="light"] .cb-offline strong {
   color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .cb-offline svg {
+  color: #c62828;
 }

@@ -18,6 +18,20 @@ function json(data: unknown, status = 200): Response {
 
 export const buildError = (message: string, status = 400) => json({ error: message }, status);
 
+/**
+ * Runs a handler against CREW_DB. A missing binding or a failing database answers 503 with a
+ * JSON error, so the page can pause sign-ups instead of getting an HTML error page.
+ */
+export async function withCrewDb(db: D1Database | undefined, handler: (db: D1Database) => Promise<Response>) {
+  if (!db) return buildError("The build database is not configured.", 503);
+  try {
+    return await handler(db);
+  } catch (error) {
+    console.error("crew build: database unavailable", error);
+    return buildError("The build database can’t be reached right now.", 503);
+  }
+}
+
 async function readBody(request: Request): Promise<Record<string, unknown>> {
   try {
     const body = (await request.json()) as unknown;

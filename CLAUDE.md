@@ -16,6 +16,8 @@ pnpm dev             # Development server with hot reload
 pnpm build           # Production build to dist/
 pnpm preview         # Preview production build locally
 pnpm og              # Regenerate the Open Graph cards in public/og/ (needs Google Chrome)
+pnpm db:migrate:local # Create the local experience sign-ups database (DB)
+pnpm db:crew:local   # Create the local build crew tables for /volunteers (CREW_DB)
 ```
 
 For production builds with absolute metadata URLs:

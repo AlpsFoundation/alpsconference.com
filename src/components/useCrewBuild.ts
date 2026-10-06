@@ -4,28 +4,51 @@ import type { BuildState } from "../lib/crewBuild";
 import { withBase } from "../lib/withBase";
 
 const POLL_MS = 15_000;
+/** How long a "Not saved" message stays up. */
+const SAVE_ERROR_MS = 10_000;
+
+/**
+ * `loading` until the first answer; `offline` while the build database cannot be reached,
+ * which pauses sign-ups, ticks and adding names until a poll gets through again.
+ */
+export type CrewBuildStatus = "loading" | "online" | "offline";
 
 export type CrewBuildApi = {
   state: BuildState | null;
-  /** Last load or save problem, shown next to the build lists. */
+  status: CrewBuildStatus;
+  /** Last save problem, shown next to the build lists. */
   error: string | null;
   assign: (id: string, person: string, phase: BuildPhase, on: boolean) => Promise<void>;
   tick: (id: string, phase: BuildPhase, done: boolean, by: string | null) => Promise<void>;
   addPerson: (name: string) => Promise<string | null>;
 };
 
+/** The database answered that it is down (503), or the request never got through. */
+class OfflineError extends Error {}
+
 async function call(path: string, body?: unknown) {
-  const response = await fetch(withBase(`api/crew-build/${path}`), body
-    ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }
-    : { cache: "no-store" });
-  const data = (await response.json().catch(() => ({}))) as { error?: string };
-  if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+  let response: Response;
+  try {
+    response = await fetch(withBase(`api/crew-build/${path}`), body
+      ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }
+      : { cache: "no-store" });
+  } catch {
+    throw new OfflineError("No connection.");
+  }
+  const data = (await response.json().catch(() => null)) as { error?: string } | null;
+  if (!response.ok || !data) {
+    const message = data?.error || `HTTP ${response.status}`;
+    throw response.status >= 500 || !data ? new OfflineError(message) : new Error(message);
+  }
   return data;
 }
 
-/** Live build sign-ups and ticks: polled every 15 s, refreshed when the tab comes back. */
+const messageOf = (err: unknown) => (err instanceof Error ? err.message : String(err));
+
+/** Live build sign-ups and ticks: polled every 15 s, refreshed when the tab or the connection comes back. */
 export function useCrewBuild(): CrewBuildApi {
   const [state, setState] = useState<BuildState | null>(null);
+  const [status, setStatus] = useState<CrewBuildStatus>("loading");
   const [error, setError] = useState<string | null>(null);
   const pending = useRef(0);
 
@@ -34,9 +57,11 @@ export function useCrewBuild(): CrewBuildApi {
       const next = (await call("state")) as unknown as BuildState;
       // A save in flight would be undone by an older read.
       if (!pending.current) setState(next);
-      setError(null);
+      setStatus("online");
     } catch (err) {
-      setError(`Offline: ${err instanceof Error ? err.message : String(err)}`);
+      // Keep the last answer on screen; the page only pauses what needs the database.
+      if (!(err instanceof OfflineError)) console.warn("crew build: unexpected answer", err);
+      setStatus("offline");
     }
   }, []);
 
@@ -47,11 +72,24 @@ export function useCrewBuild(): CrewBuildApi {
       if (!document.hidden) refresh();
     };
     document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("online", refresh);
     return () => {
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("online", refresh);
     };
   }, [refresh]);
+
+  useEffect(() => {
+    if (!error) return;
+    const timer = window.setTimeout(() => setError(null), SAVE_ERROR_MS);
+    return () => window.clearTimeout(timer);
+  }, [error]);
+
+  const failed = useCallback((err: unknown) => {
+    if (err instanceof OfflineError) setStatus("offline");
+    setError(`Not saved: ${messageOf(err)}`);
+  }, []);
 
   const save = useCallback(
     async (path: string, body: unknown, optimistic: (prev: BuildState) => BuildState) => {
@@ -61,13 +99,13 @@ export function useCrewBuild(): CrewBuildApi {
         await call(path, body);
         setError(null);
       } catch (err) {
-        setError(`Not saved: ${err instanceof Error ? err.message : String(err)}`);
+        failed(err);
       } finally {
         pending.current -= 1;
         await refresh();
       }
     },
-    [refresh]
+    [refresh, failed]
   );
 
   const assign = useCallback<CrewBuildApi["assign"]>(
@@ -99,12 +137,12 @@ export function useCrewBuild(): CrewBuildApi {
         await refresh();
         return result.name ?? null;
       } catch (err) {
-        setError(`Not saved: ${err instanceof Error ? err.message : String(err)}`);
+        failed(err);
         return null;
       }
     },
-    [refresh]
+    [refresh, failed]
   );
 
-  return { state, error, assign, tick, addPerson };
+  return { state, status, error, assign, tick, addPerson };
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Check, ChevronUp, HandHeart, Maximize2, MapPin, Minimize2, Plus, UserPlus, Users, X } from "lucide-react";
+import { Check, ChevronUp, CloudOff, HandHeart, Maximize2, MapPin, Minimize2, Plus, UserPlus, Users, X } from "lucide-react";
 import { BUILD_PHASES, BUILD_ZONES, type BuildItem, type BuildPhase, type BuildSection } from "../data/crewBuild";
 import {
   assigneesOf,
@@ -39,6 +39,8 @@ function readShow(): Show {
     return "all";
   }
 }
+const savedAtFormat = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Zurich" });
+
 /** The part of public/img/venue-plan.svg that holds the ground floor. */
 const VIEW = { x: 84, y: 134, w: 1052, h: 432 };
 
@@ -109,6 +111,8 @@ function NeedPill({ signed, need }: { signed: number; need: number | null }) {
 export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPerson }: Props) {
   const phases = BUILD_DAYS[dateTime];
   const { state } = build;
+  // Sign-ups and ticks need the database; while it is unreachable the lists are read-only.
+  const live = build.status === "online";
   const [selected, setSelected] = useState<string | null>(null);
   const [mapSize, setMapSize] = useState<MapSize>("fit");
   const [stickTop, setStickTop] = useState(0);
@@ -117,6 +121,8 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   const svgRef = useRef<SVGSVGElement>(null);
 
   const [show, setShow] = useState<Show>("all");
+  // Without sign-ups to go on, "Needs people" and "Not done yet" would list everything.
+  const view: Show = state ? show : "all";
   /** The task whose "Add someone" field is open, as `phase:id`, and what is typed in it. */
   const [adding, setAdding] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
@@ -205,7 +211,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   };
 
   const shows = (item: BuildItem, phase: BuildPhase) =>
-    show === "needs" ? needsPeople(item, phase) : show === "open" ? !tickOf(state, item.id, phase) : true;
+    view === "needs" ? needsPeople(item, phase) : view === "open" ? !tickOf(state, item.id, phase) : true;
 
   const visible = useMemo(
     () =>
@@ -219,14 +225,14 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
           .filter((section) => section.items.length),
         // The checklist has no headcount, so "Needs people" leaves it out.
         material:
-          onlyMine || show === "needs"
+          onlyMine || view === "needs"
             ? []
             : materialSections(phase)
                 .map((section) => ({ ...section, items: section.items.filter((item) => shows(item, phase)) }))
                 .filter((section) => section.items.length),
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [phases, onlyMine, person, state, show]
+    [phases, onlyMine, person, state, view]
   );
 
   // Counts on the switch: tasks of this day, whatever the current choice.
@@ -299,6 +305,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
           role="checkbox"
           aria-checked={Boolean(done)}
           aria-label={`${taskDoneLabel(phase)}: ${item.name}`}
+          disabled={!live}
           onClick={() => build.tick(item.id, phase, !done, person)}
         >
           <Check size={20} aria-hidden="true" />
@@ -309,7 +316,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
               {item.name}
               {item.draft && <span className="cb-draft">Draft</span>}
             </p>
-            <NeedPill signed={people.length} need={need} />
+            {state && <NeedPill signed={people.length} need={need} />}
           </div>
           <p className="cb-task__what" data-empty={!item.what || undefined}>
             {item.what ?? "To be described."}
@@ -327,7 +334,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
             </p>
           )}
           {item.detail && item.detail !== item.what && <p className="cb-task__meta">{item.detail}</p>}
-          {phase === "teardown" && (
+          {phase === "teardown" && state && (
             <p className="cb-task__meta">
               {setupBy.length ? (
                 <>
@@ -346,25 +353,26 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                   type="button"
                   aria-label={name === person ? "Remove me" : `Remove ${name}`}
                   title={name === person ? "Remove me" : `Remove ${name}`}
+                  disabled={!live}
                   onClick={() => build.assign(item.id, name, phase, false)}
                 >
                   <X size={14} aria-hidden="true" />
                 </button>
               </span>
             ))}
-            {open > 0 && (
+            {state && open > 0 && (
               <span className="cb-slot">
                 {open} open {open === 1 ? "spot" : "spots"}
               </span>
             )}
             {!(person && people.includes(person)) && (
-              <button type="button" className="cb-join" onClick={() => join(item, phase)}>
+              <button type="button" className="cb-join" disabled={!live} onClick={() => join(item, phase)}>
                 <Plus size={15} aria-hidden="true" />
                 {info.joinLabel}
               </button>
             )}
             {adding !== addKey && (
-              <button type="button" className="cb-add" onClick={() => openAdding(addKey)}>
+              <button type="button" className="cb-add" disabled={!live} onClick={() => openAdding(addKey)}>
                 <UserPlus size={15} aria-hidden="true" />
                 {person ? "Add someone" : "Add a name"}
               </button>
@@ -392,7 +400,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                   if (event.key === "Escape") setAdding(null);
                 }}
               />
-              <button type="submit" className="cb-join" disabled={!draft.trim()}>
+              <button type="submit" className="cb-join" disabled={!live || !draft.trim()}>
                 <Plus size={15} aria-hidden="true" />
                 Add
               </button>
@@ -424,6 +432,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
           role="checkbox"
           aria-checked={Boolean(done)}
           aria-label={`${info.doneLabel}: ${item.name}`}
+          disabled={!live}
           onClick={() => build.tick(item.id, phase, !done, person)}
         >
           <Check size={16} aria-hidden="true" />
@@ -561,15 +570,29 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
         </div>
 
         <div className="cb-main">
-          <div className="cb-filter" role="radiogroup" aria-label="Show tasks">
-            {SHOWS.map(({ id, label }) => (
-              <button key={id} type="button" role="radio" aria-checked={show === id} onClick={() => chooseShow(id)}>
-                {label}
-                <span className="cb-filter__count">{showCounts[id]}</span>
-              </button>
-            ))}
-          </div>
-          {show === "needs" && (
+          {build.status === "offline" && (
+            <p className="cb-offline" role="status">
+              <CloudOff size={18} aria-hidden="true" />
+              <span>
+                <strong>Sign-ups are paused.</strong> The build database can’t be reached right now
+                {state
+                  ? `, so this shows who had signed up at ${savedAtFormat.format(new Date(state.generated_at))}.`
+                  : ", so the tasks show without who signed up."}{" "}
+                Signing up and ticking come back on their own once it’s reachable again.
+              </span>
+            </p>
+          )}
+          {state && (
+            <div className="cb-filter" role="radiogroup" aria-label="Show tasks">
+              {SHOWS.map(({ id, label }) => (
+                <button key={id} type="button" role="radio" aria-checked={show === id} onClick={() => chooseShow(id)}>
+                  {label}
+                  <span className="cb-filter__count">{showCounts[id]}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {view === "needs" && (
             <p className="cb-invite">
               <HandHeart size={18} aria-hidden="true" />
               <span>
@@ -578,7 +601,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
               </span>
             </p>
           )}
-          {show === "open" && (
+          {view === "open" && (
             <p className="cb-invite">
               <HandHeart size={18} aria-hidden="true" />
               <span>
@@ -605,25 +628,27 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                   <p className="cb-phase__time">{phaseTime(phase)}</p>
                   <h3 className="cb-phase__title">{info.label}</h3>
                   {info.timeNote && <p className="cb-phase__note">{info.timeNote}</p>}
-                  <p className="cb-phase__stats">
-                    <strong>{done}</strong>/{all.length} {taskDoneLabel(phase).toLowerCase()}
-                    {needSum > 0 && (
-                      <>
-                        {" · "}
-                        <strong>{filled}</strong>/{needSum} people
-                      </>
-                    )}
-                    {unset > 0 && ` · ${unset} without a headcount`}
-                  </p>
+                  {state && (
+                    <p className="cb-phase__stats">
+                      <strong>{done}</strong>/{all.length} {taskDoneLabel(phase).toLowerCase()}
+                      {needSum > 0 && (
+                        <>
+                          {" · "}
+                          <strong>{filled}</strong>/{needSum} people
+                        </>
+                      )}
+                      {unset > 0 && ` · ${unset} without a headcount`}
+                    </p>
+                  )}
                 </header>
 
                 {tasks.length === 0 && (
                   <p className="cb-empty">
                     {onlyMine
                       ? "Nothing signed up here yet."
-                      : show === "needs"
+                      : view === "needs"
                         ? "Every task here has enough people for now. Thank you!"
-                        : show === "open"
+                        : view === "open"
                           ? "Everything here is done."
                           : "No tasks."}
                   </p>
@@ -634,7 +659,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                     <div key={section.id} className="cb-section">
                       <h4 className="cb-section__title">
                         {section.title}
-                        {counts.needSum > 0 ? (
+                        {state && counts.needSum > 0 ? (
                           <span>
                             {counts.filled}/{counts.needSum} people
                           </span>
@@ -652,9 +677,11 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                   <details className="cb-material">
                     <summary>
                       <span>Material checklist</span>
-                      <span className="cb-material__count">
-                        {materialDone}/{materialAll.length} {info.doneLabel.toLowerCase()}
-                      </span>
+                      {state && (
+                        <span className="cb-material__count">
+                          {materialDone}/{materialAll.length} {info.doneLabel.toLowerCase()}
+                        </span>
+                      )}
                     </summary>
                     <p className="cb-section__note">
                       {phase === "unload" ? "Tick each item when it has arrived at the KuK." : "Tick each item when it is back on the truck."}
