@@ -282,6 +282,12 @@ type Logo = { file: string; name: string; /** Visual weight: tall marks are draw
 /** Logos live in public/img/booklet/logos/<file> (student groups in public/img/booklet/spsn/). */
 export const PARTNER_GROUPS: { title: string; logos: Logo[]; boxed?: boolean }[] = [
   {
+    title: "Sponsor",
+    logos: [
+      { file: "csm.webp", name: "Fondation Conscience et Santé Mentale", h: 2.2 },
+    ],
+  },
+  {
     title: "Partner academic institutions",
     logos: [
       { file: "hug.webp", name: "Hôpitaux Universitaires de Genève" },
