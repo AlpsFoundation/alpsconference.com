@@ -495,7 +495,17 @@ export default function BreakScreen() {
       <div className="break-vignette" aria-hidden />
 
       <header className="break-top">
-        <img src={withBase("img/logo.png")} alt="ALPS Conference 2026" className="break-logo" />
+        <div className="break-brand">
+          <img src={withBase("img/logo.png")} alt="ALPS Conference 2026" className="break-logo" />
+          <div className="break-sponsor">
+            <span className="break-sponsor__label">With thanks to our sponsor</span>
+            <img
+              src={withBase("img/booklet/logos/csm.webp")}
+              alt="Fondation Conscience et Santé Mentale"
+              className="break-sponsor__logo"
+            />
+          </div>
+        </div>
         {now && (
           <p className="break-clock">
             <CalendarDays aria-hidden />
