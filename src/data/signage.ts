@@ -93,8 +93,19 @@ export type SignOrientation = "portrait" | "landscape";
  * schedule  — a timed list (program, experiences)
  * sheet     — ruled table to fill in by hand (sign-up sheets, price list)
  * timer     — one giant figure, for time signals held up to the speaker
+ * qr        — one large QR code with a title, or a sheet of identical cut-out cards (`tiles`)
  */
-export type SignLayout = "statement" | "schedule" | "sheet" | "timer";
+export type SignLayout = "statement" | "schedule" | "sheet" | "timer" | "qr";
+
+/** How many identical cards a `qr` sign prints per A4 sheet, with cut lines between them. */
+export type SignTiles = 1 | 2 | 4 | 6 | 8;
+export const SIGN_TILES: { id: SignTiles; label: string; hint: string }[] = [
+  { id: 1, label: "1", hint: "One large code on the page" },
+  { id: 2, label: "2", hint: "A5 halves" },
+  { id: 4, label: "4", hint: "A6 cards" },
+  { id: 6, label: "6", hint: "Table cards" },
+  { id: 8, label: "8", hint: "Business-card size" },
+];
 
 export type SignRow = {
   /** Time, step number or short label in the left column. */
@@ -124,7 +135,10 @@ export type Sign = {
   /** Numbers on the venue map (/map), shown as map markers. */
   markers?: number[];
   rows?: SignRow[];
-  qr?: { url: string; label: string; caption?: string };
+  /** `url` is what the code encodes: usually a link, or a Wi-Fi or text payload on `qr` signs. */
+  qr?: { url: string; label: string; caption?: string; ecc?: "L" | "M" | "Q" | "H" };
+  /** Cards per sheet on `qr` signs. */
+  tiles?: SignTiles;
   /** Ruled table for `sheet` signs: column headings and how many rows, split into two tables side by side when `split`. */
   sheet?: { columns: string[]; rows: number; split?: boolean };
   /** Giant figure for `timer` signs. */
@@ -597,6 +611,16 @@ const SIGNS: Sign[] = [
     title: "Share your feedback",
     subtitle: "Two minutes that shape ALPS 2027.",
     qr: link("/links#feedback"),
+  },
+  {
+    id: "online-links-cards",
+    category: "online",
+    name: "QR cards for the tables, 6 per page",
+    layout: "qr",
+    tiles: 6,
+    title: "Everything on your phone",
+    subtitle: "Program, venue map, wifi and sign-ups",
+    qr: link("/links"),
   },
   {
     id: "online-newsletter",
