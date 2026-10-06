@@ -41,7 +41,8 @@
   display: inline-block;
 }
 
-.vol-theme {
+.vol-theme,
+.vol-catering__view {
   display: inline-flex;
   flex-shrink: 0;
   padding: 0.2rem;
@@ -50,7 +51,8 @@
   background: rgba(4, 30, 49, 0.6);
 }
 
-.vol-theme button {
+.vol-theme button,
+.vol-catering__view button {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -67,11 +69,13 @@
   transition: background 150ms ease, color 150ms ease;
 }
 
-.vol-theme button:hover {
+.vol-theme button:hover,
+.vol-catering__view button:hover {
   color: white;
 }
 
-.vol-theme button[aria-checked="true"] {
+.vol-theme button[aria-checked="true"],
+.vol-catering__view button[aria-checked="true"] {
   background: white;
   color: var(--color-neutral-dark);
 }
@@ -572,13 +576,531 @@
   accent-color: white;
 }
 
-/* The catering team's plan, under that day's grid. */
+/* The catering team's plan, under that day's grid: one small calendar per service, folded until opened. */
 .vol-catering {
+  --vol-task: var(--vol-crew);
   margin-top: 1.75rem;
+  border: 1px solid var(--vol-line);
+  border-radius: 1.1rem;
+  background: var(--vol-panel);
 }
 
-.vol-catering .vol-note {
-  margin: 0.2rem 0 0.75rem;
+.vol-catering__head {
+  margin: 0;
+}
+
+.vol-catering__head button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.15rem 1rem;
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  border: 0;
+  border-radius: 1.1rem;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vol-catering__head button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.vol-catering__title {
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.vol-catering__meta {
+  grid-column: 1;
+  color: var(--vol-muted);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.vol-catering__chevron {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  color: var(--vol-muted);
+  transition: rotate 200ms ease, color 150ms ease;
+}
+
+.vol-catering__head button:hover .vol-catering__chevron {
+  color: white;
+}
+
+.vol-catering[data-open] .vol-catering__chevron {
+  rotate: 180deg;
+}
+
+/* Your own catering times, readable folded or open. */
+.vol-catering__mine {
+  margin: -0.2rem 1.1rem 0.8rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--vol-crew) 16%, transparent);
+  color: rgba(238, 244, 248, 0.92);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.vol-catering__mine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.1rem;
+}
+
+.vol-catering__mine strong {
+  color: var(--color-accent-light);
+}
+
+.vol-catering__shift b {
+  font-weight: 650;
+}
+
+/* Folded: one chip per service, in the order of the day. */
+.vol-catering__strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0 1.1rem 1rem;
+  list-style: none;
+}
+
+.vol-catering__strip button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--vol-crew) 40%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--vol-crew) 8%, transparent);
+  color: rgba(238, 244, 248, 0.92);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.vol-catering__strip button:hover {
+  border-color: var(--vol-crew);
+}
+
+.vol-catering__strip small {
+  color: var(--vol-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.vol-catering__strip button[data-me] {
+  border-color: var(--vol-crew);
+  background: var(--vol-crew);
+  color: var(--color-neutral-dark);
+}
+
+.vol-catering__strip button[data-me] small {
+  color: rgba(11, 60, 93, 0.75);
+}
+
+/* Open: each service is a small calendar. A station is named once; each of its shift
+   times is a bar on the service's own timeline, so staggered starts read at a glance. */
+.vol-catering__services {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0 0.75rem 0.75rem;
+}
+
+.vol-cater {
+  --cols: 6.5rem 6.4rem minmax(6rem, 1fr) minmax(0, 1.5fr);
+  overflow: hidden;
+  border: 1px solid var(--vol-line);
+  border-radius: 0.9rem;
+  background: rgba(4, 30, 49, 0.35);
+  scroll-margin: 1rem;
+}
+
+.vol-cater[data-single] {
+  --cols: 6.4rem minmax(6rem, 1fr) minmax(0, 1.5fr);
+}
+
+.vol-cater[data-me] {
+  border-color: color-mix(in srgb, var(--vol-crew) 55%, transparent);
+}
+
+.vol-cater[data-live] {
+  box-shadow: inset 3px 0 0 var(--vol-crew);
+}
+
+.vol-cater__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  padding: 0.7rem 1rem 0.2rem;
+}
+
+.vol-cater__head h4 {
+  margin: 0;
+  color: var(--color-accent-light);
+  font-size: 0.98rem;
+  font-weight: 650;
+}
+
+.vol-cater__window {
+  color: white;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.vol-cater__count {
+  color: var(--vol-muted);
+  font-size: 0.8rem;
+}
+
+.vol-cater__ruler,
+.vol-cater__row {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  column-gap: 0.75rem;
+  padding-inline: 1rem;
+}
+
+.vol-cater__ruler {
+  height: 1.35rem;
+}
+
+/* The timeline is always the second column from the end. */
+.vol-cater__ruler .vol-cater__track {
+  grid-column: -3 / -2;
+  height: 100%;
+  border-radius: 0;
+  background: none;
+}
+
+.vol-cater__rows {
+  margin: 0;
+  padding: 0 0 0.5rem;
+  list-style: none;
+}
+
+.vol-cater__row {
+  min-height: 2.5rem;
+  padding-block: 0.35rem;
+}
+
+.vol-cater__row[data-first]:not(:first-child) {
+  margin-top: 0.2rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--vol-line);
+}
+
+.vol-cater__row[data-me] {
+  background: color-mix(in srgb, var(--vol-crew) 12%, transparent);
+}
+
+.vol-cater__station {
+  color: rgba(238, 244, 248, 0.92);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.vol-cater__time {
+  color: var(--vol-muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vol-cater__row[data-me] .vol-cater__time {
+  color: white;
+}
+
+.vol-cater__track {
+  position: relative;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.vol-cater__grid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.vol-cater__bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  min-width: 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--vol-crew) 55%, transparent);
+}
+
+.vol-cater__row[data-me] .vol-cater__bar {
+  background: var(--vol-crew);
+}
+
+.vol-cater__now {
+  position: absolute;
+  top: -0.3rem;
+  bottom: -0.3rem;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: white;
+}
+
+.vol-cater__tick {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  height: 0.25rem;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.vol-cater__tick[data-hour] {
+  height: 0.4rem;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.vol-cater__tick span {
+  position: absolute;
+  bottom: 0.45rem;
+  left: 0;
+  color: var(--vol-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+.vol-cater__names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.vol-cater--simple .vol-cater__head {
+  align-items: center;
+  padding-block: 0.65rem;
+}
+
+.vol-cater--simple .vol-cater__names {
+  margin-left: auto;
+}
+
+.vol-cater--simple[data-me] {
+  background: color-mix(in srgb, var(--vol-crew) 12%, transparent);
+}
+
+/* Phones: the station on its own line, names beside the time, the bar underneath. */
+@media (max-width: 719px) {
+  .vol-cater,
+  .vol-cater[data-single] {
+    --cols: 5.4rem minmax(0, 1fr);
+  }
+
+  .vol-cater__row {
+    grid-template-areas:
+      "station station"
+      "time names"
+      "track track";
+    row-gap: 0.35rem;
+  }
+
+  .vol-cater__station {
+    grid-area: station;
+    color: var(--vol-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .vol-cater__station:empty {
+    display: none;
+  }
+
+  .vol-cater--simple .vol-cater__names {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .vol-cater__time {
+    grid-area: time;
+  }
+
+  .vol-cater__names {
+    grid-area: names;
+  }
+
+  .vol-cater__row > .vol-cater__track {
+    grid-area: track;
+    height: 0.4rem;
+  }
+
+  .vol-cater__ruler {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vol-cater__ruler .vol-cater__track {
+    grid-column: 1;
+  }
+}
+
+/* Vertical / Horizontal switch for the open plan. */
+.vol-catering__view {
+  justify-self: start;
+}
+
+/* Vertical: time runs down the left, each station is a column, and each shift time is a block
+   as tall as it lasts (--vol-cal-min rem per minute, set per day so the tightest one fits).
+   Overlapping times at one station sit side by side; too many columns scroll sideways. */
+.vol-cal {
+  overflow-x: auto;
+  padding: 0.35rem 1rem 0.6rem 0.4rem;
+}
+
+.vol-cal__grid {
+  --axis: 3rem;
+  display: grid;
+  grid-template-columns: var(--axis) minmax(0, 1fr);
+  min-width: calc(var(--axis) + var(--lanes) * 6.5rem);
+}
+
+.vol-cal__heads {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(var(--lanes), minmax(0, 1fr));
+}
+
+.vol-cal__head {
+  padding: 0 0.45rem 0.1rem;
+  color: rgba(238, 244, 248, 0.92);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.vol-cal__axis,
+.vol-cal__body {
+  position: relative;
+  height: calc(var(--span) * var(--vol-cal-min));
+  margin-block: 0.6rem;
+}
+
+.vol-cal__axis {
+  grid-column: 1;
+}
+
+.vol-cal__axis span {
+  position: absolute;
+  top: calc(var(--at) * var(--vol-cal-min));
+  right: 0.55rem;
+  color: var(--vol-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  translate: 0 -50%;
+}
+
+.vol-cal__axis span[data-hour] {
+  color: rgba(238, 244, 248, 0.88);
+}
+
+.vol-cal__body {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(var(--lanes), minmax(0, 1fr));
+  grid-template-rows: 100%;
+}
+
+.vol-cal__line,
+.vol-cal__now {
+  position: absolute;
+  grid-row: 1;
+  grid-column: 1 / -1;
+  left: 0;
+  right: 0;
+  top: calc(var(--at) * var(--vol-cal-min));
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.vol-cal__line[data-hour] {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.vol-cal__sep {
+  position: absolute;
+  grid-row: 1;
+  top: -0.6rem;
+  bottom: -0.6rem;
+  left: 0;
+  width: 1px;
+  background: var(--vol-line);
+}
+
+.vol-cal__block {
+  position: absolute;
+  grid-row: 1;
+  top: calc(var(--at) * var(--vol-cal-min) + 1px);
+  left: 3px;
+  right: 3px;
+  height: calc(var(--len) * var(--vol-cal-min) - 2px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--vol-crew) 40%, transparent);
+  border-left: 3px solid color-mix(in srgb, var(--vol-crew) 70%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--vol-crew) 16%, #0a3352);
+}
+
+.vol-cal__block[data-me] {
+  border-color: var(--vol-crew);
+  background: color-mix(in srgb, var(--vol-crew) 34%, #0a3352);
+}
+
+.vol-cal__block[data-state="now"] {
+  box-shadow: 0 0 0 2px white;
+}
+
+.vol-cal__time {
+  color: white;
+  font-size: 0.76rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.vol-cal__names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.vol-cal__block .vol-name {
+  padding: 0.1rem 0.45rem;
+  font-size: 0.78rem;
+}
+
+.vol-cal__now {
+  z-index: 1;
+  height: 2px;
+  margin-top: -1px;
+  background: white;
 }
 
 .vol-h3 {
@@ -1120,16 +1642,19 @@
 }
 
 :root[data-vol-theme="light"] .vol-theme,
+:root[data-vol-theme="light"] .vol-catering__view,
 :root[data-vol-theme="light"] .vol-tabs {
   background: var(--vl-surface);
 }
 
 :root[data-vol-theme="light"] .vol-theme button:hover,
+:root[data-vol-theme="light"] .vol-catering__view button:hover,
 :root[data-vol-theme="light"] .vol-tabs button:hover {
   color: var(--vl-ink);
 }
 
 :root[data-vol-theme="light"] .vol-theme button[aria-checked="true"],
+:root[data-vol-theme="light"] .vol-catering__view button[aria-checked="true"],
 :root[data-vol-theme="light"] .vol-tabs button[aria-selected="true"] {
   background: var(--vl-ink);
   color: white;
@@ -1357,3 +1882,127 @@
 :root[data-vol-theme="light"] .vol-page .calendar-subscribe__note {
   color: var(--vl-muted);
 }
+
+/* Catering plan, light theme */
+:root[data-vol-theme="light"] .vol-catering {
+  --vol-task-soft: var(--vl-pink-soft);
+}
+
+:root[data-vol-theme="light"] .vol-catering__title,
+:root[data-vol-theme="light"] .vol-cater__head h4,
+:root[data-vol-theme="light"] .vol-cater__window,
+:root[data-vol-theme="light"] .vol-cater__station,
+:root[data-vol-theme="light"] .vol-cater__row[data-me] .vol-cater__time,
+:root[data-vol-theme="light"] .vol-catering__mine,
+:root[data-vol-theme="light"] .vol-catering__mine strong {
+  color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .vol-catering__head button:hover .vol-catering__chevron {
+  color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .vol-catering__head button:focus-visible {
+  outline-color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .vol-catering__mine {
+  background: var(--vl-pink-soft);
+}
+
+:root[data-vol-theme="light"] .vol-catering__strip button {
+  border-color: transparent;
+  background: var(--vl-pink-soft);
+  color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .vol-catering__strip button:hover {
+  border-color: var(--vl-pink);
+}
+
+:root[data-vol-theme="light"] .vol-catering__strip button[data-me] {
+  background: var(--vl-ink);
+  color: white;
+}
+
+:root[data-vol-theme="light"] .vol-catering__strip button[data-me] small {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+:root[data-vol-theme="light"] .vol-cater {
+  background: var(--vl-tint);
+}
+
+:root[data-vol-theme="light"] .vol-cater__row[data-me],
+:root[data-vol-theme="light"] .vol-cater--simple[data-me] {
+  background: var(--vl-pink-soft);
+}
+
+/* Teammates on your own row stand out from its pink background. */
+:root[data-vol-theme="light"] .vol-cater [data-me] .vol-name:not([data-me]),
+:root[data-vol-theme="light"] .vol-cater--simple[data-me] .vol-name:not([data-me]) {
+  background: var(--vl-surface);
+}
+
+:root[data-vol-theme="light"] .vol-cater__track {
+  background: rgba(11, 60, 93, 0.07);
+}
+
+:root[data-vol-theme="light"] .vol-cater__ruler .vol-cater__track {
+  background: none;
+}
+
+:root[data-vol-theme="light"] .vol-cater__grid {
+  background: rgba(11, 60, 93, 0.12);
+}
+
+:root[data-vol-theme="light"] .vol-cater__tick {
+  background: rgba(11, 60, 93, 0.25);
+}
+
+:root[data-vol-theme="light"] .vol-cater__tick[data-hour] {
+  background: rgba(11, 60, 93, 0.45);
+}
+
+:root[data-vol-theme="light"] .vol-cater__now,
+:root[data-vol-theme="light"] .vol-cal__now {
+  background: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .vol-cal__head,
+:root[data-vol-theme="light"] .vol-cal__axis span[data-hour],
+:root[data-vol-theme="light"] .vol-cal__time {
+  color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .vol-cal__axis span {
+  color: var(--vl-muted);
+}
+
+:root[data-vol-theme="light"] .vol-cal__line {
+  background: rgba(11, 60, 93, 0.07);
+}
+
+:root[data-vol-theme="light"] .vol-cal__line[data-hour] {
+  background: rgba(11, 60, 93, 0.16);
+}
+
+:root[data-vol-theme="light"] .vol-cal__sep {
+  background: var(--vl-line);
+}
+
+:root[data-vol-theme="light"] .vol-cal__block {
+  border-color: color-mix(in srgb, var(--vl-pink) 55%, transparent);
+  border-left-color: var(--vl-pink);
+  background: var(--vl-surface);
+}
+
+:root[data-vol-theme="light"] .vol-cal__block[data-me] {
+  border-color: var(--vl-pink);
+  background: var(--vl-pink-soft);
+}
+
+:root[data-vol-theme="light"] .vol-cal__block[data-state="now"] {
+  box-shadow: 0 0 0 2px var(--vl-ink);
+}
+

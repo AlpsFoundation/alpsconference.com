@@ -330,7 +330,7 @@ export const CATERING_SHIFTS: CateringShift[] = [
   { person: "Myriam", dateTime: "2026-10-09", from: "18:30", to: "19:30", station: "Diner 1" },
   { person: "Myriam", dateTime: "2026-10-10", from: "10:45", to: "11:45", station: "Morning Break" },
   { person: "Myriam", dateTime: "2026-10-10", from: "18:45", to: "20:45", station: "Networking Apéro" },
-  { person: "Myriam", dateTime: "2026-10-10", from: "21:15", to: "22:30", station: "Apero Abbau" },
+  { person: "Myriam", dateTime: "2026-10-10", from: "21:15", to: "22:30", station: "Apéro Abbau" },
   { person: "Benedikt", dateTime: "2026-10-09", from: "10:15", to: "11:45", station: "Morning Break" },
   { person: "Benedikt", dateTime: "2026-10-09", from: "12:30", to: "14:00", station: "Lunch Service" },
   { person: "Benedikt", dateTime: "2026-10-09", from: "18:45", to: "19:45", station: "Diner 1" },
@@ -363,6 +363,20 @@ export const CATERING_SHIFTS: CateringShift[] = [
   { person: "Simon", dateTime: "2026-10-09", from: "19:45", to: "21:15", station: "Diner 2" },
   { person: "Simon", dateTime: "2026-10-10", from: "12:00", to: "13:45", station: "Lunch Service" },
   { person: "Simon", dateTime: "2026-10-10", from: "19:30", to: "21:30", station: "Apéro Spät" },
+];
+
+/**
+ * Catering stations grouped by service, in the order of the day, with the name
+ * shown on the page. The keys are the station names of the catering plan; a
+ * station missing here gets a service of its own.
+ */
+export const CATERING_SERVICES: { id: string; label: string; stations: Record<string, string> }[] = [
+  { id: "arrival", label: "Arrival", stations: { Arrival: "Arrival" } },
+  { id: "morning", label: "Morning break", stations: { "Morning Break": "Morning break" } },
+  { id: "lunch", label: "Lunch", stations: { "Lunch Service": "Service", "Lunch Küche": "Kitchen" } },
+  { id: "afternoon", label: "Afternoon break", stations: { "Afternoon Break": "Afternoon break" } },
+  { id: "dinner", label: "Dinner", stations: { "Diner 1": "Dinner 1", "Diner 2": "Dinner 2" } },
+  { id: "apero", label: "Apéro", stations: { "Networking Apéro": "Networking", "Apéro Spät": "Late shift", "Apéro Abbau": "Teardown" } },
 ];
 
 /** Roles across Friday and Saturday ("Roles" tab). Not counted in the hours. */

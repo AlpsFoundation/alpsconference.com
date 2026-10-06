@@ -2,6 +2,7 @@
  * Shift logic shared by the /volunteers page and the per-person calendar feeds.
  */
 import {
+  CATERING_SERVICES,
   CATERING_SHIFTS,
   CREW_EVENTS,
   CREW_ROLES,
@@ -179,23 +180,68 @@ export function cateringFor(person: string): CateringShift[] {
   return CATERING_SHIFTS.filter((shift) => shift.person === person);
 }
 
-/** One catering station at one time, with everyone on it. */
-export type CateringRow = { from: string; to: string; station: string; people: string[] };
+/** One shift time at a catering station, with everyone on it. */
+export type CateringBar = { from: number; to: number; people: string[] };
+/** A station of a service, with its shift times in order. */
+export type CateringStation = { station: string; label: string; bars: CateringBar[] };
+/** A service (lunch, dinner…) on one day: its stations, and the window from the first start to the last end. */
+export type CateringService = { id: string; label: string; start: number; end: number; stations: CateringStation[]; people: string[] };
 
-export function cateringRows(dateTime: string): CateringRow[] {
-  const rows = new Map<string, CateringRow>();
-  for (const shift of CATERING_SHIFTS) {
-    if (shift.dateTime !== dateTime) continue;
-    const key = `${shift.from}|${shift.to}|${shift.station}`;
-    const row = rows.get(key) ?? { from: shift.from, to: shift.to, station: shift.station, people: [] };
-    row.people.push(shift.person);
-    rows.set(key, row);
-  }
-  return [...rows.values()]
-    .map((row) => ({ ...row, people: row.people.sort((a, b) => a.localeCompare(b, "en")) }))
-    .sort(
-      (a, b) =>
-        toMinutes(a.from) - toMinutes(b.from) || toMinutes(a.to) - toMinutes(b.to) || a.station.localeCompare(b.station)
-    );
+function serviceOf(station: string) {
+  return (
+    CATERING_SERVICES.find((service) => station in service.stations) ?? { id: station, label: station, stations: { [station]: station } }
+  );
 }
 
+/** "Lunch · Kitchen", or just "Arrival" or "Dinner 1" when the station already names the service. */
+export function cateringLabel(station: string) {
+  const service = serviceOf(station);
+  const label = service.stations[station];
+  return label.startsWith(service.label) ? label : `${service.label} · ${label}`;
+}
+
+export function cateringServices(dateTime: string): CateringService[] {
+  const services = new Map<string, CateringService>();
+  for (const shift of CATERING_SHIFTS) {
+    if (shift.dateTime !== dateTime) continue;
+    const def = serviceOf(shift.station);
+    const service = services.get(def.id) ?? { id: def.id, label: def.label, start: Infinity, end: -Infinity, stations: [], people: [] };
+    services.set(def.id, service);
+    let station = service.stations.find((entry) => entry.station === shift.station);
+    if (!station) {
+      station = { station: shift.station, label: def.stations[shift.station], bars: [] };
+      service.stations.push(station);
+    }
+    const from = toMinutes(shift.from);
+    const to = toMinutes(shift.to);
+    const bar = station.bars.find((entry) => entry.from === from && entry.to === to);
+    if (bar) bar.people.push(shift.person);
+    else station.bars.push({ from, to, people: [shift.person] });
+    if (!service.people.includes(shift.person)) service.people.push(shift.person);
+    service.start = Math.min(service.start, from);
+    service.end = Math.max(service.end, to);
+  }
+
+  const order = (def: { id: string }) => {
+    const index = CATERING_SERVICES.findIndex((service) => service.id === def.id);
+    return index === -1 ? CATERING_SERVICES.length : index;
+  };
+  return [...services.values()]
+    .map((service) => {
+      const def = CATERING_SERVICES.find((entry) => entry.id === service.id);
+      const stationOrder = def ? Object.keys(def.stations) : [];
+      return {
+        ...service,
+        people: service.people.sort((a, b) => a.localeCompare(b, "en")),
+        stations: service.stations
+          .sort((a, b) => stationOrder.indexOf(a.station) - stationOrder.indexOf(b.station) || a.bars[0].from - b.bars[0].from)
+          .map((station) => ({
+            ...station,
+            bars: station.bars
+              .map((bar) => ({ ...bar, people: bar.people.sort((a, b) => a.localeCompare(b, "en")) }))
+              .sort((a, b) => a.from - b.from || a.to - b.to),
+          })),
+      };
+    })
+    .sort((a, b) => a.start - b.start || order(a) - order(b));
+}

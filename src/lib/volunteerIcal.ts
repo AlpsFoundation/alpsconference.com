@@ -11,6 +11,7 @@ import { serializeCalendar, VENUE, type CalendarEvent } from "./ical";
 import {
   blockTasks,
   cateringFor,
+  cateringLabel,
   crewEventsFor,
   formatTime,
   shiftBlocks,
@@ -66,7 +67,7 @@ export function buildVolunteerCalendar(
     uid: `crew-${slug}-catering-${shift.dateTime}-${shift.from.replace(":", "")}@${UID_DOMAIN}`,
     date: shift.dateTime,
     range: { start: shift.from, end: shift.to },
-    summary: `ALPS catering: ${shift.station}`,
+    summary: `ALPS catering: ${cateringLabel(shift.station)}`,
     description: ["Catering team · not counted in the hours.", ...footer].join("\n\n"),
     location: VENUE,
     url: pageUrl,
