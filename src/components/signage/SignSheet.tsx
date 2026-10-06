@@ -54,9 +54,9 @@ import {
   Wine,
   type LucideIcon,
 } from "lucide-react";
-import { encode } from "uqr";
 import { withBase } from "../../lib/withBase";
-import { SIGN_CATEGORIES, type Sign, type SignArrow, type SignArt, type SignIcon } from "../../data/signage";
+import { SIGN_CATEGORIES, type Sign, type SignArrow, type SignArt, type SignIcon, type SignTiles } from "../../data/signage";
+import { qrPath, type QrEcc } from "./qr";
 
 export const ICONS: Record<SignIcon, LucideIcon> = {
   info: Info,
@@ -112,7 +112,7 @@ export const ICONS: Record<SignIcon, LucideIcon> = {
   pencil: PencilLine,
 };
 
-const ARROW_ANGLE: Record<SignArrow, number> = {
+export const ARROW_ANGLE: Record<SignArrow, number> = {
   up: 0,
   "up-right": 45,
   right: 90,
@@ -178,29 +178,11 @@ export function artFor(sign: Sign): SignArt {
 
 /* ------------------------------------------------------------------ QR -- */
 
-/** One path for the whole code: each run of dark modules in a row becomes a rectangle. */
-function qrPath(text: string) {
-  const { data, size } = encode(text, { ecc: "M", border: 0 });
-  let d = "";
-  data.forEach((row, y) => {
-    let x = 0;
-    while (x < size) {
-      if (!row[x]) {
-        x += 1;
-        continue;
-      }
-      const start = x;
-      while (x < size && row[x]) x += 1;
-      d += `M${start} ${y}h${x - start}v1h${start - x}z`;
-    }
-  });
-  return { d, size };
-}
-
-function Qr({ url }: { url: string }) {
-  const { d, size } = useMemo(() => qrPath(url), [url]);
+/** `align` places the square code inside a box of another shape, as on the cut-out cards. */
+export function Qr({ url, ecc = "M", className = "sign__qr-code", align }: { url: string; ecc?: QrEcc; className?: string; align?: string }) {
+  const { d, size } = useMemo(() => qrPath(url, ecc), [url, ecc]);
   return (
-    <svg className="sign__qr-code" viewBox={`-1 -1 ${size + 2} ${size + 2}`} shapeRendering="crispEdges" aria-hidden="true">
+    <svg className={className} viewBox={`-1 -1 ${size + 2} ${size + 2}`} preserveAspectRatio={align} shapeRendering="crispEdges" aria-hidden="true">
       <path d={d} fill="currentColor" />
     </svg>
   );
@@ -218,6 +200,7 @@ function titleLimits(sign: Sign): { max: number; lines: number } {
   if (layout === "schedule") return { max: 9, lines: 2 };
   if (layout === "sheet") return { max: 7, lines: 2 };
   if (layout === "timer") return { max: 7, lines: 1 };
+  if (layout === "qr") return { max: sign.orientation === "landscape" ? 11.5 : 13, lines: 3 };
   const busy = Boolean(sign.qr || sign.rows?.length || (sign.body?.length ?? 0) > 1);
   if (sign.orientation === "landscape") return { max: busy ? 13 : 24, lines: 3 };
   return { max: busy ? 13 : 20, lines: 4 };
@@ -231,6 +214,7 @@ function useFit(sign: Sign, contentRef: React.RefObject<HTMLDivElement | null>, 
   useLayoutEffect(() => {
     const content = contentRef.current;
     const main = mainRef.current;
+    // Tiled QR sheets render neither: every card is sized against itself, with no fitting.
     if (!content || !main) return;
     const title = content.querySelector<HTMLElement>(".sign__title");
     const { max, lines } = titleLimits(sign);
@@ -244,21 +228,36 @@ function useFit(sign: Sign, contentRef: React.RefObject<HTMLDivElement | null>, 
     };
     const pageFits = () => content.scrollHeight <= main.clientHeight + 1 && content.scrollWidth <= main.clientWidth + 1;
 
-    let start = steps.length - 1;
-    for (let i = 0; i < steps.length; i++) {
-      content.style.setProperty("--title", `${steps[i]}cqmin`);
-      if (titleFits()) {
-        start = i;
-        break;
+    const fit = () => {
+      let start = steps.length - 1;
+      for (let i = 0; i < steps.length; i++) {
+        content.style.setProperty("--title", `${steps[i]}cqmin`);
+        if (titleFits()) {
+          start = i;
+          break;
+        }
       }
-    }
-    for (let i = start; i < steps.length; i++) {
-      content.style.setProperty("--title", `${steps[i]}cqmin`);
-      for (const density of DENSITY_STEPS) {
-        content.style.setProperty("--density", String(density));
-        if (pageFits()) return;
+      for (let i = start; i < steps.length; i++) {
+        content.style.setProperty("--title", `${steps[i]}cqmin`);
+        for (const density of DENSITY_STEPS) {
+          content.style.setProperty("--density", String(density));
+          if (pageFits()) return;
+        }
       }
+    };
+
+    if (main.clientHeight > 0) {
+      fit();
+      return;
     }
+    // Rendered while hidden, as in a dialog that is not open yet: fit once the sheet has a size.
+    const observer = new ResizeObserver(() => {
+      if (main.clientHeight === 0) return;
+      observer.disconnect();
+      fit();
+    });
+    observer.observe(main);
+    return () => observer.disconnect();
   }, [sign, fontsReady, contentRef, mainRef]);
 }
 
@@ -319,7 +318,7 @@ function breakable(text: string) {
 function QrBlock({ qr }: { qr: NonNullable<Sign["qr"]> }) {
   return (
     <div className="sign__qr">
-      <Qr url={qr.url} />
+      <Qr url={qr.url} ecc={qr.ecc} />
       <div className="sign__qr-text">
         <p className="sign__qr-kicker">Scan</p>
         <p className="sign__qr-label">{breakable(qr.label)}</p>
@@ -431,6 +430,61 @@ function TimerLayout({ sign }: { sign: Sign }) {
   );
 }
 
+function QrLayout({ sign }: { sign: Sign }) {
+  return (
+    <>
+      <Text sign={sign} />
+      {sign.qr && (
+        <div className="sign__qr-hero">
+          <Qr url={sign.qr.url} ecc={sign.qr.ecc} />
+          <div className="sign__qr-text">
+            <p className="sign__qr-kicker">Scan</p>
+            <p className="sign__qr-label">{breakable(sign.qr.label)}</p>
+            {sign.qr.caption && <p className="sign__qr-caption">{sign.qr.caption}</p>}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/** Columns and rows of cut-out cards on one sheet. */
+export function tileGrid(tiles: SignTiles, orientation: "portrait" | "landscape") {
+  const long = tiles === 2 ? 2 : tiles / 2;
+  const short = tiles === 2 ? 1 : 2;
+  return orientation === "portrait" ? { cols: short, rows: long } : { cols: long, rows: short };
+}
+
+/** The same small card, repeated with cut lines between: for tables, counters and stickers. */
+function QrTiles({ sign }: { sign: Sign }) {
+  const tiles = sign.tiles ?? 1;
+  const { cols, rows } = tileGrid(tiles, sign.orientation ?? "portrait");
+  return (
+    <div className="sign__tiles" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
+      {Array.from({ length: tiles }, (_, index) => (
+        <div key={index} className="sign__tile">
+          <div className="sign__tile-inner">
+            <div className="sign__tile-text">
+              <img className="sign__tile-logo" src={withBase("img/logo.png")} alt={index === 0 ? "ALPS Research Conference" : ""} />
+              {sign.eyebrow && <p className="sign__tile-eyebrow">{sign.eyebrow}</p>}
+              {sign.title && <h2 className="sign__tile-title">{sign.title}</h2>}
+              {sign.subtitle && <p className="sign__tile-subtitle">{sign.subtitle}</p>}
+            </div>
+            {sign.qr && (
+              <>
+                <div className="sign__tile-code">
+                  <Qr url={sign.qr.url} ecc={sign.qr.ecc} align="xMinYMid meet" />
+                </div>
+                <p className="sign__tile-label">{breakable(sign.qr.label)}</p>
+              </>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ sign -- */
 
 type SignSheetProps = {
@@ -454,6 +508,15 @@ function SignSheetImpl({ sign, lineArt = true, fontsReady = false, className = "
   const place = artSpec?.[orientation];
   const cq = (value?: number) => (value == null ? undefined : `${value}cqmin`);
   const hasText = Boolean(sign.title || sign.eyebrow || sign.subtitle);
+  const tiled = layout === "qr" && (sign.tiles ?? 1) > 1;
+
+  if (tiled) {
+    return (
+      <div className={`sign sign--${orientation} sign--qr is-tiled ${className}`} style={style}>
+        <QrTiles sign={sign} />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -488,6 +551,7 @@ function SignSheetImpl({ sign, lineArt = true, fontsReady = false, className = "
             {layout === "schedule" && <Schedule sign={sign} />}
             {layout === "sheet" && <SheetLayout sign={sign} />}
             {layout === "timer" && <TimerLayout sign={sign} />}
+            {layout === "qr" && <QrLayout sign={sign} />}
             {sign.note && <p className="sign__note">{sign.note}</p>}
           </div>
         </div>

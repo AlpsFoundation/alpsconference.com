@@ -1,21 +1,52 @@
 import { SIGN_CATEGORY_LABEL, signName, type Sign } from "../../data/signage";
 
 /** The parts of a sign the generator lets you edit. */
-export const EDITABLE_FIELDS = ["orientation", "eyebrow", "title", "subtitle", "body", "icon", "arrow", "markers", "qr", "art"] as const;
+export const EDITABLE_FIELDS = [
+  "layout",
+  "orientation",
+  "eyebrow",
+  "title",
+  "subtitle",
+  "body",
+  "rows",
+  "icon",
+  "arrow",
+  "markers",
+  "qr",
+  "tiles",
+  "sheet",
+  "figure",
+  "note",
+  "art",
+] as const;
 export type EditableField = (typeof EDITABLE_FIELDS)[number];
-export type SignEdit = Partial<Pick<Sign, EditableField>>;
+/** `null` clears a field: unlike `undefined`, it survives the trip through localStorage. */
+export type SignEdit = { [K in EditableField]?: Sign[K] | null };
+
+// Stable, and blind to empty strings, so `{ caption: "" }` matches a QR code without one.
+export const canon = (value: unknown) =>
+  JSON.stringify(value ?? null, (_key, entry) => {
+    if (entry === "") return undefined;
+    if (entry && typeof entry === "object" && !Array.isArray(entry)) {
+      return Object.fromEntries(Object.entries(entry).sort(([a], [b]) => a.localeCompare(b)));
+    }
+    return entry;
+  });
+
+export const same = (a: unknown, b: unknown) => canon(a) === canon(b);
 
 function show(value: unknown): string {
   if (value == null || value === "") return "(none)";
   if (Array.isArray(value)) return value.length ? value.map((item) => show(item)).join(" / ") : "(none)";
   if (typeof value === "object") {
-    const qr = value as { url?: string; label?: string };
-    return qr.url ? `${qr.url} labelled "${qr.label ?? ""}"` : JSON.stringify(value);
+    const record = value as Record<string, unknown>;
+    if (typeof record.url === "string") return `${record.url} labelled "${record.label ?? ""}"${record.caption ? `, caption "${record.caption}"` : ""}`;
+    if (typeof record.label === "string") return [record.lead, record.label, record.detail, record.aside].filter(Boolean).join(" | ");
+    if (Array.isArray(record.columns)) return `columns ${(record.columns as string[]).join(", ")}, ${record.rows} rows${record.split ? ", split" : ""}`;
+    return JSON.stringify(value);
   }
   return `"${String(value)}"`;
 }
-
-const same = (a: unknown, b: unknown) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
 
 /** Field-by-field changes of an edited sign, as "title "A" → "B"". */
 export function describeEdit(base: Sign, edit: SignEdit): string[] {
@@ -25,15 +56,21 @@ export function describeEdit(base: Sign, edit: SignEdit): string[] {
 }
 
 function describeNew(sign: Sign): string {
+  const layout = sign.layout ?? "statement";
   const parts = [
+    layout !== "statement" && `layout "${layout}"${sign.tiles && sign.tiles > 1 ? ` with ${sign.tiles} cut-out cards per page` : ""}`,
     `title ${show(sign.title)}`,
     sign.eyebrow && `eyebrow ${show(sign.eyebrow)}`,
     sign.subtitle && `subtitle ${show(sign.subtitle)}`,
     sign.body?.length && `body ${show(sign.body)}`,
+    sign.rows?.length && `rows ${show(sign.rows)}`,
     sign.icon && `icon "${sign.icon}"`,
     sign.arrow && `arrow "${sign.arrow}"`,
     sign.markers?.length && `map numbers ${sign.markers.join(", ")}`,
-    sign.qr && `QR code ${show(sign.qr)}`,
+    sign.qr && `QR code ${show(sign.qr)}${sign.qr.ecc && sign.qr.ecc !== "M" ? ` (error correction ${sign.qr.ecc})` : ""}`,
+    sign.sheet && `sheet ${show(sign.sheet)}`,
+    sign.figure && `figure ${show(sign.figure)}`,
+    sign.note && `note ${show(sign.note)}`,
     sign.art && `line art "${sign.art}"`,
     sign.orientation === "landscape" ? "landscape" : "portrait",
   ].filter(Boolean);
@@ -48,9 +85,9 @@ type PromptInput = {
 };
 
 export function changeCount({ library, removed, edits, added }: PromptInput) {
-  const ids = new Set(library.map((sign) => sign.id));
-  const edited = Object.entries(edits).filter(([id, edit]) => ids.has(id) && !removed.includes(id) && describeEdit(library.find((s) => s.id === id)!, edit).length);
-  return { removed: removed.filter((id) => ids.has(id)).length, edited: edited.length, added: added.length };
+  const byId = new Map(library.map((sign) => [sign.id, sign]));
+  const edited = Object.entries(edits).filter(([id, edit]) => byId.has(id) && !removed.includes(id) && describeEdit(byId.get(id)!, edit).length);
+  return { removed: removed.filter((id) => byId.has(id)).length, edited: edited.length, added: added.length };
 }
 
 /**
