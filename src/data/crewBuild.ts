@@ -625,6 +625,12 @@ const DATA: BuildData = {
           ],
           "draft": true,
           "what": "Take the ALPS double wood panels, connector sticks and magnets from 13 back to the truck."
+        },
+        {
+          "id": "load-moss",
+          "name": "Moss decoration goes back into its own boxes",
+          "lead": "Matthias",
+          "what": "Pack the moss back into the boxes it came in and put each box's return label on. Matthias drops the boxes at the post office in Bern on Sunday 11 October at 16:00."
         }
       ]
     },
