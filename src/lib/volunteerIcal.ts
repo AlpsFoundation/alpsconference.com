@@ -1,6 +1,6 @@
 /**
  * Per-person crew calendar: every shift and catering shift, plus the loading,
- * morning circles and dismantling that person is part of, plus what they signed up for in the build
+ * crew meals, morning circles and dismantling that person is part of, plus what they signed up for in the build
  * (setup on Thursday, teardown and packing the truck on Saturday). Served on demand,
  * so subscribers pick up plan changes and new sign-ups on their next refresh.
  */

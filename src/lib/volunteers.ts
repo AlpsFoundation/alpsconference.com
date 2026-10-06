@@ -199,5 +199,3 @@ export function cateringRows(dateTime: string): CateringRow[] {
     );
 }
 
-/** Days with a catering plan, each shown in its own schedule tab. */
-export const CATERING_DAYS: string[] = [...new Set(CATERING_SHIFTS.map((shift) => shift.dateTime))].sort();

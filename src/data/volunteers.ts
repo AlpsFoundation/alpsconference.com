@@ -209,6 +209,14 @@ export const CREW_EVENTS: CrewEvent[] = [
     people: ["Ece"],
   },
   {
+    id: "dinner-thu",
+    title: "Crew dinner",
+    dateTime: "2026-10-08",
+    start: "18:00",
+    calendarMinutes: 120,
+    place: "Meet at the Kultur & Kongresshaus Aarau",
+  },
+  {
     id: "power-circle-fri",
     title: "Morning Love & Compassion Circle",
     dateTime: "2026-10-09",
@@ -267,6 +275,14 @@ export const CREW_EVENTS: CrewEvent[] = [
     start: "21:30",
     calendarMinutes: 60,
     place: "Kultur & Kongresshaus Aarau",
+  },
+  {
+    id: "lunch-sun",
+    title: "Final lunch – right after checkout",
+    dateTime: "2026-10-11",
+    start: "11:15",
+    calendarMinutes: 90,
+    place: "Meet in front of the Kultur & Kongresshaus Aarau",
   },
   {
     id: "unloading",

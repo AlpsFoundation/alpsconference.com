@@ -19,7 +19,6 @@ import {
 } from "../data/volunteers";
 import {
   blockMinutes,
-  CATERING_DAYS,
   cateringFor,
   cateringRows,
   countedMinutes,
@@ -57,10 +56,10 @@ const DAY_PARAMS: Record<string, string> = {
   fri: "2026-10-09",
   sat: "2026-10-10",
   sun: "2026-10-11",
-  "fri-catering": "2026-10-09-catering",
-  "sat-catering": "2026-10-10-catering",
+  // Catering used to have its own tabs; it now sits under that day's grid.
+  "fri-catering": "2026-10-09",
+  "sat-catering": "2026-10-10",
 };
-const CATERING_SUFFIX = "-catering";
 
 type ThemePref = "auto" | "light" | "dark";
 
@@ -91,12 +90,6 @@ type PlanRow =
   | { kind: "slot"; key: string; start: number; end: number; slot: ShiftSlot; program: string }
   | { kind: "crew"; key: string; start: number; end: number; event: CrewEvent }
   | { kind: "catering"; key: string; start: number; end: number; row: CateringRow };
-
-/** Schedule tabs: one per plan day, then one per catering day. */
-const PLAN_TABS = [
-  ...PLAN_DAYS.map((day) => ({ id: day.dateTime, date: day.dateTime, catering: false })),
-  ...CATERING_DAYS.map((date) => ({ id: `${date}${CATERING_SUFFIX}`, date, catering: true })),
-];
 
 const dateLabelFormat = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 const tabLabelFormat = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", timeZone: "UTC" });
@@ -371,6 +364,116 @@ function CrewEventLine({ event, person }: { event: CrewEvent; person: string | n
   );
 }
 
+/** One timeline of schedule rows, with a line marking the time between rows on the day itself. */
+function PlanList({
+  rows,
+  date,
+  clock,
+  person,
+  onChoose,
+}: {
+  rows: PlanRow[];
+  date: string;
+  clock: Clock | null;
+  person: string | null;
+  onChoose: (name: string) => void;
+}) {
+  const rowTimings = rows.map((row) => timingOf(clock, date, row.start, row.end));
+  const nowLineAt =
+    clock?.date === date && !rowTimings.includes("now")
+      ? (() => {
+          const index = rows.findIndex((row) => row.start > clock.minutes);
+          return index === -1 ? rows.length : index;
+        })()
+      : -1;
+  const nowLine = clock && (
+    <li className="vol-nowline" aria-label={`Now, ${formatTime(clock.minutes)}`}>
+      <span className="vol-state">Now · {formatTime(clock.minutes)}</span>
+    </li>
+  );
+
+  return (
+    <ol className="vol-grid__rows">
+      {rows.map((row, index) => {
+        const timing = rowTimings[index];
+        const hasMe = Boolean(person) && involves(row, person!);
+        return (
+          <Fragment key={row.key}>
+            {index === nowLineAt && nowLine}
+            {row.kind === "catering" ? (
+              <li className="vol-slot vol-slot--crew" data-me={hasMe || undefined} data-state={timing}>
+                <div className="vol-slot__time">
+                  {row.row.from}–{row.row.to}
+                  <StateBadge timing={timing} clock={clock} />
+                </div>
+                <div className="vol-slot__program">
+                  <strong>{row.row.station}</strong>
+                  <span className="vol-slot__place">Catering</span>
+                </div>
+                <div className="vol-slot__crew">
+                  {row.row.people.map((name) => (
+                    <NamePill key={name} name={name} person={person} onChoose={onChoose} />
+                  ))}
+                </div>
+              </li>
+            ) : row.kind === "crew" ? (
+              <li className="vol-slot vol-slot--crew" data-me={hasMe || undefined} data-state={timing}>
+                <div className="vol-slot__time">
+                  {crewTime(row.event)}
+                  <StateBadge timing={timing} clock={clock} />
+                </div>
+                <div className="vol-slot__program">
+                  <strong>{row.event.title}</strong>
+                  <span className="vol-slot__place">{row.event.place}</span>
+                </div>
+                <div className="vol-slot__crew">
+                  {row.event.people ? (
+                    row.event.people.map((name) => (
+                      <NamePill key={name} name={name} person={person} onChoose={onChoose} />
+                    ))
+                  ) : (
+                    <span className="vol-slot__everyone">Everyone</span>
+                  )}
+                </div>
+              </li>
+            ) : (
+              <li className="vol-slot" data-me={hasMe || undefined} data-state={timing}>
+                <div className="vol-slot__time">
+                  {row.slot.from}–{row.slot.to}
+                  <StateBadge timing={timing} clock={clock} />
+                </div>
+                <div className="vol-slot__program">
+                  {row.slot.program ? <strong>{row.slot.program}</strong> : <span>{row.program}</span>}
+                </div>
+                {VOLUNTEER_TASK_ORDER.map((task) => (
+                  <div
+                    key={task}
+                    className="vol-slot__cell"
+                    data-task={task}
+                    data-empty={!row.slot[task].length || undefined}
+                  >
+                    <span className="vol-slot__label">{VOLUNTEER_TASKS[task].label}</span>
+                    <span className="vol-slot__names">
+                      {row.slot[task].length ? (
+                        row.slot[task].map((name) => (
+                          <NamePill key={name} name={name} person={person} onChoose={onChoose} />
+                        ))
+                      ) : (
+                        <span className="vol-slot__none">–</span>
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </li>
+            )}
+          </Fragment>
+        );
+      })}
+      {nowLineAt === rows.length && nowLine}
+    </ol>
+  );
+}
+
 function MyShifts({
   person,
   clock,
@@ -571,7 +674,7 @@ export default function VolunteersPage() {
   useEffect(() => {
     const raw = new URLSearchParams(window.location.search).get("day")?.toLowerCase() ?? "";
     const date = DAY_PARAMS[raw] ?? raw;
-    if (PLAN_TABS.some((tab) => tab.id === date)) {
+    if (PLAN_DAYS.some((day) => day.dateTime === date)) {
       dayPicked.current = true;
       setDayDate(date);
     }
@@ -653,24 +756,10 @@ export default function VolunteersPage() {
     document.getElementById("vol-plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const tab = PLAN_TABS.find((entry) => entry.id === dayDate) ?? PLAN_TABS[0];
-  const day = PLAN_DAYS.find((entry) => entry.dateTime === tab.date) ?? PLAN_DAYS[0];
-  const cateringTab = tab.catering;
-  const rows = (cateringTab ? cateringPlanRows(tab.date) : planRows(day)).filter((row) => !onlyMine || !person || involves(row, person));
-  const rowTimings = rows.map((row) => timingOf(clock, tab.date, row.start, row.end));
-  // Between rows (or before or after them all) on the day itself, a line marks the time.
-  const nowLineAt =
-    clock?.date === tab.date && !rowTimings.includes("now")
-      ? (() => {
-          const index = rows.findIndex((row) => row.start > clock.minutes);
-          return index === -1 ? rows.length : index;
-        })()
-      : -1;
-  const nowLine = clock && (
-    <li className="vol-nowline" aria-label={`Now, ${formatTime(clock.minutes)}`}>
-      <span className="vol-state">Now · {formatTime(clock.minutes)}</span>
-    </li>
-  );
+  const day = PLAN_DAYS.find((entry) => entry.dateTime === dayDate) ?? PLAN_DAYS[0];
+  const mine = (row: PlanRow) => !onlyMine || !person || involves(row, person);
+  const rows = planRows(day).filter(mine);
+  const catering = cateringPlanRows(day.dateTime).filter(mine);
 
   return (
     <div className="vol-page">
@@ -773,25 +862,19 @@ export default function VolunteersPage() {
           </h2>
           <div className="vol-plan__controls">
             <div className="vol-tabs" role="tablist" aria-label="Day">
-              {PLAN_TABS.map((entry, index) => (
-                <Fragment key={entry.id}>
-                  {/* On phones the catering tabs start a second row. */}
-                  {entry.catering && !PLAN_TABS[index - 1]?.catering && (
-                    <span className="vol-tabs__break" aria-hidden="true" />
-                  )}
-                  <button
-                    type="button"
-                    role="tab"
-                    id={`vol-tab-${entry.id}`}
-                    aria-selected={entry.id === tab.id}
-                    aria-controls="vol-grid"
-                    data-past={(clock && entry.date < clock.date) || undefined}
-                    onClick={() => setDayDate(entry.id)}
-                  >
-                    {tabLabel(entry.date)}
-                    {entry.catering && " Catering"}
-                  </button>
-                </Fragment>
+              {PLAN_DAYS.map((entry) => (
+                <button
+                  key={entry.dateTime}
+                  type="button"
+                  role="tab"
+                  id={`vol-tab-${entry.dateTime}`}
+                  aria-selected={entry.dateTime === day.dateTime}
+                  aria-controls="vol-day-panel"
+                  data-past={(clock && entry.dateTime < clock.date) || undefined}
+                  onClick={() => setDayDate(entry.dateTime)}
+                >
+                  {tabLabel(entry.dateTime)}
+                </button>
               ))}
             </div>
             {person && (
@@ -803,112 +886,45 @@ export default function VolunteersPage() {
           </div>
         </div>
 
-        <div id="vol-grid" className="vol-grid" role="tabpanel" aria-labelledby={`vol-tab-${tab.id}`}>
-          {!cateringTab && day.shiftDay && (
-            <div ref={headRef} className="vol-grid__head">
-              <span className="vol-grid__col">Time</span>
-              <span className="vol-grid__col">On stage</span>
-              {VOLUNTEER_TASK_ORDER.map((task) => (
-                <TaskHeader
-                  key={task}
-                  task={task}
-                  open={openTask === task}
-                  onToggle={() => setOpenTask((current) => (current === task ? null : task))}
-                />
-              ))}
-            </div>
+        <div id="vol-day-panel" role="tabpanel" aria-labelledby={`vol-tab-${day.dateTime}`}>
+          <div className="vol-grid">
+            {day.shiftDay && (
+              <div ref={headRef} className="vol-grid__head">
+                <span className="vol-grid__col">Time</span>
+                <span className="vol-grid__col">On stage</span>
+                {VOLUNTEER_TASK_ORDER.map((task) => (
+                  <TaskHeader
+                    key={task}
+                    task={task}
+                    open={openTask === task}
+                    onToggle={() => setOpenTask((current) => (current === task ? null : task))}
+                  />
+                ))}
+              </div>
+            )}
+            <PlanList rows={rows} date={day.dateTime} clock={clock} person={person} onChoose={chooseAndScroll} />
+          </div>
+          {catering.length > 0 && (
+            <section id="vol-catering" className="vol-catering" aria-labelledby="vol-catering-title">
+              <h3 id="vol-catering-title" className="vol-h3">
+                Catering team
+              </h3>
+              <p className="vol-note">From the catering plan. Not counted in the hours.</p>
+              <div className="vol-grid">
+                <PlanList rows={catering} date={day.dateTime} clock={clock} person={person} onChoose={chooseAndScroll} />
+              </div>
+            </section>
           )}
-          <ol className="vol-grid__rows">
-            {rows.map((row, index) => {
-              const timing = rowTimings[index];
-              const hasMe = Boolean(person) && involves(row, person!);
-              return (
-                <Fragment key={row.key}>
-                  {index === nowLineAt && nowLine}
-                  {row.kind === "catering" ? (
-                    <li className="vol-slot vol-slot--crew" data-me={hasMe || undefined} data-state={timing}>
-                      <div className="vol-slot__time">
-                        {row.row.from}–{row.row.to}
-                        <StateBadge timing={timing} clock={clock} />
-                      </div>
-                      <div className="vol-slot__program">
-                        <strong>{row.row.station}</strong>
-                        <span className="vol-slot__place">Catering</span>
-                      </div>
-                      <div className="vol-slot__crew">
-                        {row.row.people.map((name) => (
-                          <NamePill key={name} name={name} person={person} onChoose={chooseAndScroll} />
-                        ))}
-                      </div>
-                    </li>
-                  ) : row.kind === "crew" ? (
-                    <li className="vol-slot vol-slot--crew" data-me={hasMe || undefined} data-state={timing}>
-                      <div className="vol-slot__time">
-                        {crewTime(row.event)}
-                        <StateBadge timing={timing} clock={clock} />
-                      </div>
-                      <div className="vol-slot__program">
-                        <strong>{row.event.title}</strong>
-                        <span className="vol-slot__place">{row.event.place}</span>
-                      </div>
-                      <div className="vol-slot__crew">
-                        {row.event.people ? (
-                          row.event.people.map((name) => (
-                            <NamePill key={name} name={name} person={person} onChoose={chooseAndScroll} />
-                          ))
-                        ) : (
-                          <span className="vol-slot__everyone">Everyone</span>
-                        )}
-                      </div>
-                    </li>
-                  ) : (
-                    <li className="vol-slot" data-me={hasMe || undefined} data-state={timing}>
-                      <div className="vol-slot__time">
-                        {row.slot.from}–{row.slot.to}
-                        <StateBadge timing={timing} clock={clock} />
-                      </div>
-                      <div className="vol-slot__program">
-                        {row.slot.program ? <strong>{row.slot.program}</strong> : <span>{row.program}</span>}
-                      </div>
-                      {VOLUNTEER_TASK_ORDER.map((task) => (
-                        <div
-                          key={task}
-                          className="vol-slot__cell"
-                          data-task={task}
-                          data-empty={!row.slot[task].length || undefined}
-                        >
-                          <span className="vol-slot__label">{VOLUNTEER_TASKS[task].label}</span>
-                          <span className="vol-slot__names">
-                            {row.slot[task].length ? (
-                              row.slot[task].map((name) => (
-                                <NamePill key={name} name={name} person={person} onChoose={chooseAndScroll} />
-                              ))
-                            ) : (
-                              <span className="vol-slot__none">–</span>
-                            )}
-                          </span>
-                        </div>
-                      ))}
-                    </li>
-                  )}
-                </Fragment>
-              );
-            })}
-            {nowLineAt === rows.length && nowLine}
-          </ol>
+          {BUILD_DAYS[day.dateTime] && (
+            <CrewBuild
+              dateTime={day.dateTime}
+              person={person}
+              build={build}
+              onlyMine={onlyMine}
+              onNeedPerson={needPerson}
+            />
+          )}
         </div>
-        {cateringTab && (
-          <p className="vol-note">Catering team, from the catering plan. Not counted in the hours.</p>
-        )}
-        {!cateringTab && BUILD_DAYS[day.dateTime] && (
-          <CrewBuild
-            dateTime={day.dateTime}
-            person={person}
-            build={build}
-            onlyMine={onlyMine}
-            onNeedPerson={needPerson}
-          />
-        )}
       </section>
 
       <footer className="vol-foot">
