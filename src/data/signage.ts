@@ -15,6 +15,12 @@ import { WIFI } from "./links";
 
 export const SIGN_SITE = "https://alpsconference.com";
 
+/**
+ * Invite link to the conference WhatsApp group. It goes out only as the QR
+ * code on the welcome-desk sign, never as text on the site (Matthias, 6 Oct).
+ */
+const WHATSAPP_GROUP_INVITE = "https://chat.whatsapp.com/JxuEyEs4lLcGZlzbUBrdyB";
+
 export type SignArrow = "up" | "up-right" | "right" | "down-right" | "down" | "down-left" | "left" | "up-left";
 export const SIGN_ARROWS: SignArrow[] = ["up", "up-right", "right", "down-right", "down", "down-left", "left", "up-left"];
 
@@ -216,12 +222,7 @@ const SIGNS: Sign[] = [
     eyebrow: "Ticket holders only",
     title: "Join the WhatsApp group",
     subtitle: "Last-minute changes, lift shares and meeting up during the breaks.",
-    rows: [
-      { lead: "01", label: "Open WhatsApp and go to Settings" },
-      { lead: "02", label: "Tap the QR icon next to your name" },
-      { lead: "03", label: "Show your code to a group admin at this desk" },
-    ],
-    note: "There is no invite link: a group admin adds you here.",
+    qr: { url: WHATSAPP_GROUP_INVITE, label: "Join in WhatsApp", caption: "Point your phone camera at the code." },
   },
 
   /* ------------------------------------------------------------ rooms -- */

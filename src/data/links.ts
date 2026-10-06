@@ -60,7 +60,7 @@ export const QUICK_LINKS: QuickLink[] = [
     icon: "whatsapp",
     body: "The attendee group for last-minute changes, lift shares and meeting up during the breaks. It is for ticket holders only, so you join it in person at the welcome desk.",
     details: [
-      { label: "How to join", value: "At the welcome desk, open WhatsApp, go to Settings and tap the QR icon next to your name. A group admin at the desk scans your code and adds you. There is no invite link." },
+      { label: "How to join", value: "Scan the QR code on the WhatsApp sign at the welcome desk with your phone camera." },
       { label: "Who can join", value: "Conference ticket holders" },
     ],
   },
