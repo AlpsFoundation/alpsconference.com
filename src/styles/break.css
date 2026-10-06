@@ -62,34 +62,6 @@
   width: auto;
 }
 
-/* Sponsor thank-you beside the logo: quiet, on every break and holding screen. */
-.break-brand {
-  display: flex;
-  align-items: center;
-  gap: clamp(1rem, 3vmin, 2.5rem);
-  min-width: 0;
-}
-
-.break-sponsor {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4em;
-  padding-left: clamp(1rem, 3vmin, 2.5rem);
-  border-left: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.break-sponsor__label {
-  font-size: clamp(0.75rem, 1.7vmin, 1.15rem);
-  letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.break-sponsor__logo {
-  align-self: flex-start;
-  height: clamp(2rem, 5.5vmin, 4rem);
-  width: auto;
-}
-
 .break-clock {
   display: inline-flex;
   align-items: center;
@@ -121,7 +93,15 @@
   align-items: flex-start;
   max-width: 78rem;
   text-align: left;
-  animation: break-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* backwards, not both: once in, no filter or transform is left on the message, which would keep
+     it on a layer of its own that can crop the headline's glow. */
+  animation: break-in 900ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* With the sponsor beside the headline, the message spans the full width so the sponsor's third is a third. */
+.break-message.has-sponsor {
+  width: 100%;
+  max-width: none;
 }
 
 .break-message__eyebrow {
@@ -146,17 +126,97 @@
   color: var(--color-accent-light);
 }
 
+/* The headline, with the sponsor thank-you beside it on coffee and meal breaks, the apéro
+   and the thank-you slides: the headline takes two thirds of the width, the sponsor one third. */
+.break-message__title {
+  display: flex;
+  align-items: center;
+  /* 0.3em of the headline's own size, as before the sponsor moved beside it. */
+  margin-top: clamp(0.9rem, 3.3vmin, 3rem);
+}
+
+.has-sponsor .break-message__title {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-self: stretch;
+}
+
+.has-sponsor .break-message__headline {
+  padding-right: clamp(1.5rem, 5vmin, 4.5rem);
+}
+
+/* On the same glass as the Next up banner, so it stays legible where it crosses the synapse. */
+.break-sponsor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  min-width: 0;
+  padding: clamp(0.9rem, 2.4vmin, 2rem) clamp(1rem, 3vmin, 2.5rem);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: clamp(1rem, 2.4vmin, 1.75rem);
+  background:
+    linear-gradient(110deg, rgba(243, 143, 191, 0.1), rgba(46, 124, 199, 0.14)),
+    rgba(8, 47, 74, 0.72);
+  box-shadow: 0 24px 80px rgba(3, 20, 35, 0.4);
+  backdrop-filter: blur(20px);
+}
+
+.break-sponsor__label {
+  font-size: clamp(1rem, 2.6vmin, 1.9rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 3px rgba(8, 47, 74, 0.95), 0 0 18px rgba(8, 47, 74, 0.9);
+}
+
+/* The logo fills the sponsor's third, short of crowding the screen's height. */
+.break-sponsor__logo {
+  width: 100%;
+  height: auto;
+  max-height: 34vh;
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* The sponsor's own slide, after the closing talk: the logo is the message. */
+.break-sponsor-hero {
+  width: min(33vw, 60vh);
+  height: auto;
+  margin-top: clamp(1rem, 4vmin, 3rem);
+  filter: drop-shadow(0 0 1.5vmin rgba(255, 255, 255, 0.3));
+}
+
+@media (max-width: 720px) {
+  .has-sponsor .break-message__title {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .has-sponsor .break-message__headline {
+    padding-right: 0;
+  }
+
+  .break-sponsor__logo {
+    width: 60%;
+  }
+
+  .break-sponsor-hero {
+    width: 70vw;
+  }
+}
+
 .break-message__headline {
-  margin-top: 0.3em;
   font-size: clamp(3rem, 11vmin, 10rem);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.035em;
   text-wrap: balance;
+  /* In em, so the glow scales with the headline: 0.42em of an 11vmin headline stays inside the
+     5vmin gutter, where a fixed 48px glow was cut off by the screen edge on smaller screens. */
   text-shadow:
     0 0 1px rgba(255, 255, 255, 0.95),
-    0 0 20px rgba(255, 255, 255, 0.45),
-    0 0 48px rgba(255, 255, 255, 0.25);
+    0 0 0.18em rgba(255, 255, 255, 0.45),
+    0 0 0.42em rgba(255, 255, 255, 0.25);
 }
 
 .break-message__headline.is-long {
@@ -252,7 +312,7 @@
 }
 
 .break-fade {
-  animation: break-in 900ms 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: break-in 900ms 150ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .break-next {

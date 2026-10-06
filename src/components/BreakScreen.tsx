@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
   Coffee,
+  HandHeart,
   Maximize,
   Minimize,
   MessageCircleQuestion,
@@ -46,6 +47,14 @@ const GLOW_CENTER = [0.5 + SYNAPSE_OPTIONS.shiftX, 0.5 - SYNAPSE_OPTIONS.shiftY]
 
 const IDLE_MS = 2500;
 
+/** The sponsor's own slide, right after the closing talk and before the apéro; ← → and the drawer reach it. */
+const SPONSOR_SLIDE = "sponsor";
+const CLOSING = TIMELINE.find((e) => /closing/i.test(e.title));
+/** Everything the screen can be pinned to, in order: the timeline, with the sponsor slide after the closing talk. */
+const STEPS: string[] = TIMELINE.flatMap((e) => (e === CLOSING ? [e.id, SPONSOR_SLIDE] : [e.id]));
+
+const SPONSOR_LOGO = { src: "img/booklet/logos/csm.webp", alt: "Fondation Conscience et Santé Mentale" };
+
 /* ---------- Clock and pinned item ---------- */
 
 function useClock() {
@@ -66,7 +75,7 @@ function usePinnedItem() {
 
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get("item");
-    if (id && TIMELINE.some((e) => e.id === id)) setPinnedId(id);
+    if (id && STEPS.includes(id)) setPinnedId(id);
   }, []);
 
   const pin = useCallback((id: string | null) => {
@@ -134,16 +143,23 @@ function iconFor(entry: TimelineEntry): LucideIcon {
 
 type Message = {
   eyebrow?: string;
-  headline: string;
+  headline?: string;
   sub?: string;
   highlight?: string;
   people?: Person[];
   icon?: LucideIcon;
+  /** Thank the sponsor beside the headline: coffee and meal breaks, the apéro and the thank-you slides. */
+  sponsor?: boolean;
+  /** The sponsor's own slide: its logo is the message. */
+  logo?: boolean;
 };
+
+const SPONSOR_MESSAGE: Message = { eyebrow: "With thanks to our sponsor", icon: HandHeart, logo: true };
 
 function messageFor(current: TimelineEntry | undefined, next: TimelineEntry | undefined, now: Date): Message {
   if (!current) {
-    if (!next) return { eyebrow: "ALPS Conference 2026", headline: "Thank you for coming!", sub: "See you next year", icon: Sparkles };
+    if (!next)
+      return { eyebrow: "ALPS Conference 2026", headline: "Thank you for coming!", sub: "See you next year", icon: Sparkles, sponsor: true };
     if (next === TIMELINE[0]) return { eyebrow: "ALPS Conference 2026", headline: "Welcome", sub: "Kultur & Kongresshaus Aarau", icon: Sparkles };
     const sameDay = zurichDay.format(now) === zurichDay.format(next.start);
     return { eyebrow: "ALPS Conference 2026", headline: sameDay ? "Welcome back" : "See you tomorrow", icon: Sparkles };
@@ -156,15 +172,16 @@ function messageFor(current: TimelineEntry | undefined, next: TimelineEntry | un
   if (current.title === "Doors open")
     return { eyebrow: current.title, headline: firstDay ? "Welcome" : "Welcome back", sub: current.menuNote, icon: Coffee };
   if (/lunch|dinner/i.test(current.title))
-    return { eyebrow: current.title, headline: "Bon appétit!", sub: current.menuNote, highlight, icon: Utensils };
+    return { eyebrow: current.title, headline: "Bon appétit!", sub: current.menuNote, highlight, icon: Utensils, sponsor: true };
   if (current.kind === "pause")
-    return { eyebrow: current.title, headline: "Enjoy the break", sub: current.menuNote, highlight, icon: Coffee };
-  if (/apéro/i.test(current.title)) return { eyebrow: current.title, headline: "Santé!", icon: Wine };
+    return { eyebrow: current.title, headline: "Enjoy the break", sub: current.menuNote, highlight, icon: Coffee, sponsor: true };
+  if (/apéro/i.test(current.title)) return { eyebrow: current.title, headline: "Santé!", icon: Wine, sponsor: true };
   if (/afterparty/i.test(current.title))
     return { eyebrow: "Tonight", headline: "See you at the afterparty", sub: current.detail, icon: PartyPopper };
   if (current.kind === "social") return { eyebrow: current.title, headline: "Enjoy the evening", icon: Sparkles };
   if (current.title === "Opening") return { eyebrow: "Opening", headline: "Welcome", sub: current.detail, icon: Sparkles };
-  if (/closing/i.test(current.title)) return { eyebrow: current.title, headline: "Thank you", sub: current.detail, icon: Sparkles };
+  if (/closing/i.test(current.title))
+    return { eyebrow: current.title, headline: "Thank you", sub: current.detail, icon: Sparkles, sponsor: true };
   if (item?.panel)
     return { eyebrow: "Panel discussion · Q&A", headline: current.detail ?? current.title, people: peopleFor(item), icon: Users };
   if (isTalk(current))
@@ -353,24 +370,43 @@ function ScheduleDrawer({
                   const talk = isTalk(entry);
                   const shown = pinnedId ? entry.id === pinnedId : entry.id === liveId;
                   return (
-                    <li key={entry.id}>
-                      <button
-                        type="button"
-                        className={`break-drawer__item ${shown ? "is-shown" : ""} ${entry.kind !== "session" ? "is-pause" : ""}`}
-                        onClick={() => {
-                          onPin(entry.id);
-                          onClose();
-                        }}
-                      >
-                        <span className="tabular-nums text-white/55">{timeFormat.format(entry.start)}</span>
-                        <Icon className="h-4 w-4 shrink-0 text-white/45" aria-hidden />
-                        <span className="min-w-0 flex-1 truncate">
-                          {talk ? <>{entry.title} <span className="text-white/50">· {entry.detail}</span></> : entry.title}
-                        </span>
-                        {entry.id === liveId && <span className="break-tag">Live</span>}
-                        {pinnedId === entry.id && <span className="break-tag break-tag--pinned">Showing</span>}
-                      </button>
-                    </li>
+                    <Fragment key={entry.id}>
+                      <li>
+                        <button
+                          type="button"
+                          className={`break-drawer__item ${shown ? "is-shown" : ""} ${entry.kind !== "session" ? "is-pause" : ""}`}
+                          onClick={() => {
+                            onPin(entry.id);
+                            onClose();
+                          }}
+                        >
+                          <span className="tabular-nums text-white/55">{timeFormat.format(entry.start)}</span>
+                          <Icon className="h-4 w-4 shrink-0 text-white/45" aria-hidden />
+                          <span className="min-w-0 flex-1 truncate">
+                            {talk ? <>{entry.title} <span className="text-white/50">· {entry.detail}</span></> : entry.title}
+                          </span>
+                          {entry.id === liveId && <span className="break-tag">Live</span>}
+                          {pinnedId === entry.id && <span className="break-tag break-tag--pinned">Showing</span>}
+                        </button>
+                      </li>
+                      {entry === CLOSING && (
+                        <li>
+                          <button
+                            type="button"
+                            className={`break-drawer__item is-pause ${pinnedId === SPONSOR_SLIDE ? "is-shown" : ""}`}
+                            onClick={() => {
+                              onPin(SPONSOR_SLIDE);
+                              onClose();
+                            }}
+                          >
+                            <span className="tabular-nums text-white/55">{timeFormat.format(entry.end)}</span>
+                            <HandHeart className="h-4 w-4 shrink-0 text-white/45" aria-hidden />
+                            <span className="min-w-0 flex-1 truncate">With thanks to our sponsor</span>
+                            {pinnedId === SPONSOR_SLIDE && <span className="break-tag break-tag--pinned">Showing</span>}
+                          </button>
+                        </li>
+                      )}
+                    </Fragment>
                   );
                 })}
               </ul>
@@ -424,10 +460,13 @@ export default function BreakScreen() {
   const live = now ? getConferenceState(now) : null;
   const liveId = live?.phase === "live" ? live.current.id : undefined;
   const pinned = pinnedId ? TIMELINE.find((e) => e.id === pinnedId) : undefined;
+  const sponsorSlide = pinnedId === SPONSOR_SLIDE && !!CLOSING;
 
   let current: TimelineEntry | undefined;
   let next: TimelineEntry | undefined;
-  if (pinned) {
+  if (sponsorSlide) {
+    next = TIMELINE[TIMELINE.indexOf(CLOSING!) + 1];
+  } else if (pinned) {
     current = pinned;
     next = TIMELINE[TIMELINE.indexOf(pinned) + 1];
   } else if (live && live.phase !== "after") {
@@ -437,15 +476,16 @@ export default function BreakScreen() {
 
   // Step the pinned item through the schedule. Between items (or after the
   // last one) "now" sits half a step before the next one.
-  const position = current ? TIMELINE.indexOf(current) : next ? TIMELINE.indexOf(next) - 0.5 : TIMELINE.length - 0.5;
-  const prevEntry = TIMELINE[Math.ceil(position - 1)];
-  const nextEntry = TIMELINE[Math.floor(position + 1)];
+  const shownStep = sponsorSlide ? SPONSOR_SLIDE : current?.id;
+  const position = shownStep ? STEPS.indexOf(shownStep) : next ? STEPS.indexOf(next.id) - 0.5 : STEPS.length - 0.5;
+  const prevStep = STEPS[Math.ceil(position - 1)];
+  const nextStep = STEPS[Math.floor(position + 1)];
   const step = useCallback(
     (dir: 1 | -1) => {
-      const target = dir > 0 ? nextEntry : prevEntry;
-      if (target) pin(target.id);
+      const target = dir > 0 ? nextStep : prevStep;
+      if (target) pin(target);
     },
-    [nextEntry, prevEntry, pin],
+    [nextStep, prevStep, pin],
   );
 
   // Keyboard: ← → step the pinned item, F toggles full screen, Esc closes the drawer.
@@ -461,10 +501,10 @@ export default function BreakScreen() {
     return () => window.removeEventListener("keydown", onKey);
   }, [step, toggleFullscreen]);
 
-  const message = now ? messageFor(current, next, now) : null;
+  const message = now ? (sponsorSlide ? SPONSOR_MESSAGE : messageFor(current, next, now)) : null;
   const Icon = message?.icon;
-  const messageKey = `${current?.id ?? "none"}-${next?.id ?? "none"}`;
-  const long = (message?.headline.length ?? 0) > 32;
+  const messageKey = `${shownStep ?? "none"}-${next?.id ?? "none"}`;
+  const long = (message?.headline?.length ?? 0) > 32;
 
   return (
     <div ref={rootRef} className={`break-screen ${active || drawerOpen ? "" : "is-idle"}`}>
@@ -495,17 +535,7 @@ export default function BreakScreen() {
       <div className="break-vignette" aria-hidden />
 
       <header className="break-top">
-        <div className="break-brand">
-          <img src={withBase("img/logo.png")} alt="ALPS Conference 2026" className="break-logo" />
-          <div className="break-sponsor">
-            <span className="break-sponsor__label">With thanks to our sponsor</span>
-            <img
-              src={withBase("img/booklet/logos/csm.webp")}
-              alt="Fondation Conscience et Santé Mentale"
-              className="break-sponsor__logo"
-            />
-          </div>
-        </div>
+        <img src={withBase("img/logo.png")} alt="ALPS Conference 2026" className="break-logo" />
         {now && (
           <p className="break-clock">
             <CalendarDays aria-hidden />
@@ -516,14 +546,25 @@ export default function BreakScreen() {
 
       <main className="break-main">
         {message && (
-          <div key={messageKey} className="break-message">
+          <div key={messageKey} className={`break-message ${message.sponsor ? "has-sponsor" : ""}`}>
             {message.eyebrow && (
               <p className="break-message__eyebrow">
                 {Icon && <Icon aria-hidden />}
                 {message.eyebrow}
               </p>
             )}
-            <h1 className={`break-message__headline ${long ? "is-long" : ""}`}>{message.headline}</h1>
+            {message.headline && (
+              <div className="break-message__title">
+                <h1 className={`break-message__headline ${long ? "is-long" : ""}`}>{message.headline}</h1>
+                {message.sponsor && (
+                  <div className="break-sponsor">
+                    <span className="break-sponsor__label">With thanks to our sponsor</span>
+                    <img src={withBase(SPONSOR_LOGO.src)} alt={SPONSOR_LOGO.alt} className="break-sponsor__logo" />
+                  </div>
+                )}
+              </div>
+            )}
+            {message.logo && <img src={withBase(SPONSOR_LOGO.src)} alt={SPONSOR_LOGO.alt} className="break-sponsor-hero" />}
             {message.people && message.people.length > 0 && (
               <ul className="break-message__people">
                 {message.people.map((p) => (
@@ -551,19 +592,19 @@ export default function BreakScreen() {
         </div>
         {/* Shown while the mouse moves (or on hover): step through the schedule, or open it. */}
         <nav className={`break-pager ${active || drawerOpen ? "is-visible" : ""}`} aria-label="Schedule">
-          <button type="button" onClick={() => step(-1)} disabled={!prevEntry} title="Previous item (←)" aria-label="Previous item">
+          <button type="button" onClick={() => step(-1)} disabled={!prevStep} title="Previous item (←)" aria-label="Previous item">
             <ChevronLeft aria-hidden />
           </button>
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            title={pinned ? "Schedule (pinned)" : "Schedule"}
+            title={pinnedId ? "Schedule (pinned)" : "Schedule"}
             aria-label="Open the schedule"
           >
             <CalendarDays aria-hidden />
-            {pinned && <span className="break-pager__dot" aria-hidden />}
+            {pinnedId && <span className="break-pager__dot" aria-hidden />}
           </button>
-          <button type="button" onClick={() => step(1)} disabled={!nextEntry} title="Next item (→)" aria-label="Next item">
+          <button type="button" onClick={() => step(1)} disabled={!nextStep} title="Next item (→)" aria-label="Next item">
             <ChevronRight aria-hidden />
           </button>
         </nav>
