@@ -107,7 +107,7 @@ export const QUICK_LINKS: QuickLink[] = [
     label: "Networking dinner",
     summary: "Friday, 19:15–20:15 · pre-sale",
     icon: "dinner",
-    body: "Tofu-vegetable curry on rice with herb pesto, a crêpe station, drinks included. Buy on Infomaniak or at the ALPS info table at the venue.",
+    body: "Tofu-vegetable curry on rice with herb pesto, a crêpe station, 1 drink included. Buy on Infomaniak or at the ALPS info table at the venue.",
     actions: [{
       label: "Buy a dinner ticket",
       href: "https://infomaniak.events/en-ch/conferences/alps-conference-2026/c2484795-1ae7-4b4b-aa21-c9b8f085008c/events/382409",

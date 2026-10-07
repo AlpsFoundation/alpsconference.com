@@ -497,7 +497,7 @@ const SIGNS: Sign[] = [
     rows: [
       { lead: "01", label: "Tofu-vegetable curry on rice with herb pesto" },
       { lead: "02", label: "Crêpe station" },
-      { lead: "03", label: "Drinks included" },
+      { lead: "03", label: "1 drink included" },
     ],
     qr: {
       url: "https://infomaniak.events/en-ch/conferences/alps-conference-2026/c2484795-1ae7-4b4b-aa21-c9b8f085008c/events/382409",
