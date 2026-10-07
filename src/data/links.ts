@@ -28,7 +28,8 @@ export type QuickLink = {
   summary: string;
   icon: QuickLinkIcon;
   body?: string;
-  details?: { label: string; value: string }[];
+  /** `lead` is shown in bold before `value`. */
+  details?: { label: string; value: string; lead?: string }[];
   actions?: QuickLinkAction[];
   /** Special content rendered inside the item. */
   media?: "venue-map" | "wifi";
@@ -119,11 +120,11 @@ export const QUICK_LINKS: QuickLink[] = [
     label: "Afterparty",
     summary: "Saturday, 21:30–04:00 · Flösserplatz",
     icon: "afterparty",
-    body: "The conference closes with the Afterglow afterparty. Music starts at 22:00 and the night runs until 04:00.",
+    body: "The conference closes with the Afterglow afterparty, right after the Apero finishes. The night runs until 04:00.",
     details: [
       { label: "Where", value: "Jugendkulturhaus Flösserplatz, Flösserstrasse 7, 5000 Aarau" },
       { label: "Getting there", value: "5 minutes on foot from the conference venue" },
-      { label: "Entry", value: "Included in your conference ticket. The party is guestlist only — get on the list via eventfrog" },
+      { label: "Entry", lead: "Included in your conference ticket.", value: "The party is guestlist only — if you have friends or family who want to join, have them get on the list via eventfrog." },
       { label: "Lineup", value: "Enero · Psyre · Adage · DK ∞" },
     ],
     actions: [

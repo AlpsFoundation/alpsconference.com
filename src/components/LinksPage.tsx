@@ -456,7 +456,7 @@ function QuickLinks({ now }: { now: Date }) {
                 {link.details && (
                   <dl className="links-details">
                     {link.details.map((d) => (
-                      <div key={d.label}><dt>{d.label}</dt><dd>{d.value}</dd></div>
+                      <div key={d.label}><dt>{d.label}</dt><dd>{d.lead && <><strong className="text-white">{d.lead}</strong> </>}{d.value}</dd></div>
                     ))}
                   </dl>
                 )}
