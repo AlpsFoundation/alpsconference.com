@@ -601,6 +601,13 @@ const DATA: BuildData = {
           "lead": "Matthias",
           "draft": true,
           "what": "Print the A3 and A4 signs on the on-site printer (Matthias and Maria), then put them up around the house."
+        },
+        {
+          "id": "signs-stage-timers",
+          "name": "Print the stage time cards for the moderators",
+          "lead": "Matthias",
+          "draft": true,
+          "what": "Print the Stage & team time signals from alpsconference.com/signage (10, 5 and 1 minute, Time is up, Q&A) and hand them to the Friday morning moderator before the first talk at 09:30."
         }
       ]
     },
