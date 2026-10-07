@@ -27,6 +27,13 @@
   background: radial-gradient(ellipse 55% 32% at 25% 66%, rgba(8, 47, 74, 0.6), transparent 70%);
 }
 
+/* With the sponsor in the right third, the same soft shade sits behind it, where the synapse crosses. */
+.break-screen[data-sponsor] .break-vignette {
+  background:
+    radial-gradient(ellipse 55% 32% at 25% 66%, rgba(8, 47, 74, 0.6), transparent 70%),
+    radial-gradient(ellipse 27% 38% at 82% 50%, rgba(8, 47, 74, 0.88), transparent 80%);
+}
+
 /* Fallback PNG, framed like the 3D view: smaller and in the upper right. */
 .break-bones {
   position: absolute;
@@ -88,9 +95,6 @@
 }
 
 .break-message {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   max-width: 78rem;
   text-align: left;
   /* backwards, not both: once in, no filter or transform is left on the message, which would keep
@@ -98,111 +102,92 @@
   animation: break-in 900ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
-/* With the sponsor beside the headline, the message spans the full width so the sponsor's third is a third. */
+.break-message__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+/* Coffee and meal breaks, the apéro and the thank-you slides: the message keeps two thirds, the
+   sponsor takes the right third, and the two are centred on each other. */
 .break-message.has-sponsor {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: center;
   width: 100%;
   max-width: none;
 }
 
-.break-message__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6em;
-  padding: 0.5em 1.1em;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 999px;
-  background:
-    linear-gradient(110deg, rgba(243, 143, 191, 0.16), rgba(46, 124, 199, 0.2)),
-    rgba(8, 47, 74, 0.58);
-  backdrop-filter: blur(16px);
-  font-size: clamp(0.9rem, 2.2vmin, 1.6rem);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.break-message__eyebrow svg {
-  width: 1.1em;
-  height: 1.1em;
-  color: var(--color-accent-light);
-}
-
-/* The headline, with the sponsor thank-you beside it on coffee and meal breaks, the apéro
-   and the thank-you slides: the headline takes two thirds of the width, the sponsor one third. */
-.break-message__title {
-  display: flex;
-  align-items: center;
-  /* 0.3em of the headline's own size, as before the sponsor moved beside it. */
-  margin-top: clamp(0.9rem, 3.3vmin, 3rem);
-}
-
-.has-sponsor .break-message__title {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  align-self: stretch;
-}
-
-.has-sponsor .break-message__headline {
+.has-sponsor .break-message__text {
   padding-right: clamp(1.5rem, 5vmin, 4.5rem);
 }
 
-/* On the same glass as the Next up banner, so it stays legible where it crosses the synapse. */
 .break-sponsor {
   display: flex;
   flex-direction: column;
   gap: 0.6em;
   min-width: 0;
-  padding: clamp(0.9rem, 2.4vmin, 2rem) clamp(1rem, 3vmin, 2.5rem);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: clamp(1rem, 2.4vmin, 1.75rem);
-  background:
-    linear-gradient(110deg, rgba(243, 143, 191, 0.1), rgba(46, 124, 199, 0.14)),
-    rgba(8, 47, 74, 0.72);
-  box-shadow: 0 24px 80px rgba(3, 20, 35, 0.4);
-  backdrop-filter: blur(20px);
+  padding-left: clamp(1.5rem, 5vmin, 4.5rem);
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .break-sponsor__label {
   font-size: clamp(1rem, 2.6vmin, 1.9rem);
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: rgba(255, 255, 255, 0.85);
-  text-shadow: 0 1px 3px rgba(8, 47, 74, 0.95), 0 0 18px rgba(8, 47, 74, 0.9);
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 3px rgba(8, 47, 74, 0.95), 0 0 12px rgba(8, 47, 74, 0.95), 0 0 28px rgba(8, 47, 74, 0.9);
 }
 
-/* The logo fills the sponsor's third, short of crowding the screen's height. */
+/* The logo fills the sponsor's third, short of crowding the screen's height. A dark halo, like the
+   text's, keeps the white logo apart from the white fibres. */
 .break-sponsor__logo {
   width: 100%;
   height: auto;
   max-height: 34vh;
   object-fit: contain;
   object-position: left center;
-}
-
-/* The sponsor's own slide, after the closing talk: the logo is the message. */
-.break-sponsor-hero {
-  width: min(33vw, 60vh);
-  height: auto;
-  margin-top: clamp(1rem, 4vmin, 3rem);
-  filter: drop-shadow(0 0 1.5vmin rgba(255, 255, 255, 0.3));
+  filter: drop-shadow(0 0 1.2vmin rgba(8, 47, 74, 0.85));
 }
 
 @media (max-width: 720px) {
-  .has-sponsor .break-message__title {
+  .break-message.has-sponsor {
     grid-template-columns: minmax(0, 1fr);
-    gap: 1rem;
+    gap: 1.5rem;
   }
 
-  .has-sponsor .break-message__headline {
+  .has-sponsor .break-message__text {
     padding-right: 0;
+  }
+
+  .break-sponsor {
+    padding-left: 0;
+    border-left: 0;
   }
 
   .break-sponsor__logo {
     width: 60%;
   }
+}
 
-  .break-sponsor-hero {
-    width: 70vw;
-  }
+/* What is on, above the headline: plain text with its icon, no badge. */
+.break-message__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-bottom: clamp(0.6rem, 2.4vmin, 2rem);
+  font-size: clamp(0.9rem, 2.4vmin, 1.75rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 3px rgba(8, 47, 74, 0.95), 0 0 18px rgba(8, 47, 74, 0.9);
+}
+
+.break-message__eyebrow svg {
+  width: 1.1em;
+  height: 1.1em;
+  color: var(--color-accent-light);
 }
 
 .break-message__headline {
@@ -246,6 +231,37 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5em;
+}
+
+/* A talk's first slide: the speakers large, with where they are from. */
+.break-message__people.is-large {
+  gap: 0.9em 2em;
+  margin-top: 1.2em;
+  font-size: clamp(1.1rem, 3.2vmin, 2.4rem);
+}
+
+.break-message__people.is-large li {
+  gap: 0.7em;
+}
+
+/* A panel's speakers in two columns, so long affiliations wrap rather than stack the slide up. */
+.break-message__people.is-large.is-many {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-self: stretch;
+  font-size: clamp(1rem, 2.8vmin, 2.1rem);
+}
+
+.break-message__people.is-large.is-many li > span {
+  min-width: 0;
+}
+
+.break-message__people small {
+  display: block;
+  margin-top: 0.15em;
+  font-size: 0.68em;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .break-message__highlight {
@@ -301,6 +317,12 @@
 .break-portrait--chip {
   width: 1.9em;
   height: 1.9em;
+}
+
+.break-portrait--large {
+  width: 2.8em;
+  height: 2.8em;
+  border-width: 2px;
 }
 
 /* Next up banner */
@@ -594,6 +616,40 @@
 .break-drawer__item.is-shown {
   border-color: rgba(248, 172, 208, 0.45);
   background: rgba(243, 143, 191, 0.12);
+}
+
+/* A talk's row opens its first slide; Q&A and Thanks beside it open the other two. */
+.break-drawer__talk {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.break-drawer__talk .break-drawer__item {
+  flex: 1;
+  min-width: 0;
+}
+
+.break-drawer__slide {
+  flex-shrink: 0;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.break-drawer__slide:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.break-drawer__slide.is-shown {
+  border-color: rgba(248, 172, 208, 0.45);
+  background: rgba(243, 143, 191, 0.12);
+  color: white;
 }
 
 .break-button {

@@ -47,12 +47,6 @@ const GLOW_CENTER = [0.5 + SYNAPSE_OPTIONS.shiftX, 0.5 - SYNAPSE_OPTIONS.shiftY]
 
 const IDLE_MS = 2500;
 
-/** The sponsor's own slide, right after the closing talk and before the apéro; ← → and the drawer reach it. */
-const SPONSOR_SLIDE = "sponsor";
-const CLOSING = TIMELINE.find((e) => /closing/i.test(e.title));
-/** Everything the screen can be pinned to, in order: the timeline, with the sponsor slide after the closing talk. */
-const STEPS: string[] = TIMELINE.flatMap((e) => (e === CLOSING ? [e.id, SPONSOR_SLIDE] : [e.id]));
-
 const SPONSOR_LOGO = { src: "img/booklet/logos/csm.webp", alt: "Fondation Conscience et Santé Mentale" };
 
 /* ---------- Clock and pinned item ---------- */
@@ -139,30 +133,92 @@ function iconFor(entry: TimelineEntry): LucideIcon {
   return Mic;
 }
 
+/* ---------- Slides ---------- */
+
+/**
+ * Each talk and panel has three slides: its title and speakers, the questions and answers, and a
+ * thank-you, the only one of the three with the Next up banner.
+ */
+type TalkSlide = "intro" | "qa" | "thanks";
+const TALK_SLIDES: TalkSlide[] = ["intro", "qa", "thanks"];
+
+/** Following the clock, the last quarter hour of a talk is its questions, and the very end its thank-you. */
+const QA_MINUTES = 15;
+const THANKS_MINUTES = 3;
+
+function clockSlide(entry: TimelineEntry, now: Date): TalkSlide {
+  const left = (entry.end.getTime() - now.getTime()) / 60_000;
+  return left <= THANKS_MINUTES ? "thanks" : left <= QA_MINUTES ? "qa" : "intro";
+}
+
+/** The sponsor's own slide, right after the closing talk and before the apéro. */
+const SPONSOR_SLIDE = "sponsor";
+const CLOSING = TIMELINE.find((e) => /closing/i.test(e.title));
+
+/** What can be pinned: a timeline id (a talk's first slide), `<id>:qa`, `<id>:thanks`, or the sponsor's slide. */
+const stepOf = (entry: TimelineEntry, slide?: TalkSlide) => (slide && slide !== "intro" ? `${entry.id}:${slide}` : entry.id);
+
+function parseStep(step: string): { id: string; slide: TalkSlide } {
+  const [id, slide] = step.split(":");
+  return { id, slide: slide === "qa" || slide === "thanks" ? slide : "intro" };
+}
+
+/** Every slide in order, as ← → step through them. */
+const STEPS: string[] = TIMELINE.flatMap((e) =>
+  isTalk(e) ? TALK_SLIDES.map((slide) => stepOf(e, slide)) : e === CLOSING ? [e.id, SPONSOR_SLIDE] : [e.id],
+);
+
 /* ---------- What the screen says ---------- */
 
 type Message = {
   eyebrow?: string;
-  headline?: string;
+  icon?: LucideIcon;
+  headline: string;
   sub?: string;
   highlight?: string;
   people?: Person[];
-  icon?: LucideIcon;
-  /** Thank the sponsor beside the headline: coffee and meal breaks, the apéro and the thank-you slides. */
-  sponsor?: boolean;
-  /** The sponsor's own slide: its logo is the message. */
-  logo?: boolean;
+  /** On a talk's first slide the speakers are shown large, with where they are from. */
+  peopleLarge?: boolean;
+  /**
+   * The sponsor in the right third, beside the message: "beside" with its thank-you line (coffee
+   * and meal breaks, the apéro and the thank-you slides), "alone" on its own slide, whose
+   * headline already thanks them.
+   */
+  sponsor?: "beside" | "alone";
 };
 
-const SPONSOR_MESSAGE: Message = { eyebrow: "With thanks to our sponsor", icon: HandHeart, logo: true };
+const SPONSOR_MESSAGE: Message = {
+  eyebrow: "ALPS Conference 2026",
+  icon: Sparkles,
+  headline: "With thanks to our sponsor",
+  sponsor: "alone",
+};
 
-function messageFor(current: TimelineEntry | undefined, next: TimelineEntry | undefined, now: Date): Message {
+function talkMessage(current: TimelineEntry, item: ProgramItem | undefined, slide: TalkSlide): Message {
+  const panel = !!item?.panel;
+  const title = current.detail ?? current.title;
+  const people = peopleFor(item);
+  if (slide === "intro")
+    return { eyebrow: panel ? "Panel discussion" : "Now on stage", icon: panel ? Users : Mic, headline: title, people, peopleLarge: true };
+  if (slide === "thanks")
+    return {
+      eyebrow: panel ? "Panel discussion" : current.title,
+      icon: HandHeart,
+      headline: "Thank you",
+      people: panel ? people : undefined,
+      sub: title,
+    };
+  return { eyebrow: panel ? "Panel discussion · Q&A" : "Questions & answers", icon: MessageCircleQuestion, headline: title, people };
+}
+
+function messageFor(current: TimelineEntry | undefined, next: TimelineEntry | undefined, now: Date, slide: TalkSlide): Message {
   if (!current) {
     if (!next)
-      return { eyebrow: "ALPS Conference 2026", headline: "Thank you for coming!", sub: "See you next year", icon: Sparkles, sponsor: true };
-    if (next === TIMELINE[0]) return { eyebrow: "ALPS Conference 2026", headline: "Welcome", sub: "Kultur & Kongresshaus Aarau", icon: Sparkles };
+      return { eyebrow: "ALPS Conference 2026", icon: Sparkles, headline: "Thank you for coming!", sub: "See you next year", sponsor: "beside" };
+    if (next === TIMELINE[0])
+      return { eyebrow: "ALPS Conference 2026", icon: Sparkles, headline: "Welcome", sub: "Kultur & Kongresshaus Aarau" };
     const sameDay = zurichDay.format(now) === zurichDay.format(next.start);
-    return { eyebrow: "ALPS Conference 2026", headline: sameDay ? "Welcome back" : "See you tomorrow", icon: Sparkles };
+    return { eyebrow: "ALPS Conference 2026", icon: Sparkles, headline: sameDay ? "Welcome back" : "See you tomorrow" };
   }
 
   const item = programItem(current);
@@ -170,22 +226,19 @@ function messageFor(current: TimelineEntry | undefined, next: TimelineEntry | un
   const firstDay = current.id.startsWith(TIMELINE[0].id.slice(0, 10));
 
   if (current.title === "Doors open")
-    return { eyebrow: current.title, headline: firstDay ? "Welcome" : "Welcome back", sub: current.menuNote, icon: Coffee };
+    return { eyebrow: current.title, icon: Coffee, headline: firstDay ? "Welcome" : "Welcome back", sub: current.menuNote };
   if (/lunch|dinner/i.test(current.title))
-    return { eyebrow: current.title, headline: "Bon appétit!", sub: current.menuNote, highlight, icon: Utensils, sponsor: true };
+    return { eyebrow: current.title, icon: Utensils, headline: "Bon appétit!", sub: current.menuNote, highlight, sponsor: "beside" };
   if (current.kind === "pause")
-    return { eyebrow: current.title, headline: "Enjoy the break", sub: current.menuNote, highlight, icon: Coffee, sponsor: true };
-  if (/apéro/i.test(current.title)) return { eyebrow: current.title, headline: "Santé!", icon: Wine, sponsor: true };
+    return { eyebrow: current.title, icon: Coffee, headline: "Enjoy the break", sub: current.menuNote, highlight, sponsor: "beside" };
+  if (/apéro/i.test(current.title)) return { eyebrow: current.title, icon: Wine, headline: "Santé!", sponsor: "beside" };
   if (/afterparty/i.test(current.title))
-    return { eyebrow: "Tonight", headline: "See you at the afterparty", sub: current.detail, icon: PartyPopper };
-  if (current.kind === "social") return { eyebrow: current.title, headline: "Enjoy the evening", icon: Sparkles };
-  if (current.title === "Opening") return { eyebrow: "Opening", headline: "Welcome", sub: current.detail, icon: Sparkles };
+    return { eyebrow: "Tonight", icon: PartyPopper, headline: "See you at the afterparty", sub: current.detail };
+  if (current.kind === "social") return { eyebrow: current.title, icon: Sparkles, headline: "Enjoy the evening" };
+  if (current.title === "Opening") return { eyebrow: "Opening", icon: Sparkles, headline: "Welcome", sub: current.detail };
   if (/closing/i.test(current.title))
-    return { eyebrow: current.title, headline: "Thank you", sub: current.detail, icon: Sparkles, sponsor: true };
-  if (item?.panel)
-    return { eyebrow: "Panel discussion · Q&A", headline: current.detail ?? current.title, people: peopleFor(item), icon: Users };
-  if (isTalk(current))
-    return { eyebrow: "Questions & answers", headline: current.detail!, people: peopleFor(item), icon: MessageCircleQuestion };
+    return { eyebrow: current.title, icon: Sparkles, headline: "Thank you", sub: current.detail, sponsor: "beside" };
+  if (isTalk(current)) return talkMessage(current, item, slide);
   return { eyebrow: current.title, headline: current.detail ?? current.title };
 }
 
@@ -368,10 +421,10 @@ function ScheduleDrawer({
                 {entries.map((entry) => {
                   const Icon = iconFor(entry);
                   const talk = isTalk(entry);
-                  const shown = pinnedId ? entry.id === pinnedId : entry.id === liveId;
+                  const shown = pinnedId ? parseStep(pinnedId).id === entry.id : entry.id === liveId;
                   return (
                     <Fragment key={entry.id}>
-                      <li>
+                      <li className={talk ? "break-drawer__talk" : undefined}>
                         <button
                           type="button"
                           className={`break-drawer__item ${shown ? "is-shown" : ""} ${entry.kind !== "session" ? "is-pause" : ""}`}
@@ -388,6 +441,20 @@ function ScheduleDrawer({
                           {entry.id === liveId && <span className="break-tag">Live</span>}
                           {pinnedId === entry.id && <span className="break-tag break-tag--pinned">Showing</span>}
                         </button>
+                        {talk &&
+                          (["qa", "thanks"] as const).map((slide) => (
+                            <button
+                              key={slide}
+                              type="button"
+                              className={`break-drawer__slide ${pinnedId === stepOf(entry, slide) ? "is-shown" : ""}`}
+                              onClick={() => {
+                                onPin(stepOf(entry, slide));
+                                onClose();
+                              }}
+                            >
+                              {slide === "qa" ? "Q&A" : "Thanks"}
+                            </button>
+                          ))}
                       </li>
                       {entry === CLOSING && (
                         <li>
@@ -459,24 +526,31 @@ export default function BreakScreen() {
 
   const live = now ? getConferenceState(now) : null;
   const liveId = live?.phase === "live" ? live.current.id : undefined;
-  const pinned = pinnedId ? TIMELINE.find((e) => e.id === pinnedId) : undefined;
+  const pinnedStep = pinnedId ? parseStep(pinnedId) : null;
+  const pinned = pinnedStep ? TIMELINE.find((e) => e.id === pinnedStep.id) : undefined;
   const sponsorSlide = pinnedId === SPONSOR_SLIDE && !!CLOSING;
 
   let current: TimelineEntry | undefined;
   let next: TimelineEntry | undefined;
+  let slide: TalkSlide = "intro";
   if (sponsorSlide) {
     next = TIMELINE[TIMELINE.indexOf(CLOSING!) + 1];
   } else if (pinned) {
     current = pinned;
     next = TIMELINE[TIMELINE.indexOf(pinned) + 1];
+    slide = pinnedStep!.slide;
   } else if (live && live.phase !== "after") {
     current = live.phase === "live" ? live.current : undefined;
     next = live.next;
+    if (current && now) slide = clockSlide(current, now);
   }
+  const talk = !!current && isTalk(current);
+  // A talk's title and Q&A slides keep the room on the talk; only its thank-you looks ahead.
+  const showNext = !talk || slide === "thanks";
 
   // Step the pinned item through the schedule. Between items (or after the
   // last one) "now" sits half a step before the next one.
-  const shownStep = sponsorSlide ? SPONSOR_SLIDE : current?.id;
+  const shownStep = sponsorSlide ? SPONSOR_SLIDE : current ? stepOf(current, talk ? slide : undefined) : undefined;
   const position = shownStep ? STEPS.indexOf(shownStep) : next ? STEPS.indexOf(next.id) - 0.5 : STEPS.length - 0.5;
   const prevStep = STEPS[Math.ceil(position - 1)];
   const nextStep = STEPS[Math.floor(position + 1)];
@@ -501,13 +575,17 @@ export default function BreakScreen() {
     return () => window.removeEventListener("keydown", onKey);
   }, [step, toggleFullscreen]);
 
-  const message = now ? (sponsorSlide ? SPONSOR_MESSAGE : messageFor(current, next, now)) : null;
+  const message = now ? (sponsorSlide ? SPONSOR_MESSAGE : messageFor(current, next, now, slide)) : null;
   const Icon = message?.icon;
   const messageKey = `${shownStep ?? "none"}-${next?.id ?? "none"}`;
-  const long = (message?.headline?.length ?? 0) > 32;
+  const long = (message?.headline.length ?? 0) > 32;
 
   return (
-    <div ref={rootRef} className={`break-screen ${active || drawerOpen ? "" : "is-idle"}`}>
+    <div
+      ref={rootRef}
+      className={`break-screen ${active || drawerOpen ? "" : "is-idle"}`}
+      data-sponsor={message?.sponsor ? "" : undefined}
+    >
       <div className="absolute inset-0" aria-hidden>
         {/* Oversized so its radial glow can sit on the synapse and still cover the screen. */}
         <img
@@ -527,7 +605,7 @@ export default function BreakScreen() {
         <SynapseIllustration
           className="opacity-90"
           options={SYNAPSE_OPTIONS}
-          replayKey={now ? messageKey : undefined}
+          transitionKey={now ? messageKey : undefined}
           interactionTarget={rootRef}
           onUnsupported={() => setSynapseFailed(true)}
         />
@@ -547,44 +625,50 @@ export default function BreakScreen() {
       <main className="break-main">
         {message && (
           <div key={messageKey} className={`break-message ${message.sponsor ? "has-sponsor" : ""}`}>
-            {message.eyebrow && (
-              <p className="break-message__eyebrow">
-                {Icon && <Icon aria-hidden />}
-                {message.eyebrow}
-              </p>
-            )}
-            {message.headline && (
-              <div className="break-message__title">
-                <h1 className={`break-message__headline ${long ? "is-long" : ""}`}>{message.headline}</h1>
-                {message.sponsor && (
-                  <div className="break-sponsor">
-                    <span className="break-sponsor__label">With thanks to our sponsor</span>
-                    <img src={withBase(SPONSOR_LOGO.src)} alt={SPONSOR_LOGO.alt} className="break-sponsor__logo" />
-                  </div>
-                )}
+            <div className="break-message__text">
+              {message.eyebrow && (
+                <p className="break-message__eyebrow">
+                  {Icon && <Icon aria-hidden />}
+                  {message.eyebrow}
+                </p>
+              )}
+              <h1 className={`break-message__headline ${long ? "is-long" : ""}`}>{message.headline}</h1>
+              {message.people && message.people.length > 0 && (
+                <ul
+                  className={`break-message__people ${message.peopleLarge ? "is-large" : ""} ${message.people.length > 2 ? "is-many" : ""}`}
+                >
+                  {message.people.map((p) => (
+                    <li key={p.name}>
+                      <Portrait person={p} className={message.peopleLarge ? "break-portrait--large" : "break-portrait--chip"} />
+                      {message.peopleLarge ? (
+                        <span>
+                          {p.name}
+                          {p.note && <small>{p.note}</small>}
+                        </span>
+                      ) : (
+                        p.name
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {message.highlight && <p className="break-message__highlight">{message.highlight}</p>}
+              {message.sub && <p className="break-message__sub">{message.sub}</p>}
+              <Experiences item={current ? programItem(current) : undefined} />
+            </div>
+            {message.sponsor && (
+              <div className="break-sponsor">
+                {message.sponsor === "beside" && <span className="break-sponsor__label">With thanks to our sponsor</span>}
+                <img src={withBase(SPONSOR_LOGO.src)} alt={SPONSOR_LOGO.alt} className="break-sponsor__logo" />
               </div>
             )}
-            {message.logo && <img src={withBase(SPONSOR_LOGO.src)} alt={SPONSOR_LOGO.alt} className="break-sponsor-hero" />}
-            {message.people && message.people.length > 0 && (
-              <ul className="break-message__people">
-                {message.people.map((p) => (
-                  <li key={p.name}>
-                    <Portrait person={p} className="break-portrait--chip" />
-                    {p.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-            {message.highlight && <p className="break-message__highlight">{message.highlight}</p>}
-            {message.sub && <p className="break-message__sub">{message.sub}</p>}
-            <Experiences item={current ? programItem(current) : undefined} />
           </div>
         )}
       </main>
 
       <footer className="break-bottom">
         <div className="min-w-0 flex-1">
-          {now && next && (
+          {now && next && showNext && (
             <div key={next.id} className="break-fade">
               <NextUp entry={next} now={now} />
             </div>
