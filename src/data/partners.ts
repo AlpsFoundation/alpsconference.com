@@ -32,3 +32,10 @@ export const PARTNERS = {
     { src: "/img/partners/psychedelics-europe.png", alt: "Psychedelics Europe", url: "https://psychedelicseurope.eu/", width: "11.5rem" }
   ]
 };
+
+/** Shown large at the end of the partners section; the full-colour logo sits on a white card. */
+export const CATERING_PARTNER = {
+  src: "/img/partners/funky-kitchen.png",
+  alt: "Funky Kitchen – Kochen mit Herz und Liebe",
+  url: "https://www.funkykitchen.ch/"
+};

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
-import { PARTNERS } from "../data/partners";
+import { CATERING_PARTNER, PARTNERS } from "../data/partners";
 
 export default function Partners() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -84,6 +84,28 @@ export default function Partners() {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div data-fade-up className="opacity-0 mt-12 sm:mt-14 text-center">
+          <h3 className="text-xs sm:text-sm font-medium tracking-[0.12em] uppercase text-white/45 mb-4">
+            Our Amazing Catering Partner
+          </h3>
+          <a
+            href={CATERING_PARTNER.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block rounded-2xl bg-white p-5 sm:p-7 shadow-lg shadow-black/20 transition-transform duration-200 hover:scale-[1.02]"
+          >
+            <img
+              src={CATERING_PARTNER.src}
+              alt={CATERING_PARTNER.alt}
+              width={800}
+              height={687}
+              className="block w-[min(18rem,70vw)] sm:w-[22rem] md:w-[26rem] h-auto"
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
         </div>
       </div>
     </section>
