@@ -684,6 +684,8 @@ function paintBackground(ctx: CanvasRenderingContext2D, w: number, h: number) {
 
 // ---------------------------------------------------------------------------
 
+export type SynapseControls = { transition(): void };
+
 export type SynapseOptions = {
   onUnsupported?: () => void;
   motionButton?: HTMLButtonElement;
@@ -714,9 +716,10 @@ export type SynapseOptions = {
   // Embedded framing: the widest the PNG's box may be for a canvas of this
   // size (the hero shrinks it on short windows).
   maxWidth?: (w: number, h: number) => number;
-  // Receives controls once running: replay() draws the mesh in again (the
-  // opening sequence without the particle fade).
-  onReady?: (controls: { replay(): void }) => void;
+  // Receives controls once running: transition() marks a change of content
+  // (a new slide): the terminals draw apart and back together as the synapse
+  // spins up, with a release of specks as they meet.
+  onReady?: (controls: SynapseControls) => void;
   // Extra, larger motes floating across the whole view.
   floaters?: boolean;
 };
@@ -729,6 +732,21 @@ const INTRO = {
   title: 2.5,
   particles: [3.1, 4.8],
 } as const;
+// Transition timeline, in seconds: the terminals part quickly as the slide
+// leaves and close again as the next one settles, releasing specks as they
+// meet; the spin and the drift surge over the whole of it.
+const TRANSITION = {
+  apart: [0, 0.45],
+  together: [0.45, 1.6],
+  release: 1.35,
+  surge: [0, 1.6],
+} as const;
+// How far each terminal moves away from the cleft (world units; the cleft
+// itself is GAP wide), and the extra roll about the axis (radians).
+const SPREAD = 0.42;
+const SURGE_TURN = 1.2;
+// How much faster the dust and floaters drift at the height of the surge.
+const SURGE_DRIFT = 4;
 // Draw progress range swept by the intro; it ends past every stroke (rings add
 // up to 0.1, lines lag up to 0.03) so no pen tip stays lit.
 const REVEAL_FROM = 0.08;
@@ -817,6 +835,8 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     axis.add(group);
   }
 
+  // Half the cleft: GAP / 2 at rest, wider while a transition parts the terminals.
+  let halfGap = GAP / 2;
   const groupA = new THREE.Group();
   groupA.position.set(-GAP / 2, termA.sag, 0);
   addTerminal(termA, groupA);
@@ -901,8 +921,8 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
       const wz = v.z + Math.cos(t * v.speed * 0.5 + v.phase) * 0.03;
       const p = Math.min(1, Math.max(0, v.p + Math.sin(t * v.speed + v.phase * 1.3) * 0.12));
       const margin = vRadius[i] + STROKE;
-      const ax = -GAP / 2 + faceSurfaceX(termA, wy - termA.sag, wz) + margin;
-      const bx = GAP / 2 - faceSurfaceX(termB, -termB.sag - wy, wz) - margin;
+      const ax = -halfGap + faceSurfaceX(termA, wy - termA.sag, wz) + margin;
+      const bx = halfGap - faceSurfaceX(termB, -termB.sag - wy, wz) - margin;
       vOffset[i * 3] = bx > ax ? ax + (bx - ax) * p : (ax + bx) / 2;
       vOffset[i * 3 + 1] = wy;
       vOffset[i * 3 + 2] = wz;
@@ -1018,8 +1038,8 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
         // Keep a steady trickle; burst specks go back to waiting.
         sp.wait = i % 2 === 0 ? 0 : 1e9;
       }
-      const ax = -GAP / 2 + faceSurfaceX(termA, sp.y - termA.sag, sp.z) + 0.02;
-      const bx = GAP / 2 - faceSurfaceX(termB, -termB.sag - sp.y, sp.z) - 0.02;
+      const ax = -halfGap + faceSurfaceX(termA, sp.y - termA.sag, sp.z) + 0.02;
+      const bx = halfGap - faceSurfaceX(termB, -termB.sag - sp.y, sp.z) - 0.02;
       pos.setXYZ(i, ax + (bx - ax) * sp.p, sp.y, sp.z);
       alpha.setX(i, 0.9 * smoothstep(0, 0.15, sp.p) * smoothstep(1, 0.8, sp.p));
     });
@@ -1242,9 +1262,6 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
   if (intro) nextRelease = INTRO.particles[0] + 0.3;
   let titleShown = false;
   let particlesShown = false;
-  let introOn = intro;
-  let introStart = 0;
-  let replaying = false;
   function runIntro(t: number) {
     if (!titleShown && (!intro || t >= INTRO.title)) {
       titleShown = true;
@@ -1254,21 +1271,55 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
       particlesShown = true;
       opts.onParticles?.();
     }
-    if (!introOn) return { glow: 1, fade: 1, yaw: 0, pitch: 0, roll: 0 };
-    const it = t - introStart;
+    if (!intro) return { glow: 1, fade: 1, yaw: 0, pitch: 0, roll: 0 };
+    const it = t;
     reveal.value = REVEAL_FROM + (REVEAL_TO - REVEAL_FROM) * easeInOutCubic(progress(it, INTRO.draw));
     const away = 1 - easeInOutCubic(progress(it, INTRO.tilt));
     return {
       glow: smoothstep(0, 1, progress(it, INTRO.glow)),
-      fade: replaying ? 1 : smoothstep(0, 1, progress(it, INTRO.particles)),
+      fade: smoothstep(0, 1, progress(it, INTRO.particles)),
       yaw: INTRO_YAW * away,
       pitch: INTRO_PITCH * away,
       roll: INTRO_ROLL * away,
     };
   }
 
+  // Transition: -Infinity until the first one.
+  let transitionStart = -Infinity;
+  let released = true;
+  let spreadFrom = 0;
+  let spinOffset = 0;
+  let spinFrom = 0;
+  let driftTime = 0;
+  function runTransition(t: number) {
+    const tt = t - transitionStart;
+    if (tt > TRANSITION.surge[1]) {
+      halfGap = GAP / 2;
+      spinOffset = spinFrom + (transitionStart === -Infinity ? 0 : SURGE_TURN);
+      return 0;
+    }
+    // Out fast and decelerating, back slower, settling softly.
+    const out = 1 - (1 - progress(tt, TRANSITION.apart)) ** 3;
+    const back = easeInOutCubic(progress(tt, TRANSITION.together));
+    // From wherever an earlier transition had them, so a quick second one never snaps.
+    halfGap = GAP / 2 + (spreadFrom + (SPREAD - spreadFrom) * out) * (1 - back);
+    if (!released && tt >= TRANSITION.release) {
+      released = true;
+      boost = Math.max(boost, 0.8);
+      release();
+    }
+    const surge = progress(tt, TRANSITION.surge);
+    spinOffset = spinFrom + SURGE_TURN * easeInOutCubic(surge);
+    // A bell over the transition: up quickly, down gently.
+    return Math.sin(Math.PI * Math.sqrt(surge));
+  }
+
   function render(t: number, dt: number) {
     const introState = runIntro(t);
+    const surge = runTransition(t);
+    driftTime += dt * (1 + SURGE_DRIFT * surge);
+    groupA.position.x = -halfGap;
+    groupB.position.x = halfGap;
     updateVesicles(dt, t);
     if (!reducedMotion && t > nextRelease) {
       release();
@@ -1282,8 +1333,8 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     coreGlow.opacity = (0.16 + 0.05 * breathe + 0.14 * pulse) * introState.glow * (1 + 1.6 * boost);
     vesicleFade.value = introState.fade;
     particleFade.value = introState.fade * (1 + 1.5 * boost);
-    dustMat.uniforms.uTime.value = t;
-    if (floaterMat) floaterMat.uniforms.uTime.value = t;
+    dustMat.uniforms.uTime.value = driftTime;
+    if (floaterMat) floaterMat.uniforms.uTime.value = driftTime;
 
     const ease = 1 - Math.exp(-dt * 3.5);
     current.x += (target.x - current.x) * ease;
@@ -1295,11 +1346,11 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     if (spin) {
       yaw = SPIN_YAW + idleX * 0.2 + introState.yaw;
       pitch = SPIN_PITCH + idleY * 0.2 + introState.pitch;
-      axis.rotation.x = reducedMotion ? 0 : t * spin;
+      axis.rotation.x = reducedMotion ? 0 : t * spin + spinOffset;
     } else {
       yaw = REST_YAW + (current.x + idleX) * TILT_YAW + introState.yaw;
       pitch = REST_PITCH + (current.y + idleY) * TILT_PITCH + introState.pitch;
-      axis.rotation.x = (current.y + idleY) * AXIS_SPIN;
+      axis.rotation.x = (current.y + idleY) * AXIS_SPIN + spinOffset;
     }
     camera.position.set(Math.sin(yaw) * distance, Math.sin(pitch) * distance, Math.cos(yaw) * Math.cos(pitch) * distance);
     camera.lookAt(0, 0, 0);
@@ -1367,10 +1418,15 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
     observers.push(io);
   }
   opts.onReady?.({
-    replay() {
-      introOn = true;
-      replaying = true;
-      introStart = clock.getElapsed();
+    transition() {
+      const t = clock.getElapsed();
+      // Carry on from wherever a running transition has turned to.
+      runTransition(t);
+      spreadFrom = halfGap - GAP / 2;
+      spinFrom = spinOffset;
+      transitionStart = t;
+      released = false;
+      nextRelease = Math.max(nextRelease, t + TRANSITION.release + 2);
     },
   });
   return dispose;

@@ -1,5 +1,5 @@
 import { useEffect, useRef, type RefObject } from "react";
-import type { SynapseOptions } from "../scripts/synapse3d";
+import type { SynapseControls, SynapseOptions } from "../scripts/synapse3d";
 
 type Props = {
   onTitle?: () => void;
@@ -12,8 +12,9 @@ type Props = {
   className?: string;
   // Extra options for initSynapse (spin, framing), read once on mount.
   options?: Pick<SynapseOptions, "spin" | "zoom" | "shiftX" | "shiftY" | "maxWidth">;
-  // Changing this draws the mesh in again (not its first value: the intro plays anyway).
-  replayKey?: string;
+  // Changing this plays the transition: part of the mesh redraws as the synapse
+  // spins up and the particles surge (not on its first value: the intro plays anyway).
+  transitionKey?: string;
 };
 
 // Give up on three.js if it hasn't loaded by then.
@@ -38,15 +39,15 @@ export default function SynapseIllustration(props: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const callbacks = useRef(props);
   callbacks.current = props;
-  const controls = useRef<{ replay(): void } | null>(null);
-  const lastReplayKey = useRef(props.replayKey);
+  const controls = useRef<SynapseControls | null>(null);
+  const lastTransitionKey = useRef(props.transitionKey);
 
   useEffect(() => {
-    if (props.replayKey === lastReplayKey.current) return;
-    const first = lastReplayKey.current === undefined;
-    lastReplayKey.current = props.replayKey;
-    if (!first) controls.current?.replay();
-  }, [props.replayKey]);
+    if (props.transitionKey === lastTransitionKey.current) return;
+    const first = lastTransitionKey.current === undefined;
+    lastTransitionKey.current = props.transitionKey;
+    if (!first) controls.current?.transition();
+  }, [props.transitionKey]);
 
   useEffect(() => {
     const unsupported = () => callbacks.current.onUnsupported?.();
