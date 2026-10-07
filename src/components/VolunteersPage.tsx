@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ChevronDown, CircleHelp, Columns3, Info, MapPin, Moon, Rows3, Sun, SunMoon, Users, type LucideIcon } from "lucide-react";
+import { ChevronDown, CircleHelp, Info, MapPin, Moon, Sun, SunMoon, Users, type LucideIcon } from "lucide-react";
 import CalendarSubscribe from "./CalendarSubscribe";
 import CrewBuild from "./CrewBuild";
 import { useCrewBuild } from "./useCrewBuild";
@@ -50,7 +50,6 @@ import "../styles/volunteers.css";
 
 const STORAGE_KEY = "alps-volunteer-2026";
 const THEME_KEY = "alps-volunteer-theme";
-const CATERING_VIEW_KEY = "alps-volunteer-catering-view";
 const TZID = "Europe/Zurich";
 const DEFAULT_DAY = "2026-10-09";
 /** `?day=thu` (or a date) opens that tab, e.g. from the old setup page's address. */
@@ -485,12 +484,9 @@ function verticalScale(services: CateringService[]) {
   return Math.max(0.1, ...bars.map((bar) => (2 + bar.people.length * 1.8) / (bar.to - bar.from)));
 }
 
+/** The catering plan runs vertically; the horizontal bars stay in CateringCard, unused for now. */
 type CateringView = "vertical" | "horizontal";
-
-const CATERING_VIEWS: { id: CateringView; label: string; icon: LucideIcon }[] = [
-  { id: "vertical", label: "Vertical", icon: Columns3 },
-  { id: "horizontal", label: "Horizontal", icon: Rows3 },
-];
+const CATERING_VIEW: CateringView = "vertical";
 
 /** One service (lunch, dinner…) as a small calendar: each station once, its shift times as bars on the service's timeline. */
 function CateringCard({
@@ -703,25 +699,6 @@ function CateringPlan({
   onChoose: (name: string) => void;
 }) {
   const all = useMemo(() => cateringServices(date), [date]);
-  const [view, setView] = useState<CateringView>("vertical");
-
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(CATERING_VIEW_KEY) === "horizontal") setView("horizontal");
-    } catch {
-      // Blocked storage: the default view it is.
-    }
-  }, []);
-
-  const chooseView = (next: CateringView) => {
-    setView(next);
-    try {
-      localStorage.setItem(CATERING_VIEW_KEY, next);
-    } catch {
-      // Blocked storage: the choice holds until the page is left.
-    }
-  };
-
   const services = onlyMine && person ? all.filter((service) => service.people.includes(person)) : all;
   if (!services.length) return null;
   const people = new Set(all.flatMap((service) => service.people)).size;
@@ -765,14 +742,6 @@ function CateringPlan({
           className="vol-catering__services"
           style={{ "--vol-cal-min": `${verticalScale(all)}rem` } as CSSProperties}
         >
-          <div className="vol-catering__view" role="radiogroup" aria-label="Timeline">
-            {CATERING_VIEWS.map(({ id, label, icon: Icon }) => (
-              <button key={id} type="button" role="radio" aria-checked={view === id} onClick={() => chooseView(id)}>
-                <Icon size={14} aria-hidden="true" />
-                {label}
-              </button>
-            ))}
-          </div>
           {services.map((service) => (
             <CateringCard
               key={service.id}
@@ -781,7 +750,7 @@ function CateringPlan({
               clock={clock}
               person={person}
               onlyMine={onlyMine}
-              view={view}
+              view={CATERING_VIEW}
               onChoose={onChoose}
             />
           ))}

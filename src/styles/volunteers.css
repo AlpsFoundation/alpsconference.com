@@ -41,8 +41,7 @@
   display: inline-block;
 }
 
-.vol-theme,
-.vol-catering__view {
+.vol-theme {
   display: inline-flex;
   flex-shrink: 0;
   padding: 0.2rem;
@@ -51,8 +50,7 @@
   background: rgba(4, 30, 49, 0.6);
 }
 
-.vol-theme button,
-.vol-catering__view button {
+.vol-theme button {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -69,13 +67,11 @@
   transition: background 150ms ease, color 150ms ease;
 }
 
-.vol-theme button:hover,
-.vol-catering__view button:hover {
+.vol-theme button:hover {
   color: white;
 }
 
-.vol-theme button[aria-checked="true"],
-.vol-catering__view button[aria-checked="true"] {
+.vol-theme button[aria-checked="true"] {
   background: white;
   color: var(--color-neutral-dark);
 }
@@ -959,11 +955,6 @@
   }
 }
 
-/* Vertical / Horizontal switch for the open plan. */
-.vol-catering__view {
-  justify-self: start;
-}
-
 /* Vertical: time runs down the left, each station is a column, and each shift time is a block
    as tall as it lasts (--vol-cal-min rem per minute, set per day so the tightest one fits).
    Overlapping times at one station sit side by side; too many columns scroll sideways. */
@@ -1642,19 +1633,16 @@
 }
 
 :root[data-vol-theme="light"] .vol-theme,
-:root[data-vol-theme="light"] .vol-catering__view,
 :root[data-vol-theme="light"] .vol-tabs {
   background: var(--vl-surface);
 }
 
 :root[data-vol-theme="light"] .vol-theme button:hover,
-:root[data-vol-theme="light"] .vol-catering__view button:hover,
 :root[data-vol-theme="light"] .vol-tabs button:hover {
   color: var(--vl-ink);
 }
 
 :root[data-vol-theme="light"] .vol-theme button[aria-checked="true"],
-:root[data-vol-theme="light"] .vol-catering__view button[aria-checked="true"],
 :root[data-vol-theme="light"] .vol-tabs button[aria-selected="true"] {
   background: var(--vl-ink);
   color: white;
