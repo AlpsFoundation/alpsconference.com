@@ -146,11 +146,19 @@ button:focus-visible {
   white-space: nowrap;
 }
 
+/* The PDF link and the contents button, at the right end of the bar. */
+.bk-chrome__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-self: end;
+}
+
+.bk-chrome__pdf,
 .bk-chrome__menu {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  justify-self: end;
   min-height: 2.5rem;
   padding: 0 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -163,6 +171,12 @@ button:focus-visible {
   cursor: pointer;
 }
 
+.bk-chrome__pdf {
+  gap: 0.45rem;
+  text-decoration: none;
+}
+
+.bk-chrome__pdf:hover,
 .bk-chrome__menu:hover {
   background: rgba(255, 255, 255, 0.08);
 }
@@ -191,10 +205,12 @@ button:focus-visible {
 
 @media (max-width: 519px) {
   .bk-chrome__home span,
+  .bk-chrome__pdf-label,
   .bk-chrome__menu-label {
     display: none;
   }
 
+  .bk-chrome__pdf,
   .bk-chrome__menu {
     width: 2.5rem;
     padding: 0;

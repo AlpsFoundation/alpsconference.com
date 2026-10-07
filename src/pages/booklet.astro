@@ -7,6 +7,8 @@ import { withBase } from "../lib/withBase";
 const switzerFont = withBase("fonts/Switzer-Variable.woff2");
 const switzerItalic = withBase("fonts/Switzer-VariableItalic.woff2");
 const ogImagePath = withBase("og/booklet.jpg");
+// The printable booklet, in the shared Google Drive folder.
+const PDF_URL = "https://drive.google.com/file/d/1LCfygDUhsKqnsl5no_FS9RBGc7M6RLfX/view?usp=sharing";
 const ogImageUrl = Astro.site ? new URL(ogImagePath, Astro.site).href : ogImagePath;
 
 const fontFaceCss = `@font-face {
@@ -58,10 +60,22 @@ const fontFaceCss = `@font-face {
         <span>Booklet</span>
       </a>
       <p class="bk-chrome__section" aria-live="polite"><span id="bk-current">ALPS 2026</span></p>
-      <button type="button" class="bk-chrome__menu" aria-expanded="false" aria-controls="bk-toc">
-        <span class="bk-chrome__menu-label">Contents</span>
-        <span class="bk-chrome__menu-icon" aria-hidden="true"><span></span><span></span></span>
-      </button>
+      <div class="bk-chrome__actions">
+        <a
+          class="bk-chrome__pdf"
+          href={PDF_URL}
+          target="_blank"
+          rel="noopener"
+          aria-label="PDF version (opens in a new tab)"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M12 18v-6" /><path d="m9 15 3 3 3-3" /></svg>
+          <span class="bk-chrome__pdf-label">PDF</span>
+        </a>
+        <button type="button" class="bk-chrome__menu" aria-expanded="false" aria-controls="bk-toc">
+          <span class="bk-chrome__menu-label">Contents</span>
+          <span class="bk-chrome__menu-icon" aria-hidden="true"><span></span><span></span></span>
+        </button>
+      </div>
     </header>
 
     <div class="bk-toc__backdrop" hidden></div>
