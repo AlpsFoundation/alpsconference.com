@@ -11,8 +11,8 @@ import {
   zoneGroupKey,
   zoneOf,
 } from "../lib/crewBuild";
+import { loadVenueDrawing } from "../lib/venuePlanDrawing";
 import { CREW, volunteerFromSlug, volunteerSlug } from "../lib/volunteers";
-import { withBase } from "../lib/withBase";
 import type { CrewBuildApi } from "./useCrewBuild";
 import "../styles/crewBuild.css";
 
@@ -121,6 +121,18 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   const svgRef = useRef<SVGSVGElement>(null);
 
   const [show, setShow] = useState<Show>("all");
+  // The floor plan is inlined so the theme can recolour it; as an <image> it kept the export's black walls.
+  const [drawing, setDrawing] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    loadVenueDrawing().then(
+      (plan) => alive && setDrawing(plan.drawing),
+      () => {},
+    );
+    return () => {
+      alive = false;
+    };
+  }, []);
   // Without sign-ups to go on, "Needs people" and "Not done yet" would list everything.
   const view: Show = state ? show : "all";
   /** The task whose "Add someone" field is open, as `phase:id`, and what is typed in it. */
@@ -504,7 +516,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                     role="img"
                     aria-label="Floor plan of the KuK with the numbered zones"
                   >
-                    <image href={withBase("img/venue-plan.svg")} x="0" y="0" width="1190.4" height="841.68" />
+                    {drawing && <g className="cb-plan__drawing" aria-hidden="true" dangerouslySetInnerHTML={{ __html: drawing }} />}
                     <g>
                       {BUILD_ZONES.map((zone) => (
                         <rect

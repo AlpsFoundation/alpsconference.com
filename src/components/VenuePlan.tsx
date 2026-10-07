@@ -20,46 +20,19 @@ import {
   VENUE_LEGEND,
   VENUE_MARKERS,
   VENUE_PALETTES,
-  VENUE_PLAN_SRC,
   VENUE_PLAN_VIEW as VIEW,
   VENUE_SECTIONS,
   type VenueColors,
   type VenueIcon,
   type VenueSection,
 } from "../data/venuePlan";
+import { loadVenueDrawing, type VenueDrawing } from "../lib/venuePlanDrawing";
 import { withBase } from "../lib/withBase";
 import "../styles/venue-plan.css";
 
 /* ---------- drawing (fetched once, only when a plan scrolls into view) ---------- */
 
-type Plan = { drawing: string; walls: string };
-
-let planPromise: Promise<Plan> | null = null;
-
-function loadPlan() {
-  planPromise ??= fetch(withBase(VENUE_PLAN_SRC))
-    .then((r) => (r.ok ? r.text() : Promise.reject(new Error(`HTTP ${r.status}`))))
-    // The export carries its own legend as magenta <text> glyphs; the legend
-    // is rebuilt in HTML, so keep only the drawing layers.
-    .then((raw) =>
-      raw
-        .replace(/^[\s\S]*?<svg[^>]*>/, "")
-        .replace(/<\/svg>\s*$/, "")
-        .replace(/<defs\s*\/>/, "")
-        .replace(/<text\b[^>]*>[\s\S]*?<\/text>/g, ""),
-    )
-    // The solid walls of the base layer, redrawn raised when the plan is tilted.
-    .then((drawing) => {
-      const base = drawing.match(/<g id="01_BASE_SIMPLIFIEE">([\s\S]*?)<\/g>/)?.[1] ?? "";
-      const walls = base.match(/<path\b[^>]*fill="#000000"[^>]*\/>/g)?.join("") ?? "";
-      return { drawing, walls };
-    })
-    .catch((err) => {
-      planPromise = null;
-      throw err;
-    });
-  return planPromise;
-}
+type Plan = VenueDrawing;
 
 function usePlanWhenVisible(ref: RefObject<HTMLElement | null>) {
   const [plan, setPlan] = useState<Plan | null>(null);
@@ -71,7 +44,7 @@ function usePlanWhenVisible(ref: RefObject<HTMLElement | null>) {
       ([entry]) => {
         if (!entry.isIntersecting) return;
         io.disconnect();
-        loadPlan().then((p) => !cancelled && setPlan(p), () => {});
+        loadVenueDrawing().then((p) => !cancelled && setPlan(p), () => {});
       },
       { rootMargin: "400px" },
     );
@@ -592,9 +565,11 @@ export default function VenuePlan({
               <rect width="50" height="50" fill={`url(#${uid}-grid-minor)`} />
               <path d="M50 0H0V50" className="vp-grid-line vp-grid-major" />
             </pattern>
-            <pattern id={`${uid}-hatch`} width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <rect width="3.2" height="3.2" className="vp-hatch-bg" />
-              <path d="M0 0V3.2" className="vp-hatch-line" />
+            {/* Diagonals drawn straight into the tile, corners included so they join across tiles. Safari
+                paints a rotated tile with a semi-transparent hairline on its edge as dark patches. */}
+            <pattern id={`${uid}-hatch`} width="4.5" height="4.5" patternUnits="userSpaceOnUse">
+              <rect width="4.5" height="4.5" className="vp-hatch-bg" />
+              <path d="M-1 1L1 -1M0 4.5L4.5 0M3.5 5.5L5.5 3.5" className="vp-hatch-line" />
             </pattern>
             {plan && <g id={`${uid}-walls`} className="vp-plan" dangerouslySetInnerHTML={{ __html: plan.walls }} />}
           </defs>

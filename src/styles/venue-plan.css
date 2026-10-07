@@ -161,10 +161,11 @@
   fill: var(--vp-wall);
 }
 
+/* The line colour is mixed in, not faded with opacity: no transparency layer inside the pattern tile. */
 .vp-hatch-line {
-  stroke: var(--vp-ink);
-  stroke-width: 0.45;
-  opacity: 0.4;
+  fill: none;
+  stroke: color-mix(in srgb, var(--vp-ink) 40%, var(--vp-wall));
+  stroke-width: 0.32;
 }
 
 .vp-plan [fill="#1E78A9"] {

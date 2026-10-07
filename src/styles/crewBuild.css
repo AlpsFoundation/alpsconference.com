@@ -37,12 +37,35 @@
   -webkit-backdrop-filter: blur(12px);
 }
 
+/* The floor plan in the page's own colours, set per theme below: the export's black
+   walls and blue furniture are recoloured, so the coloured zones stay the focus. */
 .cb-map {
+  --cb-paper: #0a2c45;
+  --cb-wall: rgba(238, 244, 248, 0.3);
+  --cb-ink: rgba(238, 244, 248, 0.45);
+  --cb-furniture: rgba(238, 244, 248, 0.1);
+  --cb-furniture-line: rgba(238, 244, 248, 0.28);
+  --cb-detail: rgba(238, 244, 248, 0.14);
+  --cb-display: rgba(243, 143, 191, 0.75);
+  --cb-caption: rgba(238, 244, 248, 0.92);
+  --cb-caption-soft: rgba(238, 244, 248, 0.62);
   position: relative;
   overflow: hidden;
   border: 1px solid var(--vol-line);
   border-radius: 0.9rem;
-  background: #fff;
+  background: var(--cb-paper);
+}
+
+:root[data-vol-theme="light"] .cb-map {
+  --cb-paper: #ffffff;
+  --cb-wall: #cfd7e0;
+  --cb-ink: #94a2b1;
+  --cb-furniture: #e6ebf0;
+  --cb-furniture-line: #b4c1ce;
+  --cb-detail: #e1e6eb;
+  --cb-display: #e58fb2;
+  --cb-caption: #082f4a;
+  --cb-caption-soft: #4b5563;
 }
 
 .cb-map[data-size="hidden"] {
@@ -73,8 +96,39 @@
   height: 100%;
 }
 
-.cb-plan image {
-  filter: grayscale(1) contrast(1.05) opacity(0.5);
+.cb-plan__drawing {
+  pointer-events: none;
+}
+
+.cb-plan__drawing [stroke="Black"],
+.cb-plan__drawing [stroke="#000000"] {
+  stroke: var(--cb-ink);
+}
+
+.cb-plan__drawing [fill="#000000"] {
+  fill: var(--cb-wall);
+  stroke: var(--cb-ink);
+  stroke-width: 0.4px;
+}
+
+.cb-plan__drawing [fill="#1E78A9"] {
+  fill: var(--cb-furniture);
+}
+
+.cb-plan__drawing [stroke="#1E78A9"] {
+  stroke: var(--cb-furniture-line);
+}
+
+.cb-plan__drawing [stroke="#BEBEBE"] {
+  stroke: var(--cb-detail);
+}
+
+.cb-plan__drawing [fill="#FF0000"] {
+  fill: var(--cb-display);
+}
+
+.cb-plan__drawing [stroke="#FF0000"] {
+  stroke: var(--cb-display);
 }
 
 .cb-plan__area,
@@ -117,7 +171,7 @@
 }
 
 .cb-plan__marker[data-selected] circle {
-  stroke: #082f4a;
+  stroke: var(--cb-caption);
   stroke-width: 2.5;
 }
 
@@ -159,8 +213,8 @@
   min-height: 1.9rem;
   margin: 0;
   padding: 0.3rem 0.7rem;
-  border-top: 1px solid rgba(8, 47, 74, 0.12);
-  color: #082f4a;
+  border-top: 1px solid var(--vol-line);
+  color: var(--cb-caption);
   font-size: 0.82rem;
   white-space: nowrap;
   overflow: hidden;
@@ -168,7 +222,7 @@
 }
 
 .cb-map__caption span {
-  color: #4b5563;
+  color: var(--cb-caption-soft);
 }
 
 .cb-map__caption i {
