@@ -807,6 +807,9 @@ function ExperiencesSection({
           {notYetOpen && `Sign-ups open on ${SIGNUPS_OPEN_LABEL}. `}
           Places are limited. When a session is full, join the waitlist and we move you up as spots free.
         </p>
+        <p className="mt-2 text-sm font-semibold text-white">
+          Outside the listed sessions, Saal 4 is open to everyone as a quiet space to retreat and relax.
+        </p>
       </div>
 
       {upcomingDays.map(([day, sessions]) => (
