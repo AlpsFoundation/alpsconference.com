@@ -883,6 +883,30 @@ button.links-row:not(:disabled):hover {
 
 .links-button:disabled { opacity: 0.6; }
 
+/* Donation buttons: quiet tiles, so the payment logos carry them. */
+.links-pay {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.links-pay:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.links-pay:focus-visible {
+  outline: 2px solid var(--color-support-light);
+  outline-offset: 2px;
+}
+
 .links-button--ghost {
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: transparent;

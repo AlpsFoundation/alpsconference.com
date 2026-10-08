@@ -46,6 +46,12 @@ export const WIFI = {
   password: "ALPS-2026",
 };
 
+// Donation buttons at the bottom of /links (/links#donate): cards go through Stripe, TWINT through RaiseNow.
+export const DONATIONS = {
+  card: "https://buy.stripe.com/4gM5kD27t3IC1UQ5HCawo09",
+  twint: "https://donate.raisenow.io/bmyqy",
+};
+
 const VENUE_MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=Kultur+%26+Kongresshaus+Aarau%2C+Schlossplatz+9%2C+5000+Aarau";
 const AFTERPARTY_DIRECTIONS_URL =

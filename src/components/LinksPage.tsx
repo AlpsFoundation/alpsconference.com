@@ -40,7 +40,7 @@ import {
   type TimelineEntry,
 } from "../data/conferenceTimeline";
 import { EXPERIENCE_PORTRAITS } from "../data/experiences";
-import { QUICK_LINKS, WIFI, type QuickLinkAction, type QuickLinkIcon } from "../data/links";
+import { DONATIONS, QUICK_LINKS, WIFI, type QuickLinkAction, type QuickLinkIcon } from "../data/links";
 import type { SignupAvailability, SignupResult } from "../lib/experienceSignups";
 import { withBase } from "../lib/withBase";
 import VenuePlan from "./VenuePlan";
@@ -868,6 +868,30 @@ function ExperiencesSection({
   );
 }
 
+function DonationSection() {
+  return (
+    <section id="donate" aria-labelledby="donate-heading" className="space-y-4">
+      <div data-reveal className="links-reveal">
+        <p className="links-eyebrow">Donations</p>
+        <h2 id="donate-heading" className="mt-1 text-2xl font-semibold text-white">Support ALPS</h2>
+        <p className="mt-1 text-sm text-white/65">
+          The ALPS Foundation is a non-profit run entirely by volunteers. Donations keep the wheels running and go
+          directly to education, research and medical access facilitation.
+        </p>
+      </div>
+      <div data-reveal data-reveal-delay="45" className="links-reveal grid grid-cols-2 gap-2">
+        <a className="links-pay" href={DONATIONS.twint} target="_blank" rel="noopener noreferrer" aria-label="Donate with TWINT">
+          <img src={withBase("img/payments/twint.svg")} alt="" className="h-5 w-auto" />
+        </a>
+        <a className="links-pay" href={DONATIONS.card} target="_blank" rel="noopener noreferrer" aria-label="Donate by card">
+          <img src={withBase("img/payments/visa.svg")} alt="" className="h-3 w-auto" />
+          <img src={withBase("img/payments/mastercard.svg")} alt="" className="h-[1.1rem] w-auto" />
+        </a>
+      </div>
+    </section>
+  );
+}
+
 function normalizeStored(raw: Record<string, unknown>): Record<string, StoredSignup> {
   const next: Record<string, StoredSignup> = {};
   for (const [id, value] of Object.entries(raw)) {
@@ -955,7 +979,8 @@ export default function LinksPage() {
     return () => window.clearInterval(timer);
   }, [refresh]);
 
-  // Open the item named in the URL hash, e.g. /links#afterparty, once the clock has rendered it.
+  // Open the item named in the URL hash, e.g. /links#afterparty, or scroll to a section such as
+  // /links#donate, once the clock has rendered it.
   useEffect(() => {
     if (!clock) return;
     const id = decodeURIComponent(window.location.hash.slice(1));
@@ -963,6 +988,8 @@ export default function LinksPage() {
     if (item instanceof HTMLDetailsElement && !item.open) {
       item.open = true;
       item.scrollIntoView({ block: "center" });
+    } else if (item) {
+      item.scrollIntoView();
     }
   }, [Boolean(clock)]);
 
@@ -1010,6 +1037,8 @@ export default function LinksPage() {
         onSignedUp={handleSignedUp}
         onCancelled={handleCancelled}
       />
+
+      <DonationSection />
 
       <footer className="links-reveal mt-auto text-center text-sm text-white/50" data-reveal>
         <a href={withBase("/")} className="hover:text-white">alpsconference.com</a>
