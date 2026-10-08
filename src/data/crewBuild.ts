@@ -118,7 +118,7 @@ export const BUILD_ZONE_GROUPS: Record<string, string> = {
   Exhibitors: "exhibitors",
   "Research posters": "research",
   "Kevin Barron exhibition": "kevin",
-  "Hannah Stanke artwork": "hannah",
+  "Art corner: Hana Stanke and Joanne Lackey": "hannah",
 };
 
 type BuildData = { people: string[]; zones: BuildZone[]; sections: BuildSection[] };
@@ -352,8 +352,8 @@ const DATA: BuildData = {
     },
     {
       "n": "14",
-      "label": "Hannah Stanke artwork — 2 × A0 display area",
-      "group": "Hannah Stanke artwork",
+      "label": "Art corner: Hana Stanke and Joanne Lackey — one shared gallery wall",
+      "group": "Art corner: Hana Stanke and Joanne Lackey",
       "x": 310,
       "y": 439,
       "area": [
@@ -480,11 +480,11 @@ const DATA: BuildData = {
         },
         {
           "id": "lounge-bottom",
-          "name": "Lounge bottom: Artwork Corner, live painting setup assistance",
+          "name": "Lounge bottom: paravents, live painting setup assistance",
           "zones": [
             "7 bottom"
           ],
-          "what": "Build the Artwork Corner in Lounge bottom with paravents and lit walls, and help set up the live painting, including Joanne's easel."
+          "what": "Set up Lounge bottom with paravents and lit walls, beside the art corner at 14, and help set up the live painting, including Joanne's easel."
         },
         {
           "id": "lounge-mid",
@@ -580,12 +580,13 @@ const DATA: BuildData = {
         },
         {
           "id": "hannah-display",
-          "name": "Set up Hannah Stanke's artwork display",
+          "name": "Build the art corner wall for Hana and Joanne",
           "zones": [
             "14"
           ],
           "draft": true,
-          "what": "Set up the 2 × A0 display area for Hannah Stanke's artwork at 14, with the artwork and equipment coming from Berlin with Lennert."
+          "detail": "Panel count: ask Raphaël",
+          "what": "Build one shared gallery wall at 14 for Hana Stanke and Joanne Lackey: display panels, with Hana's big black cloth over them and her lights, which Joanne shares. They asked for at least 8 panels and no easels for showing the work. How many panels the corner gets is Raphaël's call, so ask him before you start."
         }
       ]
     },
@@ -711,15 +712,37 @@ const DATA: BuildData = {
         },
         {
           "id": "hanna-artwork",
-          "name": "Hanna's artwork and equipment from Berlin",
+          "name": "Hana's artwork, black cloth and lights, from Berlin",
+          "zones": [
+            "14"
+          ],
           "who": "Lennert and other Berlin travellers",
-          "status": "Volume unknown"
+          "status": "Transport settled; volume not known"
         },
         {
           "id": "easel",
           "name": "Easel for live painting",
           "qty": "1",
           "who": "Joanne, from Basel"
+        },
+        {
+          "id": "joanne-artwork",
+          "name": "Joanne's artworks, from Basel",
+          "zones": [
+            "14"
+          ],
+          "who": "David, in his rental car on Thursday",
+          "status": "Raphaël and David arrange the pickup"
+        },
+        {
+          "id": "art-corner-panels",
+          "name": "Display panels for the art corner wall",
+          "zones": [
+            "14"
+          ],
+          "qty": "At least 8, as Hana and Joanne asked",
+          "who": "Raphaël decides: ALPS panels or KuK Stellwände",
+          "status": "Count not decided"
         },
         {
           "id": "kevin-tables",
@@ -796,6 +819,12 @@ const DATA: BuildData = {
           "name": "Blankets",
           "qty": "20 in the tracker",
           "who": "Philipp"
+        },
+        {
+          "id": "marina-carpet",
+          "name": "Carpet or big blanket for Marina's sound-meditation instruments",
+          "who": "Philipp brings a big blanket, maybe a carpet; David's carpet is free on Friday only",
+          "status": "Asked on 5 Oct"
         },
         {
           "id": "percussion-led",
@@ -937,20 +966,20 @@ const DATA: BuildData = {
           "id": "badges",
           "name": "Badges",
           "who": "Philipp",
-          "status": "Product not chosen"
+          "status": "200 badges arrived; Philipp prints the name labels, last-minute ones from the template on Drive"
         },
         {
           "id": "booklets",
           "name": "Booklets",
           "qty": "250",
           "who": "Philipp",
-          "status": "Planned to go to print 22 Sept, not confirmed here"
+          "status": "Print not confirmed in Slack; the web booklet is live"
         },
         {
           "id": "banners-merch",
           "name": "Banners and merch",
           "who": "Philipp",
-          "status": "Banners pending, 5-day delivery"
+          "status": "Banners went to Philipp (due 6 Oct) for the truck; Justine picks up the posters and postcards on Thursday morning"
         }
       ]
     }
