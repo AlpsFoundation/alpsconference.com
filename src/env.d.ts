@@ -6,9 +6,9 @@ interface Env {
   INFOMANIAK_NEWSLETTER_GROUPS?: string;
   NEWSLETTER_DEBUG?: string;
   DB: D1Database;
-  /** Booking mailbox login, e.g. the Gmail address and an app password. */
+  /** Gmail account the booking emails are sent as (notifications@alps.foundation), and its app password. */
   SMTP_USER?: string;
-  SMTP_PASS?: string;
+  GOOGLE_APPS_PASSWORD?: string;
   /** Defaults to smtp.gmail.com and 465. */
   SMTP_HOST?: string;
   SMTP_PORT?: string;

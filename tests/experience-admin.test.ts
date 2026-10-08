@@ -34,7 +34,12 @@ describe("staff booking tools", () => {
     expect(sessions.map((s) => s.id).sort()).toEqual(bookable.map((s) => s.id).sort());
     const starts = sessions.map((s) => s.start!);
     expect(starts).toEqual([...starts].sort());
-    expect(sessions.find((s) => s.id === session.id)).toMatchObject({ title: session.title, capacity: session.capacity, bookings: [] });
+    expect(sessions.find((s) => s.id === session.id)).toMatchObject({
+      title: session.title,
+      capacity: session.capacity,
+      signupsOpenAt: "2026-10-08T22:00:00.000Z",
+      bookings: [],
+    });
   });
 
   it("add people at the desk, emailing only those who give an address", async () => {
@@ -65,7 +70,7 @@ describe("staff booking tools", () => {
 
   it("remove a confirmed booking and email whoever moves up", async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
-    vi.setSystemTime(new Date("2026-10-08T10:00:00+02:00"));
+    vi.setSystemTime(new Date("2026-10-09T09:00:00+02:00"));
     try {
       const first = await add("Person 1", "person1@example.com");
       for (let n = 2; n <= session.capacity; n++) await add(`Person ${n}`);

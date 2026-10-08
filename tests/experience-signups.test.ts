@@ -45,7 +45,7 @@ beforeEach(() => {
   pending = [];
   sent.mockClear();
   vi.useFakeTimers({ toFake: ["Date"] });
-  vi.setSystemTime(new Date("2026-10-08T10:00:00+02:00"));
+  vi.setSystemTime(new Date("2026-10-09T09:00:00+02:00"));
 });
 
 afterEach(() => {
@@ -53,15 +53,18 @@ afterEach(() => {
 });
 
 describe("experience sign-ups", () => {
-  it("stay closed before 8 October unless ?time moves the clock", async () => {
-    vi.setSystemTime(new Date("2026-10-07T23:59:00+02:00"));
+  it("stay closed until Friday 9 October unless ?time moves the clock", async () => {
+    vi.setSystemTime(new Date("2026-10-08T23:59:00+02:00"));
 
     const early = await signUp(1);
     expect(early.response.status).toBe(403);
-    expect(early.data.error).toBe("Sign-ups open on Thursday 8 October.");
+    expect(early.data.error).toBe("Sign-ups open on Friday 9 October.");
     expect(sent).not.toHaveBeenCalled();
 
-    const travelled = await signUp(1, "?time=2026-10-08-00-00");
+    const stillEarly = await signUp(1, "?time=2026-10-08-23-59");
+    expect(stillEarly.response.status).toBe(403);
+
+    const travelled = await signUp(1, "?time=2026-10-09-00-00");
     expect(travelled.response.status).toBe(201);
     expect(travelled.data.status).toBe("confirmed");
     expect(sent).toHaveBeenCalledOnce();

@@ -77,7 +77,7 @@ cp .env.example .env
 
 ### Runtime secrets for local development
 
-Configure these in `.dev.vars`:
+Configure these in `.dev.vars`, or in `.env` when there is no `.dev.vars` (the Cloudflare runtime falls back to it):
 
 | Variable | Required | Description |
 | --- | --- | --- |
@@ -85,8 +85,8 @@ Configure these in `.dev.vars`:
 | `INFOMANIAK_NEWSLETTER_DOMAIN` | Yes* | Infomaniak newsletter domain ID. Must be a positive integer. |
 | `INFOMANIAK_NEWSLETTER_GROUPS` | No | Optional comma-separated group IDs and/or group names to assign new subscribers to. |
 | `NEWSLETTER_DEBUG` | No | Set to `1` to include extra `debug` details in API error responses during local troubleshooting. |
-| `SMTP_USER` | Yes** | Address of the booking mailbox (a Gmail account). |
-| `SMTP_PASS` | Yes** | A Google app password for that account (Google Account → Security → 2-Step Verification → App passwords). Spaces are ignored. |
+| `GOOGLE_APPS_PASSWORD` | Yes** | Google app password of `notifications@alps.foundation` (Google Account → Security → 2-Step Verification → App passwords). Spaces are ignored. |
+| `SMTP_USER` | No | Account the booking emails are sent as. Set to `notifications@alps.foundation` in `wrangler.jsonc`. |
 | `SMTP_HOST` | No | Defaults to `smtp.gmail.com`. |
 | `SMTP_PORT` | No | Defaults to `465` (implicit TLS); `587` uses STARTTLS. |
 | `BOOKING_FROM_EMAIL` | No | From-address for booking emails. Defaults to `SMTP_USER`; Gmail only sends as the account itself or one of its verified "Send mail as" aliases. |
@@ -94,11 +94,13 @@ Configure these in `.dev.vars`:
 
 \* Required when you want to test the newsletter signup route. The static landing page itself does not require them.
 
-\*\* Without them, bookings still work and the emails are skipped (logged as a warning).
+\*\* Without it, bookings still work and the emails are skipped (logged as a warning).
 
 ### Experience bookings
 
-`/links` takes experience sign-ups into the `alpsconference-signups` D1 database (`pnpm db:migrate:local` once before `pnpm dev`). Each booking sends a confirmation with a calendar file and a cancel link; when a confirmed spot is cancelled, the first person on the waitlist moves up and gets a "spot opened up" email. The emails go out over SMTP from the booking Gmail mailbox (`src/lib/bookingMailer.ts`, [worker-mailer](https://github.com/zou-yu/worker-mailer) over Cloudflare TCP sockets).
+`/links` takes experience sign-ups into the `alpsconference-signups` D1 database (`pnpm db:migrate:local` once before `pnpm dev`). Each booking sends a confirmation with a calendar file and a cancel link; when a confirmed spot is cancelled, the first person on the waitlist moves up and gets a "spot opened up" email. The emails come from `notifications@alps.foundation`, sent over Gmail SMTP with that account's app password (`GOOGLE_APPS_PASSWORD`; `src/lib/bookingMailer.ts`, [worker-mailer](https://github.com/zou-yu/worker-mailer) over Cloudflare TCP sockets).
+
+Sign-ups open on **Friday 9 October 2026 at 00:00 in Aarau** (`SIGNUPS_OPEN` in `src/data/conferenceTimeline.ts`) and close for each session when it starts; until then the page shows the opening date and the API refuses bookings. `?time=yyyy-mm-dd-hh-mm` on `/links` moves the page's clock, and the API follows it, so `/links?time=2026-10-09-10-00` books for real before opening. Preview deployments share the production database and send real emails, so cancel test bookings from their email.
 
 Staff manage bookings at [tools.alps.foundation/experiences](https://tools.alps.foundation/experiences/) (Google sign-in, `AlpsFoundation/tools.alps.foundation`, package `experiences`): per session, who is confirmed and waiting, add someone at the desk, remove a booking, and door check-in. That tool reaches the bookings through the `ExperienceBookings` RPC entrypoint in `src/worker.ts` (logic in `src/lib/experienceAdmin.ts`), which only a service binding can call — it has no public URL. Apply migration `0003_experience_signups_staff.sql` (`pnpm db:migrate:remote`) before that tool goes live; bookings from `/links` work with or without it.
 
@@ -106,19 +108,22 @@ Staff manage bookings at [tools.alps.foundation/experiences](https://tools.alps.
 
 `/volunteers` keeps build sign-ups, ticks and added names in the `conf26-setup` D1 database (binding `CREW_DB`), shared with the old tools-conf26-setup page; its migrations live in `AlpsFoundation/tools.alps.foundation`, package `conf26-setup`. For `pnpm dev`, run `pnpm db:crew:local` once to create its tables locally. When the database can't be reached, the API answers 503 and the page stays readable: it pauses signing up, ticking and adding names, and turns them back on once a poll gets through.
 
-Sign-ups open on **8 October 2026 at 00:00 in Aarau** (`SIGNUPS_OPEN` in `src/data/conferenceTimeline.ts`); until then the page shows the opening date and the API refuses bookings. `?time=yyyy-mm-dd-hh-mm` on `/links` moves the page's clock, and the API follows it, so `/links?time=2026-10-08-10-00` books for real before opening — cancel those test bookings from their email before 8 October.
-
 ### Runtime secrets in Cloudflare
 
-Set the same newsletter secrets in Cloudflare for production/preview deployments, for example with Wrangler:
+Set the same secrets in Cloudflare for production/preview deployments, for example with Wrangler:
 
 ```bash
 wrangler secret put INFOMANIAK_TOKEN
 wrangler secret put INFOMANIAK_NEWSLETTER_DOMAIN
 wrangler secret put INFOMANIAK_NEWSLETTER_GROUPS
 wrangler secret put NEWSLETTER_DEBUG
-wrangler secret put SMTP_USER
-wrangler secret put SMTP_PASS
+wrangler secret put GOOGLE_APPS_PASSWORD
+```
+
+To copy the app password from `.env` without printing it:
+
+```bash
+grep '^GOOGLE_APPS_PASSWORD=' .env | cut -d= -f2- | pnpm exec wrangler secret put GOOGLE_APPS_PASSWORD
 ```
 
 ## Calendar feeds

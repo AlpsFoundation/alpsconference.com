@@ -4,7 +4,8 @@ export type MailerEnv = {
   SMTP_HOST?: string;
   SMTP_PORT?: string;
   SMTP_USER?: string;
-  SMTP_PASS?: string;
+  /** App password of the SMTP_USER Google account. */
+  GOOGLE_APPS_PASSWORD?: string;
   BOOKING_FROM_EMAIL?: string;
   BOOKING_FROM_NAME?: string;
 };
@@ -24,16 +25,16 @@ function base64(value: string): string {
 }
 
 /**
- * Sends a booking email through the booking mailbox's SMTP server — Gmail by
- * default (smtp.gmail.com:465, the account address and an app password).
- * Without credentials, e.g. in local dev, the email is skipped and logged.
+ * Sends a booking email through Gmail SMTP (smtp.gmail.com:465) as SMTP_USER,
+ * notifications@alps.foundation, signing in with its Google app password.
+ * Without the password, e.g. in local dev, the email is skipped and logged.
  */
 export async function sendBookingEmail(env: MailerEnv, email: BookingEmail): Promise<void> {
   const username = env.SMTP_USER?.trim();
   // Google shows app passwords in groups of four; the spaces are not part of them.
-  const password = env.SMTP_PASS?.replace(/\s+/g, "");
+  const password = env.GOOGLE_APPS_PASSWORD?.replace(/\s+/g, "");
   if (!username || !password) {
-    console.warn(`booking email to ${email.to} skipped: SMTP_USER / SMTP_PASS are not set`);
+    console.warn(`booking email to ${email.to} skipped: SMTP_USER / GOOGLE_APPS_PASSWORD are not set`);
     return;
   }
 

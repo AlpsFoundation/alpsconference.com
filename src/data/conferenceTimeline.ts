@@ -147,9 +147,9 @@ export function findSignupSession(id: string): ExperienceSession | undefined {
   return EXPERIENCE_SESSIONS.find((session) => session.id === id && session.signup);
 }
 
-/** Experience sign-ups open at midnight in Aarau the day before the conference. `?time=` overrides the clock. */
-export const SIGNUPS_OPEN = zurichDate("2026-10-08", "00:00");
-export const SIGNUPS_OPEN_LABEL = "Thursday 8 October";
+/** Experience sign-ups open at midnight in Aarau on the first conference day. `?time=` overrides the clock. */
+export const SIGNUPS_OPEN = zurichDate("2026-10-09", "00:00");
+export const SIGNUPS_OPEN_LABEL = "Friday 9 October";
 
 export const CONFERENCE_START = TIMELINE[0].start;
 export const CONFERENCE_END = TIMELINE[TIMELINE.length - 1].end;

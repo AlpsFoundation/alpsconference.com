@@ -12,10 +12,9 @@ INFOMANIAK_NEWSLETTER_DOMAIN=
 # Optional debug payloads on API errors
 # NEWSLETTER_DEBUG=1
 
-# Booking emails from /links, sent over SMTP from the booking Gmail mailbox.
-# SMTP_PASS is a Google app password (Google Account → Security → App passwords).
-# Leave both empty to skip sending in local dev.
-SMTP_USER=
-SMTP_PASS=
+# Booking emails from /links go out over Gmail SMTP as notifications@alps.foundation
+# (SMTP_USER in wrangler.jsonc). This is that account's Google app password
+# (Google Account → Security → App passwords). Leave it empty to skip sending.
+GOOGLE_APPS_PASSWORD=
 # SMTP_HOST=smtp.gmail.com
 # SMTP_PORT=465

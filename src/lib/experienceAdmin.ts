@@ -2,7 +2,12 @@
  * Staff operations on experience bookings, for tools.alps.foundation/experiences.
  * Exposed only through the `ExperienceBookings` RPC entrypoint in src/worker.ts.
  */
-import { EXPERIENCE_SESSIONS, findSignupSession, type ExperienceSession } from "../data/conferenceTimeline";
+import {
+  EXPERIENCE_SESSIONS,
+  SIGNUPS_OPEN,
+  findSignupSession,
+  type ExperienceSession,
+} from "../data/conferenceTimeline";
 import {
   cleanEmail,
   cleanFullName,
@@ -41,6 +46,8 @@ export type AdminSession = {
   capacity: number;
   start?: string;
   end?: string;
+  /** When /links starts taking bookings (ISO). It stops at `start`. */
+  signupsOpenAt: string;
   bookings: AdminBooking[];
 };
 
@@ -72,6 +79,7 @@ function toAdminSession(session: ExperienceSession, rows: BookingRow[]): AdminSe
     capacity: session.capacity,
     start: session.start?.toISOString(),
     end: session.end?.toISOString(),
+    signupsOpenAt: SIGNUPS_OPEN.toISOString(),
     // Rows arrive ordered by id: the first `capacity` are confirmed, the rest wait.
     bookings: rows.map((row, index) => ({
       signupId: row.id,

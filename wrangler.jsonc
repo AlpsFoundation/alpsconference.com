@@ -27,6 +27,9 @@
     }
   ],
   "vars": {
+    // Booking emails go out over Gmail SMTP as this Workspace account. Its app
+    // password is the GOOGLE_APPS_PASSWORD secret (`.env` locally).
+    "SMTP_USER": "notifications@alps.foundation",
     "BOOKING_FROM_NAME": "ALPS Conference"
   },
   "observability": {
