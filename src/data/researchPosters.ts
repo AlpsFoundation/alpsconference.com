@@ -171,4 +171,18 @@ export const POSTERS: ResearchPoster[] = [
     ],
     hasPhoto: true,
   },
+  {
+    slug: "alessandro-lo-jacono",
+    name: "Alessandro Lo Jacono",
+    credentials: "MD · PhD candidate",
+    affiliation: "Universitat Autònoma de Barcelona and Institut de Recerca Sant Pau, Spain; Società Italiana di Medicina Psichedelica (SIMEPSI), Italy",
+    title: "Motivations, Stigma and Post-Acute Psychological Outcomes After Psychedelic Use: Insights from the Italy-Based Respondents to the Global Psychedelic Survey 2025",
+    summary: [
+      "Why people take psychedelics may matter as much as what they take. In real-world settings, anxiety and depression that persist after the acute effects of a psychedelic experience remain largely unexplored, as do the roles of motivation and stigma, especially in prohibitive contexts such as Italy.",
+      "This poster presents data from 534 Italy-based respondents to the Global Psychedelic Survey 2025. Post-acute anxiety was reported by 18.5% and depression by 37.4%. Enhancement-oriented motivations were associated with lower likelihood and burden of depression. Broader motivational profiles and greater perceived stigma were linked to higher risk.",
+      "The findings point to two practical levers for harm reduction: psychotherapeutic preparation to shape users’ set and intentions, and scientific dissemination to reduce stigma.",
+    ],
+    hasPhoto: true,
+    hasPdf: true,
+  },
 ];
