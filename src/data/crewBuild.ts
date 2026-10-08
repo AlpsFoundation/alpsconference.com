@@ -600,7 +600,7 @@ const DATA: BuildData = {
           "name": "Print and put up the A3 and A4 signs",
           "lead": "Matthias",
           "draft": true,
-          "what": "Print the A3 and A4 signs on the on-site printer (Matthias and Maria), then put them up around the house."
+          "what": "Print the A4 signs from the signage tool and the A3 posters from Drive on the on-site printer (Matthias and Maria), then put them up around the house."
         },
         {
           "id": "signs-stage-timers",

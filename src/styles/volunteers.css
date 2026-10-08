@@ -1994,3 +1994,97 @@
   box-shadow: 0 0 0 2px var(--vl-ink);
 }
 
+
+/* ---------- links (src/data/crewLinks.ts, src/components/CrewLinks.tsx) ---------- */
+.vol-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vol-linkchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 1.75rem;
+  padding: 0.15rem 0.5rem 0.15rem 0.65rem;
+  border: 1px solid var(--vol-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(238, 244, 248, 0.92);
+  font-size: 0.8rem;
+  font-weight: 550;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.vol-linkchip:hover {
+  border-color: color-mix(in srgb, var(--color-support-light) 70%, transparent);
+}
+
+.vol-linkchip:focus-visible {
+  outline: 2px solid var(--color-support-light);
+  outline-offset: 2px;
+}
+
+.vol-linkchip svg {
+  flex: none;
+  opacity: 0.7;
+}
+
+.vol-linkchip__team {
+  padding: 0.05rem 0.35rem;
+  border: 1px dashed var(--vol-line);
+  border-radius: 999px;
+  color: var(--vol-muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.vol-links--slot {
+  flex-basis: 100%;
+  margin-top: 0.35rem;
+}
+
+.vol-links--popover {
+  margin-top: 0.75rem;
+}
+
+.vol-daylinks {
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem 0.9rem;
+  border: 1px solid var(--vol-line);
+  border-radius: 1.1rem;
+  background: var(--vol-panel);
+}
+
+.vol-daylinks__title {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-support-light) 88%, white);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+:root[data-vol-theme="light"] .vol-linkchip {
+  background: var(--vl-surface);
+  color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .vol-linkchip:hover {
+  border-color: var(--vl-accent);
+}
+
+:root[data-vol-theme="light"] .vol-daylinks {
+  background: var(--vl-surface);
+}
+
+:root[data-vol-theme="light"] .vol-daylinks__title {
+  color: var(--vl-accent);
+}

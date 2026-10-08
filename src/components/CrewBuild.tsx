@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Check, ChevronUp, CloudOff, HandHeart, Maximize2, MapPin, Minimize2, Plus, UserPlus, Users, X } from "lucide-react";
 import { BUILD_PHASES, BUILD_ZONES, type BuildItem, type BuildPhase, type BuildSection } from "../data/crewBuild";
+import { BUILD_ITEM_LINKS } from "../data/crewLinks";
+import CrewLinks from "./CrewLinks";
 import {
   assigneesOf,
   BUILD_DAYS,
@@ -333,6 +335,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
           <p className="cb-task__what" data-empty={!item.what || undefined}>
             {item.what ?? "To be described."}
           </p>
+          <CrewLinks links={BUILD_ITEM_LINKS[item.id]} label={`Links for ${item.name}`} />
           {item.zones?.length ? (
             <div className="cb-chips">
               {item.zones.map((n) => (
@@ -452,6 +455,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
         <div>
           <p className="cb-mat__name">{item.name}</p>
           {facts.length > 0 && <p className="cb-mat__facts">{facts.join(" · ")}</p>}
+          <CrewLinks links={BUILD_ITEM_LINKS[item.id]} label={`Links for ${item.name}`} />
           {item.zones?.length ? (
             <div className="cb-chips">
               {item.zones.map((n) => (

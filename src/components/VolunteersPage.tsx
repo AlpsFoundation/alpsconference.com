@@ -2,6 +2,8 @@ import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } fr
 import { ChevronDown, CircleHelp, Info, MapPin, Moon, Sun, SunMoon, Users, type LucideIcon } from "lucide-react";
 import CalendarSubscribe from "./CalendarSubscribe";
 import CrewBuild from "./CrewBuild";
+import CrewLinks from "./CrewLinks";
+import { CREW_EVENT_LINKS, DAY_LINKS, TASK_LINKS } from "../data/crewLinks";
 import { useCrewBuild } from "./useCrewBuild";
 import { BUILD_PHASES } from "../data/crewBuild";
 import { BUILD_DAYS, personBuild, type PersonBuildEntry } from "../lib/crewBuild";
@@ -326,6 +328,7 @@ function TaskHeader({ task, open, onToggle }: { task: VolunteerTask; open: boole
               <li key={duty}>{duty}</li>
             ))}
           </ul>
+          <CrewLinks links={TASK_LINKS[task]} label={`Links for ${info.label}`} className="vol-links--popover" />
           {info.weight !== 1 && (
             <p className="vol-popover__note">
               {info.weight === 0 ? "Not counted in the hours." : "Counts half towards the hours."}
@@ -399,6 +402,7 @@ function PlanList({
                 <div className="vol-slot__program">
                   <strong>{row.event.title}</strong>
                   <span className="vol-slot__place">{row.event.place}</span>
+                  <CrewLinks links={CREW_EVENT_LINKS[row.event.id]} label={`Links for ${row.event.title}`} className="vol-links--slot" />
                 </div>
                 <div className="vol-slot__crew">
                   {row.event.people ? (
@@ -1213,6 +1217,12 @@ export default function VolunteersPage() {
         </div>
 
         <div id="vol-day-panel" role="tabpanel" aria-labelledby={`vol-tab-${day.dateTime}`}>
+          {DAY_LINKS[day.dateTime] && (
+            <div className="vol-daylinks">
+              <p className="vol-daylinks__title">Links for {tabLabel(day.dateTime)}</p>
+              <CrewLinks links={DAY_LINKS[day.dateTime]} label={`Links for ${tabLabel(day.dateTime)}`} />
+            </div>
+          )}
           <div className="vol-grid">
             {day.shiftDay && (
               <div ref={headRef} className="vol-grid__head">
