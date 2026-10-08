@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   CalendarDays,
   ChevronLeft,
@@ -47,7 +47,11 @@ const GLOW_CENTER = [0.5 + SYNAPSE_OPTIONS.shiftX, 0.5 - SYNAPSE_OPTIONS.shiftY]
 
 const IDLE_MS = 2500;
 
-const SPONSOR_LOGO = { src: "img/booklet/logos/csm.webp", alt: "Fondation Conscience et Santé Mentale" };
+/** The sponsors' logos, side by side; `h` scales a logo's height (Aarau's file carries its clear space). */
+const SPONSOR_LOGOS = [
+  { src: "img/booklet/logos/csm.webp", alt: "Fondation Conscience et Santé Mentale", h: 1 },
+  { src: "img/booklet/logos/aarau.webp", alt: "City of Aarau (Stadt Aarau)", h: 1.5 },
+];
 
 /* ---------- Clock and pinned item ---------- */
 
@@ -151,7 +155,7 @@ function clockSlide(entry: TimelineEntry, now: Date): TalkSlide {
   return left <= THANKS_MINUTES ? "thanks" : left <= QA_MINUTES ? "qa" : "intro";
 }
 
-/** The sponsor's own slide, right after the closing talk and before the apéro. */
+/** The sponsors' own slide, right after the closing talk and before the apéro. */
 const SPONSOR_SLIDE = "sponsor";
 const CLOSING = TIMELINE.find((e) => /closing/i.test(e.title));
 
@@ -190,7 +194,7 @@ type Message = {
 const SPONSOR_MESSAGE: Message = {
   eyebrow: "ALPS Conference 2026",
   icon: Sparkles,
-  headline: "With thanks to our sponsor",
+  headline: "With thanks to our sponsors",
   sponsor: "alone",
 };
 
@@ -468,7 +472,7 @@ function ScheduleDrawer({
                           >
                             <span className="tabular-nums text-white/55">{timeFormat.format(entry.end)}</span>
                             <HandHeart className="h-4 w-4 shrink-0 text-white/45" aria-hidden />
-                            <span className="min-w-0 flex-1 truncate">With thanks to our sponsor</span>
+                            <span className="min-w-0 flex-1 truncate">With thanks to our sponsors</span>
                             {pinnedId === SPONSOR_SLIDE && <span className="break-tag break-tag--pinned">Showing</span>}
                           </button>
                         </li>
@@ -658,8 +662,18 @@ export default function BreakScreen() {
             </div>
             {message.sponsor && (
               <div className="break-sponsor">
-                {message.sponsor === "beside" && <span className="break-sponsor__label">With thanks to our sponsor</span>}
-                <img src={withBase(SPONSOR_LOGO.src)} alt={SPONSOR_LOGO.alt} className="break-sponsor__logo" />
+                {message.sponsor === "beside" && <span className="break-sponsor__label">With thanks to our sponsors</span>}
+                <div className="break-sponsor__logos">
+                  {SPONSOR_LOGOS.map((logo) => (
+                    <img
+                      key={logo.src}
+                      src={withBase(logo.src)}
+                      alt={logo.alt}
+                      className="break-sponsor__logo"
+                      style={{ "--h": logo.h } as CSSProperties}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </div>

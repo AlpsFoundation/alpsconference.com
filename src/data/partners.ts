@@ -1,8 +1,10 @@
 /** Shared partner logos used by the conference site and the print booklet. */
 
 export const PARTNERS = {
-  "Sponsor": [
-    { src: "/img/partners/csm.png", alt: "Fondation Conscience et Santé Mentale", url: "https://fondationcsm.org/" }
+  "Sponsors": [
+    { src: "/img/partners/csm.png", alt: "Fondation Conscience et Santé Mentale", url: "https://fondationcsm.org/" },
+    // Official negative logo from aarau.ch, clear space (half the logo height) built into the file.
+    { src: "/img/partners/aarau.png", alt: "City of Aarau (Stadt Aarau)", url: "https://www.aarau.ch/" }
   ],
   "Academic Partners": [
     { src: "/img/partners/hug.png", alt: "Hôpitaux Universitaires de Genève (HUG)", url: "https://www.hug.ch/" },
