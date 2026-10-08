@@ -21,6 +21,9 @@ export const SIGN_SITE = "https://alpsconference.com";
  */
 const WHATSAPP_GROUP_INVITE = "https://chat.whatsapp.com/JxuEyEs4lLcGZlzbUBrdyB";
 
+/** The 2026 photo gallery on the summer school site (section #recap-2026), for the info-table sign. */
+const SUMMER_SCHOOL_GALLERY = "https://summerschool.alps.foundation/#recap-2026";
+
 export type SignArrow = "up" | "up-right" | "right" | "down-right" | "down" | "down-left" | "left" | "up-left";
 export const SIGN_ARROWS: SignArrow[] = ["up", "up-right", "right", "down-right", "down", "down-left", "left", "up-left"];
 
@@ -703,6 +706,19 @@ const SIGNS: Sign[] = [
     title: "Support ALPS with a donation",
     subtitle: "Donations keep the wheels running. Give by TWINT, card or bank transfer.",
     qr: { url: MEMBERSHIP.donationLink.url, label: "alps.foundation/support" },
+  },
+  {
+    id: "info-summer-school",
+    category: "info",
+    icon: "image",
+    eyebrow: "ALPS Summer School 2026",
+    title: "A week at Le Camp, in pictures",
+    subtitle: "Photos from the summer school in Vaumarcus, and what participants said about it.",
+    qr: {
+      url: SUMMER_SCHOOL_GALLERY,
+      label: "summerschool.alps.foundation",
+      caption: "Opens the photo gallery.",
+    },
   },
   {
     id: "info-credits",
