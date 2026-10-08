@@ -200,6 +200,14 @@ export const CREW_EVENTS: CrewEvent[] = [
     people: ["Philipp", "Matthias", "Ece", "Andrea", "Olga", "Myriam", "Abel", "José", "Akram"],
   },
   {
+    id: "setup-meet-thu",
+    title: "Setup meeting",
+    dateTime: "2026-10-08",
+    start: "12:00",
+    calendarMinutes: 30,
+    place: "Meet at the Kultur & Kongresshaus Aarau",
+  },
+  {
     id: "crushed-ice-thu",
     title: "Bring 2 packs of crushed ice from Migros",
     dateTime: "2026-10-08",
