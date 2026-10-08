@@ -69,6 +69,8 @@ export default defineConfig({
     "/break": "/slides",
     // The call for research posters closed; its guidelines moved here.
     "/poster": "/research-posters/guidelines",
+    // Singular alias for the build crew portal.
+    "/volunteer": "/volunteers",
   },
   integrations: [
     react(),
