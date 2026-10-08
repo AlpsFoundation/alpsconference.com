@@ -1106,6 +1106,10 @@ export default function VolunteersPage() {
           Pick your name to see your shifts and add them to your calendar. Sign up for the setup on Thursday and the
           teardown on Saturday in those tabs.
         </p>
+        <p className="vol-notice">
+          <Info size={15} aria-hidden="true" />
+          <span>The plan may still change, and we can’t accommodate wishes. Thanks for your understanding.</span>
+        </p>
       </header>
 
       <section id="vol-picker" className="vol-picker" aria-label="Choose a person">
@@ -1266,7 +1270,7 @@ export default function VolunteersPage() {
         <p>
           <Info size={15} aria-hidden="true" />
           <span>
-            Changes? Tell {CREW_CONTACTS.changes}. Not sure on the day? Ask a Happy Helper,{" "}
+            Can’t make a shift? Tell {CREW_CONTACTS.changes}. Not sure on the day? Ask a Happy Helper,{" "}
             {CREW_CONTACTS.onSite.join(" or ")}.
           </span>
         </p>

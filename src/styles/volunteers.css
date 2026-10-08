@@ -106,6 +106,25 @@
   line-height: 1.5;
 }
 
+.vol-notice {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 40rem;
+  margin: 0.85rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-left: 2px solid var(--vol-crew);
+  border-radius: 0 6px 6px 0;
+  background: var(--vol-panel);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.vol-notice svg {
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  color: var(--vol-crew);
+}
+
 .vol-h2 {
   margin: 0;
   color: white;
