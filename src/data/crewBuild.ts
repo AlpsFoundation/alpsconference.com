@@ -75,7 +75,7 @@ export const BUILD_PHASES: Record<BuildPhase, BuildPhaseInfo> = {
     dateTime: "2026-10-08",
     start: "13:00",
     calendarMinutes: 60,
-    timeNote: "Setup and unloading start at 13:00, once the workshops have started. KuK Aufbau window 13:00–17:00.",
+    timeNote: "Setup meeting at 12:30 at the KuK. Unloading and setup start at 13:00, once the workshops have started. KuK Aufbau window 13:00–17:00.",
     doneLabel: "Arrived",
     joinLabel: "I'm on this",
   },
@@ -84,7 +84,7 @@ export const BUILD_PHASES: Record<BuildPhase, BuildPhaseInfo> = {
     dateTime: "2026-10-08",
     start: "13:00",
     end: "17:00",
-    timeNote: "Workshop rooms from 12:00; everything else in the KuK Aufbau window, 13:00–17:00.",
+    timeNote: "Setup meeting at 12:30 at the KuK. Workshop rooms from 12:00; everything else in the KuK Aufbau window, 13:00–17:00.",
     doneLabel: "Done",
     joinLabel: "I'm on this",
   },
@@ -326,7 +326,7 @@ const DATA: BuildData = {
     },
     {
       "n": "12",
-      "label": "15 × Research posters",
+      "label": "11 × Research posters",
       "group": "Research posters",
       "x": 159,
       "y": 449,
@@ -370,7 +370,7 @@ const DATA: BuildData = {
       "title": "Unloading, 13:00",
       "kind": "task",
       "phase": "unload",
-      "note": "Setup and unloading start at 13:00, once the workshops have started. KuK Aufbau window 13:00–17:00.",
+      "note": "Setup meeting at 12:30 at the KuK. Unloading and setup start at 13:00, once the workshops have started. KuK Aufbau window 13:00–17:00.",
       "items": [
         {
           "id": "unload-all",
@@ -383,6 +383,7 @@ const DATA: BuildData = {
         },
         {
           "id": "unload-panels",
+          "lead": "Régis",
           "name": "Wood panels are brought to 13",
           "zones": [
             "13"
@@ -469,6 +470,7 @@ const DATA: BuildData = {
       "items": [
         {
           "id": "jw-clean",
+          "lead": "Régis",
           "name": "Clean the Japanese walls and place them in the lounges",
           "zones": [
             "7 top",
@@ -480,6 +482,7 @@ const DATA: BuildData = {
         },
         {
           "id": "lounge-bottom",
+          "lead": "Régis",
           "name": "Lounge bottom: paravents, live painting setup assistance",
           "zones": [
             "7 bottom"
@@ -488,6 +491,7 @@ const DATA: BuildData = {
         },
         {
           "id": "lounge-mid",
+          "lead": "Régis",
           "name": "Lounge mid: small light events",
           "zones": [
             "7 mid"
@@ -496,6 +500,7 @@ const DATA: BuildData = {
         },
         {
           "id": "lounge-top",
+          "lead": "Régis",
           "name": "Lounge top: small light events",
           "zones": [
             "7 top"
@@ -562,6 +567,7 @@ const DATA: BuildData = {
       "items": [
         {
           "id": "wood-wall",
+          "lead": "Régis",
           "name": "Build the wood-panel wall for the Kevin Barron exhibition",
           "zones": [
             "13"
@@ -571,12 +577,13 @@ const DATA: BuildData = {
         },
         {
           "id": "research-spaces",
-          "name": "Set up the 15 research poster spaces",
+          "lead": "Cyril",
+          "name": "Put up the 11 research posters",
           "zones": [
             "12"
           ],
           "draft": true,
-          "what": "Put up the 15 research poster spaces at 12, with the magnets and pins Cyril brings."
+          "what": "The poster panels are already at the KuK. Put up the 11 research posters on them at 12, with the magnets and pins Cyril brings."
         },
         {
           "id": "hannah-display",
@@ -602,13 +609,6 @@ const DATA: BuildData = {
           "lead": "Matthias",
           "draft": true,
           "what": "Print the A4 signs from the signage tool and the A3 posters from Drive on the on-site printer (Matthias and Maria), then put them up around the house."
-        },
-        {
-          "id": "signs-stage-timers",
-          "name": "Print the stage time cards for the moderators",
-          "lead": "Matthias",
-          "draft": true,
-          "what": "Print the Stage & team time signals from alpsconference.com/signage (10, 5 and 1 minute, Time is up, Q&A) and hand them to the Friday morning moderator before the first talk at 09:30."
         }
       ]
     },
@@ -627,6 +627,7 @@ const DATA: BuildData = {
         },
         {
           "id": "load-panels",
+          "lead": "Régis",
           "name": "Wood panels go back onto the truck",
           "zones": [
             "13"
@@ -686,7 +687,8 @@ const DATA: BuildData = {
         {
           "id": "poster-panels",
           "name": "Cheap poster panels, roughly CHF 300–400",
-          "who": "Régis"
+          "who": "Régis",
+          "status": "Research poster panels already at the KuK"
         }
       ]
     },
@@ -697,12 +699,13 @@ const DATA: BuildData = {
       "items": [
         {
           "id": "research-posters",
-          "name": "Research poster spaces, with magnets and pins",
+          "name": "Research posters, with magnets and pins",
           "zones": [
             "12"
           ],
-          "qty": "15 spaces",
-          "who": "Cyril (magnets and pins)"
+          "qty": "11 posters",
+          "who": "Cyril (magnets and pins)",
+          "status": "Poster panels already at the KuK"
         },
         {
           "id": "large-prints",
