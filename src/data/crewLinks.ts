@@ -49,6 +49,7 @@ const L = {
   setupCanvas: { label: "Setup canvas", href: slack("docs/T049Q4TS0TX/F0C3ZJMF813"), team: true },
   equipment: { label: "Equipment tracker", href: slack("lists/T049Q4TS0TX/F0B17Q71KBN"), team: true },
   moderatorCards: { label: "Friday moderator cards", href: slack("docs/T049Q4TS0TX/F0C7FHR14R4"), team: true },
+  artPanels: { label: "Art corner panel thread", href: slack("archives/C049TEF6VNX/p1790865084606919"), team: true },
   woodWallPlan: {
     label: "Wall plan (kevin_baron_illustration.jpg)",
     href: slack("files/U08TY8ZGR7Y/F0C1K5SRR7G/kevin_baron_illustration.jpg"),
@@ -85,6 +86,7 @@ export const BUILD_ITEM_LINKS: Record<string, CrewLink[]> = {
   "exhibitor-tables": [L.saal2Plan],
   "research-spaces": [L.researchPosters],
   "wood-wall": [L.woodWallPlan],
+  "hannah-display": [L.artPanels],
   "signs-print": [L.signage, L.a3Posters, L.signageFolder],
   "signs-stage-timers": [L.stageTimers, L.moderatorCards],
   "load-all": [L.equipment, L.loadingRules],

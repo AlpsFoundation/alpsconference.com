@@ -87,7 +87,7 @@ export const EXPERIENCES: ExperienceCategory[] = [
               {
                 title: "Live painting",
                 description:
-                  "Hannah will exhibit work in the Foyer Art Corner, with pieces available for purchase. She will live-paint both days; finished works may be purchased by visitors.",
+                  "Hana will exhibit work in the Foyer Art Corner, with pieces available for purchase. She will live-paint both days; finished works may be purchased by visitors.",
               },
             ],
             bio: "Hana Stanke is a visual artist who expresses her inner world and philosophy through paint. Her art is inspired by her inner cosmos and the human experience. She likes to visually express her emotions and inner world with elements she connects to such as botany, airy and moving elements like clouds and energies, micro and natural patterns.",
