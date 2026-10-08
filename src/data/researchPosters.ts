@@ -170,6 +170,7 @@ export const POSTERS: ResearchPoster[] = [
       "Conclusion: These preliminary results suggest the FES is a reliable, construct-valid instrument that operationalises the acute, metacognitive feeling of insight and psychological reframing. The FES provides a context-independent psychometric tool to explore how these acute perspectival shifts translate into lasting therapeutic changes.",
     ],
     hasPhoto: true,
+    hasPdf: true,
   },
   {
     slug: "alessandro-lo-jacono",
