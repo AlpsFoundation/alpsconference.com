@@ -203,7 +203,7 @@ export const CREW_EVENTS: CrewEvent[] = [
     id: "setup-meet-thu",
     title: "Setup meeting",
     dateTime: "2026-10-08",
-    start: "12:00",
+    start: "12:30",
     calendarMinutes: 30,
     place: "Meet at the Kultur & Kongresshaus Aarau",
   },

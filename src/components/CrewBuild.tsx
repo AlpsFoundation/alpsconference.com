@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Check, ChevronUp, CloudOff, HandHeart, Maximize2, MapPin, Minimize2, Plus, UserPlus, Users, X } from "lucide-react";
+import { Check, ChevronUp, CloudOff, HandHeart, Link2, Maximize2, MapPin, Minimize2, Plus, UserPlus, Users, X } from "lucide-react";
 import { BUILD_PHASES, BUILD_ZONES, type BuildItem, type BuildPhase, type BuildSection } from "../data/crewBuild";
 import { BUILD_ITEM_LINKS } from "../data/crewLinks";
 import CrewLinks from "./CrewLinks";
@@ -30,8 +30,62 @@ const SHOWS: { id: Show; label: string }[] = [
   { id: "all", label: "All" },
 ];
 
+/** `?item=<phase>-<id>`: a link to one task or material item, copied from its link button. */
+const ITEM_PARAM = "item";
+const DAY_SLUGS: Record<string, string> = { "2026-10-08": "thu", "2026-10-09": "fri", "2026-10-10": "sat", "2026-10-11": "sun" };
+const itemKey = (phase: BuildPhase, id: string) => `${phase}-${id}`;
+const itemAnchor = (key: string) => `cb-item-${key}`;
+
+function itemUrl(dateTime: string, key: string) {
+  const url = new URL(window.location.pathname, window.location.origin);
+  url.searchParams.set("day", DAY_SLUGS[dateTime] ?? dateTime);
+  url.searchParams.set(ITEM_PARAM, key);
+  return url.toString();
+}
+
+/** Clipboard API first; the textarea fallback covers older phones and non-secure previews. */
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    try {
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.setAttribute("readonly", "");
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand("copy");
+      area.remove();
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
+function LinkButton({ copied, label, onCopy }: { copied: boolean; label: string; onCopy: () => void }) {
+  return (
+    <button
+      type="button"
+      className="cb-linkbtn"
+      data-copied={copied || undefined}
+      title={copied ? "Link copied" : "Copy a link to this item, to paste into WhatsApp or Slack"}
+      aria-label={copied ? "Link copied" : `Copy a link to ${label}`}
+      onClick={onCopy}
+    >
+      {copied ? <Check size={14} aria-hidden="true" /> : <Link2 size={14} aria-hidden="true" />}
+      <span>{copied ? "Copied" : "Link"}</span>
+    </button>
+  );
+}
+
 /** `?show=needs|open|all` wins, so a link can open straight on the tasks that need help. */
 function readShow(): Show {
+  // A link to one item shows everything, so the item is never filtered out.
+  if (new URLSearchParams(window.location.search).get(ITEM_PARAM)) return "all";
   const fromUrl = new URLSearchParams(window.location.search).get("show");
   if (fromUrl === "needs" || fromUrl === "open" || fromUrl === "all") return fromUrl;
   try {
@@ -123,6 +177,21 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   const svgRef = useRef<SVGSVGElement>(null);
 
   const [show, setShow] = useState<Show>("all");
+  /** The item opened from a copied link, and the item whose link was just copied. */
+  const [linked, setLinked] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+  const copiedTimer = useRef<number | undefined>(undefined);
+
+  const copyLink = async (key: string) => {
+    const ok = await copyText(itemUrl(dateTime, key));
+    if (!ok) {
+      window.prompt("Copy this link", itemUrl(dateTime, key));
+      return;
+    }
+    setCopied(key);
+    window.clearTimeout(copiedTimer.current);
+    copiedTimer.current = window.setTimeout(() => setCopied(null), 2000);
+  };
   // The floor plan is inlined so the theme can recolour it; as an <image> it kept the export's black walls.
   const [drawing, setDrawing] = useState<string | null>(null);
   useEffect(() => {
@@ -150,7 +219,22 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   useEffect(() => {
     setMapSize(readMapSize());
     setShow(readShow());
+    setLinked(new URLSearchParams(window.location.search).get(ITEM_PARAM));
   }, []);
+
+  // Bring a linked item into view: once on arrival, and again when the sign-ups load and the page grows.
+  const hasState = Boolean(state);
+  useEffect(() => {
+    if (!linked) return;
+    const timer = window.setTimeout(() => {
+      const target = document.getElementById(itemAnchor(linked));
+      if (!target) return;
+      const details = target.closest("details");
+      if (details && !details.open) details.open = true;
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [linked, hasState, dateTime]);
 
   const chooseShow = (next: Show) => {
     setShow(next);
@@ -304,9 +388,12 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
     const open = need ? Math.max(0, need - people.length) : 0;
     const setupBy = phase === "teardown" ? assigneesOf(state, item.id, "setup") : [];
     const addKey = `${phase}:${item.id}`;
+    const key = itemKey(phase, item.id);
     return (
       <article
         key={item.id}
+        id={itemAnchor(key)}
+        data-linked={linked === key || undefined}
         className="cb-task"
         data-done={done ? "" : undefined}
         data-here={isHere(item) || undefined}
@@ -331,6 +418,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
               {item.draft && <span className="cb-draft">Draft</span>}
             </p>
             {state && <NeedPill signed={people.length} need={need} />}
+            <LinkButton copied={copied === key} label={item.name} onCopy={() => copyLink(key)} />
           </div>
           <p className="cb-task__what" data-empty={!item.what || undefined}>
             {item.what ?? "To be described."}
@@ -439,8 +527,9 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
     const info = BUILD_PHASES[phase];
     const done = tickOf(state, item.id, phase);
     const facts = [item.qty, item.who, item.status].filter(Boolean);
+    const key = itemKey(phase, item.id);
     return (
-      <article key={item.id} className="cb-mat" data-done={done ? "" : undefined} data-here={isHere(item) || undefined} data-zg={selected ? zoneGroupKey(selected) : undefined} data-zones={zoneAttr(item)}>
+      <article key={item.id} id={itemAnchor(key)} data-linked={linked === key || undefined} className="cb-mat" data-done={done ? "" : undefined} data-here={isHere(item) || undefined} data-zg={selected ? zoneGroupKey(selected) : undefined} data-zones={zoneAttr(item)}>
         <button
           type="button"
           className="cb-tick cb-tick--small"
@@ -453,7 +542,10 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
           <Check size={16} aria-hidden="true" />
         </button>
         <div>
-          <p className="cb-mat__name">{item.name}</p>
+          <div className="cb-task__top">
+            <p className="cb-mat__name">{item.name}</p>
+            <LinkButton copied={copied === key} label={item.name} onCopy={() => copyLink(key)} />
+          </div>
           {facts.length > 0 && <p className="cb-mat__facts">{facts.join(" · ")}</p>}
           <CrewLinks links={BUILD_ITEM_LINKS[item.id]} label={`Links for ${item.name}`} />
           {item.zones?.length ? (
