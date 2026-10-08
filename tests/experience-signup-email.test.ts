@@ -63,4 +63,19 @@ describe("experience signup confirmation email", () => {
     expect(email.text).toContain("you're off the waitlist");
     expect(email.html).toContain("Cancel this booking");
   });
+
+  it("says why the links come again when the same email signs up twice", () => {
+    const email = buildSignupConfirmationEmail({
+      fullName: "Ada Example",
+      session,
+      status: "waitlist",
+      waitlistPosition: 2,
+      resent: true,
+      cancelUrl: "https://example.com/cancel",
+      icalUrl: "https://example.com/ical",
+    });
+
+    expect(email.text).toContain("You signed up again, so here are your booking links once more. You're on the waitlist at position 2.");
+    expect(email.html).toContain("Cancel this booking");
+  });
 });

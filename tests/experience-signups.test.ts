@@ -4,7 +4,7 @@ vi.mock("../src/lib/bookingMailer", () => ({ sendBookingEmail: vi.fn(async () =>
 
 import { EXPERIENCE_SESSIONS } from "../src/data/conferenceTimeline";
 import { sendBookingEmail } from "../src/lib/bookingMailer";
-import { handleCancel, handleSignup, type SignupResult } from "../src/lib/experienceSignups";
+import { handleCancel, handleOwnStatus, handleSignup, type SignupResult } from "../src/lib/experienceSignups";
 import { fakeD1 } from "./support/fakeD1";
 
 const session = EXPERIENCE_SESSIONS.find((s) => s.signup)!;
@@ -24,7 +24,15 @@ async function signUp(n: number, query = "") {
     waitUntil,
   );
   await Promise.all(pending);
-  return { response, data: (await response.json()) as SignupResult & { cancelToken: string; error?: string } };
+  return {
+    response,
+    data: (await response.json()) as SignupResult & {
+      cancelToken?: string;
+      alreadySignedUp?: true;
+      emailResent?: boolean;
+      error?: string;
+    },
+  };
 }
 
 async function cancel(cancelToken: string) {
@@ -86,7 +94,7 @@ describe("experience sign-ups", () => {
     expect(waitlisted.data).toMatchObject({ status: "waitlist", waitlistPosition: 1 });
     sent.mockClear();
 
-    expect((await cancel(first.data.cancelToken)).status).toBe(200);
+    expect((await cancel(first.data.cancelToken!)).status).toBe(200);
 
     expect(sent).toHaveBeenCalledOnce();
     expect(sent.mock.calls[0][1].to).toBe(`person${session.capacity + 1}@example.com`);
@@ -98,7 +106,52 @@ describe("experience sign-ups", () => {
     const waitlisted = await signUp(session.capacity + 1);
     sent.mockClear();
 
-    expect((await cancel(waitlisted.data.cancelToken)).status).toBe(200);
+    expect((await cancel(waitlisted.data.cancelToken!)).status).toBe(200);
     expect(sent).not.toHaveBeenCalled();
+  });
+
+  it("resend the links when the same email signs up again, at most every few minutes", async () => {
+    const first = await signUp(1);
+    sent.mockClear();
+
+    // Straight after the first email, nothing is sent again.
+    const soon = await signUp(1);
+    expect(soon.response.status).toBe(200);
+    expect(soon.data).toMatchObject({ status: "confirmed", alreadySignedUp: true, emailResent: false });
+    expect(soon.data.cancelToken).toBeUndefined();
+    expect(sent).not.toHaveBeenCalled();
+
+    // SQLite's clock is the real one, not the faked Date.
+    await env.DB.prepare("UPDATE experience_signups SET created_at = '2000-01-01T00:00:00.000Z'").run();
+    const later = await signUp(1);
+    expect(later.data).toMatchObject({ signupId: first.data.signupId, alreadySignedUp: true, emailResent: true });
+    expect(later.data.cancelToken).toBeUndefined();
+    expect(sent).toHaveBeenCalledOnce();
+    expect(sent.mock.calls[0][1].to).toBe("person1@example.com");
+    expect(sent.mock.calls[0][1].text).toContain("here are your booking links once more");
+    expect(sent.mock.calls[0][1].text).toContain(`links/cancel?token=${first.data.cancelToken}`);
+
+    expect((await signUp(1)).data.emailResent).toBe(false);
+    expect(sent).toHaveBeenCalledOnce();
+  });
+
+  it("report a booking's status by id and email to the browser that signed up again", async () => {
+    const { data } = await signUp(1);
+    const status = async (signups: unknown[]) => {
+      const response = await handleOwnStatus(
+        env.DB,
+        new Request("https://alpsconference.com/api/experience-signups/mine", {
+          method: "POST",
+          body: JSON.stringify({ signups }),
+        }),
+      );
+      return ((await response.json()) as { signups: SignupResult[] }).signups;
+    };
+
+    expect(await status([{ signupId: data.signupId, email: " Person1@Example.com " }])).toEqual([
+      { experienceId: session.id, signupId: data.signupId, status: "confirmed" },
+    ]);
+    expect(await status([{ signupId: data.signupId, email: "someone@example.com" }])).toEqual([]);
+    expect(await status([{ signupId: data.signupId, cancelToken: "" }])).toEqual([]);
   });
 });

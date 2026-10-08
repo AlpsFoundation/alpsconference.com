@@ -76,6 +76,7 @@ async function readApiJson<T>(response: Response): Promise<T & { error?: string 
 }
 
 type StoredSignup = SignupResult & {
+  /** Empty when the email was already booked: its links went to that inbox instead. */
   cancelToken: string;
   fullName: string;
   email: string;
@@ -516,7 +517,7 @@ function SignupPanel({
   own?: StoredSignup;
   notYetOpen: boolean;
   closed: boolean;
-  onSignedUp: (signup: StoredSignup | (SignupResult & { alreadySignedUp: true })) => void;
+  onSignedUp: (signup: StoredSignup) => void;
   onCancelled: (experienceId: string) => void;
 }) {
   const [pending, setPending] = useState(false);
@@ -547,22 +548,25 @@ function SignupPanel({
       const data = await readApiJson<
         SignupResult & {
           alreadySignedUp?: true;
+          emailResent?: boolean;
           cancelToken?: string;
         }
       >(response);
       if (!response.ok) throw new Error(data.error ?? "Something went wrong, please try again.");
+      const { experienceId, signupId, status, waitlistPosition } = data;
       if (data.alreadySignedUp) {
         setNotice(
-          data.status === "confirmed"
-            ? "This email is already on the list — the spot is confirmed. Check your inbox for the confirmation."
-            : `This email is already on the waitlist, at position ${data.waitlistPosition}.`,
+          data.emailResent
+            ? "We've emailed the confirmation again, with your calendar and cancel links."
+            : "We emailed the confirmation a few minutes ago. Check your inbox and spam folder.",
         );
-        onSignedUp({ ...data, alreadySignedUp: true });
-        return;
       }
       setJustConfirmed(true);
       onSignedUp({
-        ...data,
+        experienceId,
+        signupId,
+        status,
+        waitlistPosition,
         cancelToken: data.cancelToken ?? "",
         fullName,
         email,
@@ -610,25 +614,37 @@ function SignupPanel({
               {own.status === "confirmed" ? "You're confirmed" : `You're #${own.waitlistPosition} on the waitlist`}
             </p>
             <p className="mt-1 text-sm text-white/75">
-              Signed up as {own.fullName}
-              {own.email ? ` · ${own.email}` : ""}.
-              {own.status === "confirmed"
-                ? " A confirmation email is on its way — it includes a calendar link."
-                : " We'll move you up automatically when a spot frees, and email you if you're promoted."}
-            </p>
-          </div>
-          {!closed && (
-            <button type="button" onClick={cancel} disabled={pending} className="links-button links-button--ghost mt-2">
-              {pending ? (
+              {own.cancelToken ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                  Cancelling…
+                  Signed up as {own.fullName}
+                  {own.email ? ` · ${own.email}` : ""}.
+                  {own.status === "confirmed"
+                    ? " A confirmation email is on its way — it includes a calendar link."
+                    : " We'll move you up automatically when a spot frees, and email you if you're promoted."}
                 </>
               ) : (
-                "Cancel my spot"
+                <>
+                  {own.email} was already signed up for this session.{" "}
+                  {notice ?? "The confirmation email has your calendar and cancel links."}
+                </>
               )}
-            </button>
-          )}
+            </p>
+          </div>
+          {!closed &&
+            (own.cancelToken ? (
+              <button type="button" onClick={cancel} disabled={pending} className="links-button links-button--ghost mt-2">
+                {pending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    Cancelling…
+                  </>
+                ) : (
+                  "Cancel my spot"
+                )}
+              </button>
+            ) : (
+              <p className="text-sm text-white/60">To cancel, use the link in the confirmation email.</p>
+            ))}
         </>
       ) : closed ? (
         <p className="text-sm text-white/60">Sign-up for this session has closed.</p>
@@ -637,8 +653,6 @@ function SignupPanel({
           <Users className="h-4 w-4 shrink-0" aria-hidden />
           {session.capacity} spots · sign-ups open on {SIGNUPS_OPEN_LABEL}.
         </p>
-      ) : notice ? (
-        <p className="rounded-xl border border-white/15 bg-white/[0.06] p-4 text-sm text-white/85">{notice}</p>
       ) : (
         <form onSubmit={submit} className="space-y-3" aria-busy={pending}>
           <p className="flex items-center gap-2 text-sm text-white/65">
@@ -703,7 +717,7 @@ function ExperiencesSection({
   now: Date;
   availability: SignupAvailability | null;
   mine: Record<string, StoredSignup>;
-  onSignedUp: (signup: StoredSignup | (SignupResult & { alreadySignedUp: true })) => void;
+  onSignedUp: (signup: StoredSignup) => void;
   onCancelled: (experienceId: string) => void;
 }) {
   const days = useMemo(() => {
@@ -918,7 +932,9 @@ export default function LinksPage() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          signups: signups.map(({ signupId, cancelToken }) => ({ signupId, cancelToken })),
+          signups: signups.map(({ signupId, cancelToken, email }) =>
+            cancelToken ? { signupId, cancelToken } : { signupId, email },
+          ),
         }),
       })
         .then((r) => (r.ok ? (r.json() as Promise<{ signups: SignupResult[] }>) : null))
@@ -950,12 +966,10 @@ export default function LinksPage() {
     }
   }, [Boolean(clock)]);
 
-  const handleSignedUp = (signup: StoredSignup | (SignupResult & { alreadySignedUp: true })) => {
-    if ("cancelToken" in signup) {
-      const next = { ...mine, [signup.experienceId]: signup };
-      writeStored(next);
-      setMine(next);
-    }
+  const handleSignedUp = (signup: StoredSignup) => {
+    const next = { ...mine, [signup.experienceId]: signup };
+    writeStored(next);
+    setMine(next);
     refresh();
   };
 

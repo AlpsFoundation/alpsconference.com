@@ -32,6 +32,8 @@ export type WaitUntil = (promise: Promise<unknown>) => void;
 
 const MAX_NAME_LENGTH = 120;
 const MAX_EMAIL_LENGTH = 254;
+/** Least time between two confirmation emails for one booking, so the form can't flood an inbox. */
+const RESEND_INTERVAL = "-5 minutes";
 
 export function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -129,6 +131,7 @@ export async function sendConfirmationEmail(
     result: Pick<SignupResult, "status" | "waitlistPosition">;
     cancelToken: string;
     promoted?: boolean;
+    resent?: boolean;
   },
 ) {
   const { cancelUrl, icalUrl } = bookingUrls(origin, params.cancelToken);
@@ -138,6 +141,7 @@ export async function sendConfirmationEmail(
     status: params.result.status,
     waitlistPosition: params.result.waitlistPosition,
     promoted: params.promoted,
+    resent: params.resent,
     cancelUrl,
     icalUrl,
   });
@@ -231,6 +235,19 @@ export async function insertSignup(
   return inserted ? { id: inserted.id, cancelToken } : null;
 }
 
+/** Claims the next resend of a booking's confirmation; false while the last email is still recent. */
+async function claimResend(db: D1Database, signupId: number): Promise<boolean> {
+  const row = await db
+    .prepare(
+      `UPDATE experience_signups SET confirmation_sent_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+       WHERE id = ? AND COALESCE(confirmation_sent_at, created_at) <= strftime('%Y-%m-%dT%H:%M:%fZ', 'now', ?)
+       RETURNING id`,
+    )
+    .bind(signupId, RESEND_INTERVAL)
+    .first<{ id: number }>();
+  return row !== null;
+}
+
 /** The API honours the page's `?time=` override, so time-travelled previews book for real. */
 function requestTime(request: Request): Date {
   return parseTimeTravel(new URL(request.url).searchParams.get("time")) ?? new Date();
@@ -274,13 +291,29 @@ export async function handleSignup(
   const inserted = await insertSignup(env.DB, { experienceId, fullName, email, emailKey: key });
 
   if (!inserted) {
-    // Same email already signed up: report their place, but never hand out their cancel token.
+    // Same email already signed up: send its links to that inbox again, but never hand
+    // the cancel token to whoever typed the address.
     const existing = await env.DB
-      .prepare("SELECT id FROM experience_signups WHERE experience_id = ? AND email_key = ?")
+      .prepare(
+        `SELECT id, full_name, email, cancel_token FROM experience_signups
+         WHERE experience_id = ? AND email_key = ?`,
+      )
       .bind(experienceId, key)
-      .first<{ id: number }>();
+      .first<{ id: number; full_name: string; email: string; cancel_token: string }>();
     if (!existing) return errorResponse("Something went wrong, please try again.", 500);
-    return json({ ...(await resultFor(env.DB, experienceId, existing.id)), alreadySignedUp: true });
+    const result = await resultFor(env.DB, experienceId, existing.id);
+    const emailResent = await claimResend(env.DB, existing.id);
+    if (emailResent) {
+      waitUntil(sendConfirmationEmail(env, siteOrigin(request), {
+        fullName: existing.full_name,
+        email: existing.email || email,
+        session,
+        result,
+        cancelToken: existing.cancel_token,
+        resent: true,
+      }));
+    }
+    return json({ ...result, alreadySignedUp: true, emailResent });
   }
 
   const result = await resultFor(env.DB, experienceId, inserted.id);
@@ -296,37 +329,52 @@ export async function handleSignup(
   return json({ ...result, cancelToken }, 201);
 }
 
-type OwnSignup = { signupId?: number; cancelToken: string };
+/**
+ * A booking this browser remembers: by cancel token, or by id and email when it
+ * signed up again with a booked address and only that inbox got the token.
+ */
+type OwnSignup = { signupId?: number; cancelToken?: string; email?: string };
 
 function parseOwnSignups(value: unknown): OwnSignup[] {
   if (!Array.isArray(value)) return [];
   return value
-    .filter(
-      (s): s is OwnSignup =>
-        s &&
-        typeof s === "object" &&
-        typeof (s as OwnSignup).cancelToken === "string" &&
-        ((s as OwnSignup).signupId === undefined || Number.isInteger((s as OwnSignup).signupId)),
-    )
+    .filter((s): s is OwnSignup => {
+      if (!s || typeof s !== "object") return false;
+      const { signupId, cancelToken, email } = s as OwnSignup;
+      if (signupId !== undefined && !Number.isInteger(signupId)) return false;
+      return Boolean(cancelToken && typeof cancelToken === "string") || (signupId !== undefined && typeof email === "string");
+    })
     .slice(0, 50);
 }
 
-/** Current status of the signups this browser holds tokens for (waitlist promotions included). */
+function findOwnSignup(db: D1Database, { signupId, cancelToken, email }: OwnSignup) {
+  if (!cancelToken) {
+    const address = cleanEmail(email);
+    if (!address) return null;
+    return db
+      .prepare("SELECT experience_id, id FROM experience_signups WHERE id = ? AND email_key = ?")
+      .bind(signupId, emailKey(address))
+      .first<{ experience_id: string; id: number }>();
+  }
+  return signupId != null
+    ? db
+        .prepare("SELECT experience_id, id FROM experience_signups WHERE id = ? AND cancel_token = ?")
+        .bind(signupId, cancelToken)
+        .first<{ experience_id: string; id: number }>()
+    : db
+        .prepare("SELECT experience_id, id FROM experience_signups WHERE cancel_token = ?")
+        .bind(cancelToken)
+        .first<{ experience_id: string; id: number }>();
+}
+
+/** Current status of the signups this browser remembers (waitlist promotions included). */
 export async function handleOwnStatus(db: D1Database, request: Request): Promise<Response> {
   const body = await readJson(request);
   const signups = parseOwnSignups(body?.signups);
   const results: SignupResult[] = [];
 
-  for (const { signupId, cancelToken } of signups) {
-    const row = signupId != null
-      ? await db
-          .prepare("SELECT experience_id, id FROM experience_signups WHERE id = ? AND cancel_token = ?")
-          .bind(signupId, cancelToken)
-          .first<{ experience_id: string; id: number }>()
-      : await db
-          .prepare("SELECT experience_id, id FROM experience_signups WHERE cancel_token = ?")
-          .bind(cancelToken)
-          .first<{ experience_id: string; id: number }>();
+  for (const signup of signups) {
+    const row = await findOwnSignup(db, signup);
     if (row) results.push(await resultFor(db, row.experience_id, row.id));
   }
 
