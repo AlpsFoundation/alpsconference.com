@@ -140,12 +140,20 @@
   text-shadow: 0 1px 3px rgba(8, 47, 74, 0.95), 0 0 12px rgba(8, 47, 74, 0.95), 0 0 28px rgba(8, 47, 74, 0.9);
 }
 
-/* The logo fills the sponsor's third, short of crowding the screen's height. A dark halo, like the
-   text's, keeps the white logo apart from the white fibres. */
+/* The sponsors' logos sit side by side in the sponsor's third, wrapping on a narrow screen. Each
+   takes a common height times its --h (Aarau's file carries the city's clear space, so it is drawn
+   taller). A dark halo, like the text's, keeps the white logos apart from the white fibres. */
+.break-sponsor__logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(0.75rem, 2.5vmin, 2rem);
+}
+
 .break-sponsor__logo {
-  width: 100%;
-  height: auto;
-  max-height: 34vh;
+  width: auto;
+  max-width: 100%;
+  height: calc(min(13vh, 8vw) * var(--h, 1));
   object-fit: contain;
   object-position: left center;
   filter: drop-shadow(0 0 1.2vmin rgba(8, 47, 74, 0.85));
@@ -167,7 +175,7 @@
   }
 
   .break-sponsor__logo {
-    width: 60%;
+    height: calc(18vw * var(--h, 1));
   }
 }
 

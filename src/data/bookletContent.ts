@@ -282,9 +282,11 @@ type Logo = { file: string; name: string; /** Visual weight: tall marks are draw
 /** Logos live in public/img/booklet/logos/<file> (student groups in public/img/booklet/spsn/). */
 export const PARTNER_GROUPS: { title: string; logos: Logo[]; boxed?: boolean }[] = [
   {
-    title: "Sponsor",
+    title: "Sponsors",
     logos: [
       { file: "csm.webp", name: "Fondation Conscience et Santé Mentale", h: 2.2 },
+      // Clear space (half the logo height) is built into the file, so it is drawn taller.
+      { file: "aarau.webp", name: "City of Aarau (Stadt Aarau)", h: 3.2 },
     ],
   },
   {
