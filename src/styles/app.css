@@ -16,9 +16,14 @@
 
 /* Base styles */
 html {
+  --site-banner-height: 0px;
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
+  scroll-padding-top: calc(5rem + var(--site-banner-height));
   scrollbar-gutter: stable;
+}
+
+html:has(.site-banner) {
+  --site-banner-height: 2.75rem;
 }
 
 body {
@@ -190,6 +195,103 @@ main > section:not(:first-child) {
 .countdown-banner strong {
   color: white;
   font-weight: 670;
+}
+
+/* Attendee portal bar above the home page navbar (AttendeeBanner). */
+.site-banner {
+  display: flex;
+  height: var(--site-banner-height);
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding-inline: 1rem;
+  overflow: hidden;
+  background: linear-gradient(100deg, var(--color-accent) 0%, #b9a3dd 52%, var(--color-support-light) 100%);
+  color: var(--color-neutral-dark);
+  font-size: 0.9rem;
+  font-weight: 560;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.site-banner:focus-visible {
+  outline: 2px solid var(--color-neutral-dark);
+  outline-offset: -4px;
+}
+
+.site-banner__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.site-banner__dot {
+  position: relative;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-neutral-dark);
+}
+
+.site-banner__dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: site-banner-pulse 1.8s ease-out infinite;
+}
+
+@keyframes site-banner-pulse {
+  from { opacity: 0.55; transform: scale(1); }
+  to { opacity: 0; transform: scale(2.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-banner__dot::after { animation: none; }
+}
+
+.site-banner__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-banner__cta {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: var(--color-neutral-dark);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 620;
+  transition: background-color 200ms;
+}
+
+.site-banner__cta svg {
+  transition: transform 200ms;
+}
+
+.site-banner:hover .site-banner__cta {
+  background: var(--color-primary);
+}
+
+.site-banner:hover .site-banner__cta svg {
+  transform: translateX(3px);
+}
+
+@media (max-width: 767px) {
+  .site-banner__text { display: none; }
+}
+
+@media (max-width: 359px) {
+  .site-banner__live-label { display: none; }
 }
 
 /* Shared talks and experiences schedule. */

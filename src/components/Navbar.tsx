@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { ArrowUpRight, ChevronDown, Menu, X } from "lucide-react";
 import { withBase } from "../lib/withBase";
 import { lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
@@ -14,7 +14,6 @@ type NavLink = {
 };
 
 const CONFERENCE_LINKS: NavLink[] = [
-  { label: "Tickets", href: "/#tickets", description: "Reserve your place" },
   { label: "Overview", href: "/#about", description: "Theme, dates, and conference details" },
   { label: "Speakers", href: "/#speakers", description: "Confirmed speakers and talks" },
   { label: "Program", href: "/#program", description: "Workshop Day plus the Friday–Saturday schedule" },
@@ -166,7 +165,8 @@ function MobileLinkGroup({
   );
 }
 
-export default function Navbar() {
+/** `banner` renders full width above the nav row, e.g. AttendeeBanner on the home page. */
+export default function Navbar({ banner }: { banner?: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
@@ -203,6 +203,7 @@ export default function Navbar() {
             : "bg-transparent border-transparent"
         }`}
       >
+        {banner}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
@@ -278,7 +279,7 @@ export default function Navbar() {
             isOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          <div className="flex h-full flex-col gap-8 overflow-y-auto pt-24 px-6 pb-8">
+          <div className="flex h-full flex-col gap-8 overflow-y-auto pt-[calc(6rem+var(--site-banner-height))] px-6 pb-8">
             <a
               href={withBase(WORKSHOP_DAY_LINK.href)}
               onClick={() => setIsOpen(false)}

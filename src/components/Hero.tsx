@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Calendar, Ticket, Mail, MapPin, Clock } from "lucide-react";
+import { Mail, MapPin, Clock } from "lucide-react";
 import { animate, stagger } from "animejs";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
@@ -14,7 +14,31 @@ export type HeroIllustration = "image" | "synapse";
 const TITLE_FALLBACK_MS = 5000;
 
 // Title words, grouped into the runs that must not wrap; each letter animates in on its own.
+// The greeting sits on its own smaller line above the name.
+const GREETING = ["Welcome", "to"];
 const TITLE = [["ALPS"], ["CONFERENCE", "2026"]];
+const TITLE_LABEL = "Welcome to ALPS Conference 2026";
+
+function TitleLetters({ words }: { words: string[] }) {
+  return (
+    <span className="whitespace-nowrap">
+      {words.map((word, w) => (
+        <span key={w}>
+          {w > 0 && " "}
+          {[...word].map((letter, l) => (
+            <span
+              key={l}
+              data-letter
+              className="inline-block opacity-0 will-change-transform bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent]"
+            >
+              {letter}
+            </span>
+          ))}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 // On short desktop windows the illustration shrinks to keep the boutons between
 // the title and the event details, which take about 510px of the hero's height
@@ -110,29 +134,6 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
     }
   }, [showImage]);
 
-  const handleCalendar = () => {
-    const icsContent = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "BEGIN:VEVENT",
-      "DTSTART:20261009T090000Z",
-      "DTEND:20261010T180000Z",
-      "SUMMARY:ALPS Conference 2026",
-      "LOCATION:Kultur & Kongresshaus Aarau, Schlossplatz, Aarau, Switzerland",
-      "DESCRIPTION:Awareness Lectures on Psychedelics in Switzerland - Research Conference",
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
-
-    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "alps-conference-2026.ics";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <section
       ref={sectionRef}
@@ -185,34 +186,25 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
       )}
 
       {/* Content: upper / middle / lower thirds to keep center clear for illustration */}
-      <div className="relative z-10 flex flex-1 flex-col min-h-0 max-w-5xl lg:max-w-6xl w-full mx-auto px-4 sm:px-6 text-center pt-20 sm:pt-24">
+      <div className="relative z-10 flex flex-1 flex-col min-h-0 max-w-5xl lg:max-w-6xl w-full mx-auto px-4 sm:px-6 text-center pt-[calc(5rem+var(--site-banner-height))] sm:pt-[calc(6rem+var(--site-banner-height))]">
         <div className="flex-[1_1_0] flex flex-col items-center justify-start min-h-0">
           <div data-animate-last className="opacity-0">
             <ConferenceCountdown />
           </div>
           <h1
-            aria-label={TITLE.flat().join(" ")}
+            aria-label={TITLE_LABEL}
             className="opacity-0 mt-4 text-[length:min(2.25rem,calc((100vw-2rem)/8.9))] sm:max-md:text-7xl md:text-7xl lg:whitespace-nowrap lg:text-[length:min(6rem,calc((100vw-3rem)/11.6))] font-bold tracking-[-0.035em] leading-[0.96] mb-4 sm:mb-6 mx-auto [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
           >
+            <span
+              aria-hidden="true"
+              className="block mb-[0.45em] text-[length:min(1.35rem,calc((100vw-2rem)/14))] sm:text-3xl lg:text-4xl font-semibold tracking-[-0.02em]"
+            >
+              <TitleLetters words={GREETING} />
+            </span>
             {TITLE.map((run, r) => (
               <span key={r} aria-hidden="true">
                 {r > 0 && " "}
-                <span className="whitespace-nowrap">
-                  {run.map((word, w) => (
-                    <span key={w}>
-                      {w > 0 && " "}
-                      {[...word].map((letter, l) => (
-                        <span
-                          key={l}
-                          data-letter
-                          className="inline-block opacity-0 will-change-transform bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent]"
-                        >
-                          {letter}
-                        </span>
-                      ))}
-                    </span>
-                  ))}
-                </span>
+                <TitleLetters words={run} />
               </span>
             ))}
           </h1>
@@ -240,43 +232,14 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-3 sm:gap-4 w-full max-w-xs sm:max-w-sm mx-auto">
-            <a
-              data-animate-scale
-              href="https://infomaniak.events/en-ch/conferences/alps-conference-2026/c2484795-1ae7-4b4b-aa21-c9b8f085008c/events/382409"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="opacity-0 flex w-full items-center justify-center gap-2 sm:gap-2.5 px-6 sm:px-9 py-3.5 sm:py-4.5 bg-support hover:bg-support-light text-white text-base sm:text-lg font-semibold rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/25 leading-tight"
-            >
-              <Ticket className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-              <span className="whitespace-nowrap">Buy Tickets</span>
-            </a>
-
-            <ul data-animate className="opacity-0 text-xs sm:text-sm text-white/50 space-y-1 text-center list-none m-0 p-0">
-              <li>3+1 Team &amp; Friends Tickets available (applied at checkout)</li>
-              <li>Financial Support Compassion Fund available (see FAQ)</li>
-            </ul>
-
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
-              <button
-                data-animate-scale
-                onClick={handleCalendar}
-                className="opacity-0 group flex min-w-0 items-center justify-center gap-1.5 sm:gap-2.5 px-2 min-[380px]:px-3 sm:px-5 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white text-[13px] min-[380px]:text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 cursor-pointer leading-tight"
-              >
-                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-                <span className="whitespace-nowrap">Save the Date</span>
-              </button>
-
-              <a
-                data-animate-scale
-                href="#newsletter"
-                className="opacity-0 flex min-w-0 items-center justify-center gap-1.5 sm:gap-2.5 px-2 min-[380px]:px-3 sm:px-5 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-[13px] min-[380px]:text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
-              >
-                <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-                <span className="whitespace-nowrap">Stay in Touch</span>
-              </a>
-            </div>
-          </div>
+          <a
+            data-animate-scale
+            href="#newsletter"
+            className="opacity-0 flex items-center justify-center gap-2 sm:gap-2.5 px-5 sm:px-7 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
+          >
+            <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <span className="whitespace-nowrap">Stay in Touch</span>
+          </a>
         </div>
       </div>
     </section>
