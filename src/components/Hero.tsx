@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Mail, MapPin, Clock } from "lucide-react";
+import { Ticket, Mail, MapPin, Clock } from "lucide-react";
 import { animate, stagger } from "animejs";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
@@ -45,16 +45,51 @@ function TitleLetters({ words }: { words: string[] }) {
 // between them. Keep in step with the bones box's lg:max-w below.
 const illustrationMaxWidth = (_w: number, h: number) =>
   window.innerWidth >= 1024 ? Math.max(320, 3.3 * (h - 510)) : Infinity;
-const SYNAPSE_OPTIONS = { maxWidth: illustrationMaxWidth };
+
+// Top of el within the hero, from the layout alone (ignores the entrance transforms).
+function offsetWithin(el: HTMLElement, root: HTMLElement) {
+  let top = 0;
+  for (let node: HTMLElement | null = el; node && node !== root; node = node.offsetParent as HTMLElement | null) {
+    top += node.offsetTop;
+  }
+  return top;
+}
 
 export default function Hero({ illustration = "image" }: { illustration?: HeroIllustration }) {
   const sectionRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const detailsRef = useRef<HTMLDivElement>(null);
   const bonesRef = useRef<HTMLDivElement>(null);
   const contentShown = useRef(false);
   const is3d = illustration === "synapse";
   const [synapseFailed, setSynapseFailed] = useState(false);
   const [particlesOn, setParticlesOn] = useState(!is3d);
   const showImage = !is3d || synapseFailed;
+
+  // The illustration sits in the middle of the gap between the title and the
+  // event details rather than in the middle of the hero, so the title doesn't
+  // cover it: how far below the hero's centre that is, in pixels.
+  const gapOffset = () => {
+    const section = sectionRef.current;
+    const title = titleRef.current;
+    const details = detailsRef.current;
+    if (!section || !title || !details) return 0;
+    const titleBottom = offsetWithin(title, section) + title.offsetHeight;
+    return (titleBottom + offsetWithin(details, section) - section.offsetHeight) / 2;
+  };
+  const synapseOptions = useRef({
+    maxWidth: illustrationMaxWidth,
+    shiftY: (_w: number, h: number) => -gapOffset() / h,
+  }).current;
+  const [imageOffset, setImageOffset] = useState(0);
+
+  useEffect(() => {
+    if (!showImage) return;
+    const update = () => setImageOffset(gapOffset());
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [showImage]);
 
   const showContent = () => {
     const el = sectionRef.current;
@@ -158,7 +193,7 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
       {is3d && !synapseFailed && (
         <SynapseIllustration
           interactionTarget={sectionRef}
-          options={SYNAPSE_OPTIONS}
+          options={synapseOptions}
           onTitle={showContent}
           onParticles={() => setParticlesOn(true)}
           onUnsupported={onSynapseUnsupported}
@@ -167,7 +202,10 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
 
       {/* Bones illustration */}
       {showImage && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none [container-type:size]">
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none [container-type:size]"
+          style={{ transform: `translateY(${imageOffset}px)` }}
+        >
           <div
             ref={bonesRef}
             className="w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl px-2 opacity-0 will-change-transform"
@@ -192,6 +230,7 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
             <ConferenceCountdown />
           </div>
           <h1
+            ref={titleRef}
             aria-label={TITLE_LABEL}
             className="opacity-0 mt-4 text-[length:min(2.25rem,calc((100vw-2rem)/8.9))] sm:max-md:text-7xl md:text-7xl lg:whitespace-nowrap lg:text-[length:min(6rem,calc((100vw-3rem)/11.6))] font-bold tracking-[-0.035em] leading-[0.96] mb-4 sm:mb-6 mx-auto [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
           >
@@ -213,9 +252,11 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
         <div className="flex-[1_1_0] min-h-0 shrink-0" aria-hidden="true" />
 
         <div className="flex-[1_1_0] flex flex-col items-center justify-end gap-4 sm:gap-5 min-h-0 pb-4 sm:pb-28 lg:pb-10">
+          {/* The dark halo keeps them legible where a fibre runs behind them on short windows. */}
           <div
+            ref={detailsRef}
             data-animate
-            className="opacity-0 flex w-full max-w-full flex-wrap sm:flex-nowrap items-center justify-center gap-x-2 gap-y-1 min-[380px]:gap-x-3 sm:gap-6"
+            className="opacity-0 flex w-full max-w-full flex-wrap sm:flex-nowrap items-center justify-center gap-x-2 gap-y-1 min-[380px]:gap-x-3 sm:gap-6 [text-shadow:0_1px_3px_rgba(8,47,74,0.95),0_0_18px_rgba(8,47,74,0.9)]"
           >
             <div className="flex shrink-0 items-center gap-1.5 min-[380px]:gap-2 text-white">
               <Clock className="w-5 h-5 text-support-light" />
@@ -232,14 +273,27 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
             </div>
           </div>
 
-          <a
-            data-animate-scale
-            href="#newsletter"
-            className="opacity-0 flex items-center justify-center gap-2 sm:gap-2.5 px-5 sm:px-7 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
-          >
-            <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-            <span className="whitespace-nowrap">Stay in Touch</span>
-          </a>
+          <div className="flex flex-col items-center gap-3 sm:gap-4 w-full max-w-xs sm:max-w-sm mx-auto">
+            <a
+              data-animate-scale
+              href="https://infomaniak.events/en-ch/conferences/alps-conference-2026/c2484795-1ae7-4b4b-aa21-c9b8f085008c/events/382409"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-0 flex w-full items-center justify-center gap-2 sm:gap-2.5 px-6 sm:px-9 py-3.5 sm:py-4.5 bg-support hover:bg-support-light text-white text-base sm:text-lg font-semibold rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/25 leading-tight"
+            >
+              <Ticket className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
+              <span className="whitespace-nowrap">Buy Networking Dinner Tickets</span>
+            </a>
+
+            <a
+              data-animate-scale
+              href="#newsletter"
+              className="opacity-0 flex items-center justify-center gap-2 sm:gap-2.5 px-5 sm:px-7 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
+            >
+              <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="whitespace-nowrap">Stay in Touch</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>

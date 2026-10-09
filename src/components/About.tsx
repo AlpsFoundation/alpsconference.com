@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
 import { withBase } from "../lib/withBase";
-import { WORKSHOP_BUNDLE } from "../data/workshops";
 
 const REDUCED_PRICE_FORM_URL = "https://forms.gle/kAJ8Gmm6E3F8vaKg8";
 
@@ -145,35 +144,6 @@ export default function About() {
             >
               Request a Price Reduction *
             </a>
-          </div>
-          </div>
-          <div
-            id="bundle"
-            data-fade-up
-            className="opacity-0 lg:col-span-2 rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-6 sm:p-7 text-left"
-          >
-          <div className="mb-4">
-            <span className="text-sm uppercase tracking-[0.18em] text-white/50">
-              Thursday–Saturday, October 8–10, 2026 · Limited number
-            </span>
-          </div>
-          <h3 className="text-2xl font-semibold text-white mb-3">Workshop + Conference Bundle</h3>
-          <p className="text-white/72 text-base sm:text-lg leading-relaxed mb-6">
-            A Workshop Day seat in the track of your choice plus the two-day conference ticket, for{" "}
-            {WORKSHOP_BUNDLE.price} instead of {WORKSHOP_BUNDLE.separately}. Choose your track:
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {WORKSHOP_BUNDLE.tracks.map((track) => (
-              <a
-                key={track.language}
-                href={track.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
-              >
-                Bundle · {track.language} track
-              </a>
-            ))}
           </div>
           </div>
         </div>

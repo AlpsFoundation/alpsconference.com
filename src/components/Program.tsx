@@ -269,14 +269,23 @@ function ProgramItemDetail({ item }: { item: ScheduleItem }) {
   );
 }
 
+// An experience led by a speaker (Ricardo Morales's cacao ceremony) opens their speaker profile.
+function modalSpeaker(item: ScheduleItem) {
+  if (item.speakerName) return item.speakerName;
+  if (item.experienceName && speakerByName(item.experienceName)) return item.experienceName;
+  return undefined;
+}
+
 function itemHref(item: ScheduleItem) {
-  if (item.speakerName) return `#${getSpeakerModalId(item.speakerName)}`;
+  const speaker = modalSpeaker(item);
+  if (speaker) return `#${getSpeakerModalId(speaker)}`;
   if (item.panel) return `#${getPanelModalId(item.panel)}`;
   return `#${getExperienceModalId(item.experienceName!)}`;
 }
 
 function openItem(item: ScheduleItem) {
-  if (item.speakerName) openSpeakerModal(item.speakerName);
+  const speaker = modalSpeaker(item);
+  if (speaker) openSpeakerModal(speaker);
   else if (item.panel) openPanelModal(item.panel);
   else openExperienceModal(item.experienceName!);
 }

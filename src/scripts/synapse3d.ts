@@ -709,10 +709,11 @@ export type SynapseOptions = {
   spin?: number;
   // Embedded framing: size relative to the hero PNG, and how far to move the
   // synapse right and up (fractions of the canvas size; the canvas itself
-  // stays full size, so nothing is clipped).
+  // stays full size, so nothing is clipped). shiftY may be worked out for each
+  // canvas size (the hero centres the synapse between its title and details).
   zoom?: number;
   shiftX?: number;
-  shiftY?: number;
+  shiftY?: number | ((w: number, h: number) => number);
   // Embedded framing: the widest the PNG's box may be for a canvas of this
   // size (the hero shrinks it on short windows).
   maxWidth?: (w: number, h: number) => number;
@@ -1122,12 +1123,12 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
   const spin = opts.spin ?? 0;
   const zoom = opts.zoom ?? 1;
   const shiftX = opts.shiftX ?? 0;
-  const shiftY = opts.shiftY ?? 0;
   let distance = 14;
   function resize() {
     const w = embedded ? canvas.clientWidth : window.innerWidth;
     const h = embedded ? canvas.clientHeight : window.innerHeight;
     if (!w || !h) return;
+    const shiftY = typeof opts.shiftY === "function" ? opts.shiftY(w, h) : (opts.shiftY ?? 0);
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(w, h, false);
     if (!embedded) {
@@ -1160,6 +1161,7 @@ export function initSynapse(canvas: HTMLCanvasElement, opts: SynapseOptions = {}
       floaterMat.uniforms.uBound.value.set(halfH * camera.aspect * (1.25 + 2 * Math.abs(shiftX)), halfH * (1.2 + 2 * Math.abs(shiftY)));
     }
     if (shiftX || shiftY) camera.setViewOffset(w, h, -shiftX * w, shiftY * h, w, h);
+    else camera.clearViewOffset();
     camera.updateProjectionMatrix();
     if (reducedMotion) render(0, 0);
   }

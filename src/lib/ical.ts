@@ -4,6 +4,7 @@
  */
 import { EXPERIENCE_DAYS, EXPERIENCE_PORTRAITS } from "../data/experiences";
 import { PROGRAM, type ProgramItem } from "../data/program";
+import { speakerByName } from "../data/speakers";
 import { getExperienceModalId } from "./experienceModal";
 import { getPanelModalId } from "./panelModal";
 import { getSpeakerModalId } from "./speakerModal";
@@ -194,10 +195,13 @@ function experienceEvents(home: string): CalendarEvent[] {
       const people = item.credits?.map((credit) => `${credit.name} — ${credit.type ?? ""}`.replace(/ — $/, ""))
         ?? item.personNames
         ?? (item.personName && item.personName !== item.title ? [item.personName] : []);
-      // Only facilitators with a card of their own have a modal to deep-link into.
+      // Only facilitators with a card of their own have a modal to deep-link into;
+      // one who is also a speaker (Ricardo Morales) links to their speaker profile.
       const modalName = item.personName ?? item.title;
       const hasModal = Boolean(EXPERIENCE_PORTRAITS[modalName]) || modalName === "Afterparty";
-      const url = hasModal ? `${home}#${getExperienceModalId(modalName)}` : `${home}#experiences`;
+      const url = speakerByName(modalName)
+        ? `${home}#${getSpeakerModalId(modalName)}`
+        : hasModal ? `${home}#${getExperienceModalId(modalName)}` : `${home}#experiences`;
 
       return times.map((time, index) => ({
         uid: `experiences-${day.dateTime}-${slug(item.title)}-${index}@${UID_DOMAIN}`,
