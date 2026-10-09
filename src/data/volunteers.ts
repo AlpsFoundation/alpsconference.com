@@ -369,11 +369,12 @@ export const CATERING_SHIFTS: CateringShift[] = [
   { person: "Simon", dateTime: "2026-10-10", from: "12:00", to: "13:45", station: "Lunch Service" },
   { person: "Simon", dateTime: "2026-10-10", from: "19:30", to: "21:30", station: "Apéro Spät" },
   // Aurora is not at the conference (Ece, 2026-10-09): her Friday catering moved to the crew in the
-  // morning, her Saturday evening (Networking Apéro + late shift) in the afternoon.
+  // morning; her Saturday evening is split between Stela, Federico and Benedikt (Dave has his DJ set).
   { person: "José", dateTime: "2026-10-09", from: "14:00", to: "15:30", station: "Lunch Küche" },
   { person: "DK", dateTime: "2026-10-09", from: "16:15", to: "17:45", station: "Afternoon Break" },
-  { person: "Federico", dateTime: "2026-10-10", from: "18:45", to: "21:00", station: "Networking Apéro" },
-  { person: "Dave", dateTime: "2026-10-10", from: "21:00", to: "22:30", station: "Apéro Spät" },
+  { person: "Stela", dateTime: "2026-10-10", from: "18:45", to: "20:00", station: "Networking Apéro" },
+  { person: "Federico", dateTime: "2026-10-10", from: "20:00", to: "21:00", station: "Networking Apéro" },
+  { person: "Benedikt", dateTime: "2026-10-10", from: "21:00", to: "21:45", station: "Apéro Spät" },
 ];
 
 /**
