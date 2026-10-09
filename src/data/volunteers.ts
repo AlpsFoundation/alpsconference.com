@@ -104,8 +104,10 @@ export const SHIFT_DAYS: ShiftDay[] = [
       { from: "13:00", to: "13:30", program: "Lunch break", checkin: ["Akram"], info: ["Noor", "Marina"], mic: [], helper: ["Federico", "Gerel"] },
       { from: "13:30", to: "13:45", checkin: ["Lennert"], info: ["Noor", "Federico"], mic: [], helper: ["Akram", "Gerel"] },
       { from: "13:45", to: "14:00", checkin: ["Lennert"], info: ["José", "Valentin"], mic: [], helper: ["Akram", "Dave"] },
-      { from: "14:00", to: "14:15", checkin: ["Lennert"], info: ["Federico", "Valentin"], mic: [], helper: ["Dave"] },
-      { from: "14:15", to: "14:30", checkin: ["Lennert"], info: ["Federico", "Michel"], mic: [], helper: ["Dave"] },
+      // Lunch rush (Ece, 2026-10-09 12:40): José stays on the Info Table until 14:30, Dave joins him there,
+      // Akram takes José's kitchen shift, Federico is back on Happy Helper as originally planned.
+      { from: "14:00", to: "14:15", checkin: ["Lennert"], info: ["José", "Dave", "Valentin"], mic: [], helper: ["Federico"] },
+      { from: "14:15", to: "14:30", checkin: ["Lennert"], info: ["José", "Dave", "Michel"], mic: [], helper: ["Federico"] },
       { from: "14:30", to: "15:00", program: "Manal Al-Hammadi", checkin: ["Lennert"], info: ["Michel"], mic: [], helper: ["Andrea", "Dave"] },
       { from: "15:00", to: "15:30", checkin: ["Maximilian"], info: ["Maria"], mic: ["Andrea", "Lennert"], helper: ["Marina", "Dave"] },
       { from: "15:30", to: "15:45", program: "Sandeep Nayak", checkin: ["Andrea"], info: ["Maria"], mic: [], helper: ["Marina", "Cyril"] },
@@ -370,7 +372,7 @@ export const CATERING_SHIFTS: CateringShift[] = [
   { person: "Simon", dateTime: "2026-10-10", from: "19:30", to: "21:30", station: "Apéro Spät" },
   // Aurora is not at the conference (Ece, 2026-10-09): her Friday catering moved to the crew in the
   // morning; her Saturday evening is split between Stela, Federico and Benedikt (Dave has his DJ set).
-  { person: "José", dateTime: "2026-10-09", from: "14:00", to: "15:30", station: "Lunch Küche" },
+  { person: "Akram", dateTime: "2026-10-09", from: "14:00", to: "15:30", station: "Lunch Küche" },
   { person: "DK", dateTime: "2026-10-09", from: "16:15", to: "17:45", station: "Afternoon Break" },
   { person: "Stela", dateTime: "2026-10-10", from: "18:45", to: "20:00", station: "Networking Apéro" },
   { person: "Federico", dateTime: "2026-10-10", from: "20:00", to: "21:00", station: "Networking Apéro" },
