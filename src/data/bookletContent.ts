@@ -222,7 +222,7 @@ export const TEAM: { title: string; people: TeamMember[] }[] = [
       { name: "Ana Mateea Cerchez", role: "Team Member", photo: "ana-mateea-cerchez" },
       { name: "Julien Pierre Chanel", role: "Fundraising Coordinator", photo: "julien-pierre-chanel" },
       { name: "Mourad Chouaki", role: "Podcast Coordinator", photo: "mourad-chouaki" },
-      { name: "Vincent Diehl", role: "Speaker & Workshop Coordinator", photo: "vincent-diehl" },
+      { name: "Vincent Diehl", role: "Speaker & Workshop Coordinator", photo: "vincent-diehl-2" },
       { name: "Akram Elrhaoussi", role: "Team Member", photo: "akram-elrhaoussi" },
       { name: "Gerel Jargalsaikhan", role: "Communications Coordinator", photo: "gerel-jargalsaikhan" },
       { name: "Justine Jones", role: "Graphic Design Coordinator", photo: "justine-jones" },

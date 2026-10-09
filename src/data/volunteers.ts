@@ -452,7 +452,7 @@ export const TEAM_PHOTOS: Record<string, string | null> = {
   Raphaël: "raphael-saunier",
   Régis: "regis-paroz",
   Valentin: "valentin-rieder",
-  Vincent: "vincent-diehl",
+  Vincent: "vincent-diehl-2",
 };
 
 export const CREW_CONTACTS = {
