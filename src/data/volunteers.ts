@@ -119,9 +119,9 @@ export const SHIFT_DAYS: ShiftDay[] = [
       { from: "17:15", to: "17:45", program: "Amandine Luquiens", checkin: ["Stela"], info: ["Federico"], mic: [], helper: ["Cyril", "Parsa"] },
       { from: "17:45", to: "18:00", checkin: ["Stela"], info: ["DK"], mic: ["Andrea", "Lennert"], helper: ["Cyril", "Parsa"] },
       { from: "18:00", to: "18:15", checkin: ["Marina"], info: ["DK"], mic: ["Andrea", "Lennert"], helper: ["Cyril", "Parsa"] },
-      { from: "18:15", to: "18:45", program: "Panel 1", checkin: ["DK"], info: ["Abigail"], mic: [], helper: ["Akram"] },
-      { from: "18:45", to: "19:00", checkin: ["DK"], info: ["Abigail"], mic: ["Andrea", "Lennert"], helper: ["Akram"] },
-      { from: "19:00", to: "19:15", checkin: ["DK"], info: ["Maria"], mic: ["Andrea", "Lennert"], helper: ["Akram"] },
+      { from: "18:15", to: "18:45", program: "Panel 1", checkin: ["DK"], info: ["Abigail"], mic: [], helper: ["Akram", "Parsa"] },
+      { from: "18:45", to: "19:00", checkin: ["DK"], info: ["Abigail"], mic: ["Andrea", "Lennert"], helper: ["Akram", "Parsa"] },
+      { from: "19:00", to: "19:15", checkin: ["DK"], info: ["Maria"], mic: ["Andrea", "Lennert"], helper: ["Akram", "Parsa"] },
       { from: "19:15", to: "19:45", program: "Networking dinner (optional)", checkin: ["Matthias"], info: ["Maria", "José"], mic: [], helper: [] },
       { from: "19:45", to: "20:15", checkin: ["Matthias"], info: ["José"], mic: [], helper: [] },
       { from: "20:15", to: "21:15", program: "Friday evening program", checkin: ["Benedikt"], info: ["José"], mic: [], helper: [] },
@@ -375,8 +375,8 @@ export const CATERING_SHIFTS: CateringShift[] = [
   { person: "Stela", dateTime: "2026-10-10", from: "18:45", to: "20:00", station: "Networking Apéro" },
   { person: "Federico", dateTime: "2026-10-10", from: "20:00", to: "21:00", station: "Networking Apéro" },
   { person: "Benedikt", dateTime: "2026-10-10", from: "21:00", to: "21:45", station: "Apéro Spät" },
-  // Fri 9 Oct, 13:50 (Ece/Matthias): Olga is off after Lunch Service — Parsa takes her two dinner shifts and leaves the helper pool at 18:30.
-  { person: "Parsa", dateTime: "2026-10-09", from: "18:30", to: "19:30", station: "Diner 1" },
+  // Fri 9 Oct (Ece/Matthias): Olga keeps Dinner 1 and is off after it; Parsa takes her Dinner 2 (15:20, after 13:50 had moved both).
+  { person: "Olga", dateTime: "2026-10-09", from: "18:30", to: "19:30", station: "Diner 1" },
   { person: "Parsa", dateTime: "2026-10-09", from: "20:15", to: "20:45", station: "Diner 2" },
   // Fri 9 Oct, 15:00 (Matthias): Lennert and Philipp run the bar from 19:15 through the evening programme.
   { person: "Lennert", dateTime: "2026-10-09", from: "19:15", to: "21:15", station: "Bar" },
