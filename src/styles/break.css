@@ -159,7 +159,39 @@
   filter: drop-shadow(0 0 1.2vmin rgba(8, 47, 74, 0.85));
 }
 
+/* Coffee and meal breaks: the survey's QR code heads the right third, above the sponsor. Dark on a
+   white tile, which every phone camera reads off a projection; sized in vh and vw like the logos. */
+.break-survey {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2.5vmin, 2rem);
+  margin-bottom: clamp(1rem, 4vmin, 3.5rem);
+}
+
+.break-survey__code {
+  flex-shrink: 0;
+  width: min(24vh, 13vw);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: clamp(0.4rem, 1vmin, 0.75rem);
+  background: white;
+  color: var(--color-neutral-dark);
+  box-shadow: 0 0 1.2vmin rgba(8, 47, 74, 0.85);
+}
+
+.break-survey__label {
+  font-size: clamp(1.1rem, 3.2vmin, 2.4rem);
+  font-weight: 650;
+  line-height: 1.15;
+  text-wrap: balance;
+  text-shadow: 0 1px 3px rgba(8, 47, 74, 0.95), 0 0 12px rgba(8, 47, 74, 0.95), 0 0 28px rgba(8, 47, 74, 0.9);
+}
+
 @media (max-width: 720px) {
+  .break-survey__code {
+    width: 32vw;
+  }
+
   .break-message.has-sponsor {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;

@@ -32,6 +32,7 @@ import {
 } from "../data/speakers";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
+import { qrPath } from "./signage/qr";
 import SynapseIllustration from "./SynapseIllustration";
 
 // Turns slowly about its axis in the upper right; the message sits below, on the left.
@@ -52,6 +53,9 @@ const SPONSOR_LOGOS = [
   { src: "img/booklet/logos/csm.webp", alt: "Fondation Conscience et Santé Mentale", h: 1 },
   { src: "img/booklet/logos/aarau.webp", alt: "City of Aarau (Stadt Aarau)", h: 1.5 },
 ];
+
+/** The demographic survey, scanned from the coffee and meal break slides. */
+const SURVEY_URL = "https://forms.gle/ApiSPVNDJGe4ZQ2W9";
 
 /* ---------- Clock and pinned item ---------- */
 
@@ -189,6 +193,8 @@ type Message = {
    * headline already thanks them.
    */
   sponsor?: "beside" | "alone";
+  /** Coffee and meal breaks: the survey's QR code above the sponsor, in the right third. */
+  survey?: boolean;
 };
 
 const SPONSOR_MESSAGE: Message = {
@@ -232,9 +238,9 @@ function messageFor(current: TimelineEntry | undefined, next: TimelineEntry | un
   if (current.title === "Doors open")
     return { eyebrow: current.title, icon: Coffee, headline: firstDay ? "Welcome" : "Welcome back", sub: current.menuNote };
   if (/lunch|dinner/i.test(current.title))
-    return { eyebrow: current.title, icon: Utensils, headline: "Bon appétit!", sub: current.menuNote, highlight, sponsor: "beside" };
+    return { eyebrow: current.title, icon: Utensils, headline: "Bon appétit!", sub: current.menuNote, highlight, sponsor: "beside", survey: true };
   if (current.kind === "pause")
-    return { eyebrow: current.title, icon: Coffee, headline: "Enjoy the break", sub: current.menuNote, highlight, sponsor: "beside" };
+    return { eyebrow: current.title, icon: Coffee, headline: "Enjoy the break", sub: current.menuNote, highlight, sponsor: "beside", survey: true };
   if (/apéro/i.test(current.title)) return { eyebrow: current.title, icon: Wine, headline: "Santé!", sponsor: "beside" };
   if (/afterparty/i.test(current.title))
     return { eyebrow: "Tonight", icon: PartyPopper, headline: "See you at the afterparty", sub: current.detail };
@@ -301,6 +307,27 @@ function Experiences({ item }: { item: ProgramItem | undefined }) {
         );
       })}
     </ul>
+  );
+}
+
+const SURVEY_QR = qrPath(SURVEY_URL);
+
+/** Dark modules on a white tile, with a three-module quiet zone, so any phone camera reads it off the projection. */
+function Survey() {
+  const { d, size } = SURVEY_QR;
+  return (
+    <div className="break-survey">
+      <svg
+        className="break-survey__code"
+        viewBox={`-3 -3 ${size + 6} ${size + 6}`}
+        shapeRendering="crispEdges"
+        role="img"
+        aria-label="QR code for the demographic survey"
+      >
+        <path d={d} fill="currentColor" />
+      </svg>
+      <p className="break-survey__label">Scan our demographic survey</p>
+    </div>
   );
 }
 
@@ -662,6 +689,7 @@ export default function BreakScreen() {
             </div>
             {message.sponsor && (
               <div className="break-sponsor">
+                {message.survey && <Survey />}
                 {message.sponsor === "beside" && <span className="break-sponsor__label">With thanks to our sponsors</span>}
                 <div className="break-sponsor__logos">
                   {SPONSOR_LOGOS.map((logo) => (
