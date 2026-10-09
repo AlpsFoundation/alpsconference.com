@@ -639,7 +639,8 @@ main > section:not(:first-child) {
   padding: 0;
   list-style: none;
 }
-.program-panel-speakers button {
+.program-panel-speakers button,
+.program-panel-moderator > div {
   display: flex;
   width: 100%;
   align-items: center;
@@ -662,6 +663,12 @@ main > section:not(:first-child) {
   font-size: 0.8rem;
   font-style: normal;
   line-height: 1.4;
+}
+/* The moderator closes the list, as a card like the speakers' but not a link: "Moderated by" above the name. */
+.program-panel-moderator > div { cursor: default; }
+.program-panel-speakers .program-panel-moderator em {
+  margin: 0 0 0.15rem;
+  color: var(--color-accent-light);
 }
 .program-item__detail--highlight { color: var(--color-accent-light); }
 .program-item--linked { display: block; padding: 0; }

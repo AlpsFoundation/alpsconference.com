@@ -37,6 +37,7 @@ import {
   SURVEY,
   SWITZERLAND,
   TEAM,
+  teamMember,
   VENUE,
   VENUE_MAP,
   WORKSHOP_INTRO,
@@ -562,6 +563,8 @@ const ARROW = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" strok
   const people = (friday ? FRIDAY_PANEL_SPEAKERS : SATURDAY_PANEL_SPEAKERS).filter(isConfirmedSpeaker);
   // Panellists without a talk of their own (Ricardo Morales) get their full profile here.
   const guests = people.filter((person) => !talks.some((t) => t.kind === "talk" && t.speaker.name === person.name));
+  const panellists = people.filter((person) => !guests.includes(person));
+  const moderator = teamMember(entry.item.moderatorName);
   return (
     <BookletPage number={N[entry.key]} section="Talks & panels" wash={friday ? "br" : "tr"}>
       <Art slot="art" src="mesh-neuron.webp" width={130} bottom={-22} right={-48} flip={!friday} opacity={0.5} />
@@ -571,7 +574,7 @@ const ARROW = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" strok
       <div class="bk-copy"><p>{copy.body}</p></div>
       <h3 class="bk-subtitle bk-panel__heading">Panel participants</h3>
       <ul class="bk-panel">
-        {people.filter((person) => !guests.includes(person)).map((person) => (
+        {panellists.map((person) => (
           <li>
             <div class="bk-avatar" style={avatarStyle(person.image)}>
               {person.image && <img src={img(`speakers/${person.image}`)} alt="" loading="lazy" />}
@@ -594,6 +597,20 @@ const ARROW = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" strok
           <div class="bk-copy">{paragraphs(guest.bio).map((paragraph) => <p>{paragraph}</p>)}</div>
         </article>
       ))}
+      {moderator && (
+        <>
+          <h3 class="bk-subtitle bk-panel__heading">Moderated by</h3>
+          {/* On the participants' grid, so the portrait is the same size as theirs. */}
+          <ul class:list={["bk-panel", { "bk-panel--four": panellists.length >= 4 }]}>
+            <li>
+              <div class="bk-avatar">
+                <img src={img(`booklet/team/${moderator.photo}.jpg`)} alt="" loading="lazy" />
+              </div>
+              <p>{moderator.name}</p>
+            </li>
+          </ul>
+        </>
+      )}
     </BookletPage>
   );
 })}

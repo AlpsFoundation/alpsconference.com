@@ -18,7 +18,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { TEAM } from "../data/bookletContent";
+import { teamMember } from "../data/bookletContent";
 import { EXPERIENCE_SESSIONS, getConferenceState, parseTimeTravel, TIMELINE, type TimelineEntry } from "../data/conferenceTimeline";
 import { EXPERIENCE_PORTRAITS } from "../data/experiences";
 import { PROGRAM, type ProgramItem } from "../data/program";
@@ -150,8 +150,7 @@ function peopleFor(item: ProgramItem | undefined): Person[] {
 
 /** The ALPS team member moderating a talk or panel, with their booklet portrait; listed after the speakers. */
 function moderatorFor(item: ProgramItem | undefined): Person | undefined {
-  if (!item?.moderatorName) return undefined;
-  const member = TEAM.flatMap((group) => group.people).find((p) => p.name === item.moderatorName);
+  const member = teamMember(item?.moderatorName);
   if (!member) return undefined;
   return { name: member.name, src: withBase(`img/booklet/team/${member.photo}.jpg`), position: "50% 50%", role: "Moderated by" };
 }

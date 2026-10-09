@@ -25,7 +25,7 @@ import {
   Wind,
   Wine,
 } from "lucide-react";
-import { PROGRAM, type ProgramDay, type ProgramItem } from "../data/program";
+import { panelItem, PROGRAM, type ProgramDay, type ProgramItem } from "../data/program";
 import { EXPERIENCE_DAYS, EXPERIENCE_PORTRAITS, type ExperienceCredit } from "../data/experiences";
 import {
   FRIDAY_PANEL_SPEAKER_NAMES,
@@ -35,7 +35,7 @@ import {
   speakersNamed,
   type Speaker,
 } from "../data/speakers";
-import { FRIDAY_PANEL, SATURDAY_PANEL } from "../data/bookletContent";
+import { FRIDAY_PANEL, SATURDAY_PANEL, teamMember, type TeamMember } from "../data/bookletContent";
 import { WORKSHOP_DAY, WORKSHOP_TRACKS } from "../data/workshops";
 import CalendarSubscribe from "./CalendarSubscribe";
 import MapAddress from "./MapAddress";
@@ -81,6 +81,7 @@ const PANELS: Record<PanelId, {
   subtitle?: string;
   body: string;
   speakers: Speaker[];
+  moderator?: TeamMember;
   eyebrow: string;
 }> = {
   friday: {
@@ -88,12 +89,14 @@ const PANELS: Record<PanelId, {
     subtitle: FRIDAY_PANEL.subtitle,
     body: FRIDAY_PANEL.body,
     speakers: speakersNamed(FRIDAY_PANEL_SPEAKER_NAMES),
+    moderator: teamMember(panelItem("friday")?.moderatorName),
     eyebrow: "Friday panel · 18:15–19:15",
   },
   saturday: {
     title: SATURDAY_PANEL.title,
     body: SATURDAY_PANEL.body,
     speakers: speakersNamed(SATURDAY_PANEL_SPEAKER_NAMES),
+    moderator: teamMember(panelItem("saturday")?.moderatorName),
     eyebrow: "Saturday panel · 18:00–19:00",
   },
 };
@@ -423,6 +426,17 @@ function PanelModal({
               </li>
             );
           })}
+          {panel.moderator && (
+            <li className="program-panel-moderator">
+              <div>
+                <PortraitMark src={withBase(`img/booklet/team/${panel.moderator.photo}.jpg`)} position="50% 50%" />
+                <span>
+                  <em>Moderated by</em>
+                  <strong>{panel.moderator.name}</strong>
+                </span>
+              </div>
+            </li>
+          )}
         </ul>
       </div>
     </div>,

@@ -12,8 +12,8 @@ import {
   type SpeakerEntry,
   type SpeakerImageCrop,
 } from "../data/speakers";
-import { FRIDAY_PANEL, SATURDAY_PANEL, TEAM, type TeamMember } from "../data/bookletContent";
-import { PROGRAM } from "../data/program";
+import { FRIDAY_PANEL, SATURDAY_PANEL, teamMember, type TeamMember } from "../data/bookletContent";
+import { panelItem } from "../data/program";
 import { withBase } from "../lib/withBase";
 import { registerPhotoParallax } from "../lib/photoParallax";
 import { setLocationHash } from "../lib/locationHash";
@@ -384,14 +384,14 @@ export default function Speakers() {
               subtitle={FRIDAY_PANEL.subtitle}
               body={FRIDAY_PANEL.body}
               speakers={FRIDAY_PANEL_SPEAKERS}
-              moderator={panelModerator("friday")}
+              moderator={teamMember(panelItem("friday")?.moderatorName)}
             />
             <PanelColumn
               eyebrow="Saturday · 18:00–19:00"
               title={SATURDAY_PANEL.title}
               body={SATURDAY_PANEL.body}
               speakers={SATURDAY_PANEL_SPEAKERS}
-              moderator={panelModerator("saturday")}
+              moderator={teamMember(panelItem("saturday")?.moderatorName)}
             />
           </div>
         </div>
@@ -454,12 +454,6 @@ function CompactSpeaker({ speaker }: { speaker: Speaker }) {
       )}
     </>
   );
-}
-
-/** The team member the program names as a panel's moderator. */
-function panelModerator(panel: "friday" | "saturday"): TeamMember | undefined {
-  const name = PROGRAM.flatMap((day) => day.items).find((item) => item.panel === panel)?.moderatorName;
-  return TEAM.flatMap((group) => group.people).find((person) => person.name === name);
 }
 
 function PanelColumn({

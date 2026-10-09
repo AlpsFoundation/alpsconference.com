@@ -248,6 +248,11 @@ export const TEAM: { title: string; people: TeamMember[] }[] = [
   },
 ];
 
+/** A team member by name, e.g. the moderator a program item names. */
+export function teamMember(name: string | undefined): TeamMember | undefined {
+  return TEAM.flatMap((group) => group.people).find((person) => person.name === name);
+}
+
 export const ADVISORY_BOARDS: { title: string; people: TeamMember[] }[] = [
   {
     title: "Scientific Advisory Board",

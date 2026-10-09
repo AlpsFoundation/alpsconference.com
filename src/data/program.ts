@@ -37,6 +37,10 @@ export type ProgramDay = {
   items: ProgramItem[];
 };
 
+/** A panel's entry in the program, where its moderator is named. */
+export const panelItem = (panel: "friday" | "saturday"): ProgramItem | undefined =>
+  PROGRAM.flatMap((day) => day.items).find((item) => item.panel === panel);
+
 export const PROGRAM: ProgramDay[] = [
   {
     day: "Friday",

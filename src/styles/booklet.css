@@ -1342,11 +1342,13 @@ button:focus-visible {
 }
 
 @container page (min-width: 44rem) {
-  .bk-panel:has(> li:nth-child(4)) {
+  .bk-panel:has(> li:nth-child(4)),
+  .bk-panel--four {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .bk-panel:has(> li:nth-child(4)) .bk-avatar {
+  .bk-panel:has(> li:nth-child(4)) .bk-avatar,
+  .bk-panel--four .bk-avatar {
     width: min(100%, 19cqi);
   }
 }
