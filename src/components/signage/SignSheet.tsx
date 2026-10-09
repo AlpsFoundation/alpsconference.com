@@ -52,11 +52,22 @@ import {
   Wifi,
   Wind,
   Wine,
+  createLucideIcon,
   type LucideIcon,
 } from "lucide-react";
 import { withBase } from "../../lib/withBase";
 import { SIGN_CATEGORIES, type Sign, type SignArrow, type SignArt, type SignIcon, type SignTiles } from "../../data/signage";
 import { qrPath, type QrEcc } from "./qr";
+
+/** Lucide has no shushing face (🤫), so this one is drawn on its 24 × 24 grid: brows, eyes, lips, a finger and its fist. */
+const Shush = createLucideIcon("shush", [
+  ["path", { d: "M16.49 18.8A9 9 0 1 0 8.5 19.29", key: "face" }],
+  ["path", { d: "M7 6.5q1.5-1 3 0M14 6.5q1.5-1 3 0", key: "brows" }],
+  ["path", { d: "M8.5 9h.01M15.5 9h.01", key: "eyes" }],
+  ["path", { d: "M7 13.5q1 .75 1.75 .75M17 13.5q-1 .75-1.75 .75", key: "lips" }],
+  ["path", { d: "M10.5 17.5V12a1.5 1.5 0 0 1 3 0v5.5", key: "finger" }],
+  ["path", { d: "M10.5 17.5H10a1.5 1.5 0 0 0-1.5 1.5v1a2.5 2.5 0 0 0 2.5 2.5h3a2.5 2.5 0 0 0 2.5-2.5v-1a1.5 1.5 0 0 0-1.5-1.5h-1.5M13.5 20h2", key: "fist" }],
+]);
 
 export const ICONS: Record<SignIcon, LucideIcon> = {
   info: Info,
@@ -96,6 +107,7 @@ export const ICONS: Record<SignIcon, LucideIcon> = {
   mic: Mic,
   podcast: Podcast,
   "volume-off": VolumeOff,
+  shush: Shush,
   wifi: Wifi,
   qr: QrCode,
   calendar: Calendar,

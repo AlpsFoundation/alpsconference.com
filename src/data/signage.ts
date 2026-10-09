@@ -78,6 +78,7 @@ export const SIGN_ICONS = [
   { id: "mic", label: "Microphone" },
   { id: "podcast", label: "Podcast" },
   { id: "volume-off", label: "Silence" },
+  { id: "shush", label: "Shush" },
   { id: "wifi", label: "Wifi" },
   { id: "qr", label: "QR code" },
   { id: "calendar", label: "Calendar" },
@@ -744,6 +745,13 @@ const SIGNS: Sign[] = [
     icon: "volume-off",
     title: "Please silence your phone",
     subtitle: "Thank you for keeping the room quiet for the speakers.",
+  },
+  {
+    id: "care-quiet",
+    category: "care",
+    icon: "shush",
+    title: "Silence during the talks",
+    subtitle: "Please keep your conversations for the breaks. Thank you.",
   },
   {
     id: "care-photo",
