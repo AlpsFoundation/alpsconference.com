@@ -8,6 +8,7 @@
   --vol-mic: #c197cd;
   --vol-helper: var(--color-secondary);
   --vol-crew: var(--color-accent);
+  --vol-ok: #7ad19a;
 
   max-width: 72rem;
   margin: 0 auto;
@@ -851,6 +852,74 @@
   font-weight: 650;
 }
 
+/* "Link" copies a link to the row. On phones it sits at the right end of the time line, on desktop under the time. */
+.vol-slot__link {
+  display: inline-flex;
+  margin-left: auto;
+}
+
+.vol-linkbtn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--vol-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--vol-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.vol-linkbtn:hover,
+.vol-linkbtn:focus-visible {
+  color: inherit;
+  border-color: currentColor;
+}
+
+.vol-linkbtn[data-copied] {
+  border-color: var(--vol-ok);
+  color: var(--vol-ok);
+}
+
+/* The row a copied link points at: a green edge that stays, and a flash on arrival. */
+.vol-slot[data-linked] {
+  position: relative;
+  outline: 2px solid var(--vol-ok);
+  outline-offset: -2px;
+}
+
+.vol-slot[data-linked]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--vol-ok);
+  opacity: 0;
+  pointer-events: none;
+  animation: vol-linked 2.4s ease-out;
+}
+
+@keyframes vol-linked {
+  from {
+    opacity: 0.22;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vol-slot[data-linked]::after {
+    animation: none;
+  }
+}
+
 .vol-slot__program {
   display: flex;
   flex-wrap: wrap;
@@ -1085,6 +1154,11 @@
     padding: 0.6rem 1rem;
   }
 
+  .vol-slot__link {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
   .vol-slot__crew {
     grid-column: 3 / -1;
   }
@@ -1194,6 +1268,7 @@
   --vol-mic: #f0a57a;
   --vol-helper: #8cc063;
   --vol-crew: var(--vl-pink);
+  --vol-ok: #2e7d4f;
 }
 
 :root[data-vol-theme="light"] [data-task="checkin"] { --vol-task-soft: #dcebfa; }
