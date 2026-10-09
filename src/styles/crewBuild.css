@@ -382,33 +382,6 @@
   outline-offset: 2px;
 }
 
-.cb-linkbtn {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.2rem 0.5rem;
-  border: 1px solid var(--vol-line);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--vol-muted);
-  font: inherit;
-  font-size: 0.75rem;
-  line-height: 1.2;
-  cursor: pointer;
-}
-
-.cb-linkbtn:hover,
-.cb-linkbtn:focus-visible {
-  color: inherit;
-  border-color: currentColor;
-}
-
-.cb-linkbtn[data-copied] {
-  border-color: var(--cb-ok);
-  color: var(--cb-ok);
-}
-
 .cb-task[data-done] .cb-task__name,
 .cb-mat[data-done] .cb-mat__name {
   color: var(--vol-muted);

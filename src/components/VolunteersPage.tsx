@@ -3,6 +3,7 @@ import { ChevronDown, CircleHelp, Info, MapPin, Moon, Sun, SunMoon, Users, type 
 import CalendarSubscribe from "./CalendarSubscribe";
 import CrewBuild from "./CrewBuild";
 import CrewLinks from "./CrewLinks";
+import LinkButton, { pageLink, useCopyLink } from "./LinkButton";
 import { CREW_EVENT_LINKS, DAY_LINKS, TASK_LINKS } from "../data/crewLinks";
 import { useCrewBuild } from "./useCrewBuild";
 import { BUILD_PHASES } from "../data/crewBuild";
@@ -64,6 +65,9 @@ const DAY_PARAMS: Record<string, string> = {
   "fri-catering": "2026-10-09",
   "sat-catering": "2026-10-10",
 };
+/** `?slot=14:00` or `?event=<id>`: a link to one row of that day's grid, copied from its "Link" button. */
+const SLOT_PARAM = "slot";
+const EVENT_PARAM = "event";
 
 type ThemePref = "auto" | "light" | "dark";
 
@@ -250,6 +254,14 @@ function involves(row: PlanRow, person: string) {
         row.catering.some((cell) => cell.people.some((entry) => entry.name === person));
 }
 
+/** One row across days: its element id (`vol-row-…`), the key the "Copied" state uses, its link and its name. */
+const rowId = (date: string, row: PlanRow) => `${date}-${row.kind}-${row.key}`;
+const rowAnchor = (date: string, row: PlanRow) => `vol-row-${rowId(date, row)}`;
+const rowLink = (date: string, row: PlanRow) =>
+  pageLink(date, row.kind === "slot" ? { [SLOT_PARAM]: row.key } : { [EVENT_PARAM]: row.key });
+const rowLabel = (date: string, row: PlanRow) =>
+  row.kind === "slot" ? `the ${row.slot.from}–${row.slot.to} row on ${tabLabel(date)}` : `${row.event.title} on ${tabLabel(date)}`;
+
 /** "from 16:15", "to 20:45" or "20:15–20:45" when a catering shift starts or ends inside the row; nothing when it spans it. */
 function cateringEdge(entry: { from?: number; to?: number }) {
   if (entry.from !== undefined && entry.to !== undefined) return `${formatTime(entry.from)}–${formatTime(entry.to)}`;
@@ -419,13 +431,20 @@ function PlanList({
   date,
   clock,
   person,
+  linked,
+  copied,
   onChoose,
+  onCopy,
 }: {
   rows: PlanRow[];
   date: string;
   clock: Clock | null;
   person: string | null;
+  /** The row a copied link points at, and the row whose link was just copied, as `rowId`s. */
+  linked: string | null;
+  copied: string | null;
   onChoose: (name: string) => void;
+  onCopy: (row: PlanRow) => void;
 }) {
   const rowTimings = rows.map((row) => timingOf(clock, date, row.start, row.end));
   const nowLineAt =
@@ -446,14 +465,27 @@ function PlanList({
       {rows.map((row, index) => {
         const timing = rowTimings[index];
         const hasMe = Boolean(person) && involves(row, person!);
+        const id = rowId(date, row);
+        const link = (
+          <span className="vol-slot__link">
+            <LinkButton copied={copied === id} label={rowLabel(date, row)} onCopy={() => onCopy(row)} />
+          </span>
+        );
         return (
           <Fragment key={row.key}>
             {index === nowLineAt && nowLine}
             {row.kind === "crew" ? (
-              <li className="vol-slot vol-slot--crew" data-me={hasMe || undefined} data-state={timing}>
+              <li
+                id={rowAnchor(date, row)}
+                className="vol-slot vol-slot--crew"
+                data-me={hasMe || undefined}
+                data-state={timing}
+                data-linked={linked === id || undefined}
+              >
                 <div className="vol-slot__time">
                   {crewTime(row.event)}
                   <StateBadge timing={timing} clock={clock} />
+                  {link}
                 </div>
                 <div className="vol-slot__program">
                   <strong>{row.event.title}</strong>
@@ -471,10 +503,17 @@ function PlanList({
                 </div>
               </li>
             ) : (
-              <li className="vol-slot" data-me={hasMe || undefined} data-state={timing}>
+              <li
+                id={rowAnchor(date, row)}
+                className="vol-slot"
+                data-me={hasMe || undefined}
+                data-state={timing}
+                data-linked={linked === id || undefined}
+              >
                 <div className="vol-slot__time">
                   {row.slot.from}–{row.slot.to}
                   <StateBadge timing={timing} clock={clock} />
+                  {link}
                 </div>
                 <div className="vol-slot__program">
                   {row.slot.program ? <strong>{row.slot.program}</strong> : <span>{row.program}</span>}
@@ -750,6 +789,9 @@ export default function VolunteersPage() {
   const [onlyMine, setOnlyMine] = useState(false);
   const [openTask, setOpenTask] = useState<VolunteerTask | "catering" | null>(null);
   const headRef = useRef<HTMLDivElement>(null);
+  /** The row a copied link points at, and the row whose link was just copied. */
+  const [linked, setLinked] = useState<string | null>(null);
+  const { copied, copy } = useCopyLink();
   const clock = useVenueClock();
   const build = useCrewBuild();
   const [adding, setAdding] = useState(false);
@@ -765,13 +807,29 @@ export default function VolunteersPage() {
   // so later ticks never undo a tab the reader picked.
   const dayPicked = useRef(false);
   useEffect(() => {
-    const raw = new URLSearchParams(window.location.search).get("day")?.toLowerCase() ?? "";
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("day")?.toLowerCase() ?? "";
     const date = DAY_PARAMS[raw] ?? raw;
     if (PLAN_DAYS.some((day) => day.dateTime === date)) {
       dayPicked.current = true;
       setDayDate(date);
+      // A link to one row of that day, from its "Link" button.
+      const slot = params.get(SLOT_PARAM);
+      const event = params.get(EVENT_PARAM);
+      if (slot) setLinked(`${date}-slot-${slot}`);
+      else if (event) setLinked(`${date}-crew-${event}`);
     }
   }, []);
+
+  // Bring the linked row into view: once the rows are on the page, and again when the sign-ups load and the page grows.
+  const hasBuild = Boolean(build.state);
+  useEffect(() => {
+    if (!linked) return;
+    const timer = window.setTimeout(() => {
+      document.getElementById(`vol-row-${linked}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [linked, hasBuild]);
 
   // Names added on the page to sign up for the build: make them pickable, and restore
   // one chosen earlier once the list has loaded.
@@ -844,12 +902,18 @@ export default function VolunteersPage() {
     choose(saved);
   };
 
-  const pickDay = (date: string) => {
+  /** Switching days also drops the highlight a copied link opened with. */
+  const showDay = (date: string) => {
     setDayDate(date);
+    setLinked(null);
+  };
+  const pickDay = (date: string) => {
+    showDay(date);
     document.getElementById("vol-plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const day = PLAN_DAYS.find((entry) => entry.dateTime === dayDate) ?? PLAN_DAYS[0];
+  const copyRow = (row: PlanRow) => copy(rowId(day.dateTime, row), rowLink(day.dateTime, row));
   const mine = (row: PlanRow) => !onlyMine || !person || involves(row, person);
   const rows = planRows(day).filter(mine);
 
@@ -979,7 +1043,7 @@ export default function VolunteersPage() {
                   aria-selected={entry.dateTime === day.dateTime}
                   aria-controls="vol-day-panel"
                   data-past={(clock && entry.dateTime < clock.date) || undefined}
-                  onClick={() => setDayDate(entry.dateTime)}
+                  onClick={() => showDay(entry.dateTime)}
                 >
                   {tabLabel(entry.dateTime)}
                 </button>
@@ -1014,7 +1078,16 @@ export default function VolunteersPage() {
                 />
               </div>
             )}
-            <PlanList rows={rows} date={day.dateTime} clock={clock} person={person} onChoose={chooseAndScroll} />
+            <PlanList
+              rows={rows}
+              date={day.dateTime}
+              clock={clock}
+              person={person}
+              linked={linked}
+              copied={copied}
+              onChoose={chooseAndScroll}
+              onCopy={copyRow}
+            />
           </div>
           {BUILD_DAYS[day.dateTime] && (
             <CrewBuild
