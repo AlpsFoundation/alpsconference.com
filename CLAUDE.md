@@ -16,6 +16,7 @@ pnpm dev             # Development server with hot reload
 pnpm build           # Production build to dist/
 pnpm preview         # Preview production build locally
 pnpm og              # Regenerate the Open Graph cards in public/og/ (needs Google Chrome)
+pnpm app-icon        # Regenerate the /links home screen icons in public/app-icon/ (needs Google Chrome)
 pnpm db:migrate:local # Create the local experience sign-ups database (DB)
 pnpm db:crew:local   # Create the local build crew tables for /volunteers (CREW_DB)
 ```
@@ -55,6 +56,10 @@ pnpm og --preview    # Serve the template to edit it in a browser (?slug=<slug>)
 ```
 
 To add a page, append an entry to `cards.mjs`, point the page's `og:image` at `og/<slug>.jpg` (keep the `og:image:width`/`height` tags), and run `pnpm og <slug>`. The script lists any page whose `og:image` is not a card and that is not in `WITHOUT_CARD`.
+
+## Home screen icon (/links)
+
+Adding `/links` to a phone's home screen installs it as "ALPS 2026" (full name "ALPS Conference 2026"), opening standalone at `/links/` with the whole site in scope. `public/links.webmanifest` holds the name, colours and icons; `src/pages/links.astro` links it and sets the iOS `apple-touch-icon` and `apple-mobile-web-app-title`. The icons in `public/app-icon/` are committed, rendered from `scripts/app-icon/template.html` (navy field, hero aura, white ALPS mark from `scripts/app-icon/alps-mark.svg`) by `pnpm app-icon`; set `CHROME_PATH` for another Chromium build.
 
 ## Slack-driven changes (traceability and previews)
 

@@ -1,0 +1,57 @@
+<!doctype html>
+<!--
+  Home screen icon for /links, drawn at the size of the viewport. Screenshotted
+  by generate.mjs; open it in a browser to edit it.
+
+  ?variant=maskable shrinks the mark into the maskable safe zone (the centre
+  circle, 80% of the width), which Android crops to its own shape.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>App icon</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #082f4a;
+      }
+
+      /* The site's navy field, with the hero's pink-to-blue aura behind the mark's S-shaped cut. */
+      .icon {
+        position: relative;
+        width: 100vmin;
+        height: 100vmin;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 50% 58%, rgba(243, 143, 191, 0.7) 0, rgba(243, 143, 191, 0.22) 15%, transparent 32%),
+          radial-gradient(ellipse 62% 58% at 50% 56%, rgba(46, 124, 199, 0.75) 0%, rgba(46, 124, 199, 0.22) 58%, transparent 100%),
+          linear-gradient(180deg, #104f79 0%, #0b3c5d 58%, #082f4a 100%);
+      }
+
+      /* Sits a little below centre so the triangle looks centred. */
+      .mark {
+        position: absolute;
+        left: 50%;
+        top: 52%;
+        width: 56%;
+        transform: translate(-50%, -50%);
+        filter: drop-shadow(0 0 2.5vmin rgba(255, 255, 255, 0.18));
+      }
+
+      .maskable .mark {
+        width: 46%;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="icon">
+      <img class="mark" src="alps-mark.svg" alt="" />
+    </main>
+    <script>
+      const variant = new URLSearchParams(location.search).get("variant");
+      if (variant) document.querySelector(".icon").classList.add(variant);
+    </script>
+  </body>
+</html>

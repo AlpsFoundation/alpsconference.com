@@ -50,6 +50,11 @@ const fontFaceCss = `@font-face {
     <!-- Favicon -->
     <link rel="icon" type="image/png" href={withBase("img/favicon.png")} />
 
+    <!-- Add to home screen: icons from `pnpm app-icon` -->
+    <link rel="manifest" href={withBase("links.webmanifest")} />
+    <link rel="apple-touch-icon" href={withBase("app-icon/apple-touch-icon.png")} />
+    <meta name="apple-mobile-web-app-title" content="ALPS 2026" />
+
     <style is:global set:html={fontFaceCss}></style>
   </head>
   <body>

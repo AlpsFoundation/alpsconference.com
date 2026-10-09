@@ -10,6 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "og": "node scripts/og/generate.mjs",
+    "app-icon": "node scripts/app-icon/generate.mjs",
     "postinstall": "pnpm run generate-types",
     "test:newsletter": "vitest run tests/newsletter-signup.test.ts",
     "generate-types": "wrangler types",
