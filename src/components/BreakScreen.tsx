@@ -764,7 +764,7 @@ export default function BreakScreen() {
         {message && (
           <div
             key={messageKey}
-            className={`break-message ${message.sponsor ? "has-sponsor" : ""} ${qrBesideTitle ? "has-sponsor has-links" : ""}`}
+            className={`break-message ${message.sponsor ? "has-sponsor" : ""} ${qrBesideTitle ? "has-sponsor has-links" : ""} ${message.agenda ? "has-agenda" : ""}`}
           >
             <div className="break-message__text">
               {message.eyebrow && (
@@ -773,7 +773,7 @@ export default function BreakScreen() {
                   {message.eyebrow}
                 </p>
               )}
-              <h1 className={`break-message__headline ${long ? "is-long" : ""}`}>{message.headline}</h1>
+              <h1 className={`break-message__headline ${long ? "is-long" : ""} ${message.agenda ? "is-compact" : ""}`}>{message.headline}</h1>
               {message.people && message.people.length > 0 && (
                 <ul
                   className={`break-message__people ${message.peopleLarge ? "is-large" : ""} ${message.people.length > 2 ? "is-many" : ""}`}

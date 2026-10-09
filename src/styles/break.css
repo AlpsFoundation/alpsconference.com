@@ -342,11 +342,27 @@
 .break-agenda {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.2em 2.4em;
+  gap: 1em 2.4em;
   align-self: stretch;
-  margin-top: 1.3em;
-  font-size: clamp(0.9rem, 2.2vmin, 1.6rem);
+  margin-top: 0.9em;
+  font-size: clamp(0.85rem, 2.1vmin, 1.5rem);
   text-shadow: 0 1px 3px rgba(8, 47, 74, 0.95), 0 0 18px rgba(8, 47, 74, 0.9);
+}
+
+/* With the two lists under it the message is tall, so everything above them tightens: the slide
+   must end above the logo on a 16:9 screen (it covered the logo on the first deploy, 9 Oct). */
+.has-agenda .break-message__eyebrow {
+  margin-bottom: clamp(0.4rem, 1.2vmin, 1rem);
+}
+
+.has-agenda .break-message__sub {
+  margin-top: 0.6em;
+}
+
+.break-message__headline.is-compact {
+  font-size: clamp(1.75rem, 4.8vmin, 4.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
 }
 
 .break-agenda__label {
@@ -357,7 +373,7 @@
   display: flex;
   align-items: center;
   gap: 0.6em;
-  padding: 0.4em 0;
+  padding: 0.35em 0;
   border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
