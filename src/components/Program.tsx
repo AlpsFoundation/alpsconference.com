@@ -49,6 +49,7 @@ import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scr
 
 type ScheduleView = "talks" | "experiences" | "workshops";
 type ScheduleItem = ProgramItem & {
+  previousVenue?: string;
   people?: string[];
   allDay?: boolean;
   credits?: ExperienceCredit[];
@@ -106,6 +107,7 @@ const EXPERIENCE_SCHEDULE: ScheduleDay[] = EXPERIENCE_DAYS.map((day) => ({
     detail: item.personName && item.personName !== item.title ? item.personName : undefined,
     menuNote: item.detail,
     venue: item.venue,
+    previousVenue: item.previousVenue,
     experienceName: item.personName,
     people: item.credits?.map((credit) => credit.name) ?? item.personNames,
     credits: item.credits,
@@ -190,7 +192,12 @@ function ProgramItemWhen({ item }: { item: ScheduleItem }) {
   return (
     <span className="program-item__when">
       <span className="program-item__time">{item.time}</span>
-      {item.venue && <span className="program-item__venue">{item.venue}</span>}
+      {item.venue && (
+        <span className="program-item__venue">
+          {item.previousVenue && <><s>{item.previousVenue}</s>{" "}</>}
+          {item.venue}
+        </span>
+      )}
     </span>
   );
 }

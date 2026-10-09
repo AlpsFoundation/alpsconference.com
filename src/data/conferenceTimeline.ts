@@ -84,6 +84,7 @@ export type ExperienceSession = {
   title: string;
   personName?: string;
   venue?: string;
+  previousVenue?: string;
   detail?: string;
   description?: string;
   /** False for drop-in experiences (all-day art, the concert, the afterparty). */
@@ -120,6 +121,7 @@ export const EXPERIENCE_SESSIONS: ExperienceSession[] = EXPERIENCE_DAYS.flatMap(
       title: item.title,
       personName: item.personName === "Afterparty" ? undefined : item.personName,
       venue: item.venue,
+      previousVenue: item.previousVenue,
       detail: item.detail,
       description: findDescription(item.personName, item.title),
       signup: item.kind !== "allday" && !DROP_IN_TITLES.has(item.title),

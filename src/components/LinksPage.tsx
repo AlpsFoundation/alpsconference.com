@@ -273,7 +273,7 @@ function EntryCard({
               <span className="text-white/45">Also on</span>
               <span>
                 {s.title}
-                {s.venue ? ` · ${s.venue}` : ""}
+                {s.venue && <> · {s.previousVenue && <><s>{s.previousVenue}</s>{" "}</>}{s.venue}</>}
                 <span className="text-white/45"> until {s.end ? timeFormat.format(s.end) : ""}</span>
               </span>
             </li>
@@ -769,7 +769,13 @@ function ExperiencesSection({
               <span className="block font-semibold leading-snug text-white">{session.title}</span>
               <span className="mt-0.5 block text-sm text-white/85">
                 <span className="font-semibold tabular-nums">{session.time}</span>
-                {session.venue && <span className="text-white/60"> · {session.venue}</span>}
+                {session.venue && (
+                  <span className="text-white/60">
+                    {" · "}
+                    {session.previousVenue && <><s>{session.previousVenue}</s>{" "}</>}
+                    {session.venue}
+                  </span>
+                )}
               </span>
               {session.personName && <span className="block text-sm text-white/60">{session.personName}</span>}
               <span className="mt-1 block text-xs text-white/50">
@@ -858,7 +864,7 @@ function ExperiencesSection({
                 <span className="font-medium text-white">{s.title}</span>
                 <span className="text-right text-white/60">
                   {s.time === "All day" ? "Both days, all day" : `${s.day} · ${s.time}`}
-                  {s.venue ? ` · ${s.venue}` : ""}
+                  {s.venue && <> · {s.previousVenue && <><s>{s.previousVenue}</s>{" "}</>}{s.venue}</>}
                 </span>
               </li>
             ))}
