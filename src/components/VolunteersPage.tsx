@@ -1158,6 +1158,12 @@ export default function VolunteersPage() {
             </option>
           </select>
         </div>
+        {person && (
+          <label className="vol-toggle vol-picker__toggle">
+            <input type="checkbox" checked={onlyMine} onChange={(event) => setOnlyMine(event.target.checked)} />
+            Only {person}’s slots
+          </label>
+        )}
         {adding && (
           <form
             className="vol-addname"
@@ -1211,12 +1217,6 @@ export default function VolunteersPage() {
                 </button>
               ))}
             </div>
-            {person && (
-              <label className="vol-toggle">
-                <input type="checkbox" checked={onlyMine} onChange={(event) => setOnlyMine(event.target.checked)} />
-                Only {person}’s slots
-              </label>
-            )}
           </div>
         </div>
 

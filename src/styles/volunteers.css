@@ -192,6 +192,16 @@
     margin: 0;
     white-space: nowrap;
   }
+
+  .vol-picker .vol-picker__toggle {
+    margin: 0;
+    white-space: nowrap;
+  }
+}
+
+/* "Only X's slots" sits in the picker, under the select on narrow screens. */
+.vol-picker__toggle {
+  margin-top: 0.6rem;
 }
 
 .vol-select {
