@@ -726,7 +726,8 @@ export default function BreakScreen() {
         )}
       </main>
 
-      <footer className="break-bottom">
+      {/* With neither banner nor card the band collapses, so the title and the card sit on the bottom edge. */}
+      <footer className={`break-bottom ${qrBesideTitle ? "is-empty" : ""}`}>
         <div className="min-w-0 flex-1">
           {now && next && showNext && (
             <div key={next.id} className="break-fade">

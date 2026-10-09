@@ -184,6 +184,7 @@
 
   .break-message > .break-links {
     justify-self: start;
+    margin-right: 0;
   }
 }
 
@@ -514,13 +515,33 @@
   backdrop-filter: blur(20px);
 }
 
-/* The card keeps its natural width beside the title; the text takes the rest. */
+/* The card keeps its natural width beside the title; the text takes the rest. Both sit on the
+   message's bottom edge, and the card stays clear of the pager's column on the right, so it stands
+   exactly where it does beside the banner on the other slides. */
 .break-message.has-links {
   grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
 }
 
 .break-message > .break-links {
   justify-self: end;
+  margin-right: calc(clamp(2.25rem, 4.6vmin, 3rem) + clamp(0.5rem, 1.5vmin, 1rem));
+}
+
+/* A band with neither banner nor card takes no room; its pager floats at the bottom right. */
+.break-bottom.is-empty {
+  padding-bottom: 0;
+}
+
+.break-bottom.is-empty > :first-child {
+  display: none;
+}
+
+.break-bottom.is-empty .break-pager {
+  position: absolute;
+  right: var(--break-gutter);
+  bottom: clamp(1rem, 4vmin, 3.5rem);
+  z-index: 2;
 }
 
 .break-links__text {
