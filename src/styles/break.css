@@ -177,6 +177,14 @@
   .break-sponsor__logo {
     height: calc(18vw * var(--h, 1));
   }
+
+  .break-message.has-links {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .break-message > .break-links {
+    justify-self: start;
+  }
 }
 
 /* What is on, above the headline: plain text with its icon, no badge. */
@@ -488,7 +496,9 @@
 }
 
 /* The attendee links page as a QR code, on every slide: the same glass card as the banner, the
-   caption on the left and the code on a white tile that carries its own quiet zone. */
+   caption on the left and the code on a white tile that carries its own quiet zone. Beside the
+   banner when there is one; otherwise in the message's right third, beside the title, flush with
+   the same right edge. */
 .break-links {
   display: flex;
   align-items: center;
@@ -502,6 +512,15 @@
     rgba(8, 47, 74, 0.72);
   box-shadow: 0 24px 80px rgba(3, 20, 35, 0.4);
   backdrop-filter: blur(20px);
+}
+
+/* The card keeps its natural width beside the title; the text takes the rest. */
+.break-message.has-links {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.break-message > .break-links {
+  justify-self: end;
 }
 
 .break-links__text {
