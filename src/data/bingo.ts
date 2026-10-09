@@ -31,7 +31,10 @@ export const CLASSIC_PROMPTS: BingoPrompt[] = [
   { id: "onstage-argument", text: "Heated argument onstage during a talk" },
 ];
 
-/** More community prompts that only show up on a shuffled card. */
+/**
+ * More community prompts. These, the programme and the Swiss prompts are hidden for now: cards
+ * only use the classic prompts. They stay in PROMPTS_BY_ID so sightings logged earlier still resolve.
+ */
 export const EXTRA_PROMPTS: BingoPrompt[] = [
   { id: "mckenna", text: "Un\u00adprompted Terence McKenna quote" },
   { id: "set-and-setting", text: "“Set and setting” explained to a room of experts" },
@@ -98,25 +101,6 @@ export const BINGO_THEMES: BingoTheme[] = [
 export const ALL_PROMPTS: BingoPrompt[] = BINGO_THEMES.flatMap((theme) => theme.prompts);
 
 export const PROMPTS_BY_ID = new Map(ALL_PROMPTS.map((prompt) => [prompt.id, prompt]));
-
-/** Suggestions for the "where" field, named as on the venue map and programme. */
-export const BINGO_PLACES = [
-  "Main Stage",
-  "Q&A",
-  "Panel discussion",
-  "Experiences (Saal 4)",
-  "Live concert (Saal 2)",
-  "Lounges",
-  "Catering",
-  "Research posters",
-  "Info tables",
-  "LSD Blotter Art Exhibition",
-  "Speed-friending",
-  "Networking dinner",
-  "Networking apéro",
-  "Afterparty (Flösserplatz)",
-  "Outside the KuK",
-];
 
 export const BINGO_SIZE = 5;
 /** Grid index of the free square. */

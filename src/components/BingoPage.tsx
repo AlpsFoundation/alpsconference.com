@@ -1,16 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { Check, Info, LockKeyhole, RotateCcw, Shuffle, Trash2, X } from "lucide-react";
-import {
-  ALL_PROMPTS,
-  BINGO_PLACES,
-  BINGO_SIZE,
-  BINGO_THEMES,
-  CLASSIC_PROMPTS,
-  FREE_INDEX,
-  PROMPTS_BY_ID,
-  type BingoPrompt,
-} from "../data/bingo";
+import { BINGO_SIZE, CLASSIC_PROMPTS, FREE_INDEX, PROMPTS_BY_ID, type BingoPrompt } from "../data/bingo";
 import { useModalMotion, useModalPresence } from "../lib/modalAnimation";
 import { focusWithoutScroll, lockBodyScroll, unlockBodyScroll } from "../lib/scrollLock";
 import "../styles/bingo.css";
@@ -20,9 +11,9 @@ const STORAGE_KEY = "alps-bingo-2026";
 const NARCOTICS_ACT_URL = "https://www.fedlex.admin.ch/eli/cc/1952/241_241_245/en";
 const CELL_COUNT = BINGO_SIZE * BINGO_SIZE;
 const CLASSIC_LAYOUT = CLASSIC_PROMPTS.map((prompt) => prompt.id);
+const CLASSIC_IDS = new Set(CLASSIC_LAYOUT);
 
 type Sighting = {
-  where: string;
   when: string;
   notes: string;
   savedAt: string;
@@ -47,8 +38,9 @@ function readState(): BingoState | null {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null");
     if (!saved || typeof saved !== "object") return null;
+    // Cards drawn while the extra prompts were on offer fall back to the classic card.
     const layout = Array.isArray(saved.layout)
-      ? saved.layout.filter((id: unknown) => typeof id === "string" && PROMPTS_BY_ID.has(id))
+      ? saved.layout.filter((id: unknown) => typeof id === "string" && CLASSIC_IDS.has(id))
       : [];
     return {
       layout: layout.length === CELL_COUNT - 1 ? layout : CLASSIC_LAYOUT,
@@ -68,12 +60,12 @@ function writeState(state: BingoState) {
 }
 
 function shuffledLayout() {
-  const ids = ALL_PROMPTS.map((prompt) => prompt.id);
+  const ids = [...CLASSIC_LAYOUT];
   for (let i = ids.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
     [ids[i], ids[j]] = [ids[j], ids[i]];
   }
-  return ids.slice(0, CELL_COUNT - 1);
+  return ids;
 }
 
 function promptAt(layout: string[], index: number): BingoPrompt | null {
@@ -126,10 +118,9 @@ function SightingModal({
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const whereRef = useRef<HTMLInputElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
-  const [where, setWhere] = useState(sighting?.where ?? "");
   const [when, setWhen] = useState(sighting?.when ?? nowForInput());
   const [notes, setNotes] = useState(sighting?.notes ?? "");
   const headingId = "bingo-modal-title";
@@ -138,7 +129,7 @@ function SightingModal({
     const handleKey = (event: KeyboardEvent) => event.key === "Escape" && onCloseRef.current();
     document.addEventListener("keydown", handleKey);
     lockBodyScroll();
-    focusWithoutScroll(whereRef.current);
+    focusWithoutScroll(closeRef.current);
     return () => {
       document.removeEventListener("keydown", handleKey);
       unlockBodyScroll();
@@ -149,7 +140,7 @@ function SightingModal({
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    onSave({ where: where.trim(), when, notes: notes.trim() });
+    onSave({ when, notes: notes.trim() });
   };
 
   return createPortal(
@@ -167,6 +158,7 @@ function SightingModal({
         onClick={(event) => event.stopPropagation()}
       >
         <button
+          ref={closeRef}
           type="button"
           onClick={onClose}
           className="absolute top-4 right-4 grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/75 transition-colors hover:bg-white/20 hover:text-white"
@@ -182,28 +174,11 @@ function SightingModal({
         <p className="mt-2 text-sm text-white/65">
           {sighting
             ? `You spotted this one. Edit the details or clear the ${index === null ? "sighting" : "square"}.`
-            : "Where did you witness it?"}
+            : "When did you witness it?"}
           {index === null && " It goes into your sightings but does not count towards a bingo."}
         </p>
 
         <form onSubmit={submit} className="mt-5 space-y-4">
-          <label className="block text-sm font-medium text-white/85">
-            Where
-            <input
-              ref={whereRef}
-              value={where}
-              onChange={(event) => setWhere(event.target.value)}
-              list="bingo-places"
-              placeholder="Talk, room or moment"
-              autoComplete="off"
-              className="links-input"
-            />
-            <datalist id="bingo-places">
-              {BINGO_PLACES.map((place) => (
-                <option key={place} value={place} />
-              ))}
-            </datalist>
-          </label>
           <label className="block text-sm font-medium text-white/85">
             When
             <input
@@ -289,15 +264,6 @@ export default function BingoPage() {
   );
   const onCard = new Set(state.layout);
 
-  const candidateThemes = useMemo(
-    () =>
-      BINGO_THEMES.map((theme) => ({
-        ...theme,
-        prompts: theme.prompts.filter((prompt) => !state.layout.includes(prompt.id)),
-      })).filter((theme) => theme.prompts.length > 0),
-    [state.layout]
-  );
-
   const openPrompt = (id: string) => {
     setModalId(id);
     setActiveId(id);
@@ -345,7 +311,7 @@ export default function BingoPage() {
         <p className="section-eyebrow">ALPS Conference 2026 · 9–10 October</p>
         <h1 className="section-title">Conference bingo</h1>
         <p className="bingo-sub">
-          Tap a square when you witness it and note where. Five in a row, column or diagonal is a bingo.
+          Tap a square when you witness it. Five in a row, column or diagonal is a bingo.
         </p>
       </header>
 
@@ -458,8 +424,7 @@ export default function BingoPage() {
               <li key={prompt.id}>
                 <p className="font-medium text-white">{prompt.text}</p>
                 <p className="mt-1 text-sm text-white/65">
-                  {[sighting.where, sighting.when && formatWhen(sighting.when)].filter(Boolean).join(" · ") ||
-                    "No details"}
+                  {sighting.when ? formatWhen(sighting.when) : "No details"}
                   {!onCard.has(prompt.id) && <span className="text-white/45"> · not on this card</span>}
                 </p>
                 {sighting.notes && <p className="mt-1.5 text-sm text-white/80">{sighting.notes}</p>}
@@ -468,43 +433,6 @@ export default function BingoPage() {
           </ul>
         </section>
       )}
-
-      <section className="bingo-candidates" aria-labelledby="bingo-candidates-title">
-        <h2 id="bingo-candidates-title" className="bingo-candidates__title">
-          Other candidates
-        </h2>
-        <p className="mt-2 text-sm text-white/65">
-          Not on your card, but they happen too. Tap one to log it, or draw a new card to mix them in.
-        </p>
-        {candidateThemes.map((theme) => (
-          <div key={theme.id} className="bingo-candidates__group">
-            <h3 className="links-eyebrow">{theme.label}</h3>
-            <ul>
-              {theme.prompts.map((prompt) => {
-                const spotted = Boolean(state.sightings[prompt.id]);
-                return (
-                  <li key={prompt.id}>
-                    <button
-                      type="button"
-                      onClick={() => openPrompt(prompt.id)}
-                      className={`bingo-candidate${spotted ? " bingo-candidate--marked" : ""}`}
-                      aria-haspopup="dialog"
-                      aria-label={`${prompt.text}${spotted ? ", spotted" : ""}`}
-                    >
-                      <span>{prompt.text}</span>
-                      {spotted && (
-                        <span className="bingo-cell__check" aria-hidden>
-                          <Check className="h-3 w-3" strokeWidth={3} />
-                        </span>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
-      </section>
 
       {present && modalPrompt && (
         <SightingModal

@@ -3,6 +3,8 @@
   max-width: 64rem;
   margin: 0 auto;
   padding: clamp(28px, 5vw, 64px) 16px clamp(48px, 6vw, 88px);
+  /* Quick taps on squares should not zoom on phones. */
+  touch-action: manipulation;
 }
 
 @media (min-width: 640px) {
@@ -102,7 +104,7 @@
   background: linear-gradient(160deg, rgba(20, 95, 145, 0.24), rgba(8, 47, 74, 0.78) 70%);
   color: rgba(248, 250, 255, 0.92);
   text-align: left;
-  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
 }
 
 @media (min-width: 640px) {
@@ -166,11 +168,17 @@ button.bingo-cell:focus-visible {
   color: var(--color-primary);
 }
 
+/* Spotted: tinted pink. In a completed line: solid pink, like a dauber. */
 .bingo-cell--marked {
-  border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 75%, transparent);
   background:
-    radial-gradient(circle at 50% 60%, rgba(243, 143, 191, 0.26), transparent 75%),
-    linear-gradient(160deg, rgba(20, 95, 145, 0.3), rgba(8, 47, 74, 0.85) 70%);
+    linear-gradient(160deg, rgba(243, 143, 191, 0.38), rgba(243, 143, 191, 0.16) 75%),
+    rgba(8, 47, 74, 0.85);
+  color: white;
+}
+
+.bingo-cell--marked .bingo-number {
+  color: var(--color-accent-light);
 }
 
 .bingo-cell--free {
@@ -193,8 +201,27 @@ button.bingo-cell:focus-visible {
 }
 
 .bingo-cell--line {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 1px var(--color-accent), 0 0 26px -6px rgba(243, 143, 191, 0.55);
+  border-color: var(--color-accent-light);
+  background: linear-gradient(160deg, var(--color-accent-light), var(--color-accent) 70%);
+  box-shadow: 0 0 26px -6px rgba(243, 143, 191, 0.65);
+  color: var(--color-primary);
+}
+
+.bingo-cell--line .bingo-number {
+  color: color-mix(in srgb, var(--color-primary) 60%, transparent);
+}
+
+.bingo-cell--line .bingo-cell__check {
+  background: var(--color-primary);
+  color: var(--color-accent-light);
+}
+
+.bingo-cell--line .bingo-free {
+  color: var(--color-primary);
+}
+
+button.bingo-cell--line:hover {
+  border-color: white;
 }
 
 .bingo-privacy {
@@ -250,67 +277,4 @@ button.bingo-cell:focus-visible {
 
 .bingo-input--datetime {
   color-scheme: dark;
-}
-
-.bingo-candidates {
-  margin-top: 3rem;
-}
-
-.bingo-candidates__title {
-  margin: 0;
-  color: white;
-  font-size: clamp(1.4rem, 3vw, 1.9rem);
-  font-weight: 650;
-  letter-spacing: -0.01em;
-}
-
-.bingo-candidates__group {
-  margin-top: 1.75rem;
-}
-
-.bingo-candidates ul {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-  gap: 0.5rem;
-  margin: 0.8rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.bingo-candidate {
-  position: relative;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 3.5rem;
-  align-items: center;
-  padding: 0.7rem 2.4rem 0.7rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  border-radius: 0.8rem;
-  background: linear-gradient(160deg, rgba(20, 95, 145, 0.2), rgba(8, 47, 74, 0.6) 70%);
-  color: rgba(248, 250, 255, 0.9);
-  font-size: 0.875rem;
-  line-height: 1.35;
-  text-align: left;
-  cursor: pointer;
-  transition: border-color 160ms ease;
-}
-
-.bingo-candidate:hover {
-  border-color: rgba(255, 255, 255, 0.26);
-}
-
-.bingo-candidate:focus-visible {
-  outline: 2px solid var(--color-support-light);
-  outline-offset: 2px;
-}
-
-.bingo-candidate--marked {
-  border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
-}
-
-.bingo-candidate .bingo-cell__check {
-  top: 50%;
-  right: 0.8rem;
-  transform: translateY(-50%);
 }
