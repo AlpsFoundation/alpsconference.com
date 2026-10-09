@@ -372,6 +372,66 @@
   font-weight: 650;
 }
 
+/* Days already over, folded at the end of "my shifts" so the list opens on today. */
+.vol-day--past {
+  border-style: dashed;
+  background: transparent;
+}
+
+.vol-day__fold {
+  margin: 0;
+}
+
+.vol-day__fold button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border: 0;
+  background: none;
+  color: rgba(238, 244, 248, 0.86);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vol-day__fold button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.vol-day__fold small {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(238, 244, 248, 0.62);
+}
+
+.vol-day__chevron {
+  flex: none;
+  color: rgba(238, 244, 248, 0.62);
+  transition: rotate 0.2s ease;
+}
+
+.vol-day--past[data-open] .vol-day__chevron {
+  rotate: 180deg;
+}
+
+.vol-day__past {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0 0.6rem 0.6rem;
+}
+
+.vol-day__past .vol-day {
+  background: var(--vol-panel);
+}
+
 .vol-link {
   padding: 0;
   border: 0;
@@ -1920,6 +1980,20 @@
 }
 
 :root[data-vol-theme="light"] .vol-catering__head button:focus-visible {
+  outline-color: var(--vl-ink);
+}
+
+/* Folded past days, light theme */
+:root[data-vol-theme="light"] .vol-day__fold button {
+  color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .vol-day__fold small,
+:root[data-vol-theme="light"] .vol-day__chevron {
+  color: var(--vl-muted);
+}
+
+:root[data-vol-theme="light"] .vol-day__fold button:focus-visible {
   outline-color: var(--vl-ink);
 }
 
