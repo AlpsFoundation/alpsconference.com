@@ -12,7 +12,9 @@ const ZURICH_OFFSET = "+02:00";
 export const DEFAULT_EXPERIENCE_CAPACITY = 30;
 
 /** Per-session capacity overrides, keyed by session id (see `sessionId`). */
-const CAPACITY_OVERRIDES: Record<string, number> = {};
+const CAPACITY_OVERRIDES: Record<string, number> = {
+  "2026-10-09-speed-friending-1345": 50,
+};
 
 /** Experiences that are open to everyone and need no sign-up. */
 const DROP_IN_TITLES = new Set(["Art exhibitions", "Live concert", "Afterparty"]);
