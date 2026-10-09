@@ -3,6 +3,8 @@
  * empty to show it as "coming soon". Items open from the URL hash, e.g. /links#afterparty.
  */
 
+import { SURVEY } from "./bookletContent";
+
 export type QuickLinkIcon =
   | "whatsapp"
   | "map"
@@ -145,8 +147,7 @@ export const QUICK_LINKS: QuickLink[] = [
     summary: "Two minutes that shape next year",
     icon: "feedback",
     body: "Tell us what worked and what we should change for ALPS 2027.",
-    // TODO: paste the feedback survey link.
-    actions: [{ label: "Open the survey", href: "" }],
+    actions: [{ label: "Open the survey", href: SURVEY.url }],
     showFrom: "2026-10-10T19:00:00+02:00",
   },
 ];

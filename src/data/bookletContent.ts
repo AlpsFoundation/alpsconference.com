@@ -373,7 +373,7 @@ export const SURVEY = {
   questions: ["Where are you from?", "Why are you here?", "How can we improve?"],
   body: "Fill in this anonymous questionnaire to help us understand who we are (as a community). Thank you for helping us improve our conference!",
   label: "Open the survey",
-  url: "https://forms.gle/LtRRdjDAeM8Dir2C8",
+  url: "https://forms.gle/2x7qh65Jna1PS5Px5",
 };
 
 export const PROJECTS = {
