@@ -378,6 +378,9 @@ export const CATERING_SHIFTS: CateringShift[] = [
   // Fri 9 Oct, 13:50 (Ece/Matthias): Olga is off after Lunch Service — Parsa takes her two dinner shifts and leaves the helper pool at 18:30.
   { person: "Parsa", dateTime: "2026-10-09", from: "18:30", to: "19:30", station: "Diner 1" },
   { person: "Parsa", dateTime: "2026-10-09", from: "20:15", to: "20:45", station: "Diner 2" },
+  // Fri 9 Oct, 15:00 (Matthias): Lennert and Philipp run the bar from 19:15 through the evening programme.
+  { person: "Lennert", dateTime: "2026-10-09", from: "19:15", to: "21:15", station: "Bar" },
+  { person: "Philipp", dateTime: "2026-10-09", from: "19:15", to: "21:15", station: "Bar" },
 ];
 
 /**
@@ -390,7 +393,7 @@ export const CATERING_SERVICES: { id: string; label: string; stations: Record<st
   { id: "morning", label: "Morning break", stations: { "Morning Break": "Morning break" } },
   { id: "lunch", label: "Lunch", stations: { "Lunch Service": "Service", "Lunch Küche": "Kitchen" } },
   { id: "afternoon", label: "Afternoon break", stations: { "Afternoon Break": "Afternoon break" } },
-  { id: "dinner", label: "Dinner", stations: { "Diner 1": "Dinner 1", "Diner 2": "Dinner 2" } },
+  { id: "dinner", label: "Dinner", stations: { "Diner 1": "Dinner 1", "Diner 2": "Dinner 2", Bar: "Bar" } },
   { id: "apero", label: "Apéro", stations: { "Networking Apéro": "Networking", "Apéro Spät": "Late shift", "Apéro Abbau": "Teardown" } },
 ];
 
