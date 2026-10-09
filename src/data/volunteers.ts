@@ -113,8 +113,10 @@ export const SHIFT_DAYS: ShiftDay[] = [
       { from: "15:30", to: "15:45", program: "Sandeep Nayak", checkin: ["Andrea"], info: ["Maria"], mic: [], helper: ["Marina", "Cyril"] },
       { from: "15:45", to: "16:00", checkin: ["Andrea"], info: ["Maria"], mic: [], helper: ["Marina", "Cyril"] },
       { from: "16:00", to: "16:30", checkin: ["Marina"], info: ["Maria"], mic: ["Andrea", "Lennert"], helper: ["Parsa"] },
-      { from: "16:30", to: "16:45", program: "Coffee break", checkin: ["Marina"], info: ["Maria", "Lennert"], mic: [], helper: ["Noor"] },
-      { from: "16:45", to: "17:00", checkin: ["Marina"], info: ["José", "Lennert"], mic: [], helper: ["Noor"] },
+      // Fri 9 Oct, 16:10 (Philipp): Noor takes the Info Table 16:30–17:00 instead of Lennert, who supports the
+      // catering team (Afternoon Break) 16:30–17:30; the Happy Helper slot stays empty until Cyril at 17:00.
+      { from: "16:30", to: "16:45", program: "Coffee break", checkin: ["Marina"], info: ["Maria", "Noor"], mic: [], helper: [] },
+      { from: "16:45", to: "17:00", checkin: ["Marina"], info: ["José", "Noor"], mic: [], helper: [] },
       { from: "17:00", to: "17:15", program: "Coffee break (until 17:15)", checkin: ["Stela"], info: ["José", "Abigail"], mic: [], helper: ["Cyril"] },
       { from: "17:15", to: "17:45", program: "Amandine Luquiens", checkin: ["Stela"], info: ["Federico"], mic: [], helper: ["Cyril", "Parsa"] },
       { from: "17:45", to: "18:00", checkin: ["Stela"], info: ["DK"], mic: ["Andrea", "Lennert"], helper: ["Cyril", "Parsa"] },
@@ -349,7 +351,8 @@ export const CATERING_SHIFTS: CateringShift[] = [
   { person: "Benedikt", dateTime: "2026-10-10", from: "21:45", to: "22:30", station: "Apéro Abbau" },
   { person: "Margarita", dateTime: "2026-10-09", from: "10:15", to: "11:45", station: "Morning Break" },
   { person: "Margarita", dateTime: "2026-10-09", from: "14:00", to: "15:30", station: "Lunch Küche" },
-  { person: "Margarita", dateTime: "2026-10-09", from: "19:45", to: "21:15", station: "Diner 2" },
+  // Fri 9 Oct, 16:10 (Philipp): Marina covers Margarita's Dinner 2 until 20:30; Margarita is on from 20:30.
+  { person: "Margarita", dateTime: "2026-10-09", from: "20:30", to: "21:15", station: "Diner 2" },
   { person: "Margarita", dateTime: "2026-10-10", from: "13:30", to: "15:00", station: "Lunch Küche" },
   { person: "Margarita", dateTime: "2026-10-10", from: "15:45", to: "17:30", station: "Afternoon Break" },
   { person: "Margarita", dateTime: "2026-10-10", from: "21:45", to: "22:30", station: "Apéro Abbau" },
@@ -381,6 +384,9 @@ export const CATERING_SHIFTS: CateringShift[] = [
   // Fri 9 Oct, 15:00 (Matthias): Lennert and Philipp run the bar from 19:15 through the evening programme.
   { person: "Lennert", dateTime: "2026-10-09", from: "19:15", to: "21:15", station: "Bar" },
   { person: "Philipp", dateTime: "2026-10-09", from: "19:15", to: "21:15", station: "Bar" },
+  // Fri 9 Oct, 16:10 (Philipp): Lennert supports the afternoon break 16:30–17:30; Marina takes Margarita's Dinner 2 19:45–20:30.
+  { person: "Lennert", dateTime: "2026-10-09", from: "16:30", to: "17:30", station: "Afternoon Break" },
+  { person: "Marina", dateTime: "2026-10-09", from: "19:45", to: "20:30", station: "Diner 2" },
 ];
 
 /**
