@@ -10,7 +10,6 @@ import {
   MessageCircleQuestion,
   Mic,
   PartyPopper,
-  QrCode,
   Radio,
   Sparkles,
   Users,
@@ -380,14 +379,7 @@ function LinksQr() {
   const box = LINKS_QR.size + QR_QUIET * 2;
   return (
     <aside className="break-links" aria-label="Attendee links">
-      <div className="break-links__text">
-        <p className="break-eyebrow">
-          <QrCode aria-hidden />
-          Scan for links
-        </p>
-        <p className="break-links__url">{LINKS_LABEL}</p>
-        <p className="break-links__note">Program, venue map, wifi and sign-ups</p>
-      </div>
+      <p className="break-links__url">{LINKS_LABEL}</p>
       <svg
         className="break-links__code"
         viewBox={`${-QR_QUIET} ${-QR_QUIET} ${box} ${box}`}
