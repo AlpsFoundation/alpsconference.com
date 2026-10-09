@@ -56,8 +56,9 @@ const SPONSOR_LOGOS = [
 ];
 
 /**
- * The attendee links page, as a QR code on every slide (bottom right, beside the Next up banner),
- * so the room can reach the program, map, wifi and sign-ups from the screen. The code is drawn
+ * The attendee links page, as a QR code on every slide — beside the Next up banner, or beside the
+ * title on a slide without one — so the room can reach the program, map, wifi and sign-ups from
+ * the screen. The code is drawn
  * once, as one SVG path, with the standard four-module quiet zone inside its white tile.
  */
 const LINKS_URL = "https://alpsconference.com/links";
@@ -589,6 +590,9 @@ export default function BreakScreen() {
   const talk = !!current && isTalk(current);
   // A talk's title and Q&A slides keep the room on the talk; only its thank-you looks ahead.
   const showNext = !talk || slide === "thanks";
+  // The links QR sits beside the Next up banner; on a slide without one it moves up beside the
+  // title, in the right third where the sponsors stand on a break (Matthias, 9 Oct).
+  const qrBesideTitle = !showNext;
 
   // Step the pinned item through the schedule. Between items (or after the
   // last one) "now" sits half a step before the next one.
@@ -666,7 +670,10 @@ export default function BreakScreen() {
 
       <main className="break-main">
         {message && (
-          <div key={messageKey} className={`break-message ${message.sponsor ? "has-sponsor" : ""}`}>
+          <div
+            key={messageKey}
+            className={`break-message ${message.sponsor ? "has-sponsor" : ""} ${qrBesideTitle ? "has-sponsor has-links" : ""}`}
+          >
             <div className="break-message__text">
               {message.eyebrow && (
                 <p className="break-message__eyebrow">
@@ -714,6 +721,7 @@ export default function BreakScreen() {
                 </div>
               </div>
             )}
+            {qrBesideTitle && <LinksQr />}
           </div>
         )}
       </main>
@@ -726,7 +734,7 @@ export default function BreakScreen() {
             </div>
           )}
         </div>
-        <LinksQr />
+        {!qrBesideTitle && <LinksQr />}
         {/* Shown while the mouse moves (or on hover): step through the schedule, or open it. */}
         <nav className={`break-pager ${active || drawerOpen ? "is-visible" : ""}`} aria-label="Schedule">
           <button type="button" onClick={() => step(-1)} disabled={!prevStep} title="Previous item (←)" aria-label="Previous item">
