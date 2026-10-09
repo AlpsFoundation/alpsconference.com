@@ -10,6 +10,7 @@ import {
   MessageCircleQuestion,
   Mic,
   PartyPopper,
+  QrCode,
   Radio,
   Sparkles,
   Users,
@@ -32,6 +33,7 @@ import {
 } from "../data/speakers";
 import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
+import { qrPath } from "./signage/qr";
 import SynapseIllustration from "./SynapseIllustration";
 
 // Turns slowly about its axis in the upper right; the message sits below, on the left.
@@ -52,6 +54,16 @@ const SPONSOR_LOGOS = [
   { src: "img/booklet/logos/csm.webp", alt: "Fondation Conscience et Santé Mentale", h: 1 },
   { src: "img/booklet/logos/aarau.webp", alt: "City of Aarau (Stadt Aarau)", h: 1.5 },
 ];
+
+/**
+ * The attendee links page, as a QR code on every slide (bottom right, beside the Next up banner),
+ * so the room can reach the program, map, wifi and sign-ups from the screen. The code is drawn
+ * once, as one SVG path, with the standard four-module quiet zone inside its white tile.
+ */
+const LINKS_URL = "https://alpsconference.com/links";
+const LINKS_LABEL = "alpsconference.com/links";
+const LINKS_QR = qrPath(LINKS_URL, "M");
+const QR_QUIET = 4;
 
 /* ---------- Clock and pinned item ---------- */
 
@@ -360,6 +372,32 @@ function NextUp({ entry, now }: { entry: TimelineEntry; now: Date }) {
         )}
       </div>
     </section>
+  );
+}
+
+function LinksQr() {
+  const box = LINKS_QR.size + QR_QUIET * 2;
+  return (
+    <aside className="break-links" aria-label="Attendee links">
+      <div className="break-links__text">
+        <p className="break-eyebrow">
+          <QrCode aria-hidden />
+          Scan for links
+        </p>
+        <p className="break-links__url">{LINKS_LABEL}</p>
+        <p className="break-links__note">Program, venue map, wifi and sign-ups</p>
+      </div>
+      <svg
+        className="break-links__code"
+        viewBox={`${-QR_QUIET} ${-QR_QUIET} ${box} ${box}`}
+        shapeRendering="crispEdges"
+        role="img"
+        aria-label={`QR code for ${LINKS_LABEL}`}
+      >
+        <rect x={-QR_QUIET} y={-QR_QUIET} width={box} height={box} fill="#fff" />
+        <path d={LINKS_QR.d} fill="currentColor" />
+      </svg>
+    </aside>
   );
 }
 
@@ -688,6 +726,7 @@ export default function BreakScreen() {
             </div>
           )}
         </div>
+        <LinksQr />
         {/* Shown while the mouse moves (or on hover): step through the schedule, or open it. */}
         <nav className={`break-pager ${active || drawerOpen ? "is-visible" : ""}`} aria-label="Schedule">
           <button type="button" onClick={() => step(-1)} disabled={!prevStep} title="Previous item (←)" aria-label="Previous item">
