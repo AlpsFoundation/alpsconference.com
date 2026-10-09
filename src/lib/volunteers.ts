@@ -200,6 +200,37 @@ export function cateringLabel(station: string) {
   return label.startsWith(service.label) ? label : `${service.label} · ${label}`;
 }
 
+/** One catering station during a grid row: who is on it, with the shift edge when it falls inside the row. */
+export type CateringCell = { station: string; label: string; people: { name: string; from?: number; to?: number }[] };
+
+/** Catering people on duty at any point of [start, end) on a day, grouped by station in service order. */
+export function cateringDuring(dateTime: string, start: number, end: number): CateringCell[] {
+  const cells = new Map<string, CateringCell>();
+  for (const shift of CATERING_SHIFTS) {
+    if (shift.dateTime !== dateTime) continue;
+    const from = toMinutes(shift.from);
+    const to = toMinutes(shift.to);
+    if (from >= end || to <= start) continue;
+    const cell = cells.get(shift.station) ?? { station: shift.station, label: cateringLabel(shift.station), people: [] };
+    cells.set(shift.station, cell);
+    cell.people.push({ name: shift.person, from: from > start ? from : undefined, to: to < end ? to : undefined });
+  }
+  const rank = (station: string) => {
+    const service = CATERING_SERVICES.findIndex((entry) => station in entry.stations);
+    const within = service === -1 ? 0 : Object.keys(CATERING_SERVICES[service].stations).indexOf(station);
+    return (service === -1 ? CATERING_SERVICES.length : service) * 100 + within;
+  };
+  return [...cells.values()]
+    .map((cell) => ({ ...cell, people: cell.people.sort((a, b) => a.name.localeCompare(b.name, "en")) }))
+    .sort((a, b) => rank(a.station) - rank(b.station));
+}
+
+/** When the day's last catering shift ends, or undefined when the day has none. */
+export function cateringEnd(dateTime: string) {
+  const ends = CATERING_SHIFTS.filter((shift) => shift.dateTime === dateTime).map((shift) => toMinutes(shift.to));
+  return ends.length ? Math.max(...ends) : undefined;
+}
+
 export function cateringServices(dateTime: string): CateringService[] {
   const services = new Map<string, CateringService>();
   for (const shift of CATERING_SHIFTS) {
