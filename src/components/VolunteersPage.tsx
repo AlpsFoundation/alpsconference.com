@@ -21,9 +21,10 @@ import {
 } from "../data/volunteers";
 import {
   blockMinutes,
+  cateringDuring,
+  cateringEnd,
   cateringFor,
   cateringLabel,
-  cateringServices,
   countedMinutes,
   CREW_TEAM,
   CREW_VOLUNTEERS,
@@ -41,8 +42,7 @@ import {
   volunteerCalendarPath,
   volunteerFromSlug,
   volunteerSlug,
-  type CateringBar,
-  type CateringService,
+  type CateringCell,
   type PlanDay,
   type ShiftBlock,
 } from "../lib/volunteers";
@@ -60,7 +60,7 @@ const DAY_PARAMS: Record<string, string> = {
   fri: "2026-10-09",
   sat: "2026-10-10",
   sun: "2026-10-11",
-  // Catering used to have its own tabs; it now sits under that day's grid.
+  // Catering used to have its own tabs; it is now a column of that day's grid.
   "fri-catering": "2026-10-09",
   "sat-catering": "2026-10-10",
 };
@@ -91,8 +91,10 @@ type AgendaItem =
   | { kind: "build"; key: string; date: string; start: number; end: number; entry: PersonBuildEntry };
 
 type PlanRow =
-  | { kind: "slot"; key: string; start: number; end: number; slot: ShiftSlot; program: string }
+  | { kind: "slot"; key: string; start: number; end: number; slot: ShiftSlot; program: string; catering: CateringCell[] }
   | { kind: "crew"; key: string; start: number; end: number; event: CrewEvent };
+
+const EMPTY_SLOT = { checkin: [], info: [], mic: [], helper: [] } as const;
 
 const dateLabelFormat = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 const tabLabelFormat = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", timeZone: "UTC" });
@@ -219,14 +221,41 @@ function planRows(day: PlanDay): PlanRow[] {
     end: toMinutes(slot.to),
     slot,
     program: programs[index],
+    catering: cateringDuring(day.dateTime, toMinutes(slot.from), toMinutes(slot.to)),
   }));
+  // Catering that runs past the last grid slot (the Saturday teardown) gets half-hour rows of its own.
+  const last = slots.at(-1);
+  const until = cateringEnd(day.dateTime);
+  if (last && until) {
+    for (let start = last.end; start < until; start += 30) {
+      const end = Math.min(start + 30, until);
+      slots.push({
+        kind: "slot",
+        key: formatTime(start),
+        start,
+        end,
+        slot: { from: formatTime(start), to: formatTime(end), ...EMPTY_SLOT },
+        program: "",
+        catering: cateringDuring(day.dateTime, start, end),
+      });
+    }
+  }
   return [...crew, ...slots].sort((a, b) => a.start - b.start);
 }
 
 function involves(row: PlanRow, person: string) {
   return row.kind === "crew"
     ? !row.event.people || row.event.people.includes(person)
-    : VOLUNTEER_TASK_ORDER.some((task) => row.slot[task].includes(person));
+    : VOLUNTEER_TASK_ORDER.some((task) => row.slot[task].includes(person)) ||
+        row.catering.some((cell) => cell.people.some((entry) => entry.name === person));
+}
+
+/** "from 16:15", "to 20:45" or "20:15–20:45" when a catering shift starts or ends inside the row; nothing when it spans it. */
+function cateringEdge(entry: { from?: number; to?: number }) {
+  if (entry.from !== undefined && entry.to !== undefined) return `${formatTime(entry.from)}–${formatTime(entry.to)}`;
+  if (entry.from !== undefined) return `from ${formatTime(entry.from)}`;
+  if (entry.to !== undefined) return `to ${formatTime(entry.to)}`;
+  return null;
 }
 
 function crewTime(event: CrewEvent) {
@@ -340,6 +369,33 @@ function TaskHeader({ task, open, onToggle }: { task: VolunteerTask; open: boole
   );
 }
 
+/** The catering column's head: same help popover as the task heads, with the plan's own wording. */
+function CateringHeader({ open, onToggle }: { open: boolean; onToggle: () => void }) {
+  const id = "vol-task-help-catering";
+  const popoverRef = useRef<HTMLDivElement>(null);
+  useKeepInViewport(popoverRef, open);
+  return (
+    <div className="vol-taskhead" data-task="catering">
+      <button type="button" className="vol-taskhead__button" aria-expanded={open} aria-controls={id} onClick={onToggle}>
+        <span className="vol-taskhead__label">
+          <span className="vol-taskhead__last">
+            Catering
+            <CircleHelp size={14} aria-hidden="true" />
+          </span>
+        </span>
+        <span className="sr-only">: what this is</span>
+      </button>
+      {open && (
+        <div ref={popoverRef} id={id} className="vol-popover" role="dialog" aria-label="Catering team">
+          <p className="vol-popover__title">Catering team</p>
+          <p>Kitchen, service and apéro shifts from the catering plan. “from” and “to” mark a shift that starts or ends inside the row.</p>
+          <p className="vol-popover__note">Not counted in the hours.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CrewEventLine({ event, person }: { event: CrewEvent; person: string | null }) {
   const others = event.people?.filter((name) => name !== person);
   return (
@@ -442,6 +498,34 @@ function PlanList({
                     </span>
                   </div>
                 ))}
+                <div className="vol-slot__cell" data-task="catering" data-empty={!row.catering.length || undefined}>
+                  <span className="vol-slot__label">Catering</span>
+                  <span className="vol-slot__names vol-slot__catering">
+                    {row.catering.length ? (
+                      row.catering.map((cell) => {
+                        // One edge for the whole station when everyone shares it, otherwise per person.
+                        const [first] = cell.people;
+                        const shared = cell.people.every((entry) => entry.from === first.from && entry.to === first.to);
+                        return (
+                          <span key={cell.station} className="vol-catgroup">
+                            <span className="vol-catgroup__label">
+                              {cell.label}
+                              {shared && <small className="vol-catgroup__edge">{cateringEdge(first)}</small>}
+                            </span>
+                            {cell.people.map((entry) => (
+                              <span key={entry.name} className="vol-catgroup__person">
+                                <NamePill name={entry.name} person={person} onChoose={onChoose} />
+                                {!shared && <small className="vol-catgroup__edge">{cateringEdge(entry)}</small>}
+                              </span>
+                            ))}
+                          </span>
+                        );
+                      })
+                    ) : (
+                      <span className="vol-slot__none">–</span>
+                    )}
+                  </span>
+                </div>
               </li>
             )}
           </Fragment>
@@ -449,336 +533,6 @@ function PlanList({
       })}
       {nowLineAt === rows.length && nowLine}
     </ol>
-  );
-}
-
-/** Hour marks on a service's timeline: every half hour for short services, every hour for long ones. */
-function timelineTicks(start: number, end: number) {
-  const step = end - start > 180 ? 60 : 30;
-  const ticks: number[] = [];
-  for (let t = Math.ceil(start / step) * step; t <= end; t += step) ticks.push(t);
-  return ticks;
-}
-
-/** Every half hour within a service, for the vertical timeline's axis. */
-function halfHours(start: number, end: number) {
-  const marks: number[] = [];
-  for (let t = Math.ceil(start / 30) * 30; t <= end; t += 30) marks.push(t);
-  return marks;
-}
-
-/** Overlapping shift times at one station sit side by side: each takes the first lane free at its start. */
-function laneBars(bars: CateringBar[]) {
-  const ends: number[] = [];
-  const placed = bars.map((bar) => {
-    let lane = ends.findIndex((end) => end <= bar.from);
-    if (lane === -1) lane = ends.length;
-    ends[lane] = bar.to;
-    return { bar, lane };
-  });
-  return { placed, lanes: ends.length };
-}
-
-/**
- * Rem per minute on a day's vertical timelines: enough for the tightest shift to show its
- * time and one name per line in a narrow column. One scale per day, so services compare.
- */
-function verticalScale(services: CateringService[]) {
-  const bars = services.flatMap((service) => service.stations.flatMap((station) => station.bars));
-  return Math.max(0.1, ...bars.map((bar) => (2 + bar.people.length * 1.8) / (bar.to - bar.from)));
-}
-
-/** The catering plan runs vertically; the horizontal bars stay in CateringCard, unused for now. */
-type CateringView = "vertical" | "horizontal";
-const CATERING_VIEW: CateringView = "vertical";
-
-/** One service (lunch, dinner…) as a small calendar: each station once, its shift times as bars on the service's timeline. */
-function CateringCard({
-  service,
-  date,
-  clock,
-  person,
-  onlyMine,
-  view,
-  onChoose,
-}: {
-  service: CateringService;
-  date: string;
-  clock: Clock | null;
-  person: string | null;
-  onlyMine: boolean;
-  view: CateringView;
-  onChoose: (name: string) => void;
-}) {
-  const span = service.end - service.start;
-  const at = (minutes: number) => `${((minutes - service.start) / span) * 100}%`;
-  const single = service.stations.length === 1 && service.stations[0].label === service.label;
-  const live = clock?.date === date && clock.minutes >= service.start && clock.minutes < service.end;
-  const stations = service.stations
-    .map((station) => ({ ...station, bars: station.bars.filter((bar) => !onlyMine || !person || bar.people.includes(person)) }))
-    .filter((station) => station.bars.length);
-  const ticks = timelineTicks(service.start, service.end);
-  const pills = (people: string[]) => people.map((name) => <NamePill key={name} name={name} person={person} onChoose={onChoose} />);
-
-  // One station, one shift time: a timeline would only repeat the header, so it is one line.
-  if (single && service.stations[0].bars.length === 1) {
-    const [bar] = service.stations[0].bars;
-    return (
-      <article
-        id={`vol-cater-${service.id}`}
-        className="vol-cater vol-cater--simple"
-        data-live={live || undefined}
-        data-me={(person && bar.people.includes(person)) || undefined}
-        data-state={timingOf(clock, date, bar.from, bar.to)}
-        aria-labelledby={`vol-cater-${service.id}-title`}
-      >
-        <header className="vol-cater__head">
-          <h4 id={`vol-cater-${service.id}-title`}>{service.label}</h4>
-          <span className="vol-cater__window">
-            {formatTime(bar.from)}–{formatTime(bar.to)}
-          </span>
-          {live && clock && <span className="vol-state">Now · {formatTime(clock.minutes)}</span>}
-          <span className="vol-cater__names">{pills(bar.people)}</span>
-        </header>
-      </article>
-    );
-  }
-
-  const head = (
-    <header className="vol-cater__head">
-      <h4 id={`vol-cater-${service.id}-title`}>{service.label}</h4>
-      <span className="vol-cater__window">
-        {formatTime(service.start)}–{formatTime(service.end)}
-      </span>
-      <span className="vol-cater__count">{service.people.length} people</span>
-      {live && clock && <span className="vol-state">Now · {formatTime(clock.minutes)}</span>}
-    </header>
-  );
-
-  // Vertical: time runs down the left, each station is a column, and each shift time a block
-  // as tall as it lasts, with its names inside.
-  if (view === "vertical") {
-    const groups = stations.map((station) => ({ station, ...laneBars(station.bars) }));
-    const offsets = groups.map((_, index) => groups.slice(0, index).reduce((sum, group) => sum + group.lanes, 0));
-    const lanes = groups.reduce((sum, group) => sum + group.lanes, 0);
-    const from = (minutes: number) => ({ "--at": minutes - service.start }) as CSSProperties;
-    const marks = halfHours(service.start, service.end);
-    return (
-      <article
-        id={`vol-cater-${service.id}`}
-        className="vol-cater vol-cater--vertical"
-        data-live={live || undefined}
-        data-me={(person && service.people.includes(person)) || undefined}
-        aria-labelledby={`vol-cater-${service.id}-title`}
-      >
-        {head}
-        <div className="vol-cal">
-          <div className="vol-cal__grid" style={{ "--lanes": lanes, "--span": span } as CSSProperties}>
-            {!single && (
-              <div className="vol-cal__heads">
-                {groups.map((group) => (
-                  <span key={group.station.station} className="vol-cal__head" style={{ gridColumn: `span ${group.lanes}` }}>
-                    {group.station.label}
-                  </span>
-                ))}
-              </div>
-            )}
-            <div className="vol-cal__axis" aria-hidden="true">
-              {marks.map((mark) => (
-                <span key={mark} data-hour={mark % 60 === 0 || undefined} style={from(mark)}>
-                  {formatTime(mark)}
-                </span>
-              ))}
-            </div>
-            <div className="vol-cal__body">
-              {marks.map((mark) => (
-                <span key={mark} className="vol-cal__line" data-hour={mark % 60 === 0 || undefined} style={from(mark)} />
-              ))}
-              {offsets.slice(1).map((offset) => (
-                <span key={offset} className="vol-cal__sep" style={{ gridColumn: `${offset + 1} / span 1` }} />
-              ))}
-              {groups.flatMap((group, index) =>
-                group.placed.map(({ bar, lane }) => (
-                  <div
-                    key={`${group.station.station}-${bar.from}-${bar.to}`}
-                    className="vol-cal__block"
-                    data-me={(person && bar.people.includes(person)) || undefined}
-                    data-state={timingOf(clock, date, bar.from, bar.to)}
-                    style={{
-                      ...from(bar.from),
-                      "--len": bar.to - bar.from,
-                      // An absolutely placed grid item needs both lines, or it runs to the edge.
-                      gridColumn: `${offsets[index] + lane + 1} / span 1`,
-                    } as CSSProperties}
-                  >
-                    <span className="vol-cal__time">
-                      {!single && <span className="sr-only">{group.station.label}, </span>}
-                      {formatTime(bar.from)}–{formatTime(bar.to)}
-                    </span>
-                    <span className="vol-cal__names">{pills(bar.people)}</span>
-                  </div>
-                )),
-              )}
-              {live && clock && <span className="vol-cal__now" style={from(clock.minutes)} />}
-            </div>
-          </div>
-        </div>
-      </article>
-    );
-  }
-
-  return (
-    <article
-      id={`vol-cater-${service.id}`}
-      className="vol-cater"
-      data-single={single || undefined}
-      data-live={live || undefined}
-      data-me={(person && service.people.includes(person)) || undefined}
-      aria-labelledby={`vol-cater-${service.id}-title`}
-    >
-      {head}
-      <div className="vol-cater__ruler" aria-hidden="true">
-        <span className="vol-cater__track">
-          {ticks.map((tick) => (
-            <span key={tick} className="vol-cater__tick" data-hour={tick % 60 === 0 || undefined} style={{ left: at(tick) }}>
-              {tick % 60 === 0 && tick !== service.end && <span>{formatTime(tick)}</span>}
-            </span>
-          ))}
-        </span>
-      </div>
-      <ol className="vol-cater__rows">
-        {stations.flatMap((station) =>
-          station.bars.map((bar, index) => {
-            const hasMe = Boolean(person) && bar.people.includes(person!);
-            return (
-              <li
-                key={`${station.station}-${bar.from}-${bar.to}`}
-                className="vol-cater__row"
-                data-first={index === 0 || undefined}
-                data-me={hasMe || undefined}
-                data-state={timingOf(clock, date, bar.from, bar.to)}
-              >
-                {!single && <span className="vol-cater__station">{index === 0 ? station.label : ""}</span>}
-                <span className="vol-cater__time">
-                  {formatTime(bar.from)}–{formatTime(bar.to)}
-                </span>
-                <span className="vol-cater__track" aria-hidden="true">
-                  {ticks.map((tick) => (
-                    <span key={tick} className="vol-cater__grid" style={{ left: at(tick) }} />
-                  ))}
-                  <span className="vol-cater__bar" style={{ left: at(bar.from), width: `${((bar.to - bar.from) / span) * 100}%` }} />
-                  {live && clock && <span className="vol-cater__now" style={{ left: at(clock.minutes) }} />}
-                </span>
-                <span className="vol-cater__names">{pills(bar.people)}</span>
-              </li>
-            );
-          }),
-        )}
-      </ol>
-    </article>
-  );
-}
-
-/**
- * The catering team's day, folded into one line per service until opened. It opens
- * by itself only for someone with catering shifts on that day.
- */
-function CateringPlan({
-  date,
-  clock,
-  person,
-  onlyMine,
-  open,
-  onToggle,
-  onOpenService,
-  onChoose,
-}: {
-  date: string;
-  clock: Clock | null;
-  person: string | null;
-  onlyMine: boolean;
-  open: boolean;
-  onToggle: () => void;
-  onOpenService: (id: string) => void;
-  onChoose: (name: string) => void;
-}) {
-  const all = useMemo(() => cateringServices(date), [date]);
-  const services = onlyMine && person ? all.filter((service) => service.people.includes(person)) : all;
-  if (!services.length) return null;
-  const people = new Set(all.flatMap((service) => service.people)).size;
-  const mine = person
-    ? all.flatMap((service) =>
-        service.stations.flatMap((station) =>
-          station.bars
-            .filter((bar) => bar.people.includes(person))
-            .map((bar) => ({ key: `${station.station}-${bar.from}`, label: cateringLabel(station.station), bar })),
-        ),
-      )
-    : [];
-
-  return (
-    <section id="vol-catering" className="vol-catering" data-open={open || undefined} aria-labelledby="vol-catering-title">
-      <h3 id="vol-catering-title" className="vol-catering__head">
-        <button type="button" aria-expanded={open} aria-controls="vol-catering-body" onClick={onToggle}>
-          <span className="vol-catering__title">Catering team</span>
-          <span className="vol-catering__meta">
-            {all.length} services · {people} people · not counted in the hours
-          </span>
-          <ChevronDown size={18} aria-hidden="true" className="vol-catering__chevron" />
-        </button>
-      </h3>
-      {mine.length > 0 && (
-        <p className="vol-catering__mine">
-          <strong>{person}</strong>
-          {mine.map((entry) => (
-            <span key={entry.key} className="vol-catering__shift">
-              <b>
-                {formatTime(entry.bar.from)}–{formatTime(entry.bar.to)}
-              </b>{" "}
-              {entry.label}
-            </span>
-          ))}
-        </p>
-      )}
-      {open ? (
-        <div
-          id="vol-catering-body"
-          className="vol-catering__services"
-          style={{ "--vol-cal-min": `${verticalScale(all)}rem` } as CSSProperties}
-        >
-          {services.map((service) => (
-            <CateringCard
-              key={service.id}
-              service={service}
-              date={date}
-              clock={clock}
-              person={person}
-              onlyMine={onlyMine}
-              view={CATERING_VIEW}
-              onChoose={onChoose}
-            />
-          ))}
-        </div>
-      ) : (
-        <ol className="vol-catering__strip" aria-label="Services">
-          {services.map((service) => (
-            <li key={service.id}>
-              <button
-                type="button"
-                data-me={(person && service.people.includes(person)) || undefined}
-                data-state={timingOf(clock, date, service.start, service.end)}
-                onClick={() => onOpenService(service.id)}
-              >
-                <span>{service.label}</span>
-                <small>
-                  {formatTime(service.start)}–{formatTime(service.end)}
-                </small>
-              </button>
-            </li>
-          ))}
-        </ol>
-      )}
-    </section>
   );
 }
 
@@ -994,10 +748,7 @@ export default function VolunteersPage() {
   const [person, setPerson] = useState<string | null>(null);
   const [dayDate, setDayDate] = useState(DEFAULT_DAY);
   const [onlyMine, setOnlyMine] = useState(false);
-  const [openTask, setOpenTask] = useState<VolunteerTask | null>(null);
-  // The catering plan opens by itself for someone with catering that day; a click decides for that person and day.
-  const [cateringChoice, setCateringChoice] = useState<{ key: string; open: boolean } | null>(null);
-  const [cateringLinked, setCateringLinked] = useState(false);
+  const [openTask, setOpenTask] = useState<VolunteerTask | "catering" | null>(null);
   const headRef = useRef<HTMLDivElement>(null);
   const clock = useVenueClock();
   const build = useCrewBuild();
@@ -1019,11 +770,6 @@ export default function VolunteersPage() {
     if (PLAN_DAYS.some((day) => day.dateTime === date)) {
       dayPicked.current = true;
       setDayDate(date);
-    }
-    // Links to the old catering tabs open the catering plan.
-    if (raw.endsWith("-catering")) {
-      setCateringLinked(true);
-      window.setTimeout(() => document.getElementById("vol-catering")?.scrollIntoView({ behavior: "smooth", block: "start" }), 400);
     }
   }, []);
 
@@ -1106,15 +852,6 @@ export default function VolunteersPage() {
   const day = PLAN_DAYS.find((entry) => entry.dateTime === dayDate) ?? PLAN_DAYS[0];
   const mine = (row: PlanRow) => !onlyMine || !person || involves(row, person);
   const rows = planRows(day).filter(mine);
-  const cateringKey = `${person ?? ""}|${day.dateTime}`;
-  const cateringOpen =
-    cateringChoice?.key === cateringKey
-      ? cateringChoice.open
-      : cateringLinked || (Boolean(person) && cateringFor(person!).some((shift) => shift.dateTime === day.dateTime));
-  const openCateringService = (id: string) => {
-    setCateringChoice({ key: cateringKey, open: true });
-    requestAnimationFrame(() => document.getElementById(`vol-cater-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }));
-  };
 
   return (
     <div className="vol-page">
@@ -1271,20 +1008,14 @@ export default function VolunteersPage() {
                     onToggle={() => setOpenTask((current) => (current === task ? null : task))}
                   />
                 ))}
+                <CateringHeader
+                  open={openTask === "catering"}
+                  onToggle={() => setOpenTask((current) => (current === "catering" ? null : "catering"))}
+                />
               </div>
             )}
             <PlanList rows={rows} date={day.dateTime} clock={clock} person={person} onChoose={chooseAndScroll} />
           </div>
-          <CateringPlan
-            date={day.dateTime}
-            clock={clock}
-            person={person}
-            onlyMine={onlyMine}
-            open={cateringOpen}
-            onToggle={() => setCateringChoice({ key: cateringKey, open: !cateringOpen })}
-            onOpenService={openCateringService}
-            onChoose={chooseAndScroll}
-          />
           {BUILD_DAYS[day.dateTime] && (
             <CrewBuild
               dateTime={day.dateTime}
