@@ -122,7 +122,7 @@ type Person = {
   origin?: string;
   /** Where a speaker is from; shown under the name on a talk's first slide. */
   note?: string;
-  /** What a non-speaker does on stage ("Moderator"); shown under the name on a Q&A slide. */
+  /** What a non-speaker does on stage ("Moderated by"); shown before the name, above it on a talk's first slide. */
   role?: string;
 };
 
@@ -148,12 +148,12 @@ function peopleFor(item: ProgramItem | undefined): Person[] {
   return speaker?.image ? [speakerPerson(speaker)] : [];
 }
 
-/** The ALPS team member moderating a talk's questions, with their booklet portrait. */
+/** The ALPS team member moderating a talk or panel, with their booklet portrait; listed after the speakers. */
 function moderatorFor(item: ProgramItem | undefined): Person | undefined {
   if (!item?.moderatorName) return undefined;
   const member = TEAM.flatMap((group) => group.people).find((p) => p.name === item.moderatorName);
   if (!member) return undefined;
-  return { name: member.name, src: withBase(`img/booklet/team/${member.photo}.jpg`), position: "50% 50%", role: "Moderator" };
+  return { name: member.name, src: withBase(`img/booklet/team/${member.photo}.jpg`), position: "50% 50%", role: "Moderated by" };
 }
 
 function experiencePerson(name: string): Person | undefined {
@@ -296,8 +296,10 @@ function talkMessage(current: TimelineEntry, item: ProgramItem | undefined, slid
   const panel = !!item?.panel;
   const title = current.detail ?? current.title;
   const people = peopleFor(item);
+  const moderator = moderatorFor(item);
+  const withModerator = moderator ? [...people, moderator] : people;
   if (slide === "intro")
-    return { eyebrow: panel ? "Panel discussion" : "Now on stage", icon: panel ? Users : Mic, headline: title, people, peopleLarge: true };
+    return { eyebrow: panel ? "Panel discussion" : "Now on stage", icon: panel ? Users : Mic, headline: title, people: withModerator, peopleLarge: true };
   if (slide === "thanks")
     return {
       eyebrow: panel ? "Panel discussion" : current.title,
@@ -306,12 +308,11 @@ function talkMessage(current: TimelineEntry, item: ProgramItem | undefined, slid
       people: panel ? people : undefined,
       sub: title,
     };
-  const moderator = moderatorFor(item);
   return {
     eyebrow: panel ? "Panel discussion · Q&A" : "Questions & answers",
     icon: MessageCircleQuestion,
     headline: title,
-    people: moderator ? [...people, moderator] : people,
+    people: withModerator,
   };
 }
 
@@ -771,17 +772,16 @@ export default function BreakScreen() {
                   className={`break-message__people ${message.peopleLarge ? "is-large" : ""} ${message.people.length > 2 ? "is-many" : ""}`}
                 >
                   {message.people.map((p) => (
-                    <li key={p.name}>
+                    <li key={p.name} className={p.role ? "has-role" : undefined}>
                       <Portrait person={p} className={message.peopleLarge ? "break-portrait--large" : "break-portrait--chip"} />
-                      {message.peopleLarge ? (
+                      {p.role ? (
+                        <span>
+                          <small>{p.role}</small> {p.name}
+                        </span>
+                      ) : message.peopleLarge ? (
                         <span>
                           {p.name}
                           {p.note && <small>{p.note}</small>}
-                        </span>
-                      ) : p.role ? (
-                        <span>
-                          {p.name}
-                          <small>{p.role}</small>
                         </span>
                       ) : (
                         p.name

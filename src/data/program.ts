@@ -21,7 +21,7 @@ export type ProgramItem = {
   speakerName?: string;
   experienceName?: string;
   panel?: "friday" | "saturday";
-  /** An ALPS team member moderating the questions; shown on the projector screen's Q&A slide (photo from the booklet's team page). */
+  /** An ALPS team member moderating; shown on the projector screen's first and Q&A slides and, for a panel, in the site's Panels section (photo from the booklet's team page). */
   moderatorName?: string;
   /** The projector screen's thank-you slide after a talk; off when the room moves straight on (the Friday panel runs into the dinner). */
   thanksSlide?: boolean;
@@ -90,7 +90,7 @@ export const PROGRAM: ProgramDay[] = [
         { title: "Breathwork", time: "16:45–18:00", personName: "Pascal Kälin" },
       ] },
       { time: "17:00–18:00", title: "Dr. Jason K. Day", detail: "What-the-Fuckness: A Phenomenological Concept for Psychedelic Experience", speakerName: "Dr. Jason K. Day" },
-      { time: "18:00–19:00", title: "Panel discussion", detail: "Psychedelics and Spirituality: Ontological Shifts and Meaning-Making Experiences", panel: "saturday" },
+      { time: "18:00–19:00", title: "Panel discussion", detail: "Psychedelics and Spirituality: Ontological Shifts and Meaning-Making Experiences", panel: "saturday", moderatorName: "Federico Seragnoli" },
       { time: "19:00–19:30", title: "Closing talk", detail: "ALPS team" },
       { time: "19:30–21:30", title: "Networking apéro", kind: "social" },
       { time: "21:30–04:00", title: "Afterparty", detail: "Jugendkulturhaus Flösserplatz, Flösserstrasse 7", detailHighlight: true, kind: "social", experienceName: "Afterparty", calendarLocation: "Jugendkulturhaus Flösserplatz, Flösserstrasse 7, 5000 Aarau, Switzerland" },

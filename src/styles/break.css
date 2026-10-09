@@ -281,6 +281,21 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
+/* A moderator closes the row, the same size as the speakers: "Moderated by" above the name on a
+   talk's first slide, before it in a chip. */
+.break-message__people .has-role small {
+  margin: 0 0 0.15em;
+  color: var(--color-accent-light);
+}
+
+.break-message__people:not(.is-large) .has-role small {
+  display: inline;
+  margin: 0;
+  font-size: 1em;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
 .break-message__highlight {
   margin-top: 1em;
   font-size: clamp(1.1rem, 3vmin, 2.2rem);

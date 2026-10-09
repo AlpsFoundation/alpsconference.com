@@ -12,7 +12,8 @@ import {
   type SpeakerEntry,
   type SpeakerImageCrop,
 } from "../data/speakers";
-import { FRIDAY_PANEL, SATURDAY_PANEL } from "../data/bookletContent";
+import { FRIDAY_PANEL, SATURDAY_PANEL, TEAM, type TeamMember } from "../data/bookletContent";
+import { PROGRAM } from "../data/program";
 import { withBase } from "../lib/withBase";
 import { registerPhotoParallax } from "../lib/photoParallax";
 import { setLocationHash } from "../lib/locationHash";
@@ -383,12 +384,14 @@ export default function Speakers() {
               subtitle={FRIDAY_PANEL.subtitle}
               body={FRIDAY_PANEL.body}
               speakers={FRIDAY_PANEL_SPEAKERS}
+              moderator={panelModerator("friday")}
             />
             <PanelColumn
               eyebrow="Saturday · 18:00–19:00"
               title={SATURDAY_PANEL.title}
               body={SATURDAY_PANEL.body}
               speakers={SATURDAY_PANEL_SPEAKERS}
+              moderator={panelModerator("saturday")}
             />
           </div>
         </div>
@@ -453,18 +456,26 @@ function CompactSpeaker({ speaker }: { speaker: Speaker }) {
   );
 }
 
+/** The team member the program names as a panel's moderator. */
+function panelModerator(panel: "friday" | "saturday"): TeamMember | undefined {
+  const name = PROGRAM.flatMap((day) => day.items).find((item) => item.panel === panel)?.moderatorName;
+  return TEAM.flatMap((group) => group.people).find((person) => person.name === name);
+}
+
 function PanelColumn({
   eyebrow,
   title,
   subtitle,
   body,
   speakers,
+  moderator,
 }: {
   eyebrow: string;
   title: string;
   subtitle?: string;
   body: string;
   speakers: SpeakerEntry[];
+  moderator?: TeamMember;
 }) {
   return (
     <div data-fade-up className="opacity-0 md:px-6 lg:px-8 first:md:pl-0 last:md:pr-0">
@@ -481,6 +492,16 @@ function PanelColumn({
           </li>
         ))}
       </ul>
+      {moderator && (
+        <p className="mt-4 inline-flex items-center gap-2 text-sm text-white/50">
+          <span className="w-9 h-9 rounded-full overflow-hidden border border-white/10 shrink-0 bg-white/[0.04]">
+            <img src={withBase(`img/booklet/team/${moderator.photo}.jpg`)} alt="" className="w-full h-full object-cover" />
+          </span>
+          <span>
+            Moderated by <span className="text-white/80">{moderator.name}</span>
+          </span>
+        </p>
+      )}
     </div>
   );
 }
