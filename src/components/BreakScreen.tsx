@@ -334,7 +334,14 @@ function messageFor(current: TimelineEntry | undefined, next: TimelineEntry | un
     return { eyebrow: current.title, icon: Coffee, headline: firstDay ? "Welcome" : "Welcome back", sub: current.menuNote };
   // The dinner slide carries the rest of the evening and tomorrow's doors instead of the pre-sale note.
   if (/dinner/i.test(current.title))
-    return { eyebrow: current.title, icon: Utensils, headline: "Bon appétit!", sub: current.menuNote, agenda: eveningAgenda(current), sponsor: "beside" };
+    return {
+      eyebrow: current.title,
+      icon: Utensils,
+      headline: item?.slideHeadline ?? "Bon appétit!",
+      sub: current.menuNote,
+      agenda: eveningAgenda(current),
+      sponsor: "beside",
+    };
   if (/lunch/i.test(current.title))
     return { eyebrow: current.title, icon: Utensils, headline: "Bon appétit!", sub: current.menuNote, highlight, sponsor: "beside" };
   if (current.kind === "pause")
