@@ -21,6 +21,10 @@ export type ProgramItem = {
   speakerName?: string;
   experienceName?: string;
   panel?: "friday" | "saturday";
+  /** An ALPS team member moderating the questions; shown on the projector screen's Q&A slide (photo from the booklet's team page). */
+  moderatorName?: string;
+  /** The projector screen's thank-you slide after a talk; off when the room moves straight on (the Friday panel runs into the dinner). */
+  thanksSlide?: boolean;
   experiences?: ProgramExperience[];
 };
 
@@ -54,9 +58,9 @@ export const PROGRAM: ProgramDay[] = [
       { time: "15:30–16:30", title: "Dr. Sandeep Nayak", detail: "From Data to Dosing Room: Optimizing Psilocybin Therapy for Clinical Practice", speakerName: "Dr. Sandeep Nayak" },
       { time: "16:30–17:15", title: "Coffee break", kind: "pause", menuNote: "Coffee, tea · Vegan cakes, Ayurvedic energy balls & fresh fruit" },
       { time: "17:15–18:15", title: "Prof. Amandine Luquiens", detail: "Is It More Than the Drug? Exploring Precision Psychedelic Therapy for Addiction", speakerName: "Prof. Amandine Luquiens" },
-      { time: "18:15–19:15", title: "Panel discussion", detail: "The \"Therapy\" in Psychedelic-Assisted Therapy", panel: "friday" },
+      { time: "18:15–19:15", title: "Panel discussion", detail: "The \"Therapy\" in Psychedelic-Assisted Therapy", panel: "friday", moderatorName: "Vincent Diehl", thanksSlide: false },
       { time: "19:15–20:15", title: "Optional networking dinner", detail: "Pre-sale available on Infomaniak or the ALPS info table at the venue", detailHighlight: true, menuNote: "Tofu-vegetable curry on rice with herb pesto · Crêpe station · 1 drink included", kind: "pause" },
-      { time: "20:15–21:15", title: "Friday evening program", kind: "social", experiences: [
+      { time: "20:15–21:15", title: "Friday evening program", detail: "Storytelling with Kate Dalby", kind: "social", experienceName: "Kate Dalby", experiences: [
         { title: "Storytelling", time: "20:15–21:15", personName: "Kate Dalby" },
       ] },
     ],

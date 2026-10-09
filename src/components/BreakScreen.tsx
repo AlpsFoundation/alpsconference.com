@@ -18,7 +18,8 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { getConferenceState, parseTimeTravel, TIMELINE, type TimelineEntry } from "../data/conferenceTimeline";
+import { TEAM } from "../data/bookletContent";
+import { EXPERIENCE_SESSIONS, getConferenceState, parseTimeTravel, TIMELINE, type TimelineEntry } from "../data/conferenceTimeline";
 import { EXPERIENCE_PORTRAITS } from "../data/experiences";
 import { PROGRAM, type ProgramItem } from "../data/program";
 import {
@@ -113,7 +114,17 @@ function programItem(entry: TimelineEntry): ProgramItem | undefined {
   return PROGRAM.find((day) => day.dateTime === date)?.items[index];
 }
 
-type Person = { name: string; src: string; position: string; scale?: number; origin?: string; note?: string };
+type Person = {
+  name: string;
+  src: string;
+  position: string;
+  scale?: number;
+  origin?: string;
+  /** Where a speaker is from; shown under the name on a talk's first slide. */
+  note?: string;
+  /** What a non-speaker does on stage ("Moderator"); shown under the name on a Q&A slide. */
+  role?: string;
+};
 
 function speakerPerson(speaker: Speaker): Person {
   const crop = getImageCrop(speaker.image);
@@ -137,6 +148,69 @@ function peopleFor(item: ProgramItem | undefined): Person[] {
   return speaker?.image ? [speakerPerson(speaker)] : [];
 }
 
+/** The ALPS team member moderating a talk's questions, with their booklet portrait. */
+function moderatorFor(item: ProgramItem | undefined): Person | undefined {
+  if (!item?.moderatorName) return undefined;
+  const member = TEAM.flatMap((group) => group.people).find((p) => p.name === item.moderatorName);
+  if (!member) return undefined;
+  return { name: member.name, src: withBase(`img/booklet/team/${member.photo}.jpg`), position: "50% 50%", role: "Moderator" };
+}
+
+function experiencePerson(name: string): Person | undefined {
+  const portrait = EXPERIENCE_PORTRAITS[name];
+  return portrait ? { name, src: withBase(`img/experiences/${portrait.file}`), position: portrait.position } : undefined;
+}
+
+function experienceVenue(date: string, title: string, time: string): string | undefined {
+  return EXPERIENCE_SESSIONS.find((s) => s.date === date && s.title === title && s.time.startsWith(time.slice(0, 5)))?.venue;
+}
+
+type AgendaRow = { time: string; title: string; note?: string; person?: Person };
+type AgendaGroup = { label: string; rows: AgendaRow[] };
+
+/**
+ * The rest of the evening and tomorrow's doors, on the dinner slide: the dinner is for those who
+ * booked it, what follows is for everyone, and the room should know when to be back (Matthias, 9 Oct).
+ */
+function eveningAgenda(current: TimelineEntry): AgendaGroup[] {
+  const date = current.id.slice(0, 10);
+  const rowsFor = (entry: TimelineEntry, dinner: boolean): AgendaRow[] => {
+    const item = programItem(entry);
+    if (item?.experiences?.length)
+      return item.experiences.map((xp) => {
+        const person = experiencePerson(xp.personName);
+        const venue = experienceVenue(entry.id.slice(0, 10), xp.title, xp.time);
+        return { time: xp.time, title: xp.title, person, note: [xp.personName, venue].filter(Boolean).join(" · ") };
+      });
+    return [{
+      time: formatRange(entry),
+      title: entry.title.replace(/^Optional (\w)/, (_, c: string) => c.toUpperCase()),
+      note: dinner ? "For those with a dinner ticket" : entry.detail && entry.detail !== entry.title ? entry.detail : entry.menuNote,
+    }];
+  };
+
+  const tonight = TIMELINE.filter((e) => e.id.startsWith(date) && e.start >= current.start).flatMap((e) => rowsFor(e, e === current));
+
+  const tomorrow = TIMELINE.filter((e) => !e.id.startsWith(date) && e.start > current.end);
+  const doors = tomorrow.find((e) => e.title === "Doors open");
+  const first = tomorrow.find((e) => e.kind === "session");
+  const next: AgendaRow[] = [];
+  if (doors) {
+    next.push({ time: formatRange(doors), title: doors.title, note: doors.menuNote });
+    next.push(...rowsFor(doors, false).filter((row) => row.title !== doors.title));
+  }
+  if (first) {
+    const item = programItem(first);
+    const talk = isTalk(first);
+    next.push({ time: formatRange(first), title: talk ? "First talk" : first.title, note: talk ? first.title : first.detail, person: peopleFor(item)[0] });
+  }
+
+  return [
+    { label: "Tonight", rows: tonight },
+    ...(next.length ? [{ label: `Tomorrow · ${(doors ?? first)!.day}`, rows: next }] : []),
+  ];
+}
+
 const isTalk = (entry: TimelineEntry) => entry.kind === "session" && !!entry.detail && entry.detail !== "ALPS team";
 
 function iconFor(entry: TimelineEntry): LucideIcon {
@@ -158,13 +232,19 @@ function iconFor(entry: TimelineEntry): LucideIcon {
 type TalkSlide = "intro" | "qa" | "thanks";
 const TALK_SLIDES: TalkSlide[] = ["intro", "qa", "thanks"];
 
+/** A talk's slides; the thank-you is left out where the program says so (the Friday panel runs straight into the dinner). */
+const slidesFor = (entry: TimelineEntry): TalkSlide[] =>
+  programItem(entry)?.thanksSlide === false ? TALK_SLIDES.filter((slide) => slide !== "thanks") : TALK_SLIDES;
+
 /** Following the clock, the last quarter hour of a talk is its questions, and the very end its thank-you. */
 const QA_MINUTES = 15;
 const THANKS_MINUTES = 3;
 
 function clockSlide(entry: TimelineEntry, now: Date): TalkSlide {
   const left = (entry.end.getTime() - now.getTime()) / 60_000;
-  return left <= THANKS_MINUTES ? "thanks" : left <= QA_MINUTES ? "qa" : "intro";
+  const slide: TalkSlide = left <= THANKS_MINUTES ? "thanks" : left <= QA_MINUTES ? "qa" : "intro";
+  const slides = slidesFor(entry);
+  return slides.includes(slide) ? slide : slides[slides.length - 1];
 }
 
 /** The sponsors' own slide, right after the closing talk and before the apéro. */
@@ -181,7 +261,7 @@ function parseStep(step: string): { id: string; slide: TalkSlide } {
 
 /** Every slide in order, as ← → step through them. */
 const STEPS: string[] = TIMELINE.flatMap((e) =>
-  isTalk(e) ? TALK_SLIDES.map((slide) => stepOf(e, slide)) : e === CLOSING ? [e.id, SPONSOR_SLIDE] : [e.id],
+  isTalk(e) ? slidesFor(e).map((slide) => stepOf(e, slide)) : e === CLOSING ? [e.id, SPONSOR_SLIDE] : [e.id],
 );
 
 /* ---------- What the screen says ---------- */
@@ -195,6 +275,8 @@ type Message = {
   people?: Person[];
   /** On a talk's first slide the speakers are shown large, with where they are from. */
   peopleLarge?: boolean;
+  /** Short lists under the message — the rest of the evening and tomorrow's doors on the dinner slide. */
+  agenda?: AgendaGroup[];
   /**
    * The sponsor in the right third, beside the message: "beside" with its thank-you line (coffee
    * and meal breaks, the apéro and the thank-you slides), "alone" on its own slide, whose
@@ -224,7 +306,13 @@ function talkMessage(current: TimelineEntry, item: ProgramItem | undefined, slid
       people: panel ? people : undefined,
       sub: title,
     };
-  return { eyebrow: panel ? "Panel discussion · Q&A" : "Questions & answers", icon: MessageCircleQuestion, headline: title, people };
+  const moderator = moderatorFor(item);
+  return {
+    eyebrow: panel ? "Panel discussion · Q&A" : "Questions & answers",
+    icon: MessageCircleQuestion,
+    headline: title,
+    people: moderator ? [...people, moderator] : people,
+  };
 }
 
 function messageFor(current: TimelineEntry | undefined, next: TimelineEntry | undefined, now: Date, slide: TalkSlide): Message {
@@ -243,7 +331,10 @@ function messageFor(current: TimelineEntry | undefined, next: TimelineEntry | un
 
   if (current.title === "Doors open")
     return { eyebrow: current.title, icon: Coffee, headline: firstDay ? "Welcome" : "Welcome back", sub: current.menuNote };
-  if (/lunch|dinner/i.test(current.title))
+  // The dinner slide carries the rest of the evening and tomorrow's doors instead of the pre-sale note.
+  if (/dinner/i.test(current.title))
+    return { eyebrow: current.title, icon: Utensils, headline: "Bon appétit!", sub: current.menuNote, agenda: eveningAgenda(current), sponsor: "beside" };
+  if (/lunch/i.test(current.title))
     return { eyebrow: current.title, icon: Utensils, headline: "Bon appétit!", sub: current.menuNote, highlight, sponsor: "beside" };
   if (current.kind === "pause")
     return { eyebrow: current.title, icon: Coffee, headline: "Enjoy the break", sub: current.menuNote, highlight, sponsor: "beside" };
@@ -477,7 +568,7 @@ function ScheduleDrawer({
                           {pinnedId === entry.id && <span className="break-tag break-tag--pinned">Showing</span>}
                         </button>
                         {talk &&
-                          (["qa", "thanks"] as const).map((slide) => (
+                          slidesFor(entry).filter((slide) => slide !== "intro").map((slide) => (
                             <button
                               key={slide}
                               type="button"
@@ -616,7 +707,8 @@ export default function BreakScreen() {
   const message = now ? (sponsorSlide ? SPONSOR_MESSAGE : messageFor(current, next, now, slide)) : null;
   const Icon = message?.icon;
   const messageKey = `${shownStep ?? "none"}-${next?.id ?? "none"}`;
-  const long = (message?.headline.length ?? 0) > 32;
+  // A long headline, or one with the agenda lists under it, takes the smaller size.
+  const long = (message?.headline.length ?? 0) > 32 || !!message?.agenda;
 
   return (
     <div
@@ -686,6 +778,11 @@ export default function BreakScreen() {
                           {p.name}
                           {p.note && <small>{p.note}</small>}
                         </span>
+                      ) : p.role ? (
+                        <span>
+                          {p.name}
+                          <small>{p.role}</small>
+                        </span>
                       ) : (
                         p.name
                       )}
@@ -695,6 +792,27 @@ export default function BreakScreen() {
               )}
               {message.highlight && <p className="break-message__highlight">{message.highlight}</p>}
               {message.sub && <p className="break-message__sub">{message.sub}</p>}
+              {message.agenda && (
+                <div className="break-agenda">
+                  {message.agenda.map((group) => (
+                    <section key={group.label} className="break-agenda__group" aria-label={group.label}>
+                      <p className="break-eyebrow break-agenda__label">{group.label}</p>
+                      <ul>
+                        {group.rows.map((row) => (
+                          <li key={`${row.time}-${row.title}`} className="break-agenda__row">
+                            <span className="break-agenda__time">{row.time}</span>
+                            {row.person && <Portrait person={row.person} className="break-portrait--chip" />}
+                            <span className="break-agenda__what">
+                              <strong>{row.title}</strong>
+                              {row.note && <span className="break-agenda__note">{row.note}</span>}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  ))}
+                </div>
+              )}
               <Experiences item={current ? programItem(current) : undefined} />
             </div>
             {message.sponsor && (
