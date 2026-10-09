@@ -14,6 +14,7 @@ export type QuickLinkIcon =
   | "afterparty"
   | "dinner"
   | "feedback"
+  | "survey"
   | "wifi";
 
 export type QuickLinkAction = {
@@ -72,6 +73,15 @@ export const QUICK_LINKS: QuickLink[] = [
       { label: "How to join", value: "Scan the QR code on the WhatsApp sign at the welcome desk with your phone camera." },
       { label: "Who can join", value: "Conference ticket holders" },
     ],
+  },
+  {
+    id: "survey",
+    label: "Conference survey",
+    summary: "Anonymous · 2 minutes",
+    icon: "survey",
+    body: "An anonymous questionnaire that helps us understand who we are as a community, and how to improve the conference.",
+    details: [{ label: "Questions", value: SURVEY.questions.join(" · ") }],
+    actions: [{ label: "Open the survey", href: SURVEY.url }],
   },
   {
     id: "program",

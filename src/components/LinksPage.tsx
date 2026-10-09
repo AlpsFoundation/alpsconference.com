@@ -53,6 +53,7 @@ const ICONS: Record<QuickLinkIcon, LucideIcon> = {
   afterparty: PartyPopper,
   dinner: Utensils,
   feedback: MessageSquareHeart,
+  survey: Users,
   booklet: BookOpen,
   wifi: Wifi,
 };
