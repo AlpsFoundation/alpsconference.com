@@ -333,19 +333,28 @@
   border-width: 2px;
 }
 
-/* Next up banner */
+/* Next up banner, with the links QR card beside it. The card sets the band's height (its code
+   must stay large enough to scan from the room); the banner stretches to match. */
 .break-bottom {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: clamp(0.5rem, 1.5vmin, 1rem);
   padding: 0 var(--break-gutter) clamp(1.25rem, 4vmin, 3.5rem);
 }
 
+.break-bottom > :first-child {
+  display: flex;
+  flex-direction: column;
+}
+
 .break-fade {
+  display: flex;
+  flex: 1;
   animation: break-in 900ms 150ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .break-next {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: clamp(1rem, 3vmin, 2.5rem);
@@ -478,12 +487,63 @@
   animation: break-pulse 1.6s ease-out infinite;
 }
 
+/* The attendee links page as a QR code, on every slide: the same glass card as the banner, the
+   caption on the left and the code on a white tile that carries its own quiet zone. */
+.break-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.9rem, 2.6vmin, 2.2rem);
+  flex-shrink: 0;
+  padding: clamp(0.9rem, 2.4vmin, 2rem) clamp(1rem, 3vmin, 2.5rem);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: clamp(1rem, 2.4vmin, 1.75rem);
+  background:
+    linear-gradient(110deg, rgba(243, 143, 191, 0.1), rgba(46, 124, 199, 0.14)),
+    rgba(8, 47, 74, 0.72);
+  box-shadow: 0 24px 80px rgba(3, 20, 35, 0.4);
+  backdrop-filter: blur(20px);
+}
+
+.break-links__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-shadow: 0 1px 3px rgba(8, 47, 74, 0.95), 0 0 18px rgba(8, 47, 74, 0.9);
+}
+
+.break-links__url {
+  margin-top: 0.35em;
+  font-size: clamp(1rem, 2.4vmin, 1.75rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.break-links__note {
+  margin-top: 0.4em;
+  font-size: clamp(0.8rem, 1.9vmin, 1.3rem);
+  color: rgba(255, 255, 255, 0.72);
+  white-space: nowrap;
+}
+
+.break-links__code {
+  display: block;
+  flex-shrink: 0;
+  width: clamp(5rem, 18vmin, 14rem);
+  height: clamp(5rem, 18vmin, 14rem);
+  overflow: hidden;
+  border-radius: clamp(0.4rem, 1vmin, 0.75rem);
+  color: var(--color-neutral-dark);
+}
+
 /* Prev / schedule / next, beside the banner: shown while the mouse moves or on hover. */
 .break-pager {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
   flex-shrink: 0;
+  align-self: center;
   opacity: 0;
   transform: translateX(6px);
   transition: opacity 300ms ease, transform 300ms ease;
@@ -728,6 +788,12 @@
 }
 
 @media (max-width: 720px) {
+  .break-bottom {
+    flex-wrap: wrap;
+  }
+  .break-links__text {
+    display: none;
+  }
   .break-next {
     flex-wrap: wrap;
   }
