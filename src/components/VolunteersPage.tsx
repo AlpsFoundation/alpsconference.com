@@ -800,6 +800,13 @@ function MyShifts({
   const roles = rolesFor(person);
   const cateringMinutes = items.reduce((sum, item) => sum + (item.kind === "catering" ? item.end - item.start : 0), 0);
   const dates = [...new Set(items.map((item) => item.date))];
+  // During the conference the list opens on today: days already over fold away at the end,
+  // unless nothing is left ahead (after the conference everything shows again).
+  const [pastOpen, setPastOpen] = useState(false);
+  const pastCandidates = clock ? dates.filter((date) => date < clock.date) : [];
+  const pastDates = pastCandidates.length < dates.length ? pastCandidates : [];
+  const shownDates = dates.filter((date) => !pastDates.includes(date));
+  const pastCount = items.filter((item) => pastDates.includes(item.date)).length;
 
   const timings = new Map(items.map((item) => [item.key, timingOf(clock, item.date, item.start, item.end)]));
   const next = clock && items.find((item) => !timings.get(item.key));
@@ -842,7 +849,33 @@ function MyShifts({
       </div>
 
       <div className="vol-mine__days">
-        {dates.map((date) => (
+        {shownDates.map(renderDay)}
+        {pastDates.length > 0 && (
+          <article className="vol-day vol-day--past" data-open={pastOpen || undefined}>
+            <h3 className="vol-day__fold">
+              <button type="button" aria-expanded={pastOpen} aria-controls="vol-mine-past" onClick={() => setPastOpen((open) => !open)}>
+                <span>
+                  Earlier · {pastDates.map((date) => tabLabel(date)).join(", ")}
+                  <small>
+                    {pastCount} item{pastCount === 1 ? "" : "s"} already behind you
+                  </small>
+                </span>
+                <ChevronDown size={18} aria-hidden="true" className="vol-day__chevron" />
+              </button>
+            </h3>
+            {pastOpen && (
+              <div id="vol-mine-past" className="vol-day__past">
+                {pastDates.map(renderDay)}
+              </div>
+            )}
+          </article>
+        )}
+      </div>
+    </section>
+  );
+
+  function renderDay(date: string) {
+    return (
           <article key={date} className="vol-day">
             <header className="vol-day__head">
               <h3>{dateLabel(date)}</h3>
@@ -953,10 +986,8 @@ function MyShifts({
                 })}
             </ol>
           </article>
-        ))}
-      </div>
-    </section>
-  );
+    );
+  }
 }
 
 export default function VolunteersPage() {
