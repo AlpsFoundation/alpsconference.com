@@ -271,7 +271,8 @@ export const CREW_EVENTS: CrewEvent[] = [
     place: "Kultur & Kongresshaus Aarau",
     people: ["Raphaël"],
   },
-  // Sat 10 Oct: Pascal Kälin's breathwork sessions in Saal 4, 11:15–12:30 and 16:45–18:00.
+  // Sat 10 Oct: Pascal Kälin's breathwork session in Saal 4, 11:15–12:30. Daria assists the first session only
+  // (Matthias, 2026-10-10); the 16:45–18:00 session has no helper on the plan.
   {
     id: "breathwork-helper-sat-am",
     title: "Breathwork helper (assist Pascal Kälin)",
@@ -299,15 +300,6 @@ export const CREW_EVENTS: CrewEvent[] = [
     calendarMinutes: 30,
     place: "Saal 4, Kultur & Kongresshaus Aarau",
     people: ["Daria", "Maria"],
-  },
-  {
-    id: "breathwork-helper-sat-pm",
-    title: "Breathwork helper (assist Pascal Kälin)",
-    dateTime: "2026-10-10",
-    start: "16:45",
-    calendarMinutes: 75,
-    place: "Saal 4, Kultur & Kongresshaus Aarau",
-    people: ["Daria"],
   },
   {
     id: "dismantling",
@@ -416,6 +408,9 @@ export const CATERING_SHIFTS: CateringShift[] = [
   // Fri 9 Oct, 16:10 (Philipp): Lennert supports the afternoon break 16:30–17:30; Marina takes Margarita's Dinner 2 19:45–20:30.
   { person: "Lennert", dateTime: "2026-10-09", from: "16:30", to: "17:30", station: "Afternoon Break" },
   { person: "Marina", dateTime: "2026-10-09", from: "19:45", to: "20:30", station: "Diner 2" },
+  // Sat 10 Oct (Matthias): Daria helps at lunch 13:00–14:00 and on the early (networking) apéro 19:00–21:00.
+  { person: "Daria", dateTime: "2026-10-10", from: "13:00", to: "14:00", station: "Lunch Service" },
+  { person: "Daria", dateTime: "2026-10-10", from: "19:00", to: "21:00", station: "Networking Apéro" },
 ];
 
 /**
