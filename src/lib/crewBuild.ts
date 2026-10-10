@@ -9,6 +9,7 @@ import {
   BUILD_SECTIONS,
   BUILD_ZONE_GROUPS,
   BUILD_ZONES,
+  TEARDOWN_LAYOUT,
   TEARDOWN_SECTION_TEXT,
   TEARDOWN_TEXT,
   type BuildItem,
@@ -39,12 +40,34 @@ export type PlacedItem = BuildItem & { section: BuildSection };
 
 /** Task sections of a phase; teardown mirrors setup in reverse order. */
 export function taskSections(phase: BuildPhase): BuildSection[] {
-  const source = phase === "teardown" ? "setup" : phase;
-  const sections = BUILD_SECTIONS.filter((section) => section.kind === "task" && section.phase === source);
-  if (phase !== "teardown") return sections;
-  // Teardown-only tasks first, then setup mirrored in reverse order.
-  const own = BUILD_SECTIONS.filter((section) => section.kind === "task" && section.phase === "teardown");
-  return [...own, ...sections.map((section) => teardownSection({ ...section, items: [...section.items].reverse() })).reverse()];
+  if (phase === "teardown") return teardownLayout();
+  const sections = BUILD_SECTIONS.filter((section) => section.kind === "task" && section.phase === phase);
+  if (phase !== "load") return sections;
+  // Truck cards placed in the teardown order are shown there, not here.
+  const placed = new Set(TEARDOWN_LAYOUT.flatMap((group) => group.items.filter(([p]) => p === "load").map(([, id]) => id)));
+  return sections
+    .map((section) => ({ ...section, items: section.items.filter((item) => !placed.has(item.id)) }))
+    .filter((section) => section.items.length);
+}
+
+/** The Saturday teardown in step order (TEARDOWN_LAYOUT); unplaced teardown tasks go to the last group. */
+function teardownLayout(): BuildSection[] {
+  const taskItems = (phase: string) =>
+    BUILD_SECTIONS.filter((section) => section.kind === "task" && section.phase === phase).flatMap((section) =>
+      section.items.map((item) => teardownSection({ ...section, items: [item] }).items[0]),
+    );
+  const teardownItems = [...taskItems("teardown"), ...taskItems("setup")];
+  const placed = new Set(TEARDOWN_LAYOUT.flatMap((group) => group.items.filter(([p]) => p === "teardown").map(([, id]) => id)));
+  const groups = TEARDOWN_LAYOUT.map((group, index) => {
+    const items: BuildItem[] = group.items.flatMap(([p, id]) => {
+      if (p === "teardown") return teardownItems.filter((item) => item.id === id);
+      const item = ITEMS.get(id);
+      return item ? [{ ...item, onPhase: p }] : [];
+    });
+    if (index === TEARDOWN_LAYOUT.length - 1) items.push(...teardownItems.filter((item) => !placed.has(item.id)));
+    return { id: group.id, title: group.title, note: group.note, kind: "task" as const, phase: "teardown" as const, items };
+  });
+  return groups.filter((group) => group.items.length);
 }
 
 /** A setup task in teardown words: setup verb crossed out, teardown name and what; setup-only details dropped. */

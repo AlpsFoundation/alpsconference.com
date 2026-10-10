@@ -243,13 +243,18 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
     first?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const mine = (item: BuildItem, phase: BuildPhase) =>
-    Boolean(person) &&
-    (assigneesOf(state, item.id, phase).includes(person!) ||
-      (phase === "teardown" && setupPeople(state, item.id).includes(person!)));
+  const mine = (item: BuildItem, part: BuildPhase) => {
+    const phase = item.onPhase ?? part;
+    return (
+      Boolean(person) &&
+      (assigneesOf(state, item.id, phase).includes(person!) ||
+        (phase === "teardown" && setupPeople(state, item.id).includes(person!)))
+    );
+  };
 
   /** Still short of people: fewer than needed, or no headcount yet and nobody on it. Ticked tasks are not. */
-  const needsPeople = (item: BuildItem, phase: BuildPhase) => {
+  const needsPeople = (item: BuildItem, part: BuildPhase) => {
+    const phase = item.onPhase ?? part;
     if (tickOf(state, item.id, phase)) return false;
     const signed = crewOf(state, item.id, phase).length;
     const need = neededFor(item);
@@ -257,7 +262,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   };
 
   const shows = (item: BuildItem, phase: BuildPhase) =>
-    view === "needs" ? needsPeople(item, phase) : view === "open" ? !tickOf(state, item.id, phase) : true;
+    view === "needs" ? needsPeople(item, phase) : view === "open" ? !tickOf(state, item.id, item.onPhase ?? phase) : true;
 
   const visible = useMemo(
     () =>
@@ -287,7 +292,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   );
   const showCounts: Record<Show, number> = {
     needs: dayTasks.filter(({ item, phase }) => needsPeople(item, phase)).length,
-    open: dayTasks.filter(({ item, phase }) => !tickOf(state, item.id, phase)).length,
+    open: dayTasks.filter(({ item, phase }) => !tickOf(state, item.id, item.onPhase ?? phase)).length,
     all: dayTasks.length,
   };
 
@@ -328,7 +333,8 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
     setDraft("");
   };
 
-  const renderTask = (item: BuildItem, phase: BuildPhase) => {
+  const renderTask = (item: BuildItem, part: BuildPhase) => {
+    const phase = item.onPhase ?? part;
     const info = BUILD_PHASES[phase];
     const people = assigneesOf(state, item.id, phase);
     const crew = crewOf(state, item.id, phase);
@@ -541,8 +547,8 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   const sectionCounts = (section: BuildSection, phase: BuildPhase) => {
     const withNeed = section.items.filter((item) => item.people);
     const needSum = withNeed.reduce((sum, item) => sum + (item.people ?? 0), 0);
-    const filled = withNeed.reduce((sum, item) => sum + Math.min(crewOf(state, item.id, phase).length, item.people ?? 0), 0);
-    const done = section.items.filter((item) => tickOf(state, item.id, phase)).length;
+    const filled = withNeed.reduce((sum, item) => sum + Math.min(crewOf(state, item.id, item.onPhase ?? phase).length, item.people ?? 0), 0);
+    const done = section.items.filter((item) => tickOf(state, item.id, item.onPhase ?? phase)).length;
     return { needSum, filled, done };
   };
 
@@ -696,9 +702,9 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
             // Stats always cover the whole part, whatever the switch shows.
             const all = taskSections(phase).flatMap((section) => section.items);
             const needSum = all.reduce((sum, item) => sum + (item.people ?? 0), 0);
-            const filled = all.reduce((sum, item) => sum + (item.people ? Math.min(crewOf(state, item.id, phase).length, item.people) : 0), 0);
+            const filled = all.reduce((sum, item) => sum + (item.people ? Math.min(crewOf(state, item.id, item.onPhase ?? phase).length, item.people) : 0), 0);
             const unset = all.filter((item) => !item.people).length;
-            const done = all.filter((item) => tickOf(state, item.id, phase)).length;
+            const done = all.filter((item) => tickOf(state, item.id, item.onPhase ?? phase)).length;
             const materialItems = material.flatMap((section) => section.items);
             const materialAll = materialSections(phase).flatMap((section) => section.items);
             const materialDone = materialAll.filter((item) => tickOf(state, item.id, phase)).length;
