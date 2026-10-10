@@ -42,6 +42,8 @@ export type BuildItem = {
   draft?: boolean;
   /** Teardown only: the setup verb, shown crossed out before the teardown name. */
   was?: string;
+  /** Who put it up when there was no setup task for it; they count as its teardown crew. */
+  setupBy?: string[];
 };
 
 /** Teardown wording per setup task: the setup verb crossed out (`was`), then what to tear down. */
@@ -74,7 +76,7 @@ export const TEARDOWN_TEXT: Record<string, { was: string; name: string; what: st
   "jw-clean": {
     was: "Clean and place",
     name: "Collect the Japanese walls from the lounges",
-    what: "Fold up the 8 Japanese walls (paravents) in the three lounges and bring them to 7 top.",
+    what: "Fold up the 8 Japanese walls (paravents) in the three lounges and carry them to the truck at the main entrance. They go on right after the wood panels.",
   },
   "lounge-bottom": {
     was: "Set up",
@@ -89,7 +91,7 @@ export const TEARDOWN_TEXT: Record<string, { was: string; name: string; what: st
   "lounge-top": {
     was: "Set up",
     name: "Clear Lounge top",
-    what: "Take down the paravents and lit walls in Lounge top and keep the space free: this is where Régis packs everything into boxes.",
+    what: "Take down the paravents and lit walls in Lounge top and keep the space free: this is where Régis packs everything into boxes, with a throw-away corner for anything that might or will be thrown away.",
   },
   "exhibitor-tables": {
     was: "Prepare",
@@ -99,12 +101,12 @@ export const TEARDOWN_TEXT: Record<string, { was: string; name: string; what: st
   "posters-1": {
     was: "Set up",
     name: "Take down Posters (1)",
-    what: "Take down about 4 lightweight poster panels at 5 and 6 and bring the panels and posters to 7 top.",
+    what: "Carefully bring about 4 lightweight panels from 5 and 6, posters still on, to 7 top. There, take the posters off, remove the magnets and roll the posters up carefully. The empty panels go onto the truck, on top of the wood panels and Japanese walls.",
   },
   "posters-2": {
     was: "Set up",
     name: "Take down Posters (2)",
-    what: "Take down the other 4 or so lightweight poster panels at 5 and 6 and bring the panels and posters to 7 top.",
+    what: "Carefully bring the other 4 or so lightweight panels from 5 and 6, posters still on, to 7 top. There, take the posters off, remove the magnets and roll the posters up carefully. The empty panels go onto the truck, on top of the wood panels and Japanese walls.",
   },
   "wood-wall": {
     was: "Build",
@@ -144,7 +146,7 @@ export type BuildSection = {
   /** "task": people sign up. "material": checklist ticked on arrival (unload) and on the truck (load). */
   kind: "task" | "material";
   /** Which part of the build a task section belongs to; setup tasks are mirrored into teardown. */
-  phase?: "unload" | "setup" | "load";
+  phase?: "unload" | "setup" | "teardown" | "load";
   items: BuildItem[];
 };
 
@@ -191,11 +193,11 @@ export const BUILD_PHASES: Record<BuildPhase, BuildPhaseInfo> = {
     timeNote:
       "Everyone helps. Whoever set a thing up tears it down. Philipp's rented backups (extension cords, cable drums, walkie-talkies, Régis's extra lights and disco ball) go back into the bags they came in, packed by whoever unpacked them.",
     steps: [
+      "18:30 · Marina and Michel (Happy Helpers) help Kevin Barron take down his artwork at 13. Matthias makes sure it is gone by 21:15.",
       "21:00 · Power and coordination circle on the big stage. Everyone comes.",
-      "21:15 · Work starts. Kevin Barron's art is gone from 13 by then; Matthias tells him.",
-      "Matthias parks the truck in front of the main entrance.",
-      "First onto the truck: the wood panels from the Kevin Barron space (13), nothing else yet. The art corner (14) may run a bit longer.",
-      "Everyone tears down what they set up on Thursday and brings all material to 7 top, where Régis packs it into boxes.",
+      "21:15 · Work starts. Matthias parks the truck in front of the main entrance.",
+      "Onto the truck, in this order: the wood panels from 13, the Japanese walls, the lightweight poster panels, then the moss and hexagon boxes, which go straight to Greenfinity. The art corner (14) may run a bit longer.",
+      "Everyone tears down what they set up on Thursday and brings all other material to 7 top, where Régis packs it into boxes. Anything that might or will be thrown away goes to the throw-away corner at 7 top; Régis and Philipp decide what is kept for future ALPS events.",
     ],
     doneLabel: "Torn down",
     joinLabel: "I'll tear this down",
@@ -203,7 +205,7 @@ export const BUILD_PHASES: Record<BuildPhase, BuildPhaseInfo> = {
   load: {
     label: "Pack the truck",
     dateTime: "2026-10-10",
-    timeNote: "The truck stands in front of the main entrance. The wood panels from 13 go on first, then the boxes Régis packs at 7 top.",
+    timeNote: "The truck stands in front of the main entrance. Order: wood panels from 13, Japanese walls, lightweight poster panels, then the moss and hexagon boxes for Greenfinity.",
     doneLabel: "On the truck",
     joinLabel: "I'm on this",
   },
@@ -715,11 +717,32 @@ const DATA: BuildData = {
       ]
     },
     {
+      "id": "teardown-extra",
+      "title": "Teardown only",
+      "kind": "task",
+      "phase": "teardown",
+      "note": "Tasks with no setup card.",
+      "items": [
+        {
+          "id": "deco-greenfinity",
+          "name": "Pack the moss and hexagons into their delivery boxes",
+          "setupBy": ["Maximilian", "Ece", "Sophia"],
+          "what": "Put the moss and hexagon decoration back into the boxes they were delivered in. The boxes go onto the truck last and are delivered straight to Greenfinity, who rented them to us. They do not go to the ALPS storage at Philipp's."
+        },
+        {
+          "id": "saal2-backstage",
+          "name": "Bring the material from Saal 2 backstage to 7 top",
+          "draft": true,
+          "what": "Carry everything ALPS has backstage in Saal 2 to 7 top, where Régis packs it. Who and when is still to be planned."
+        }
+      ]
+    },
+    {
       "id": "loading",
       "title": "Pack the truck",
       "kind": "task",
       "phase": "load",
-      "note": "During and after the teardown on Saturday 10 October, at the truck in front of the main entrance. The truck is unloaded in Bern on Sunday 11 October, about 15:00.",
+      "note": "During and after the teardown on Saturday 10 October, at the truck in front of the main entrance. Order: wood panels, Japanese walls, lightweight poster panels, moss and hexagon boxes. The truck is unloaded in Bern on Sunday 11 October, about 15:00; the moss and hexagon boxes go to Greenfinity instead.",
       "items": [
         {
           "id": "load-all",
@@ -738,10 +761,19 @@ const DATA: BuildData = {
           "what": "First thing: take the ALPS double wood panels, connector sticks and magnets from 13 to the truck at the main entrance. Only 13 for now; the art corner (14) may still be running."
         },
         {
+          "id": "load-japanese-walls",
+          "name": "Japanese walls go onto the truck",
+          "what": "Second: the 8 Japanese walls from the lounges, right after the wood panels."
+        },
+        {
+          "id": "load-lightweight-panels",
+          "name": "Lightweight poster panels go on top",
+          "what": "Third: the empty lightweight panels from 7 top (posters off, magnets removed), on top of the wood panels and Japanese walls."
+        },
+        {
           "id": "load-moss",
-          "name": "Moss decoration goes back into its own boxes",
-          "lead": "Matthias",
-          "what": "Pack the moss back into the boxes it came in and put each box's return label on. Matthias drops the boxes at the post office in Bern on Sunday 11 October at 16:00."
+          "name": "Moss and hexagon boxes go onto the truck last",
+          "what": "Last: the moss and hexagon boxes. They are delivered straight to Greenfinity, not to the ALPS storage at Philipp's."
         }
       ]
     },

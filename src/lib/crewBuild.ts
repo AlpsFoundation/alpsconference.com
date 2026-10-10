@@ -41,9 +41,10 @@ export type PlacedItem = BuildItem & { section: BuildSection };
 export function taskSections(phase: BuildPhase): BuildSection[] {
   const source = phase === "teardown" ? "setup" : phase;
   const sections = BUILD_SECTIONS.filter((section) => section.kind === "task" && section.phase === source);
-  return phase === "teardown"
-    ? sections.map((section) => teardownSection({ ...section, items: [...section.items].reverse() })).reverse()
-    : sections;
+  if (phase !== "teardown") return sections;
+  // Teardown-only tasks first, then setup mirrored in reverse order.
+  const own = BUILD_SECTIONS.filter((section) => section.kind === "task" && section.phase === "teardown");
+  return [...own, ...sections.map((section) => teardownSection({ ...section, items: [...section.items].reverse() })).reverse()];
 }
 
 /** A setup task in teardown words: setup verb crossed out, teardown name and what; setup-only details dropped. */
@@ -111,8 +112,13 @@ export function teardownCatering(person: string): CateringShift | undefined {
 export function crewOf(state: BuildState | null, id: string, phase: BuildPhase) {
   const signed = assigneesOf(state, id, phase);
   if (phase !== "teardown") return signed;
-  const setup = assigneesOf(state, id, "setup").filter((name) => !signed.includes(name) && !teardownCatering(name));
+  const setup = setupPeople(state, id).filter((name) => !signed.includes(name) && !teardownCatering(name));
   return [...signed, ...setup];
+}
+
+/** Who put a thing up: the setup sign-ups, plus names the plan gives where there was no setup task. */
+export function setupPeople(state: BuildState | null, id: string) {
+  return [...new Set([...assigneesOf(state, id, "setup"), ...(ITEMS.get(id)?.setupBy ?? [])])];
 }
 
 export function tickOf(state: BuildState | null, id: string, phase: BuildPhase) {
@@ -145,9 +151,7 @@ export function personBuild(state: BuildState | null, person: string): PersonBui
     // The teardown is done by whoever set a thing up, unless they are on catering then.
     if (phase === "teardown")
       ids.push(
-        ...(state?.assignments ?? [])
-          .filter((a) => a.person === person && a.phase === "setup" && !teardownCatering(person))
-          .map((a) => a.task_id),
+        ...[...ITEMS.keys()].filter((id) => !teardownCatering(person) && setupPeople(state, id).includes(person)),
       );
     const items = [...new Set(ids)]
       .map((id) => ITEMS.get(id))
