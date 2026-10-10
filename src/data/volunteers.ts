@@ -271,6 +271,16 @@ export const CREW_EVENTS: CrewEvent[] = [
     place: "Kultur & Kongresshaus Aarau",
     people: ["Raphaël"],
   },
+  // Sat 10 Oct: Pascal Kälin's breathwork sessions in Saal 4, 11:15–12:30 and 16:45–18:00.
+  {
+    id: "breathwork-helper-sat-am",
+    title: "Breathwork helper (assist Pascal Kälin)",
+    dateTime: "2026-10-10",
+    start: "11:15",
+    calendarMinutes: 75,
+    place: "Saal 4, Kultur & Kongresshaus Aarau",
+    people: ["Daria"],
+  },
   {
     id: "moderator-sat-pm",
     title: "Moderator – Saturday afternoon",
@@ -289,6 +299,15 @@ export const CREW_EVENTS: CrewEvent[] = [
     calendarMinutes: 30,
     place: "Saal 4, Kultur & Kongresshaus Aarau",
     people: ["Daria", "Maria"],
+  },
+  {
+    id: "breathwork-helper-sat-pm",
+    title: "Breathwork helper (assist Pascal Kälin)",
+    dateTime: "2026-10-10",
+    start: "16:45",
+    calendarMinutes: 75,
+    place: "Saal 4, Kultur & Kongresshaus Aarau",
+    people: ["Daria"],
   },
   {
     id: "dismantling",
