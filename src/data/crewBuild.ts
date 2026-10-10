@@ -44,7 +44,50 @@ export type BuildItem = {
   was?: string;
   /** Who put it up when there was no setup task for it; they count as its teardown crew. */
   setupBy?: string[];
+  /** Set when a card is shown inside another part's list (a truck card in the teardown order). */
+  onPhase?: BuildPhase;
 };
+
+/**
+ * The Saturday teardown in the order of the evening's steps, not the setup page reversed.
+ * Truck cards ("load") sit right under the teardown card that frees their material.
+ * Every teardown task not placed here lands in the last group, in setup-page order;
+ * every truck task not placed here stays in the "Pack the truck" part at the very end.
+ */
+export const TEARDOWN_LAYOUT: { id: string; title: string; note?: string; items: [BuildPhase, string][] }[] = [
+  {
+    id: "td-kevin",
+    title: "1) 18:30 · Kevin Barron exhibition",
+    note: "First thing to do. Everyone who has nothing else to do helps.",
+    items: [["teardown", "wood-wall"]],
+  },
+  {
+    id: "td-only",
+    title: "2) Teardown only",
+    items: [["teardown", "saal2-backstage"]],
+  },
+  {
+    id: "td-truck",
+    title: "3) From 21:15 · Onto the truck, in this order",
+    note: "The truck stands in front of the main entrance.",
+    items: [
+      ["load", "load-panels"],
+      ["teardown", "jw-clean"],
+      ["load", "load-japanese-walls"],
+      ["teardown", "posters-1"],
+      ["teardown", "posters-2"],
+      ["load", "load-lightweight-panels"],
+      ["teardown", "deco-greenfinity"],
+      ["load", "load-moss"],
+    ],
+  },
+  {
+    id: "td-rest",
+    title: "4) Everything else → 7 top",
+    note: "Régis packs it into boxes at 7 top. Anything that might or will be thrown away goes to the throw-away corner there.",
+    items: [],
+  },
+];
 
 /** Teardown wording per setup task: the setup verb crossed out (`was`), then what to tear down. */
 export const TEARDOWN_TEXT: Record<string, { was: string; name: string; what: string }> = {
@@ -110,8 +153,8 @@ export const TEARDOWN_TEXT: Record<string, { was: string; name: string; what: st
   },
   "wood-wall": {
     was: "Build",
-    name: "Take apart the wood-panel wall for the Kevin Barron exhibition",
-    what: "Once Kevin Barron's art is gone (by 21:15), take the double wood panels, connector sticks and magnets apart at 13 and carry them straight to the truck at the main entrance. They go on first.",
+    name: "Take Kevin Barron's pictures off the wood-panel wall",
+    what: "From 18:30, with Kevin, Marina and Michel: take the pictures off the wood panels at 13. The panels stay standing; they come apart and go onto the truck first from 21:15.",
   },
   "research-spaces": {
     was: "Put up",
@@ -193,7 +236,7 @@ export const BUILD_PHASES: Record<BuildPhase, BuildPhaseInfo> = {
     timeNote:
       "Everyone helps. Whoever set a thing up tears it down. Philipp's rented backups (extension cords, cable drums, walkie-talkies, Régis's extra lights and disco ball) go back into the bags they came in, packed by whoever unpacked them.",
     steps: [
-      "18:30 · Marina and Michel (Happy Helpers) help Kevin Barron take down his artwork at 13. Matthias makes sure it is gone by 21:15.",
+      "18:30 · First thing: Kevin Barron's pictures come off the wood panels at 13, with Marina and Michel (Happy Helpers) and everyone who has nothing else to do. The panels stay standing until the truck is there.",
       "21:00 · Power and coordination circle on the big stage. Everyone comes.",
       "21:15 · Work starts. Matthias parks the truck in front of the main entrance.",
       "Onto the truck, in this order: the wood panels from 13, the Japanese walls, the lightweight poster panels, then the moss and hexagon boxes, which go straight to Greenfinity. The art corner (14) may run a bit longer.",
@@ -205,7 +248,7 @@ export const BUILD_PHASES: Record<BuildPhase, BuildPhaseInfo> = {
   load: {
     label: "Pack the truck",
     dateTime: "2026-10-10",
-    timeNote: "The truck stands in front of the main entrance. Order: wood panels from 13, Japanese walls, lightweight poster panels, then the moss and hexagon boxes for Greenfinity.",
+    timeNote: "Last, once everything is torn down: the boxes from 7 top go onto the truck at the main entrance. The truck cards for the wood panels, Japanese walls, poster panels, and moss and hexagons are in the teardown above.",
     doneLabel: "On the truck",
     joinLabel: "I'm on this",
   },
@@ -742,7 +785,7 @@ const DATA: BuildData = {
       "title": "Pack the truck",
       "kind": "task",
       "phase": "load",
-      "note": "During and after the teardown on Saturday 10 October, at the truck in front of the main entrance. Order: wood panels, Japanese walls, lightweight poster panels, moss and hexagon boxes. The truck is unloaded in Bern on Sunday 11 October, about 15:00; the moss and hexagon boxes go to Greenfinity instead.",
+      "note": "The truck is unloaded in Bern on Sunday 11 October, about 15:00; the moss and hexagon boxes go to Greenfinity instead.",
       "items": [
         {
           "id": "load-all",
@@ -753,12 +796,12 @@ const DATA: BuildData = {
         {
           "id": "load-panels",
           "lead": "Régis",
-          "name": "Wood panels go back onto the truck",
+          "name": "Take the wood-panel wall apart and load it first",
           "zones": [
             "13"
           ],
           "draft": true,
-          "what": "First thing: take the ALPS double wood panels, connector sticks and magnets from 13 to the truck at the main entrance. Only 13 for now; the art corner (14) may still be running."
+          "what": "First thing from 21:15: take the empty wood-panel wall at 13 apart and carry the double wood panels, connector sticks and magnets to the truck at the main entrance."
         },
         {
           "id": "load-japanese-walls",
