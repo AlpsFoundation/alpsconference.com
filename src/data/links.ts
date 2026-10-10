@@ -109,7 +109,7 @@ export const QUICK_LINKS: QuickLink[] = [
     icon: "map",
     media: "venue-map",
     details: [
-      { label: "Experiences", value: "Saal 4 · live concert and cacao ceremony in Saal 2" },
+      { label: "Experiences", value: "Saal 4 · live concert and cacao circle in Saal 2" },
       { label: "Getting here", value: "A short walk from Aarau station" },
     ],
     actions: [{ label: "Open in Google Maps", href: VENUE_MAPS_URL }],

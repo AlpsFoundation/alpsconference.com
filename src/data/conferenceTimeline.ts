@@ -17,7 +17,7 @@ const CAPACITY_OVERRIDES: Record<string, number> = {
 };
 
 /** Experiences that are open to everyone and need no sign-up. */
-const DROP_IN_TITLES = new Set(["Art exhibitions", "Live concert", "Cacao ceremony", "Afterparty"]);
+const DROP_IN_TITLES = new Set(["Art exhibitions", "Live concert", "Cacao circle", "Afterparty"]);
 
 export function zurichDate(date: string, time: string): Date {
   return new Date(`${date}T${time}:00${ZURICH_OFFSET}`);

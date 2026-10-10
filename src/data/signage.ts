@@ -1050,7 +1050,7 @@ const SESSION_ICON: Record<string, SignIcon> = {
   Storytelling: "users",
   "Speed-friending": "handshake",
   "Live concert": "music",
-  "Cacao ceremony": "heart",
+  "Cacao circle": "heart",
 };
 
 /** A door sign per timed experience, and a paper sign-up sheet for each one that takes sign-ups. */

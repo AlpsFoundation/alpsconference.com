@@ -272,7 +272,7 @@ function ProgramItemDetail({ item }: { item: ScheduleItem }) {
   );
 }
 
-// An experience led by a speaker (Ricardo Morales's cacao ceremony) opens their speaker profile.
+// An experience led by a speaker (Ricardo Morales's cacao circle) opens their speaker profile.
 function modalSpeaker(item: ScheduleItem) {
   if (item.speakerName) return item.speakerName;
   if (item.experienceName && speakerByName(item.experienceName)) return item.experienceName;

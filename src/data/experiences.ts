@@ -83,7 +83,7 @@ export const EXPERIENCE_DAYS: ExperienceDay[] = [
       { time: "11:15–12:30 & 16:45–18:00", title: "Breathwork", venue: "Saal 4", personName: "Pascal Kälin" },
       { time: "12:30–14:00", title: "Live concert", venue: "Saal 2", personName: "David & Anna-Lea Wennberg" },
       { time: "13:45–14:45", title: "Sound meditation", venue: "Saal 4", personName: "Marina Vovk" },
-      { time: "16:30–17:00", title: "Cacao ceremony", venue: "Saal 2", personName: "Ricardo Morales" },
+      { time: "16:30–17:00", title: "Cacao circle", venue: "Saal 2", personName: "Ricardo Morales" },
       { time: "21:30–04:00", title: "Afterparty", detail: "Jugendkulturhaus Flösserplatz, Flösserstrasse 7 · 5 minutes on foot", personName: "Afterparty", calendarLocation: "Jugendkulturhaus Flösserplatz, Flösserstrasse 7, 5000 Aarau, Switzerland" },
     ],
   },

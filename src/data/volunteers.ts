@@ -280,6 +280,16 @@ export const CREW_EVENTS: CrewEvent[] = [
     place: "Kultur & Kongresshaus Aarau",
     people: ["Abigail"],
   },
+  // Sat 10 Oct: Marina Vovk's sound meditation in Saal 4 ends at 14:45.
+  {
+    id: "sound-meditation-dismantling-sat",
+    title: "Sound meditation dismantling (assist Marina Vovk)",
+    dateTime: "2026-10-10",
+    start: "14:45",
+    calendarMinutes: 30,
+    place: "Saal 4, Kultur & Kongresshaus Aarau",
+    people: ["Daria", "Maria"],
+  },
   {
     id: "dismantling",
     title: "Dismantling",
