@@ -762,7 +762,14 @@ function MyShifts({
                             {item.build && (
                               <ul className="vol-build-list" aria-label="Your teardown tasks">
                                 {item.build.items.map((entryItem) => (
-                                  <li key={entryItem.id}>{entryItem.name}</li>
+                                  <li key={entryItem.id}>
+                                    {entryItem.was && (
+                                      <>
+                                        <s className="cb-was">{entryItem.was}</s>{" "}
+                                      </>
+                                    )}
+                                    {entryItem.name}
+                                  </li>
                                 ))}
                               </ul>
                             )}
@@ -776,7 +783,14 @@ function MyShifts({
                             </span>
                             <ul className="vol-build-list">
                               {item.entry.items.map((entryItem) => (
-                                <li key={entryItem.id}>{entryItem.name}</li>
+                                <li key={entryItem.id}>
+                                  {entryItem.was && (
+                                    <>
+                                      <s className="cb-was">{entryItem.was}</s>{" "}
+                                    </>
+                                  )}
+                                  {entryItem.name}
+                                </li>
                               ))}
                             </ul>
                           </div>

@@ -9,6 +9,8 @@ import {
   BUILD_SECTIONS,
   BUILD_ZONE_GROUPS,
   BUILD_ZONES,
+  TEARDOWN_SECTION_TEXT,
+  TEARDOWN_TEXT,
   type BuildItem,
   type BuildPhase,
   type BuildSection,
@@ -40,8 +42,24 @@ export function taskSections(phase: BuildPhase): BuildSection[] {
   const source = phase === "teardown" ? "setup" : phase;
   const sections = BUILD_SECTIONS.filter((section) => section.kind === "task" && section.phase === source);
   return phase === "teardown"
-    ? sections.map((section) => ({ ...section, items: [...section.items].reverse() })).reverse()
+    ? sections.map((section) => teardownSection({ ...section, items: [...section.items].reverse() })).reverse()
     : sections;
+}
+
+/** A setup task in teardown words: setup verb crossed out, teardown name and what; setup-only details dropped. */
+export function teardownItem<T extends BuildItem>(item: T): T {
+  const text = TEARDOWN_TEXT[item.id];
+  return text ? { ...item, ...text, detail: undefined } : item;
+}
+
+function teardownSection(section: BuildSection): BuildSection {
+  const text = TEARDOWN_SECTION_TEXT[section.id];
+  return {
+    ...section,
+    title: text?.title ?? section.title,
+    note: text && "note" in text ? (text.note ?? undefined) : section.note,
+    items: section.items.map(teardownItem),
+  };
 }
 
 /** The material checklist, ticked on arrival (unload) and when it is back on the truck (load). */
@@ -124,7 +142,17 @@ const minutes = (time: string) => {
 export function personBuild(state: BuildState | null, person: string): PersonBuildEntry[] {
   return PHASE_ORDER.flatMap((phase) => {
     const ids = (state?.assignments ?? []).filter((a) => a.person === person && a.phase === phase).map((a) => a.task_id);
-    const items = [...new Set(ids)].map((id) => ITEMS.get(id)).filter((item): item is PlacedItem => Boolean(item));
+    // The teardown is done by whoever set a thing up, unless they are on catering then.
+    if (phase === "teardown")
+      ids.push(
+        ...(state?.assignments ?? [])
+          .filter((a) => a.person === person && a.phase === "setup" && !teardownCatering(person))
+          .map((a) => a.task_id),
+      );
+    const items = [...new Set(ids)]
+      .map((id) => ITEMS.get(id))
+      .filter((item): item is PlacedItem => Boolean(item))
+      .map((item) => (phase === "teardown" ? teardownItem(item) : item));
     if (!items.length) return [];
     const info = BUILD_PHASES[phase];
     const starts = items.map((item) => BUILD_ITEM_START[item.id] ?? info.start).filter((t): t is string => Boolean(t));

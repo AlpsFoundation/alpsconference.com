@@ -1043,3 +1043,10 @@
   font-weight: 700;
   color: var(--vol-muted);
 }
+
+/* Teardown cards: the setup verb, crossed out, before the teardown wording. */
+.cb-was {
+  font-weight: 500;
+  opacity: 0.55;
+  text-decoration-thickness: 1.5px;
+}

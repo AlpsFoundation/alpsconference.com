@@ -361,6 +361,11 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
         <div className="cb-task__body">
           <div className="cb-task__top">
             <p className="cb-task__name">
+              {item.was && (
+                <>
+                  <s className="cb-was">{item.was}</s>{" "}
+                </>
+              )}
               {item.name}
               {item.draft && <span className="cb-draft">Draft</span>}
             </p>
