@@ -516,6 +516,38 @@ main > section:not(:first-child) {
   line-height: 1.15;
 }
 .program-day__header time { color: rgba(255, 255, 255, 0.68); font-size: 0.8rem; }
+.program-day__header.program-day__header--toggle { display: block; padding: 0; }
+.program-day--folded .program-day__header { border-bottom: 0; }
+.program-day__toggle {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.95rem 1.15rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.program-day__toggle:hover { background: rgba(255, 255, 255, 0.05); }
+.program-day__toggle:focus-visible { outline: 2px solid rgba(255, 255, 255, 0.7); outline-offset: -2px; }
+.program-day__toggle-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.program-day__toggle-label { color: white; font-weight: 600; }
+.program-day__chevron { transition: transform 200ms ease; }
+.program-day__toggle[aria-expanded="true"] .program-day__chevron { transform: rotate(180deg); }
 .program-list { margin: 0; padding: 0; list-style: none; }
 .program-item, .program-session-link {
   display: grid;
@@ -719,6 +751,7 @@ main > section:not(:first-child) {
   .calendar-subscribe__trigger { width: 100%; justify-content: center; }
   .calendar-subscribe__menu { right: auto; left: 0; width: 100%; }
   .program-day__header { padding: 0.85rem 1rem; }
+  .program-day__toggle { padding: 0.85rem 1rem; }
   .program-item, .program-session-link { grid-template-columns: 1fr; gap: 0.25rem; }
   .program-item:not(.program-item--linked), .program-session-link { padding: 0.85rem 1rem; }
   .program-session-link { padding-right: 2.4rem; }

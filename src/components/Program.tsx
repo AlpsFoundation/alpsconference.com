@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   AudioLines,
   BookOpen,
+  ChevronDown,
   Coffee,
   DoorOpen,
   Flower2,
@@ -299,17 +300,56 @@ const SCHEDULES: Record<ScheduleView, ScheduleDay[]> = {
   workshops: WORKSHOP_SCHEDULE,
 };
 
+// A day that is over folds to its header while a later day is still to come, so the day that is
+// on is the first programme people see (Matthias, 10 Oct 2026: fold Friday, show Saturday).
+// Tapping the header reopens it.
+function zurichToday() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Zurich" }).format(new Date());
+}
+
 function ProgramSchedule({ view }: { view: ScheduleView }) {
   const days = SCHEDULES[view];
+  const [today, setToday] = useState(zurichToday);
+  useEffect(() => setToday(zurichToday()), []);
+  const [reopened, setReopened] = useState<string[]>([]);
+  // Only fold while a later day is still to come; once the conference is over, show everything.
+  const running = days.some((day) => day.dateTime >= today);
+  const isPast = (day: ScheduleDay) => running && day.dateTime < today;
+  const anyPast = days.some(isPast);
   return (
-    <div className={`program-board${days.length === 1 ? " program-board--single" : ""}`}>
-      {days.map((day) => (
-        <article className="program-day" key={day.day} aria-labelledby={`program-${view}-${day.day}`}>
-          <header className="program-day__header">
-            <h3 id={`program-${view}-${day.day}`}>{day.day}</h3>
-            <time dateTime={day.dateTime}>{day.date} 2026</time>
-          </header>
-          <ol className="program-list">
+    <div className={`program-board${days.length === 1 || anyPast ? " program-board--single" : ""}`}>
+      {days.map((day) => {
+        const past = isPast(day);
+        const folded = past && !reopened.includes(day.dateTime);
+        const listId = `program-${view}-${day.day}-list`;
+        return (
+        <article className={`program-day${folded ? " program-day--folded" : ""}`} key={day.day} aria-labelledby={`program-${view}-${day.day}`}>
+          {past ? (
+            <header className="program-day__header program-day__header--toggle">
+              <h3 id={`program-${view}-${day.day}`}>
+                <button
+                  type="button"
+                  className="program-day__toggle"
+                  aria-expanded={!folded}
+                  aria-controls={listId}
+                  onClick={() => setReopened((open) => folded ? [...open, day.dateTime] : open.filter((d) => d !== day.dateTime))}
+                >
+                  <span>{day.day}</span>
+                  <span className="program-day__toggle-meta">
+                    <time dateTime={day.dateTime}>{day.date} 2026</time>
+                    <span className="program-day__toggle-label">{folded ? "Show programme" : "Hide"}</span>
+                    <ChevronDown className="program-day__chevron" size={16} aria-hidden="true" />
+                  </span>
+                </button>
+              </h3>
+            </header>
+          ) : (
+            <header className="program-day__header">
+              <h3 id={`program-${view}-${day.day}`}>{day.day}</h3>
+              <time dateTime={day.dateTime}>{day.date} 2026</time>
+            </header>
+          )}
+          {!folded && <ol className="program-list" id={listId}>
             {day.items.map((item: ScheduleItem) => {
               const modalLinked = Boolean(item.speakerName || item.experienceName || item.panel);
               const linked = modalLinked || Boolean(item.href);
@@ -342,9 +382,10 @@ function ProgramSchedule({ view }: { view: ScheduleView }) {
                 </li>
               );
             })}
-          </ol>
+          </ol>}
         </article>
-      ))}
+        );
+      })}
     </div>
   );
 }
