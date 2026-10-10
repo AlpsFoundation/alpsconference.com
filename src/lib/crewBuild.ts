@@ -13,6 +13,7 @@ import {
   type BuildPhase,
   type BuildSection,
 } from "../data/crewBuild";
+import { CATERING_SHIFTS, type CateringShift } from "../data/volunteers";
 
 export type BuildAssignment = { task_id: string; person: string; phase: BuildPhase; created_at?: string };
 export type BuildTick = { task_id: string; phase: BuildPhase; done_at: string; by: string | null };
@@ -75,6 +76,25 @@ export function zoneGroupKey(n: string) {
 
 export function assigneesOf(state: BuildState | null, id: string, phase: BuildPhase) {
   return (state?.assignments ?? []).filter((a) => a.task_id === id && a.phase === phase).map((a) => a.person);
+}
+
+/** When the teardown work starts, after the 21:00 circle. */
+export const TEARDOWN_WORK_START = "21:15";
+
+/** The catering shift someone is on while the teardown runs, if any. They are flagged and not counted. */
+export function teardownCatering(person: string): CateringShift | undefined {
+  const day = BUILD_PHASES.teardown.dateTime;
+  return CATERING_SHIFTS.filter((s) => s.person === person && s.dateTime === day && s.to > TEARDOWN_WORK_START).sort(
+    (a, b) => b.to.localeCompare(a.to),
+  )[0];
+}
+
+/** Who is on a task: the sign-ups, and for the teardown also whoever set it up and is not on catering then. */
+export function crewOf(state: BuildState | null, id: string, phase: BuildPhase) {
+  const signed = assigneesOf(state, id, phase);
+  if (phase !== "teardown") return signed;
+  const setup = assigneesOf(state, id, "setup").filter((name) => !signed.includes(name) && !teardownCatering(name));
+  return [...signed, ...setup];
 }
 
 export function tickOf(state: BuildState | null, id: string, phase: BuildPhase) {

@@ -65,6 +65,8 @@ export type BuildPhaseInfo = {
   /** Length of the calendar entry when the plan sets no end time. */
   calendarMinutes?: number;
   timeNote?: string;
+  /** The order of the evening, shown as numbered steps under the note. */
+  steps?: string[];
   doneLabel: string;
   joinLabel: string;
 };
@@ -91,17 +93,24 @@ export const BUILD_PHASES: Record<BuildPhase, BuildPhaseInfo> = {
   teardown: {
     label: "Teardown",
     dateTime: "2026-10-10",
-    start: "21:30",
-    calendarMinutes: 60,
+    start: "21:00",
+    calendarMinutes: 90,
     timeNote:
-      "After the apéro, from 21:30, everyone helps. Whoever set a thing up tears it down. Philipp's rented backups (extension cords, cable drums, walkie-talkies, Régis's extra lights and disco ball) go back into the bags they came in, packed by whoever unpacked them.",
+      "Everyone helps. Whoever set a thing up tears it down. Philipp's rented backups (extension cords, cable drums, walkie-talkies, Régis's extra lights and disco ball) go back into the bags they came in, packed by whoever unpacked them.",
+    steps: [
+      "21:00 · Power and coordination circle on the big stage. Everyone comes.",
+      "21:15 · Work starts. Kevin Barron's art is gone from 13 by then; Matthias tells him.",
+      "Matthias parks the truck in front of the main entrance.",
+      "First onto the truck: the wood panels from the Kevin Barron space (13), nothing else yet. The art corner (14) may run a bit longer.",
+      "Everyone tears down what they set up on Thursday and brings all material to 7 top, where Régis packs it into boxes.",
+    ],
     doneLabel: "Torn down",
     joinLabel: "I'll tear this down",
   },
   load: {
     label: "Pack the truck",
     dateTime: "2026-10-10",
-    timeNote: "After the teardown. The time is still to be confirmed.",
+    timeNote: "The truck stands in front of the main entrance. The wood panels from 13 go on first, then the boxes Régis packs at 7 top.",
     doneLabel: "On the truck",
     joinLabel: "I'm on this",
   },
@@ -617,7 +626,7 @@ const DATA: BuildData = {
       "title": "Pack the truck",
       "kind": "task",
       "phase": "load",
-      "note": "After the teardown on Saturday 10 October. The time is still to be confirmed; the truck is unloaded in Bern on Sunday 11 October, about 15:00.",
+      "note": "During and after the teardown on Saturday 10 October, at the truck in front of the main entrance. The truck is unloaded in Bern on Sunday 11 October, about 15:00.",
       "items": [
         {
           "id": "load-all",
@@ -633,7 +642,7 @@ const DATA: BuildData = {
             "13"
           ],
           "draft": true,
-          "what": "Take the ALPS double wood panels, connector sticks and magnets from 13 back to the truck."
+          "what": "First thing: take the ALPS double wood panels, connector sticks and magnets from 13 to the truck at the main entrance. Only 13 for now; the art corner (14) may still be running."
         },
         {
           "id": "load-moss",

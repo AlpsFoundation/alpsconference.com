@@ -142,6 +142,14 @@ function useVenueClock() {
   return clock;
 }
 
+/** From the teardown circle on Saturday at 21:00 the shift grid folds away, so the teardown shows first. */
+const GRID_FOLD = { date: "2026-10-10", minutes: 21 * 60 };
+
+function gridFoldedFor(date: string, clock: Clock | null) {
+  if (!clock || date !== GRID_FOLD.date) return false;
+  return clock.date > GRID_FOLD.date || (clock.date === GRID_FOLD.date && clock.minutes >= GRID_FOLD.minutes);
+}
+
 function timingOf(clock: Clock | null, date: string, start: number, end: number): Timing | undefined {
   if (!clock) return undefined;
   if (date < clock.date || (date === clock.date && end <= clock.minutes)) return "past";
@@ -791,6 +799,7 @@ export default function VolunteersPage() {
   const headRef = useRef<HTMLDivElement>(null);
   /** The row a copied link points at, and the row whose link was just copied. */
   const [linked, setLinked] = useState<string | null>(null);
+  const [gridOpen, setGridOpen] = useState(false);
   const { copied, copy } = useCopyLink();
   const clock = useVenueClock();
   const build = useCrewBuild();
@@ -818,6 +827,8 @@ export default function VolunteersPage() {
       const event = params.get(EVENT_PARAM);
       if (slot) setLinked(`${date}-slot-${slot}`);
       else if (event) setLinked(`${date}-crew-${event}`);
+      // A shared row opens the grid even when it is folded.
+      if (slot || event) setGridOpen(true);
     }
   }, []);
 
@@ -1059,7 +1070,18 @@ export default function VolunteersPage() {
               <CrewLinks links={DAY_LINKS[day.dateTime]} label={`Links for ${tabLabel(day.dateTime)}`} />
             </div>
           )}
-          <div className="vol-grid">
+          {gridFoldedFor(day.dateTime, clock) && (
+            <h3 className="vol-gridfold" data-open={gridOpen || undefined}>
+              <button type="button" aria-expanded={gridOpen} aria-controls="vol-grid" onClick={() => setGridOpen((open) => !open)}>
+                <span>
+                  Shift schedule
+                  <small>{gridOpen ? "Tap to fold it away again" : "Folded during the teardown · tap to open"}</small>
+                </span>
+                <ChevronDown size={18} aria-hidden="true" className="vol-day__chevron" />
+              </button>
+            </h3>
+          )}
+          <div id="vol-grid" className="vol-grid" hidden={(gridFoldedFor(day.dateTime, clock) && !gridOpen) || undefined}>
             {day.shiftDay && (
               <div ref={headRef} className="vol-grid__head">
                 <span className="vol-grid__col">Time</span>

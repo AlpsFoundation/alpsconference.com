@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Check, ChevronUp, CloudOff, HandHeart, Maximize2, MapPin, Minimize2, Plus, UserPlus, Users, X } from "lucide-react";
+import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { Check, ChevronUp, CloudOff, UtensilsCrossed, HandHeart, Maximize2, MapPin, Minimize2, Plus, UserPlus, Users, X } from "lucide-react";
 import LinkButton, { pageLink, useCopyLink } from "./LinkButton";
 import { BUILD_PHASES, BUILD_ZONES, type BuildItem, type BuildPhase, type BuildSection } from "../data/crewBuild";
 import { BUILD_ITEM_LINKS } from "../data/crewLinks";
@@ -7,6 +7,8 @@ import CrewLinks from "./CrewLinks";
 import {
   assigneesOf,
   BUILD_DAYS,
+  crewOf,
+  teardownCatering,
   materialSections,
   neededFor,
   taskSections,
@@ -247,7 +249,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   /** Still short of people: fewer than needed, or no headcount yet and nobody on it. Ticked tasks are not. */
   const needsPeople = (item: BuildItem, phase: BuildPhase) => {
     if (tickOf(state, item.id, phase)) return false;
-    const signed = assigneesOf(state, item.id, phase).length;
+    const signed = crewOf(state, item.id, phase).length;
     const need = neededFor(item);
     return need ? signed < need : signed === 0;
   };
@@ -327,9 +329,10 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   const renderTask = (item: BuildItem, phase: BuildPhase) => {
     const info = BUILD_PHASES[phase];
     const people = assigneesOf(state, item.id, phase);
+    const crew = crewOf(state, item.id, phase);
     const need = neededFor(item);
     const done = tickOf(state, item.id, phase);
-    const open = need ? Math.max(0, need - people.length) : 0;
+    const open = need ? Math.max(0, need - crew.length) : 0;
     const setupBy = phase === "teardown" ? assigneesOf(state, item.id, "setup") : [];
     const addKey = `${phase}:${item.id}`;
     const key = itemKey(phase, item.id);
@@ -361,7 +364,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
               {item.name}
               {item.draft && <span className="cb-draft">Draft</span>}
             </p>
-            {state && <NeedPill signed={people.length} need={need} />}
+            {state && <NeedPill signed={crew.length} need={need} />}
             <LinkButton copied={copied === key} label={item.name} onCopy={() => copyLink(key)} />
           </div>
           <p className="cb-task__what" data-empty={!item.what || undefined}>
@@ -385,7 +388,24 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
             <p className="cb-task__meta">
               {setupBy.length ? (
                 <>
-                  Set up by <strong>{setupBy.join(", ")}</strong>
+                  Set up by{" "}
+                  {setupBy.map((name, index) => {
+                    const busy = teardownCatering(name);
+                    return (
+                      <Fragment key={name}>
+                        {index > 0 && ", "}
+                        <strong
+                          className={busy ? "cb-busy" : undefined}
+                          title={busy ? `${name} is on catering (${busy.station}) until ${busy.to}` : undefined}
+                        >
+                          {name}
+                          {busy && (
+                            <UtensilsCrossed size={13} className="cb-busy__icon" aria-label={`on catering until ${busy.to}`} />
+                          )}
+                        </strong>
+                      </Fragment>
+                    );
+                  })}
                 </>
               ) : (
                 "Nobody signed up for the setup."
@@ -513,7 +533,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   const sectionCounts = (section: BuildSection, phase: BuildPhase) => {
     const withNeed = section.items.filter((item) => item.people);
     const needSum = withNeed.reduce((sum, item) => sum + (item.people ?? 0), 0);
-    const filled = withNeed.reduce((sum, item) => sum + Math.min(assigneesOf(state, item.id, phase).length, item.people ?? 0), 0);
+    const filled = withNeed.reduce((sum, item) => sum + Math.min(crewOf(state, item.id, phase).length, item.people ?? 0), 0);
     const done = section.items.filter((item) => tickOf(state, item.id, phase)).length;
     return { needSum, filled, done };
   };
@@ -668,7 +688,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
             // Stats always cover the whole part, whatever the switch shows.
             const all = taskSections(phase).flatMap((section) => section.items);
             const needSum = all.reduce((sum, item) => sum + (item.people ?? 0), 0);
-            const filled = all.reduce((sum, item) => sum + (item.people ? Math.min(assigneesOf(state, item.id, phase).length, item.people) : 0), 0);
+            const filled = all.reduce((sum, item) => sum + (item.people ? Math.min(crewOf(state, item.id, phase).length, item.people) : 0), 0);
             const unset = all.filter((item) => !item.people).length;
             const done = all.filter((item) => tickOf(state, item.id, phase)).length;
             const materialItems = material.flatMap((section) => section.items);
@@ -679,7 +699,21 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
                 <header className="cb-phase__head">
                   <p className="cb-phase__time">{phaseTime(phase)}</p>
                   <h3 className="cb-phase__title">{info.label}</h3>
+                  {info.steps && (
+                    <ol className="cb-phase__steps">
+                      {info.steps.map((step) => (
+                        <li key={step}>{step}</li>
+                      ))}
+                    </ol>
+                  )}
                   {info.timeNote && <p className="cb-phase__note">{info.timeNote}</p>}
+                  {phase === "teardown" && (
+                    <p className="cb-phase__note">
+                      Whoever set a task up counts as its teardown crew.{" "}
+                      <UtensilsCrossed size={13} className="cb-busy__icon" aria-hidden="true" /> next to a name: on
+                      catering during the teardown, so not counted. Join where people are missing.
+                    </p>
+                  )}
                   {state && (
                     <p className="cb-phase__stats">
                       <strong>{done}</strong>/{all.length} {taskDoneLabel(phase).toLowerCase()}
