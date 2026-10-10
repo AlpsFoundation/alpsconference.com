@@ -1662,3 +1662,58 @@
 :root[data-vol-theme="light"] .vol-daylinks__title {
   color: var(--vl-accent);
 }
+
+/* Saturday from 21:00: the shift grid folds away so the teardown comes first. */
+.vol-grid[hidden] {
+  display: none;
+}
+
+.vol-gridfold {
+  margin: 0 0 0.9rem;
+  border: 1px solid var(--vol-line);
+  border-radius: 1.1rem;
+  background: var(--vol-panel);
+}
+
+.vol-gridfold button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.85rem 1.1rem;
+  border: 0;
+  background: none;
+  color: rgba(238, 244, 248, 0.86);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vol-gridfold button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.vol-gridfold small {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(238, 244, 248, 0.62);
+}
+
+.vol-gridfold[data-open] .vol-day__chevron {
+  rotate: 180deg;
+}
+
+:root[data-vol-theme="light"] .vol-gridfold button {
+  color: var(--vl-ink);
+}
+
+:root[data-vol-theme="light"] .vol-gridfold small {
+  color: var(--vl-muted);
+}

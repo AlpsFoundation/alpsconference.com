@@ -303,10 +303,10 @@ export const CREW_EVENTS: CrewEvent[] = [
   },
   {
     id: "dismantling",
-    title: "Dismantling",
+    title: "Dismantling: circle on the big stage, work from 21:15",
     dateTime: "2026-10-10",
-    start: "21:30",
-    calendarMinutes: 60,
+    start: "21:00",
+    calendarMinutes: 90,
     place: "Kultur & Kongresshaus Aarau",
   },
   {
