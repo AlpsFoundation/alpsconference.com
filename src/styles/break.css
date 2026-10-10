@@ -1006,8 +1006,35 @@
   mask-image: conic-gradient(#000 0turn, #000 calc(var(--p) * 1turn), transparent calc(var(--p) * 1turn + 0.015turn));
 }
 
-.break-survey.is-done .break-survey__fill {
-  filter: drop-shadow(0 0 calc(var(--art) / 30) rgba(243, 143, 191, 0.9));
+/* Past the goal: the print turns gold and breathes slowly; the count above the QR card goes gold too. */
+.break-survey__gold {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle, #fff1c9 0%, #f2c76e 45%, #d9a441 100%);
+  -webkit-mask: var(--spore) center / contain no-repeat;
+  mask: var(--spore) center / contain no-repeat;
+  filter: drop-shadow(0 0 calc(var(--art) / 40) rgba(242, 199, 110, 0.7));
+  transition: opacity 2.4s ease;
+}
+
+.break-survey.is-done .break-survey__gold {
+  opacity: 1;
+}
+
+.break-survey.is-done .break-survey__fill,
+.break-survey.is-done .break-survey__ghost {
+  opacity: 0;
+  transition: opacity 2.4s ease;
+}
+
+.break-survey.is-done .break-survey__art {
+  animation: break-survey-breathe 5s ease-in-out 2.4s infinite;
+}
+
+@keyframes break-survey-breathe {
+  0%, 100% { scale: 1; filter: brightness(1); }
+  50% { scale: 1.05; filter: brightness(1.18); }
 }
 
 /* The answers so far, right above the survey's QR card (Matthias, 10 Oct): out of the card's flow,
@@ -1049,6 +1076,15 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.break-survey__count.is-done,
+.break-survey__count.is-done small {
+  color: #f2c76e;
+}
+
+.break-survey__count small + strong + small {
+  margin: 0.35em 0 0;
+}
+
 .break-survey__count.is-bumped strong {
   animation: break-survey-bump 1.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -1060,5 +1096,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .break-survey { transition: none; }
+  .break-survey.is-done .break-survey__art { animation: none; }
   .break-survey__count.is-bumped strong { animation: none; }
 }

@@ -71,6 +71,8 @@ export function SurveySpore({ count, center }: { count: number; center: readonly
       <div className="break-survey__art">
         <img className="break-survey__ghost" src={withBase("img/spore.webp")} alt="" />
         <img className="break-survey__fill" src={withBase("img/spore.webp")} alt="" />
+        {/* Past the goal the spore print turns gold and breathes; the count keeps going (Matthias, 10 Oct). */}
+        <div className="break-survey__gold" style={{ "--spore": `url(${withBase("img/spore.webp")})` } as CSSProperties} />
       </div>
     </div>
   );
@@ -90,10 +92,10 @@ export function SurveyQr({ count }: { count: number | null }) {
   return (
     <aside className="break-links break-links--survey" aria-label="Participant survey">
       {count !== null && (
-        <p key={bump} className={`break-survey__count ${bump ? "is-bumped" : ""}`}>
-          <small>{done ? "Goal reached, thank you!" : "Survey answers"}</small>
+        <p key={bump} className={`break-survey__count ${bump ? "is-bumped" : ""} ${done ? "is-done" : ""}`}>
+          <small>{done ? `Goal of ${SURVEY_GOAL} reached!` : `Our goal: ${SURVEY_GOAL}`}</small>
           <strong>{count}</strong>
-          <span> / {SURVEY_GOAL}</span>
+          <small>survey answers</small>
         </p>
       )}
       <p className="break-links__url">Survey · 2 min</p>
