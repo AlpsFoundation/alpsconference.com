@@ -40,6 +40,99 @@ export type BuildItem = {
   who?: string;
   status?: string;
   draft?: boolean;
+  /** Teardown only: the setup verb, shown crossed out before the teardown name. */
+  was?: string;
+};
+
+/** Teardown wording per setup task: the setup verb crossed out (`was`), then what to tear down. */
+export const TEARDOWN_TEXT: Record<string, { was: string; name: string; what: string }> = {
+  "ws-rooms": {
+    was: "Prepare",
+    name: "Clear workshop rooms 1, 2 and 3 (second floor)",
+    what: "Collect the yoga mats, cushions and blankets from rooms 1, 2 and 3 on the second floor and bring them to 7 top.",
+  },
+  "alps-desk": {
+    was: "Set up",
+    name: "Take down the ALPS Desk",
+    what: "Pack up the combined ALPS info, merch and Summer School desk at 1 and bring everything to 7 top.",
+  },
+  "alps-infotable": {
+    was: "Set up",
+    name: "Take down the ALPS Infotable",
+    what: "Clear the ALPS info table at 2 and bring everything to 7 top.",
+  },
+  "alps-banner": {
+    was: "Put up",
+    name: "Take down the ALPS Big Banner",
+    what: "Take the big ALPS banner down at 3, roll it up and bring it to 7 top.",
+  },
+  "alps-stage": {
+    was: "Set up",
+    name: "Take down the ALPS Stage branding",
+    what: "Remove the ALPS branding from the main stage (4) and bring it to 7 top.",
+  },
+  "jw-clean": {
+    was: "Clean and place",
+    name: "Collect the Japanese walls from the lounges",
+    what: "Fold up the 8 Japanese walls (paravents) in the three lounges and bring them to 7 top.",
+  },
+  "lounge-bottom": {
+    was: "Set up",
+    name: "Clear Lounge bottom: paravents, lit walls, live painting",
+    what: "Take down the paravents and lit walls in Lounge bottom, and help pack up the live painting, including Joanne's easel, once it has finished. Bring it all to 7 top.",
+  },
+  "lounge-mid": {
+    was: "Set up",
+    name: "Clear Lounge mid",
+    what: "Take down the paravents and lit walls in Lounge mid and bring them to 7 top.",
+  },
+  "lounge-top": {
+    was: "Set up",
+    name: "Clear Lounge top",
+    what: "Take down the paravents and lit walls in Lounge top and keep the space free: this is where Régis packs everything into boxes.",
+  },
+  "exhibitor-tables": {
+    was: "Prepare",
+    name: "Clear the exhibitor tables",
+    what: "Once the exhibitors at 9 and 10 have packed their own things, clear the tables and bring any ALPS material to 7 top.",
+  },
+  "posters-1": {
+    was: "Set up",
+    name: "Take down Posters (1)",
+    what: "Take down about 4 lightweight poster panels at 5 and 6 and bring the panels and posters to 7 top.",
+  },
+  "posters-2": {
+    was: "Set up",
+    name: "Take down Posters (2)",
+    what: "Take down the other 4 or so lightweight poster panels at 5 and 6 and bring the panels and posters to 7 top.",
+  },
+  "wood-wall": {
+    was: "Build",
+    name: "Take apart the wood-panel wall for the Kevin Barron exhibition",
+    what: "Once Kevin Barron's art is gone (by 21:15), take the double wood panels, connector sticks and magnets apart at 13 and carry them straight to the truck at the main entrance. They go on first.",
+  },
+  "research-spaces": {
+    was: "Put up",
+    name: "Take down the 11 research posters",
+    what: "Take the 11 research posters off the panels at 12 and bring them, with the magnets and pins, to 7 top.",
+  },
+  "hannah-display": {
+    was: "Build",
+    name: "Take down the art corner wall for Hana and Joanne",
+    what: "The art corner at 14 may run a bit longer. When it closes, help Hana and Joanne pack their work, then take down the display panels. Hana's black cloth and lights go back to her; everything else goes to 7 top.",
+  },
+  "signs-print": {
+    was: "Print and put up",
+    name: "Take down the A3 and A4 signs",
+    what: "Collect the A4 signs and A3 posters from around the house and bring them to 7 top.",
+  },
+};
+
+/** Teardown wording per setup section, where the setup title or note does not fit. */
+export const TEARDOWN_SECTION_TEXT: Record<string, { title?: string; note?: string | null }> = {
+  workshop: { title: "0) Workshop rooms", note: null },
+  exhibitors: { note: "The exhibitors pack their own tables. ALPS clears them afterwards." },
+  display: { note: null },
 };
 
 export type BuildSection = {
