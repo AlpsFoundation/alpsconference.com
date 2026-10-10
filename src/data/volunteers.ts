@@ -271,8 +271,8 @@ export const CREW_EVENTS: CrewEvent[] = [
     place: "Kultur & Kongresshaus Aarau",
     people: ["Raphaël"],
   },
-  // Sat 10 Oct: Pascal Kälin's breathwork session in Saal 4, 11:15–12:30. Daria assists the first session only
-  // (Matthias, 2026-10-10); the 16:45–18:00 session has no helper on the plan.
+  // Sat 10 Oct: Pascal Kälin's breathwork sessions in Saal 4, 11:15–12:30 and 16:45–18:00. Daria assists both
+  // (Matthias, 2026-10-10 12:30: she wants to help at the second one again).
   {
     id: "breathwork-helper-sat-am",
     title: "Breathwork helper (assist Pascal Kälin)",
@@ -300,6 +300,15 @@ export const CREW_EVENTS: CrewEvent[] = [
     calendarMinutes: 30,
     place: "Saal 4, Kultur & Kongresshaus Aarau",
     people: ["Daria", "Maria"],
+  },
+  {
+    id: "breathwork-helper-sat-pm",
+    title: "Breathwork helper (assist Pascal Kälin)",
+    dateTime: "2026-10-10",
+    start: "16:45",
+    calendarMinutes: 75,
+    place: "Saal 4, Kultur & Kongresshaus Aarau",
+    people: ["Daria"],
   },
   // Sat 10 Oct, 12:15 (Matthias, #conference): Marina and Michel, both Happy Helpers, help Kevin Barron take down his artwork from 18:30.
   {
