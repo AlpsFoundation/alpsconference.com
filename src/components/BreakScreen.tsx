@@ -35,6 +35,7 @@ import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
 import { qrPath } from "./signage/qr";
 import SynapseIllustration from "./SynapseIllustration";
+import { SurveyBones, SurveyQr, useSurveyCount } from "./SurveyBones";
 
 // Turns slowly about its axis in the upper right; the message sits below, on the left.
 const SYNAPSE_OPTIONS = { spin: 0.1, zoom: 0.7, shiftX: 0.2, shiftY: 0.2 };
@@ -683,6 +684,11 @@ export default function BreakScreen() {
   // The links QR sits beside the Next up banner; on a slide without one it moves up beside the
   // title, in the right third where the sponsors stand on a break (Matthias, 9 Oct).
   const qrBesideTitle = !showNext;
+  // Every break slide carries the participant survey: its QR card beside the links card and, once
+  // the count is in, the Bones synapse filling up with the answers in place of the 3D synapse.
+  const surveySlide = !sponsorSlide && current?.kind === "pause";
+  const surveyCount = useSurveyCount(surveySlide);
+  const surveyBones = surveySlide && surveyCount !== null;
 
   // Step the pinned item through the schedule. Between items (or after the
   // last one) "now" sits half a step before the next one.
@@ -734,7 +740,9 @@ export default function BreakScreen() {
         <div className="absolute inset-0 bg-gradient-to-b from-neutral-dark/40 via-neutral-dark/10 to-neutral-dark/80" />
         <ParticlesCanvas variant="hero" scale={1.6} center={GLOW_CENTER} />
       </div>
-      {synapseFailed ? (
+      {surveyBones ? (
+        <SurveyBones count={surveyCount!} center={GLOW_CENTER} />
+      ) : synapseFailed ? (
         <div className="break-bones" aria-hidden>
           <img src={withBase("img/bones.png")} alt="" />
         </div>
@@ -851,6 +859,7 @@ export default function BreakScreen() {
             </div>
           )}
         </div>
+        {!qrBesideTitle && surveySlide && <SurveyQr />}
         {!qrBesideTitle && <LinksQr />}
         {/* Shown while the mouse moves (or on hover): step through the schedule, or open it. */}
         <nav className={`break-pager ${active || drawerOpen ? "is-visible" : ""}`} aria-label="Schedule">

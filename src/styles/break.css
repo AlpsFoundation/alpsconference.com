@@ -930,3 +930,112 @@
     animation: none;
   }
 }
+
+/* The participant survey on the break slides (SurveyBones.tsx): the Bones synapse fills clockwise
+   about its centre, which sits on the pink aura, and grows a little as the answers near the goal.
+   --p (0–1) is registered so the fill and the growth ease from one count to the next. */
+@property --p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.break-survey {
+  --art: min(50vmin, 40vw);
+  position: absolute;
+  width: var(--art);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: --p 2.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.break-survey__art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  transform: scale(calc(0.86 + 0.2 * var(--p)));
+}
+
+/* Half as large again as the artwork, so the turned arms' corners stay inside the mask's box. */
+.break-survey__rosette {
+  position: absolute;
+  inset: -25%;
+}
+
+.break-survey__rosette img {
+  position: absolute;
+  inset: 16.667%;
+  width: 66.667%;
+  height: 66.667%;
+}
+
+.break-survey__rosette img {
+  opacity: 0.55;
+  mix-blend-mode: screen;
+}
+
+.break-survey__ghost {
+  opacity: 0.12;
+}
+
+.break-survey__fill {
+  opacity: 0.9;
+  filter: drop-shadow(0 0 calc(var(--art) / 60) rgba(243, 143, 191, 0.55));
+  -webkit-mask-image: conic-gradient(#000 0turn, #000 calc(var(--p) * 1turn), transparent calc(var(--p) * 1turn + 0.015turn));
+  mask-image: conic-gradient(#000 0turn, #000 calc(var(--p) * 1turn), transparent calc(var(--p) * 1turn + 0.015turn));
+}
+
+.break-survey.is-done .break-survey__fill {
+  filter: drop-shadow(0 0 calc(var(--art) / 30) rgba(243, 143, 191, 0.9));
+}
+
+/* The count sits just above the rosette's centre, in the pink aura, so it stays clear of the
+   sponsors' line under it on slides with a taller message (the lunch break's two experiences). */
+.break-survey__count {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  width: max-content;
+  padding: 0.6em 2.4em 0.3em;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(8, 47, 74, 0.82), rgba(8, 47, 74, 0.5) 60%, transparent);
+  text-align: center;
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(8, 47, 74, 0.95), 0 0 18px rgba(8, 47, 74, 0.9);
+}
+
+.break-survey__count strong {
+  font-size: calc(var(--art) / 6.5);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.break-survey__count span {
+  font-size: calc(var(--art) / 13);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.break-survey__count small {
+  display: block;
+  margin-bottom: 0.35em;
+  font-size: calc(var(--art) / 22);
+  font-weight: 550;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.break-survey__count.is-bumped strong {
+  animation: break-survey-bump 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes break-survey-bump {
+  0% { color: var(--color-accent); text-shadow: 0 0 24px rgba(243, 143, 191, 0.95); }
+  100% { color: inherit; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .break-survey { transition: none; }
+  .break-survey__count.is-bumped strong { animation: none; }
+}
