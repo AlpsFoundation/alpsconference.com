@@ -301,6 +301,16 @@ export const CREW_EVENTS: CrewEvent[] = [
     place: "Saal 4, Kultur & Kongresshaus Aarau",
     people: ["Daria", "Maria"],
   },
+  // Sat 10 Oct, 12:15 (Matthias, #conference): Marina and Michel, both Happy Helpers, help Kevin Barron take down his artwork from 18:30.
+  {
+    id: "kevin-barron-dismantling-sat",
+    title: "Help Kevin Barron take down his artwork (13)",
+    dateTime: "2026-10-10",
+    start: "18:30",
+    calendarMinutes: 60,
+    place: "Kevin Barron exhibition (13), Kultur & Kongresshaus Aarau",
+    people: ["Marina", "Michel"],
+  },
   {
     id: "dismantling",
     title: "Dismantling: circle on the big stage, work from 21:15",

@@ -1050,3 +1050,26 @@
   opacity: 0.55;
   text-decoration-thickness: 1.5px;
 }
+
+/* Phones and tablets: the task title gets the full width; the headcount and Link pills sit on the line under it. */
+@media (max-width: 1099px) {
+  .cb-task__top {
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 0.45rem;
+  }
+
+  .cb-task__name {
+    flex: 1 1 100%;
+    font-size: 1.02rem;
+  }
+
+  .cb-task__top .vol-linkbtn {
+    margin-left: auto;
+  }
+
+  .cb-was {
+    display: block;
+    font-size: 0.85rem;
+  }
+}

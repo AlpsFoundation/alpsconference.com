@@ -7,7 +7,9 @@ import CrewLinks from "./CrewLinks";
 import {
   assigneesOf,
   BUILD_DAYS,
+  buildItem,
   crewOf,
+  setupPeople,
   teardownCatering,
   materialSections,
   neededFor,
@@ -244,7 +246,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
   const mine = (item: BuildItem, phase: BuildPhase) =>
     Boolean(person) &&
     (assigneesOf(state, item.id, phase).includes(person!) ||
-      (phase === "teardown" && assigneesOf(state, item.id, "setup").includes(person!)));
+      (phase === "teardown" && setupPeople(state, item.id).includes(person!)));
 
   /** Still short of people: fewer than needed, or no headcount yet and nobody on it. Ticked tasks are not. */
   const needsPeople = (item: BuildItem, phase: BuildPhase) => {
@@ -333,7 +335,8 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
     const need = neededFor(item);
     const done = tickOf(state, item.id, phase);
     const open = need ? Math.max(0, need - crew.length) : 0;
-    const setupBy = phase === "teardown" ? assigneesOf(state, item.id, "setup") : [];
+    const setupBy = phase === "teardown" ? setupPeople(state, item.id) : [];
+    const teardownOnly = buildItem(item.id)?.section.phase === "teardown";
     const addKey = `${phase}:${item.id}`;
     const key = itemKey(phase, item.id);
     return (
@@ -389,7 +392,7 @@ export default function CrewBuild({ dateTime, person, build, onlyMine, onNeedPer
             </p>
           )}
           {item.detail && item.detail !== item.what && <p className="cb-task__meta">{item.detail}</p>}
-          {phase === "teardown" && state && (
+          {phase === "teardown" && state && !(teardownOnly && !setupBy.length) && (
             <p className="cb-task__meta">
               {setupBy.length ? (
                 <>
