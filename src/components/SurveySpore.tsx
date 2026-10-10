@@ -4,7 +4,8 @@ import { qrPath } from "./signage/qr";
 
 /**
  * The participant survey as a game on the break slides (Gerel wants 80–90 answers, Matthias 10 Oct):
- * every answer fills a little more of the Bones synapse, clockwise about its centre on the pink
+ * every answer draws a little more of last year's spore print (ALPS Conference 2025 › 05_Communications
+ * › Spores › sporeJJ_1, cropped about its centre), clockwise round a full cycle centred on the pink
  * aura, and it grows slightly as it nears the goal. The count comes from a small Apps Script web
  * app on the form ("CONF26 survey response count (break slides)" in Matthias's
  * `_ALPS Apps Script & Forms` folder), polled every 30 s. Until a count arrives — or if it never
@@ -50,39 +51,15 @@ export function useSurveyCount(enabled: boolean): number | null {
   return count;
 }
 
-/**
- * A spore print made of synapses: the Bones artwork turned about its centre (the synaptic cleft)
- * in even steps, so its arms radiate like the gills of last year's spore prints.
- */
-const ARMS = 12;
-function Rosette({ className }: { className: string }) {
-  const src = withBase("img/bones.svg");
-  return (
-    <div className={`break-survey__rosette ${className}`}>
-      {Array.from({ length: ARMS }, (_, i) => (
-        <img key={i} src={src} alt="" style={{ transform: `rotate(${(i * 180) / ARMS}deg)` }} />
-      ))}
-    </div>
-  );
-}
-
-/** The Bones synapse, revealed clockwise in proportion to the answers so far. */
-export function SurveyBones({ count, center }: { count: number; center: readonly [number, number] }) {
+/** Last year's spore print, revealed clockwise in proportion to the answers so far. */
+export function SurveySpore({ count, center }: { count: number; center: readonly [number, number] }) {
   const progress = Math.max(0, Math.min(1, count / SURVEY_GOAL));
-  // Start empty, then ease to the count, so the slide opens on the synapse filling in.
+  // Start empty, then ease to the count, so the slide opens on the spore print drawing itself.
   const [shown, setShown] = useState(0);
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => setShown(progress));
     return () => window.cancelAnimationFrame(frame);
   }, [progress]);
-
-  // A short glow on the caption whenever a new answer comes in.
-  const last = useRef(count);
-  const [bump, setBump] = useState(0);
-  useEffect(() => {
-    if (count > last.current) setBump((b) => b + 1);
-    last.current = count;
-  }, [count]);
 
   const done = count >= SURVEY_GOAL;
   return (
@@ -92,23 +69,33 @@ export function SurveyBones({ count, center }: { count: number; center: readonly
       aria-hidden
     >
       <div className="break-survey__art">
-        <Rosette className="break-survey__ghost" />
-        <Rosette className="break-survey__fill" />
+        <img className="break-survey__ghost" src={withBase("img/spore.webp")} alt="" />
+        <img className="break-survey__fill" src={withBase("img/spore.webp")} alt="" />
       </div>
-      <p key={bump} className={`break-survey__count ${bump ? "is-bumped" : ""}`}>
-        <small>{done ? "Goal reached, thank you!" : "Survey answers"}</small>
-        <strong>{count}</strong>
-        <span> / {SURVEY_GOAL}</span>
-      </p>
     </div>
   );
 }
 
-/** The survey's QR card, beside the links card on the break slides. */
-export function SurveyQr() {
+/** The survey's QR card, beside the links card on the break slides, with the answers so far right above it. */
+export function SurveyQr({ count }: { count: number | null }) {
   const box = SURVEY_QR.size + QR_QUIET * 2;
+  // A short pink glow on the number whenever a new answer comes in.
+  const last = useRef(count);
+  const [bump, setBump] = useState(0);
+  useEffect(() => {
+    if (count !== null && last.current !== null && count > last.current) setBump((b) => b + 1);
+    last.current = count;
+  }, [count]);
+  const done = count !== null && count >= SURVEY_GOAL;
   return (
     <aside className="break-links break-links--survey" aria-label="Participant survey">
+      {count !== null && (
+        <p key={bump} className={`break-survey__count ${bump ? "is-bumped" : ""}`}>
+          <small>{done ? "Goal reached, thank you!" : "Survey answers"}</small>
+          <strong>{count}</strong>
+          <span> / {SURVEY_GOAL}</span>
+        </p>
+      )}
       <p className="break-links__url">Survey · 2 min</p>
       <svg
         className="break-links__code"

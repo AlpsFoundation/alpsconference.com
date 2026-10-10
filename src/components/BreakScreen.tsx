@@ -35,7 +35,7 @@ import { withBase } from "../lib/withBase";
 import ParticlesCanvas from "./ParticlesCanvas";
 import { qrPath } from "./signage/qr";
 import SynapseIllustration from "./SynapseIllustration";
-import { SurveyBones, SurveyQr, useSurveyCount } from "./SurveyBones";
+import { SurveyQr, SurveySpore, useSurveyCount } from "./SurveySpore";
 
 // Turns slowly about its axis in the upper right; the message sits below, on the left.
 const SYNAPSE_OPTIONS = { spin: 0.1, zoom: 0.7, shiftX: 0.2, shiftY: 0.2 };
@@ -474,6 +474,26 @@ function NextUp({ entry, now }: { entry: TimelineEntry; now: Date }) {
   );
 }
 
+/** The sponsors' logos: on their own slide in the message's right third, otherwise small under the ALPS logo with the thank-you line. */
+function SponsorBlock({ beside = false }: { beside?: boolean }) {
+  return (
+    <div className={`break-sponsor ${beside ? "break-sponsor--top" : ""}`}>
+      {beside && <span className="break-sponsor__label">With thanks to our sponsors</span>}
+      <div className="break-sponsor__logos">
+        {SPONSOR_LOGOS.map((logo) => (
+          <img
+            key={logo.src}
+            src={withBase(logo.src)}
+            alt={logo.alt}
+            className="break-sponsor__logo"
+            style={{ "--h": logo.h } as CSSProperties}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function LinksQr() {
   const box = LINKS_QR.size + QR_QUIET * 2;
   return (
@@ -685,10 +705,10 @@ export default function BreakScreen() {
   // title, in the right third where the sponsors stand on a break (Matthias, 9 Oct).
   const qrBesideTitle = !showNext;
   // Every break slide carries the participant survey: its QR card beside the links card and, once
-  // the count is in, the Bones synapse filling up with the answers in place of the 3D synapse.
+  // the count is in, last year's spore print filling up with the answers in place of the 3D synapse.
   const surveySlide = !sponsorSlide && current?.kind === "pause";
   const surveyCount = useSurveyCount(surveySlide);
-  const surveyBones = surveySlide && surveyCount !== null;
+  const surveySpore = surveySlide && surveyCount !== null;
 
   // Step the pinned item through the schedule. Between items (or after the
   // last one) "now" sits half a step before the next one.
@@ -721,13 +741,15 @@ export default function BreakScreen() {
   const Icon = message?.icon;
   const messageKey = `${shownStep ?? "none"}-${next?.id ?? "none"}`;
   // A long headline, or one with the agenda lists under it, takes the smaller size.
-  const long = (message?.headline.length ?? 0) > 32 || !!message?.agenda;
+  // The sponsors under the logo take room from the top, so a break slide with a highlight line too
+  // (the group picture) takes the smaller size as well.
+  const long = (message?.headline.length ?? 0) > 32 || !!message?.agenda || (message?.sponsor === "beside" && !!message.highlight);
 
   return (
     <div
       ref={rootRef}
       className={`break-screen ${active || drawerOpen ? "" : "is-idle"}`}
-      data-sponsor={message?.sponsor ? "" : undefined}
+      data-sponsor={message?.sponsor === "alone" ? "" : undefined}
     >
       <div className="absolute inset-0" aria-hidden>
         {/* Oversized so its radial glow can sit on the synapse and still cover the screen. */}
@@ -740,8 +762,8 @@ export default function BreakScreen() {
         <div className="absolute inset-0 bg-gradient-to-b from-neutral-dark/40 via-neutral-dark/10 to-neutral-dark/80" />
         <ParticlesCanvas variant="hero" scale={1.6} center={GLOW_CENTER} />
       </div>
-      {surveyBones ? (
-        <SurveyBones count={surveyCount!} center={GLOW_CENTER} />
+      {surveySpore ? (
+        <SurveySpore count={surveyCount!} center={GLOW_CENTER} />
       ) : synapseFailed ? (
         <div className="break-bones" aria-hidden>
           <img src={withBase("img/bones.png")} alt="" />
@@ -758,7 +780,11 @@ export default function BreakScreen() {
       <div className="break-vignette" aria-hidden />
 
       <header className="break-top">
-        <img src={withBase("img/logo.png")} alt="ALPS Conference 2026" className="break-logo" />
+        {/* On a break, the apéro or a closing slide the sponsors stand just under the logo (Matthias, 10 Oct). */}
+        <div className="break-brand">
+          <img src={withBase("img/logo.png")} alt="ALPS Conference 2026" className="break-logo" />
+          {message?.sponsor === "beside" && <SponsorBlock beside />}
+        </div>
         {now && (
           <p className="break-clock">
             <CalendarDays aria-hidden />
@@ -771,7 +797,7 @@ export default function BreakScreen() {
         {message && (
           <div
             key={messageKey}
-            className={`break-message ${message.sponsor ? "has-sponsor" : ""} ${qrBesideTitle ? "has-sponsor has-links" : ""} ${message.agenda ? "has-agenda" : ""}`}
+            className={`break-message ${message.sponsor === "alone" ? "has-sponsor" : ""} ${qrBesideTitle ? "has-sponsor has-links" : ""} ${message.agenda ? "has-agenda" : ""}`}
           >
             <div className="break-message__text">
               {message.eyebrow && (
@@ -829,22 +855,7 @@ export default function BreakScreen() {
               )}
               <Experiences item={current ? programItem(current) : undefined} />
             </div>
-            {message.sponsor && (
-              <div className="break-sponsor">
-                {message.sponsor === "beside" && <span className="break-sponsor__label">With thanks to our sponsors</span>}
-                <div className="break-sponsor__logos">
-                  {SPONSOR_LOGOS.map((logo) => (
-                    <img
-                      key={logo.src}
-                      src={withBase(logo.src)}
-                      alt={logo.alt}
-                      className="break-sponsor__logo"
-                      style={{ "--h": logo.h } as CSSProperties}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+            {message.sponsor === "alone" && <SponsorBlock />}
             {qrBesideTitle && <LinksQr />}
           </div>
         )}
@@ -859,7 +870,7 @@ export default function BreakScreen() {
             </div>
           )}
         </div>
-        {!qrBesideTitle && surveySlide && <SurveyQr />}
+        {!qrBesideTitle && surveySlide && <SurveyQr count={surveyCount} />}
         {!qrBesideTitle && <LinksQr />}
         {/* Shown while the mouse moves (or on hover): step through the schedule, or open it. */}
         <nav className={`break-pager ${active || drawerOpen ? "is-visible" : ""}`} aria-label="Schedule">
