@@ -128,7 +128,7 @@ export default function Location() {
             <p data-fade-up className="opacity-0 text-white/90 leading-relaxed text-base sm:text-[1.05rem]">
               A spacious foyer serves as a welcoming area and exhibition space. Located near
               the heart of Aarau&apos;s historic center, surrounded by dining and leisure options,
-              it&apos;s a prime spot for local and international attendees alike.
+              it was home to ALPS 2026.
             </p>
 
             <div data-fade-up className="opacity-0 grid gap-3 pt-3 sm:grid-cols-2">

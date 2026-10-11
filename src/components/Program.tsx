@@ -20,7 +20,6 @@ import {
   Palette,
   PartyPopper,
   Sparkles,
-  Ticket,
   Utensils,
   UtensilsCrossed,
   Wind,
@@ -500,25 +499,16 @@ const TAB_INTROS: Record<ScheduleView, string> = {
 function WorkshopDayNotice() {
   return (
     <div className="program-notice">
-      <Ticket className="program-notice__icon" size={20} aria-hidden="true" />
+      <GraduationCap className="program-notice__icon" size={20} aria-hidden="true" />
       <div className="program-notice__body">
-        <p className="program-notice__title">Separate ticket — the day before the conference</p>
+        <p className="program-notice__title">Workshop Day — the day before the conference</p>
         <p>
-          The Workshop Day runs on Thursday 8 October, one day before ALPS 2026 opens. It is booked
-          separately and is not included in a conference ticket. Places are limited and accredited for
-          4 FSP credits.
+          The Workshop Day ran on Thursday 8 October, one day before ALPS 2026 opened, with its own
+          registration. It was accredited for 4 FSP credits.
         </p>
         <span className="program-notice__actions">
           <a href={withBase("/workshops")}>
             Workshop Day details
-            <ArrowUpRight size={14} aria-hidden="true" />
-          </a>
-          <a href={WORKSHOP_DAY.ticketUrl} target="_blank" rel="noopener noreferrer">
-            Buy a workshop ticket
-            <ArrowUpRight size={14} aria-hidden="true" />
-          </a>
-          <a href={withBase("/workshops#bundle")}>
-            Workshop + conference bundle
             <ArrowUpRight size={14} aria-hidden="true" />
           </a>
         </span>

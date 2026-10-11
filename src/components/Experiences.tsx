@@ -521,7 +521,7 @@ export default function Experiences() {
           <h2 className="section-title mb-5">Experiences</h2>
           <p className="text-white/70 text-base sm:text-[1.05rem] leading-relaxed">
             ALPS is about more than science. It is also about art, connection, and the spaces between talks.
-            Alongside the scientific programme we offer an exhibition, sound, movement, and social sessions —
+            Alongside the scientific programme we offered an exhibition, sound, movement, and social sessions —
             invitations to look closely, listen deeply, and meet one another.
           </p>
         </div>

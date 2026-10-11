@@ -65,7 +65,7 @@ export const PROGRAM: ProgramDay[] = [
       { time: "16:30–17:15", title: "Coffee break", kind: "pause", menuNote: "Coffee, tea · Vegan cakes, Ayurvedic energy balls & fresh fruit" },
       { time: "17:15–18:15", title: "Prof. Amandine Luquiens", detail: "Is It More Than the Drug? Exploring Precision Psychedelic Therapy for Addiction", speakerName: "Prof. Amandine Luquiens" },
       { time: "18:15–19:15", title: "Panel discussion", detail: "The \"Therapy\" in Psychedelic-Assisted Therapy", panel: "friday", moderatorName: "Vincent Diehl", thanksSlide: false },
-      { time: "19:15–20:15", title: "Optional networking dinner", detail: "Pre-sale available on Infomaniak or the ALPS info table at the venue", detailHighlight: true, menuNote: "Tofu-vegetable curry on rice with herb pesto · 1 drink included", slideHeadline: "Not signed up yet? Get your tickets at the info table.", kind: "pause" },
+      { time: "19:15–20:15", title: "Optional networking dinner", detail: "Optional, self-paid", menuNote: "Tofu-vegetable curry on rice with herb pesto · 1 drink included", slideHeadline: "Not signed up yet? Get your tickets at the info table.", kind: "pause" },
       { time: "20:15–21:15", title: "Friday evening program", detail: "Storytelling with Kate Dalby", kind: "social", experienceName: "Kate Dalby", experiences: [
         { title: "Storytelling", time: "20:15–21:15", personName: "Kate Dalby" },
       ] },

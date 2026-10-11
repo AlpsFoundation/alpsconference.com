@@ -27,8 +27,6 @@ const VENUE_NAME = "Jugendkulturhaus Flösserplatz";
 const VENUE = `${VENUE_NAME}, Flösserstrasse 7`;
 const MAP_URL =
   "https://www.google.com/maps/search/?api=1&query=AAREAL+Fl%C3%B6sserplatz%2C+Fl%C3%B6sserstrasse+7%2C+5000+Aarau";
-const EVENTFROG_URL =
-  "https://eventfrog.ch/de/p/partys/house-techno/afterglow-afterparty-for-the-alps-conference-guestlist-only-7505194045364252288.html";
 
 /** The party's own artwork, panned inside its crop the way the speaker photos are. */
 function AfterglowPhoto({ src, className }: { src: string; className: string }) {
@@ -112,9 +110,9 @@ function AfterpartyModal({
         </p>
 
         <p className="mt-5 text-sm text-white/80 leading-relaxed">
-          The conference closes with a private afterparty — an evening of music to close the day
-          together. Music starts at <span className="font-medium text-white">10 pm</span>, the
-          night runs until <span className="font-medium text-white">4 am</span>.
+          The conference closed with a private afterparty — an evening of music to end the day
+          together. Music started at <span className="font-medium text-white">10 pm</span> and the
+          night ran until <span className="font-medium text-white">4 am</span>.
         </p>
 
         <div className="mt-6 space-y-5">
@@ -151,24 +149,11 @@ function AfterpartyModal({
 
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-light mb-2">
-              Tickets
+              Entry
             </p>
             <p className="text-sm text-white/80 leading-relaxed">
-              Entry is <span className="font-medium text-white">included</span> in your
-              conference ticket.
-            </p>
-            <p className="mt-2 text-xs text-white/65 leading-relaxed">
-              Show your conference badge at the door. Everyone else, friends and family included,
-              gets in with a ticket from{" "}
-              <a
-                href={EVENTFROG_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-white underline decoration-support-light/40 underline-offset-2 hover:decoration-support-light"
-              >
-                eventfrog
-              </a>
-              .
+              Entry was <span className="font-medium text-white">included</span> in the
+              conference ticket; the party was guestlist only.
             </p>
           </div>
         </div>

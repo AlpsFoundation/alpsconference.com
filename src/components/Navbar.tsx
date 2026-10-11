@@ -15,11 +15,11 @@ type NavLink = {
 
 const CONFERENCE_LINKS: NavLink[] = [
   { label: "Overview", href: "/#about", description: "Theme, dates, and conference details" },
-  { label: "Speakers", href: "/#speakers", description: "Confirmed speakers and talks" },
+  { label: "Speakers", href: "/#speakers", description: "Speakers and their talks" },
   { label: "Program", href: "/#program", description: "Workshop Day plus the Friday–Saturday schedule" },
-  { label: "Experiences", href: "/#experiences", description: "Art, sound, and connection", badge: "Updated" },
+  { label: "Experiences", href: "/#experiences", description: "Art, sound, and connection" },
   { label: "Research Posters", href: "/research-posters", description: "Research presented at the conference" },
-  { label: "Location", href: "/#location", description: "Venue and travel details" },
+  { label: "Location", href: "/#location", description: "The venue in Aarau" },
   { label: "FAQ", href: "/#faq", description: "Practical information" },
   { label: "Partners", href: "/#partners", description: "Sponsors and collaborators" },
 ];
@@ -36,7 +36,6 @@ const WORKSHOP_DAY_LINK: NavLink = {
   label: "Workshop Day",
   href: "/workshops",
   description: "Pre-conference PAT training",
-  badge: "New",
 };
 
 const FOUNDATION_URL = "https://www.alps.foundation/";
@@ -229,9 +228,6 @@ export default function Navbar({ banner }: { banner?: ReactNode }) {
                 className="flex items-center gap-2 px-4 py-2.5 text-base font-medium text-white/90 hover:text-white transition-colors duration-200 rounded-sm hover:bg-white/5"
               >
                 Workshop Day
-                <span className="rounded-full bg-accent px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-neutral-dark">
-                  New
-                </span>
               </a>
               <DesktopDropdown
                 label="Past editions"
@@ -287,10 +283,7 @@ export default function Navbar({ banner }: { banner?: ReactNode }) {
             >
               <span>
                 <span className="block text-lg font-semibold">Workshop Day</span>
-                <span className="block text-sm text-white/60">Thursday 8 October · separate ticket</span>
-              </span>
-              <span className="rounded-full bg-accent px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-neutral-dark">
-                New
+                <span className="block text-sm text-white/60">Thursday 8 October 2026</span>
               </span>
             </a>
 
