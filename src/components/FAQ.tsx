@@ -2,98 +2,61 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronDown, ArrowUpRight } from "lucide-react";
 import { animate } from "animejs";
 
-const REDUCED_PRICE_FORM_URL = "https://forms.gle/kAJ8Gmm6E3F8vaKg8";
+import { NEWSLETTER_SIGNUP_URL, YOUTUBE_CHANNEL_URL } from "../data/postConference";
 
+// ALPS Conference 2026 took place on 9–10 October 2026: questions are answered looking back.
 const FAQS = [
   {
-    category: "Before the Event",
+    category: "At the conference",
     items: [
       {
-        q: "When will tickets go on sale?",
-        a: "Tickets will go on sale on April 19, 2026 at 8pm CET."
+        q: "Where did the conference take place?",
+        a: "At the Kultur & Kongresshaus Aarau, Schlossplatz 9, 5000 Aarau. More about the venue: [kuk-aarau.ch](https://www.kuk-aarau.ch/)"
       },
       {
-        q: "Can my ticket be refunded?",
-        a: "We have a no-refund policy. However, you can transfer your ticket to another person before the conference. Please note that the ALPS Foundation is a non-profit organization, operated entirely by unpaid volunteers and sustained through donations. Additionally, our ticketing partner Infomaniak offers a cancellation insurance in partnership Allianz; please refer to their terms and conditions."
+        q: "What was the working language of the conference?",
+        a: "English."
       },
       {
-        q: "Who is eligible for the reduced ticket?",
-        a: "Students currently enrolled in any official college or university are eligible for the ALPS Conference 2026 Student Ticket. Please bring proof, such as a student card on the day of the event."
+        q: "What food was served?",
+        a: "Mainly vegetarian food, with vegan options at lunch and the networking apéro. Snacks during the breaks were vegetarian."
       },
       {
-        q: "I only want to attend one day of the conference, is that possible?",
-        a: "Tickets are only available for the full length of the conference, two days."
+        q: "Was the event streamed live?",
+        a: `No, but the sessions were recorded and will be published on our [YouTube channel](${YOUTUBE_CHANNEL_URL}).`
       },
       {
-        q: "The ticket price is too high for me, is there a solution?",
-        a: "Yes. We review requests for a reduced ticket price on a case-by-case basis.",
-        cta: { label: "Request a Price Reduction", href: REDUCED_PRICE_FORM_URL }
+        q: "Were photos and videos taken at the event?",
+        a: "The ALPS Foundation filmed and photographed the event for educational and promotional purposes. By entering the event premises and by participating in this event, attendees consented to the use of your photograph, likeness, or video or audio recording in whole or in part without restriction or limitation for any educational, promotional, or any purpose for distribution online and in printed publications or publication in other media.\n\nYou release the ALPS Foundation, their volunteers, and each and all persons involved from any liability connected with the taking, recording, digitisation, or publication of interviews, photographs, computer images, or video and/or sound recordings.\n\nWe are however happy to remove your image from any digital property over which we have control upon your request."
       }
     ]
   },
   {
-    category: "During the Event",
+    category: "After the conference",
     items: [
       {
-        q: "What is included in my ticket?",
-        a: "Tickets include entry to the conference for both days, featuring 12 speakers, poster presentations, a networking apéro, and an afterparty. Attendees will enjoy snacks and coffee/tea during morning and afternoon breaks. Additionally, lunch will be provided on Friday, and on Saturday, lunch and food/refreshments will be available during the networking apéro."
-      },
-      {
-        q: "What food will be served during the conference?",
-        a: "We serve mainly Vegetarian Food with Vegan options during Lunch and the Networking Apero. Snacks during breaks will be Vegetarian."
-      },
-      {
-        q: "Where can I find information about the location?",
-        a: "The conference will be held at Kultur & Kongresshaus Aarau. For more information, visit: https://www.kuk-aarau.ch/"
-      },
-      {
-        q: "Will the event be streamed live?",
-        a: "No, however all sessions are recorded and will be available on our YouTube Channel."
-      },
-      {
-        q: "What is the working language of the conference?",
-        a: "The working language of the conference is English."
-      },
-      {
-        q: "What is the dress code for the event?",
-        a: "There is no dress code for the event. We ourselves wear whatever we would wear at an academic conference."
-      },
-      {
-        q: "Are there volunteering opportunities for this event?",
-        a: "Yes. Keep an eye out for the announcement on our Instagram to find out when we open our volunteering application form."
-      },
-      {
-        q: "What services are available for participants with special needs?",
-        a: "Kultur & Kongresshaus Aarau is wheelchair accessible. Please reach out to us if you have any special needs."
-      },
-      {
-        q: "Will there be photo and video recording at the event?",
-        a: "The ALPS Foundation shoots video and pictures of the event for educational and promotional purposes. By entering the event premises and by participation in this event, you consent to the use of your photograph, likeness, or video or audio recording in whole or in part without restriction or limitation for any educational, promotional, or any purpose for distribution online and in printed publications or publication in other media.\n\nYou release the ALPS Foundation, their volunteers, and each and all persons involved from any liability connected with the taking, recording, digitisation, or publication of interviews, photographs, computer images, or video and/or sound recordings.\n\nWe are however happy to remove your image from any digital property over which we have control upon your request."
-      }
-    ]
-  },
-  {
-    category: "After the Event",
-    items: [
-      {
-        q: "Will recordings be available for later viewing? What about previous ALPS conferences?",
-        a: "Absolutely, check out our playlists from previous editions on YouTube."
+        q: "Will recordings be available? What about previous ALPS conferences?",
+        a: `Yes. The ALPS 2026 talks will be published on our [YouTube channel](${YOUTUBE_CHANNEL_URL}), where the playlists from previous editions are already online.`
       },
       {
         q: "Can I get a certificate for attending this conference?",
-        a: "Yes, a certificate of participation will be made available a few days after the conference. Please send an email after the conference at info@alps.foundation"
+        a: "Yes. Email info@alps.foundation to request your certificate of participation."
       },
       {
         q: "Can I get ECTS credits for attending the conference?",
-        a: "Yes. The main conference (October 9–10) is accredited for up to 14 ECTS for the FSP and 10 ECTS for the SGPP/SSPP."
+        a: "Yes. The main conference (9–10 October) was accredited for up to 14 ECTS for the FSP and 10 ECTS for the SGPP/SSPP."
       },
       {
         q: "Can I get FSP credits for the Workshop Day?",
-        a: "Yes — 4 FSP credits for medical professionals and psychologists. A certificate of attendance is provided after the event."
+        a: "Yes. The Workshop Day was accredited for 4 FSP credits for medical professionals and psychologists, with a certificate of attendance after the event."
       },
       {
         q: "Does the ALPS Foundation share my personal information?",
         a: "No. The ALPS Foundation keeps all personal information entered during registration confidential and secure."
+      },
+      {
+        q: "How can I stay in touch with ALPS?",
+        a: `Sign up for the newsletter on [alps.foundation](${NEWSLETTER_SIGNUP_URL}) for occasional updates on ALPS events, talks and psychedelic science in Switzerland.`
       }
     ]
   }

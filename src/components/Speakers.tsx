@@ -357,9 +357,9 @@ export default function Speakers() {
           <p className="section-eyebrow">
             ALPS 2026
           </p>
-          <h2 className="section-title mb-4">Confirmed speakers</h2>
+          <h2 className="section-title mb-4">Speakers</h2>
           <p className="text-white/50 text-base max-w-xl mx-auto">
-            Distinguished researchers and clinicians presenting at the forefront of psychedelic science.
+            Researchers and clinicians who presented their work at ALPS 2026.
           </p>
         </div>
 

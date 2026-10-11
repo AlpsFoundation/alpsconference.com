@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Ticket, Mail, MapPin, Clock } from "lucide-react";
+import { Mail, MapPin, Clock, ArrowDown } from "lucide-react";
 import { animate, stagger } from "animejs";
 import { withBase } from "../lib/withBase";
+import { NEWSLETTER_SIGNUP_URL } from "../data/postConference";
 import ParticlesCanvas from "./ParticlesCanvas";
 import ConferenceCountdown from "./ConferenceCountdown";
 import SynapseIllustration from "./SynapseIllustration";
@@ -14,10 +15,11 @@ export type HeroIllustration = "image" | "synapse";
 const TITLE_FALLBACK_MS = 5000;
 
 // Title words, grouped into the runs that must not wrap; each letter animates in on its own.
-// The greeting sits on its own smaller line above the name.
-const GREETING = ["Welcome", "to"];
+// The greeting sits on its own smaller line above the name. The conference took place
+// on 9–10 October 2026, so the hero thanks people rather than welcoming them.
+const GREETING = ["Thank", "you", "for", "joining"];
 const TITLE = [["ALPS"], ["CONFERENCE", "2026"]];
-const TITLE_LABEL = "Welcome to ALPS Conference 2026";
+const TITLE_LABEL = "Thank you for joining ALPS Conference 2026";
 
 function TitleLetters({ words }: { words: string[] }) {
   return (
@@ -261,7 +263,7 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
             <div className="flex shrink-0 items-center gap-1.5 min-[380px]:gap-2 text-white">
               <Clock className="w-5 h-5 text-support-light" />
               <span className="whitespace-nowrap text-[13px] min-[380px]:text-[15px] min-[430px]:text-base sm:text-xl font-semibold">
-                9-10 October 2026
+                9–10 October 2026
               </span>
             </div>
             <span className="hidden sm:block w-px h-5 shrink-0 bg-white/20" />
@@ -276,22 +278,22 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
           <div className="flex flex-col items-center gap-3 sm:gap-4 w-full max-w-xs sm:max-w-sm mx-auto">
             <a
               data-animate-scale
-              href="https://infomaniak.events/en-ch/conferences/alps-conference-2026/c2484795-1ae7-4b4b-aa21-c9b8f085008c/events/382409"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#thank-you"
               className="opacity-0 flex w-full items-center justify-center gap-2 sm:gap-2.5 px-6 sm:px-9 py-3.5 sm:py-4.5 bg-support hover:bg-support-light text-white text-base sm:text-lg font-semibold rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/25 leading-tight"
             >
-              <Ticket className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-              <span className="whitespace-nowrap">Buy Networking Dinner Tickets</span>
+              <ArrowDown className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
+              <span className="whitespace-nowrap">Look back at ALPS 2026</span>
             </a>
 
             <a
               data-animate-scale
-              href="#newsletter"
+              href={NEWSLETTER_SIGNUP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="opacity-0 flex items-center justify-center gap-2 sm:gap-2.5 px-5 sm:px-7 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
             >
               <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-              <span className="whitespace-nowrap">Stay in Touch</span>
+              <span className="whitespace-nowrap">Stay in touch</span>
             </a>
           </div>
         </div>

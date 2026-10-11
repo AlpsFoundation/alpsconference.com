@@ -13,13 +13,13 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
 import { withBase } from "../lib/withBase";
-import { WORKSHOP_BUNDLE, WORKSHOP_TRACKS, type WorkshopSpeaker as Speaker, type WorkshopTrack } from "../data/workshops";
+import { WORKSHOP_TRACKS, type WorkshopSpeaker as Speaker, type WorkshopTrack } from "../data/workshops";
 
 const LOGISTICS = [
   {
     icon: CalendarDays,
     label: "Date",
-    value: "Thursday, October 8th, 2026",
+    value: "Thursday, 8 October 2026",
   },
   {
     icon: Clock,
@@ -184,12 +184,10 @@ function TrackCard({ track }: { track: WorkshopTrack }) {
 export default function WorkshopPage() {
   const heroRef = useRef<HTMLElement>(null);
   const conceptRef = useRef<HTMLElement>(null);
-  const ticketsRef = useRef<HTMLElement>(null);
   const tracksRef = useRef<HTMLElement>(null);
 
   useScrollFade(heroRef);
   useScrollFade(conceptRef);
-  useScrollFade(ticketsRef);
   useScrollFade(tracksRef);
 
   return (
@@ -201,37 +199,29 @@ export default function WorkshopPage() {
           <ParticlesCanvas variant="workshopHero" />
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
             <p data-fade-up className="opacity-0 text-base tracking-[0.2em] uppercase text-support-light font-medium mb-4">
-              Pre-Conference Workshop Day
+              Pre-conference Workshop Day · 8 October 2026
             </p>
             <h1 data-fade-up className="opacity-0 text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
               PAT Training Across Switzerland's Linguistic Regions
             </h1>
             <p data-fade-up className="opacity-0 text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-8">
-              A specialized platform for Psychedelic-Assisted Therapy training, combining theoretical input
-              with experiential clinical practice in three parallel language tracks.
+              An afternoon of Psychedelic-Assisted Therapy training the day before ALPS 2026, combining
+              theoretical input with experiential clinical practice in three parallel language tracks.
             </p>
             <div data-fade-up className="opacity-0 flex justify-center mb-10">
               <div className="inline-flex items-center gap-3 rounded-full border border-support/35 bg-gradient-to-r from-support/20 via-support/10 to-accent/10 px-5 py-2.5 shadow-[0_0_28px_rgba(46,124,199,0.18)]">
                 <Award className="h-5 w-5 text-support-light" />
                 <span className="text-sm sm:text-base font-semibold text-white">
-                  Earn 4 FSP credits
+                  Accredited for 4 FSP credits
                 </span>
               </div>
             </div>
             <div data-fade-up className="opacity-0 flex flex-wrap justify-center gap-3">
               <a
-                href="https://infomaniak.events/fr-ch/shop/alps-conference-2026-RQNBE4WPQY/event/1629286/"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#tracks"
                 className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
               >
-                Buy Workshop Ticket
-              </a>
-              <a
-                href="#tracks"
-                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-white/5 hover:bg-white/[0.08] border border-white/10 hover:border-white/25 rounded-sm transition-colors duration-200"
-              >
-                Explore Tracks
+                Explore the tracks
               </a>
             </div>
           </div>
@@ -241,7 +231,7 @@ export default function WorkshopPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <SectionIntro eyebrow="Program concept & logistics" title="One Afternoon, Three Parallel Tracks">
               <p>
-                Three parallel clinical training tracks reflecting Switzerland's multilingual landscape. No prior experience required.
+                Three parallel clinical training tracks reflected Switzerland's multilingual landscape. No prior experience was required.
               </p>
             </SectionIntro>
 
@@ -257,17 +247,17 @@ export default function WorkshopPage() {
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-2">Clinical Learning Format</h3>
                   <p className="text-white/70 text-base leading-relaxed">
-                    Each track combines focused theoretical input with experiential structures, giving
+                    Each track combined focused theoretical input with experiential structures, giving
                     participants a clinically grounded setting for reflection, practice, and exchange.
-                    The workshops are open to everyone — clinicians, researchers, students, and anyone
+                    The workshops were open to everyone — clinicians, researchers, students, and anyone
                     with an interest in psychedelic-assisted therapy.
                   </p>
                   <div className="mt-4 flex items-start gap-3 rounded-sm border border-support/25 bg-support/10 px-4 py-3">
                     <Award className="mt-0.5 h-5 w-5 shrink-0 text-support-light" />
                     <p className="text-sm text-white/75 leading-relaxed">
-                      Earn <span className="font-semibold text-white">4 FSP credits</span> (medical
-                      professionals &amp; psychologists). Certificate of attendance provided after the
-                      event.
+                      Accredited for <span className="font-semibold text-white">4 FSP credits</span>{" "}
+                      (medical professionals &amp; psychologists), with a certificate of attendance
+                      after the event.
                     </p>
                   </div>
                 </div>
@@ -276,65 +266,12 @@ export default function WorkshopPage() {
           </div>
         </section>
 
-        <section ref={ticketsRef} id="tickets" className="relative py-24 sm:py-32">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <SectionIntro eyebrow="Tickets" title="Buy Workshop Tickets">
-              <p>Seats are limited across the three parallel tracks. Prices are listed in Swiss francs.</p>
-            </SectionIntro>
-            <div className="flex justify-center mt-10">
-              <a
-                href="https://infomaniak.events/fr-ch/shop/alps-conference-2026-RQNBE4WPQY/event/1629286/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md bg-white/10 hover:bg-white/20 border border-white/20 px-8 py-4 text-base font-semibold text-white transition-colors"
-              >
-                Buy Workshop Tickets
-              </a>
-            </div>
-            <div id="bundle" data-fade-up className="opacity-0 mt-10 rounded-sm border border-white/[0.07] bg-white/[0.03] px-5 py-6 text-center">
-              <p className="text-white font-semibold">
-                Workshop + Conference Bundle · {WORKSHOP_BUNDLE.price} instead of {WORKSHOP_BUNDLE.separately}
-              </p>
-              <p className="text-sm text-white/55 mt-1">
-                A seat in your workshop track plus the two-day conference ticket. Limited number.
-              </p>
-              <div className="flex flex-wrap justify-center gap-3 mt-5">
-                {WORKSHOP_BUNDLE.tracks.map((track) => (
-                  <a
-                    key={track.language}
-                    href={track.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center rounded-md bg-white/10 hover:bg-white/20 border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition-colors"
-                  >
-                    Bundle · {track.language} track
-                  </a>
-                ))}
-              </div>
-            </div>
-            <p data-fade-up className="opacity-0 text-sm text-white/55 mt-8 mb-3">
-              When purchasing, please indicate your preferred workshop track in the order notes so we can plan accordingly.
-            </p>
-            <div data-fade-up className="opacity-0 grid gap-3 grid-cols-1 sm:grid-cols-3">
-              {WORKSHOP_TRACKS.map((track) => (
-                <div key={track.language} className="flex items-center justify-between rounded-sm border border-white/[0.07] bg-white/[0.03] px-4 py-3">
-                  <span className="flex items-center gap-2 text-white/80 text-sm font-medium">
-                    <span aria-hidden="true">{track.flag}</span>
-                    {track.language}
-                  </span>
-                  <span className="text-sm text-white/45">{track.places} places</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section ref={tracksRef} id="tracks" className="relative py-24 sm:py-32 bg-white/[0.02]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <SectionIntro eyebrow="Abstracts & bios" title="Parallel Workshop Tracks">
               <p>
-                Choose one of three specialized tracks led by experienced clinicians and trainers working
-                across Switzerland's linguistic regions.
+                Three specialized tracks, led by experienced clinicians and trainers working across
+                Switzerland's linguistic regions.
               </p>
             </SectionIntro>
 

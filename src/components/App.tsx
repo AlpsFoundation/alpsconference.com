@@ -1,34 +1,34 @@
 import Navbar from "./Navbar";
-import AttendeeBanner from "./AttendeeBanner";
+import FoundationBanner from "./FoundationBanner";
 import Hero, { type HeroIllustration } from "./Hero";
-import Conference from "./Conference";
+import ThankYou from "./ThankYou";
 import Experiences from "./Experiences";
 import About from "./About";
 import Gallery from "./Gallery";
 import Program from "./Program";
 import Speakers from "./Speakers";
 import Location from "./Location";
-import Accommodation from "./Accommodation";
 import Newsletter from "./Newsletter";
 import Partners from "./Partners";
 import FAQ from "./FAQ";
 import Footer from "./Footer";
 import ParticlesCanvas from "./ParticlesCanvas";
 
+// The conference took place on 9–10 October 2026: the page now looks back on it.
+// Accommodation (hotel discounts for attendees) is no longer shown.
 export default function App({ illustration }: { illustration?: HeroIllustration }) {
   return (
     <>
-      <Navbar banner={<AttendeeBanner />} />
+      <Navbar banner={<FoundationBanner />} />
       <main>
         <Hero illustration={illustration} />
-        {/* <Conference /> */}
+        <ThankYou />
         <About />
         <Program />
         <Speakers />
         <Experiences />
         <Gallery />
         <Location />
-        <Accommodation />
         <FAQ />
         <Newsletter />
       </main>
