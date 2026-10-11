@@ -199,7 +199,7 @@ export default function WorkshopPage() {
           <ParticlesCanvas variant="workshopHero" />
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
             <p data-fade-up className="opacity-0 text-base tracking-[0.2em] uppercase text-support-light font-medium mb-4">
-              Pre-conference Workshop Day · 8 October 2026
+              Thursday 8 October 2026
             </p>
             <h1 data-fade-up className="opacity-0 text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
               PAT Training Across Switzerland's Linguistic Regions
