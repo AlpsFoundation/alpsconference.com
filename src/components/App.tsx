@@ -1,5 +1,4 @@
 import Navbar from "./Navbar";
-import FoundationBanner from "./FoundationBanner";
 import Hero, { type HeroIllustration } from "./Hero";
 import ThankYou from "./ThankYou";
 import Experiences from "./Experiences";
@@ -19,7 +18,7 @@ import ParticlesCanvas from "./ParticlesCanvas";
 export default function App({ illustration }: { illustration?: HeroIllustration }) {
   return (
     <>
-      <Navbar banner={<FoundationBanner />} />
+      <Navbar />
       <main>
         <Hero illustration={illustration} />
         <ThankYou />
