@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Mail, MapPin, Clock, ArrowDown } from "lucide-react";
+import { Mail, MapPin, Clock, ArrowUpRight } from "lucide-react";
 import { animate, stagger } from "animejs";
 import { withBase } from "../lib/withBase";
-import { NEWSLETTER_SIGNUP_URL } from "../data/postConference";
+import { FOUNDATION_URL, NEWSLETTER_SIGNUP_URL } from "../data/postConference";
 import ParticlesCanvas from "./ParticlesCanvas";
 import ConferenceCountdown from "./ConferenceCountdown";
 import SynapseIllustration from "./SynapseIllustration";
@@ -278,11 +278,13 @@ export default function Hero({ illustration = "image" }: { illustration?: HeroIl
           <div className="flex flex-col items-center gap-3 sm:gap-4 w-full max-w-xs sm:max-w-sm mx-auto">
             <a
               data-animate-scale
-              href="#thank-you"
+              href={FOUNDATION_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="opacity-0 flex w-full items-center justify-center gap-2 sm:gap-2.5 px-6 sm:px-9 py-3.5 sm:py-4.5 bg-support hover:bg-support-light text-white text-base sm:text-lg font-semibold rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/25 leading-tight"
             >
-              <ArrowDown className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-              <span className="whitespace-nowrap">Look back at ALPS 2026</span>
+              <span className="whitespace-nowrap">More from ALPS Foundation</span>
+              <ArrowUpRight className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
             </a>
 
             <a
