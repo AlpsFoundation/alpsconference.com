@@ -164,7 +164,7 @@ function MobileLinkGroup({
   );
 }
 
-/** `banner` renders full width above the nav row, e.g. AttendeeBanner on the home page. */
+/** `banner` renders full width above the nav row (the attendee portal bar while the conference was on). */
 export default function Navbar({ banner }: { banner?: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);

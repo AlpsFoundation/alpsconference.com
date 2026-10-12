@@ -10,8 +10,11 @@ type Props = {
   // Clicks and taps here flare the illustration (and ask for motion access on iOS).
   interactionTarget?: RefObject<HTMLElement | null>;
   className?: string;
-  // Extra options for initSynapse (spin, framing), read once on mount.
-  options?: Pick<SynapseOptions, "spin" | "zoom" | "shiftX" | "shiftY" | "maxWidth">;
+  // Extra options for initSynapse (spin, framing, particles), read once on mount.
+  options?: Pick<
+    SynapseOptions,
+    "spin" | "zoom" | "shiftX" | "shiftY" | "maxWidth" | "particleScale" | "floaters"
+  >;
   // Changing this plays the transition: part of the mesh redraws as the synapse
   // spins up and the particles surge (not on its first value: the intro plays anyway).
   transitionKey?: string;

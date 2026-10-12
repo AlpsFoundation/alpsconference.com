@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
-import { Mail } from "lucide-react";
 import { withBase } from "../lib/withBase";
+
+const CERTIFICATE_EMAIL = "mailto:info@alps.foundation?subject=Certificate%20of%20participation%20%E2%80%93%20ALPS%202026";
 
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -35,10 +36,10 @@ export default function About() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div data-fade-up className="opacity-0 text-center mb-10 sm:mb-12">
           <p className="section-eyebrow">
-            About the conference
+            About the Conference
           </p>
           <h2 className="section-title">
-            ALPS 2026 in Aarau
+            Looking back on ALPS 2026
           </h2>
         </div>
 
@@ -50,7 +51,7 @@ export default function About() {
             <iframe
               className="w-full h-full"
               src="https://www.youtube-nocookie.com/embed/_3iQxlvqZog?iv_load_policy=3&playsinline=1&rel=0&modestbranding=1"
-              title="ALPS Conference 2026 invitation video"
+              title="ALPS Conference 2026 — you're invited"
               loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
@@ -59,16 +60,16 @@ export default function About() {
 
           <div className="space-y-4 text-base sm:text-[1.05rem] text-white/78 leading-relaxed text-left">
           <p data-fade-up className="opacity-0">
-            The sixth edition of the ALPS Awareness Lectures on Psychedelic Science took place on <strong>Friday and Saturday, 9–10 October 2026</strong>, at the Kultur &amp; Kongresshaus in <strong>Aarau, Switzerland</strong>.
+            On <strong>Friday and Saturday, October 9–10, 2026</strong>, the sixth edition of the ALPS Awareness Lectures on Psychedelic Science brought researchers, practitioners, and enthusiasts together at the Kultur &amp; Kongresshaus in <strong>Aarau, Switzerland</strong>.
           </p>
           <p data-fade-up className="opacity-0">
-            Over two full days, speakers and panels shared recent advances in psychedelic research and therapy. For the first time, ALPS 2026 opened with a dedicated <a href={withBase("/workshops")} className="text-support-light hover:text-white transition-colors underline underline-offset-4">Workshop Day</a> on Thursday, 8 October, with three parallel PAT training tracks before the conference began. The conference was held in English.
+            Two full days of cutting-edge science, meaningful dialogue, and community building: distinguished speakers and interactive panels shared the latest advancements in psychedelic research and therapy, alongside research posters and immersive experiences. For the first time, ALPS also opened with a dedicated <a href={withBase("/workshops")} className="text-support-light hover:text-white transition-colors underline underline-offset-4">Workshop Day</a> on Thursday, October 8th, with three parallel PAT training tracks.
           </p>
           <p data-fade-up className="opacity-0">
-            Catering was vegetarian throughout, from breakfast and the breaks to lunch and the Saturday-evening apéro, with an optional networking dinner on Friday evening. Between sessions, researchers, practitioners and everyone curious about the field met over apéros, and the conference closed with our traditional afterparty on Saturday night.
+            Between the sessions, we shared vegetarian meals and apéros, the Friday networking dinner, and our traditional After Party on Saturday night.
           </p>
           <p data-fade-up className="opacity-0">
-            The conference was accredited for up to 14 FSP credits and up to 10 SGPP credits for psychologists and medical professionals.
+            Thank you to every speaker, attendee, partner, and volunteer who made it happen. We look forward to welcoming you to ALPS Conference VII.
           </p>
           </div>
         </div>
@@ -80,19 +81,20 @@ export default function About() {
           >
           <div className="mb-4">
             <span className="text-sm uppercase tracking-[0.18em] text-accent-light">
-              Thursday, 8 October 2026
+              Thursday, October 8th, 2026
             </span>
           </div>
-          <h3 className="text-2xl font-semibold text-white mb-3">Pre-conference Workshop Day</h3>
+          <h3 className="text-2xl font-semibold text-white mb-3">Pre-Conference Workshop Day</h3>
           <p className="text-white/72 text-base sm:text-lg leading-relaxed mb-6">
-            ALPS 2026 began with an afternoon of Psychedelic-Assisted Therapy training in English,
-            German and French tracks, combining theoretical input with experiential clinical practice.
+            ALPS 2026 opened with a specialized afternoon of Psychedelic-Assisted Therapy training across
+            English, German, and French tracks, combining theoretical input with experiential
+            clinical practice.
           </p>
           <a
             href={withBase("/workshops")}
             className="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
           >
-            About the Workshop Day
+            Explore Workshop Day
           </a>
           </div>
 
@@ -102,20 +104,20 @@ export default function About() {
           >
           <div className="mb-4">
             <span className="text-sm uppercase tracking-[0.18em] text-white/50">
-              After the conference
+              Friday–Saturday, October 9–10, 2026
             </span>
           </div>
-          <h3 className="text-2xl font-semibold text-white mb-3">Certificates of participation</h3>
+          <h3 className="text-2xl font-semibold text-white mb-3">Certificates of Participation</h3>
           <p className="text-white/72 text-base sm:text-lg leading-relaxed mb-6">
-            Attended ALPS 2026 and need a certificate of participation? Email us at
-            info@alps.foundation and we will send it to you.
+            The conference is accredited for up to 14 FSP credits and up to 10 SGPP credits for
+            psychologists and medical professionals. Email us to request your certificate of
+            participation.
           </p>
           <a
-            href="mailto:info@alps.foundation?subject=ALPS%202026%20certificate%20of%20participation"
-            className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-base font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-sm transition-colors duration-200"
+            href={CERTIFICATE_EMAIL}
+            className="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-support hover:bg-support-light rounded-sm transition-colors duration-200"
           >
-            <Mail className="h-5 w-5 shrink-0" aria-hidden="true" />
-            Request a certificate
+            Request a Certificate
           </a>
           </div>
         </div>

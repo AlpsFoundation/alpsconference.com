@@ -1,305 +1,89 @@
 import { useEffect, useRef, useState } from "react";
-import { Mail, MapPin, Clock, ArrowUpRight } from "lucide-react";
-import { animate, stagger } from "animejs";
 import { withBase } from "../lib/withBase";
-import { FOUNDATION_URL, NEWSLETTER_SIGNUP_URL } from "../data/postConference";
-import ParticlesCanvas from "./ParticlesCanvas";
-import ConferenceCountdown from "./ConferenceCountdown";
-import SynapseIllustration from "./SynapseIllustration";
 
-// "image": the static bones.png. "synapse": its 3D rendition, which draws itself
-// first and cues the title and the particles in (see the home page; /static uses the image).
-export type HeroIllustration = "image" | "synapse";
+// The 2026 group photo on the main stage (Saturday 10 October, by Max Lüdicke), shown whole at every size: as wide as
+// the page, or as wide as fits between the navbar and the bottom of the window.
+const PHOTO = "img/thank-you/group-photo";
+const PHOTO_WIDTHS = [640, 1024, 1440, 2000, 2400];
+const PHOTO_ALT =
+  "Group photo of the ALPS Conference 2026 speakers, attendees and crew on the stage of the Kultur & Kongresshaus Aarau, under the ALPS logo on the screen";
+// The photo's width when it fills the window's height (keep in step with .thank-you-photo in app.css).
+const PHOTO_SIZES = "(min-aspect-ratio: 3/2) calc((100vh - 5rem) * 1.61), 100vw";
 
-// Show the content anyway if the 3D intro never cues it (slow or failed load).
-const TITLE_FALLBACK_MS = 5000;
+// Start the letters anyway if the photo is slow to load.
+const READY_FALLBACK_MS = 2500;
 
-// Title words, grouped into the runs that must not wrap; each letter animates in on its own.
-// The greeting sits on its own smaller line above the name. The conference took place
-// on 9–10 October 2026, so the hero thanks people rather than welcoming them.
-const GREETING = ["Thank", "you", "for", "joining"];
-const TITLE = [["ALPS"], ["CONFERENCE", "2026"]];
-const TITLE_LABEL = "Thank you for joining ALPS Conference 2026";
+const WORDS = ["THANK", "YOU"];
 
-function TitleLetters({ words }: { words: string[] }) {
-  return (
-    <span className="whitespace-nowrap">
-      {words.map((word, w) => (
-        <span key={w}>
-          {w > 0 && " "}
-          {[...word].map((letter, l) => (
-            <span
-              key={l}
-              data-letter
-              className="inline-block opacity-0 will-change-transform bg-gradient-to-b from-white/45 via-white/85 to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent]"
-            >
-              {letter}
-            </span>
-          ))}
-        </span>
-      ))}
-    </span>
-  );
-}
+const srcSet = (format: string) =>
+  PHOTO_WIDTHS.map((w) => `${withBase(`${PHOTO}-${w}.${format}`)} ${w}w`).join(", ");
 
-// On short desktop windows the illustration shrinks to keep the boutons between
-// the title and the event details, which take about 510px of the hero's height
-// between them. Keep in step with the bones box's lg:max-w below.
-const illustrationMaxWidth = (_w: number, h: number) =>
-  window.innerWidth >= 1024 ? Math.max(320, 3.3 * (h - 510)) : Infinity;
-
-// Top of el within the hero, from the layout alone (ignores the entrance transforms).
-function offsetWithin(el: HTMLElement, root: HTMLElement) {
-  let top = 0;
-  for (let node: HTMLElement | null = el; node && node !== root; node = node.offsetParent as HTMLElement | null) {
-    top += node.offsetTop;
-  }
-  return top;
-}
-
-export default function Hero({ illustration = "image" }: { illustration?: HeroIllustration }) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const detailsRef = useRef<HTMLDivElement>(null);
-  const bonesRef = useRef<HTMLDivElement>(null);
-  const contentShown = useRef(false);
-  const is3d = illustration === "synapse";
-  const [synapseFailed, setSynapseFailed] = useState(false);
-  const [particlesOn, setParticlesOn] = useState(!is3d);
-  const showImage = !is3d || synapseFailed;
-
-  // The illustration sits in the middle of the gap between the title and the
-  // event details rather than in the middle of the hero, so the title doesn't
-  // cover it: how far below the hero's centre that is, in pixels.
-  const gapOffset = () => {
-    const section = sectionRef.current;
-    const title = titleRef.current;
-    const details = detailsRef.current;
-    if (!section || !title || !details) return 0;
-    const titleBottom = offsetWithin(title, section) + title.offsetHeight;
-    return (titleBottom + offsetWithin(details, section) - section.offsetHeight) / 2;
-  };
-  const synapseOptions = useRef({
-    maxWidth: illustrationMaxWidth,
-    shiftY: (_w: number, h: number) => -gapOffset() / h,
-  }).current;
-  const [imageOffset, setImageOffset] = useState(0);
+export default function Hero() {
+  const photoRef = useRef<HTMLImageElement>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!showImage) return;
-    const update = () => setImageOffset(gapOffset());
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [showImage]);
-
-  const showContent = () => {
-    const el = sectionRef.current;
-    if (!el || contentShown.current) return;
-    contentShown.current = true;
-
-    // Title letter by letter, then the details and buttons, the countdown last.
-    el.querySelector("h1")?.classList.remove("opacity-0");
-    animate(el.querySelectorAll("[data-letter]"), {
-      opacity: [0, 1],
-      translateY: ["0.3em", "0em"],
-      scale: [0.92, 1],
-      delay: stagger(38),
-      duration: 750,
-      ease: "outCubic",
-    });
-
-    animate(el.querySelectorAll("[data-animate]"), {
-      opacity: [0, 1],
-      translateY: [20, 0],
-      delay: stagger(160, { start: 380 }),
-      duration: 700,
-      ease: "outCubic",
-    });
-
-    animate(el.querySelectorAll("[data-animate-scale]"), {
-      opacity: [0, 1],
-      scale: [0.96, 1],
-      delay: stagger(80, { start: 480 }),
-      duration: 600,
-      ease: "outCubic",
-    });
-
-    animate(el.querySelectorAll("[data-animate-last]"), {
-      opacity: [0, 1],
-      translateY: [-10, 0],
-      delay: 1150,
-      duration: 700,
-      ease: "outCubic",
-    });
-  };
-
-  const onSynapseUnsupported = () => {
-    setSynapseFailed(true);
-    setParticlesOn(true);
-    showContent();
-  };
-
-  useEffect(() => {
-    if (!is3d) {
-      showContent();
+    const img = photoRef.current;
+    if (!img || img.complete) {
+      setReady(true);
       return;
     }
-    const timer = window.setTimeout(() => {
-      showContent();
-      setParticlesOn(true);
-    }, TITLE_FALLBACK_MS);
-    return () => window.clearTimeout(timer);
-  }, [is3d]);
+    const done = () => setReady(true);
+    img.addEventListener("load", done, { once: true });
+    img.addEventListener("error", done, { once: true });
+    const timer = window.setTimeout(done, READY_FALLBACK_MS);
+    return () => {
+      img.removeEventListener("load", done);
+      img.removeEventListener("error", done);
+      window.clearTimeout(timer);
+    };
+  }, []);
 
-  useEffect(() => {
-    if (!showImage) return;
-    const bones = bonesRef.current;
-    if (bones) {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        bones.style.opacity = "1";
-        bones.style.transform = "scale(1)";
-      } else {
-        animate(bones, {
-          opacity: [0, 1],
-          scale: [1.08, 1],
-          duration: 1200,
-          delay: 80,
-          easing: "easeOutCubic",
-        });
-      }
-    }
-  }, [showImage]);
+  let letter = 0;
 
   return (
-    <section
-      ref={sectionRef}
-      id="hero"
-      className="relative min-h-screen min-h-[100dvh] flex flex-col overflow-hidden"
-    >
-      {/* Background layers */}
-      <div className="absolute inset-0">
-        <img
-          src={withBase("img/background.jpg")}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-neutral-dark/50 via-neutral-dark/20 to-neutral-dark" />
-        <div
-          className={`absolute inset-0 transition-opacity duration-[1600ms] ease-out ${particlesOn ? "opacity-100" : "opacity-0"}`}
-        >
-          <ParticlesCanvas variant="hero" scale={is3d ? 1.6 : 1} />
-        </div>
+    <section id="hero" className="thank-you-hero">
+      {/* The photo, blurred, behind the navbar and either side of the sharp one. */}
+      <div className="thank-you-hero__backdrop" aria-hidden="true">
+        <img src={withBase(`${PHOTO}-blur.webp`)} alt="" />
       </div>
 
-      {is3d && !synapseFailed && (
-        <SynapseIllustration
-          interactionTarget={sectionRef}
-          options={synapseOptions}
-          onTitle={showContent}
-          onParticles={() => setParticlesOn(true)}
-          onUnsupported={onSynapseUnsupported}
-        />
-      )}
+      <figure className="thank-you-photo" data-ready={ready || undefined}>
+        <picture>
+          <source type="image/avif" srcSet={srcSet("avif")} sizes={PHOTO_SIZES} />
+          <source type="image/webp" srcSet={srcSet("webp")} sizes={PHOTO_SIZES} />
+          <img
+            ref={photoRef}
+            src={withBase(`${PHOTO}-1440.webp`)}
+            width={2400}
+            height={1489}
+            alt={PHOTO_ALT}
+            fetchPriority="high"
+          />
+        </picture>
 
-      {/* Bones illustration */}
-      {showImage && (
-        <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none [container-type:size]"
-          style={{ transform: `translateY(${imageOffset}px)` }}
-        >
-          <div
-            ref={bonesRef}
-            className="w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl px-2 opacity-0 will-change-transform"
-            style={{ transformOrigin: "center center" }}
-          >
-            {/* Enlarged below sm; keep in step with the embedded framing in synapse3d.ts. */}
-            <div className="origin-center scale-[1.5] min-[480px]:scale-[1.75] sm:scale-100 lg:mx-auto lg:max-w-[max(320px,calc((100cqh-510px)*3.3))]">
-              <img
-                src={withBase("img/bones.png")}
-                alt=""
-                className="w-full h-auto object-contain opacity-60 mix-blend-screen drop-shadow-[0_0_3rem_rgba(5,8,22,0.45)]"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Content: upper / middle / lower thirds to keep center clear for illustration */}
-      <div className="relative z-10 flex flex-1 flex-col min-h-0 max-w-5xl lg:max-w-6xl w-full mx-auto px-4 sm:px-6 text-center pt-[calc(5rem+var(--site-banner-height))] sm:pt-[calc(6rem+var(--site-banner-height))]">
-        <div className="flex-[1_1_0] flex flex-col items-center justify-start min-h-0">
-          <div data-animate-last className="opacity-0">
-            <ConferenceCountdown />
-          </div>
-          <h1
-            ref={titleRef}
-            aria-label={TITLE_LABEL}
-            className="opacity-0 mt-4 text-[length:min(2.25rem,calc((100vw-2rem)/8.9))] sm:max-md:text-7xl md:text-7xl lg:whitespace-nowrap lg:text-[length:min(6rem,calc((100vw-3rem)/11.6))] font-bold tracking-[-0.035em] leading-[0.96] mb-4 sm:mb-6 mx-auto [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_20px_rgba(255,255,255,0.5),0_0_48px_rgba(255,255,255,0.28)]"
-          >
-            <span
-              aria-hidden="true"
-              className="block mb-[0.45em] text-[length:min(1.35rem,calc((100vw-2rem)/14))] sm:text-3xl lg:text-4xl font-semibold tracking-[-0.02em]"
-            >
-              <TitleLetters words={GREETING} />
-            </span>
-            {TITLE.map((run, r) => (
-              <span key={r} aria-hidden="true">
-                {r > 0 && " "}
-                <TitleLetters words={run} />
+        {/* On the screen, under the triangle logo and above the tallest head. */}
+        <h1 className="thank-you-title">
+          <span className="sr-only">Thank you</span>
+          <span aria-hidden="true">
+            {WORDS.map((word, w) => (
+              <span key={word}>
+                {w > 0 && " "}
+                {[...word].map((char) => {
+                  const i = letter++;
+                  return (
+                    <span key={i} className="thank-you-letter" style={{ "--i": i } as React.CSSProperties}>
+                      {char}
+                    </span>
+                  );
+                })}
               </span>
             ))}
-          </h1>
-        </div>
+          </span>
+        </h1>
 
-        <div className="flex-[1_1_0] min-h-0 shrink-0" aria-hidden="true" />
-
-        <div className="flex-[1_1_0] flex flex-col items-center justify-end gap-4 sm:gap-5 min-h-0 pb-4 sm:pb-28 lg:pb-10">
-          {/* The dark halo keeps them legible where a fibre runs behind them on short windows. */}
-          <div
-            ref={detailsRef}
-            data-animate
-            className="opacity-0 flex w-full max-w-full flex-wrap sm:flex-nowrap items-center justify-center gap-x-2 gap-y-1 min-[380px]:gap-x-3 sm:gap-6 [text-shadow:0_1px_3px_rgba(8,47,74,0.95),0_0_18px_rgba(8,47,74,0.9)]"
-          >
-            <div className="flex shrink-0 items-center gap-1.5 min-[380px]:gap-2 text-white">
-              <Clock className="w-5 h-5 text-support-light" />
-              <span className="whitespace-nowrap text-[13px] min-[380px]:text-[15px] min-[430px]:text-base sm:text-xl font-semibold">
-                9–10 October 2026
-              </span>
-            </div>
-            <span className="hidden sm:block w-px h-5 shrink-0 bg-white/20" />
-            <div className="flex shrink-0 items-center gap-1.5 min-[380px]:gap-2 text-white">
-              <MapPin className="w-5 h-5 text-support-light" />
-              <span className="whitespace-nowrap text-[13px] min-[380px]:text-[15px] min-[430px]:text-base sm:text-xl font-semibold">
-                Kultur & Kongresshaus Aarau, Switzerland
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center gap-3 sm:gap-4 w-full max-w-xs sm:max-w-sm mx-auto">
-            <a
-              data-animate-scale
-              href={FOUNDATION_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="opacity-0 flex w-full items-center justify-center gap-2 sm:gap-2.5 px-6 sm:px-9 py-3.5 sm:py-4.5 bg-support hover:bg-support-light text-white text-base sm:text-lg font-semibold rounded-sm transition-all duration-300 hover:shadow-lg hover:shadow-support/25 leading-tight"
-            >
-              <span className="whitespace-nowrap">More from ALPS Foundation</span>
-              <ArrowUpRight className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-            </a>
-
-            <a
-              data-animate-scale
-              href={NEWSLETTER_SIGNUP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="opacity-0 flex items-center justify-center gap-2 sm:gap-2.5 px-5 sm:px-7 py-2.5 sm:py-3 bg-white/5 hover:bg-white/[0.08] text-white hover:text-white text-sm sm:text-base font-medium rounded-sm border border-white/10 hover:border-white/25 transition-all duration-300 leading-tight"
-            >
-              <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-              <span className="whitespace-nowrap">Stay in touch</span>
-            </a>
-          </div>
-        </div>
-      </div>
+        <figcaption className="thank-you-photo__credit">Photo: Max Lüdicke</figcaption>
+      </figure>
     </section>
   );
 }
