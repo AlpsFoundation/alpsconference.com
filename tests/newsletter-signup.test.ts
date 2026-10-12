@@ -124,6 +124,33 @@ describe("newsletter signup handler", () => {
     });
   });
 
+  it("sends name and surname as Infomaniak first and last name", async () => {
+    let requestBody = "";
+
+    await handleNewsletterSubscribe({
+      request: new Request("https://example.com/api/newsletter-subscribe", {
+        method: "POST",
+        body: JSON.stringify({
+          name: "  Anna Maria  von Berg ",
+          email: "person@example.com",
+        }),
+      }),
+      env: {
+        INFOMANIAK_TOKEN: "token",
+        INFOMANIAK_NEWSLETTER_DOMAIN: "123",
+      },
+      fetchImpl: async (_input, init) => {
+        requestBody = String(init?.body ?? "");
+        return new Response(JSON.stringify({ result: "success" }), { status: 201 });
+      },
+    });
+
+    expect(JSON.parse(requestBody)).toEqual({
+      email: "person@example.com",
+      fields: { firstname: "Anna", lastname: "Maria von Berg" },
+    });
+  });
+
   it("surfaces upstream API errors", async () => {
     const response = await handleNewsletterSubscribe({
       request: new Request("https://example.com/api/newsletter-subscribe", {
