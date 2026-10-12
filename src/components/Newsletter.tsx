@@ -11,6 +11,7 @@ export default function Newsletter() {
   const sectionRef = useRef<HTMLElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -88,6 +89,7 @@ export default function Newsletter() {
                 type="button"
                 onClick={() => {
                   setStatus("idle");
+                  setName("");
                   setEmail("");
                 }}
                 className="text-support-light hover:text-white text-sm font-medium underline underline-offset-4 transition-colors"
@@ -110,7 +112,7 @@ export default function Newsletter() {
                   const res = await fetch(apiUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: email.trim() }),
+                    body: JSON.stringify({ name: name.trim(), email: email.trim() }),
                   });
 
                   const payload = (await res.json().catch(() => null)) as
@@ -126,6 +128,7 @@ export default function Newsletter() {
                     return;
                   }
 
+                  setName("");
                   setEmail("");
                   setStatus("success");
                 } catch {
@@ -137,9 +140,30 @@ export default function Newsletter() {
               }}
               aria-busy={status === "loading"}
             >
+              <input
+                type="text"
+                name="name"
+                autoComplete="name"
+                maxLength={200}
+                aria-label="Name and surname"
+                disabled={status === "loading"}
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (status === "error") {
+                    setStatus("idle");
+                    setErrorMessage("");
+                  }
+                }}
+                placeholder="Name and surname"
+                className="w-full px-5 py-3.5 bg-white/[0.05] border border-white/10 rounded-sm text-white placeholder:text-white/60 focus:outline-none focus:border-support/50 focus:ring-1 focus:ring-support/30 transition-all text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              />
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
+                  name="email"
+                  autoComplete="email"
+                  aria-label="Email"
                   required
                   disabled={status === "loading"}
                   value={email}

@@ -99,7 +99,16 @@ export async function handleNewsletterSubscribe({
     );
   }
 
-  const payload: { email: string; groups?: Array<number | string> } = { email };
+  const payload: {
+    email: string;
+    fields?: { firstname?: string; lastname?: string };
+    groups?: Array<number | string>;
+  } = { email };
+  const nameFields = splitName(getNameFromPayload(data));
+
+  if (nameFields.firstname) {
+    payload.fields = nameFields;
+  }
   const groups = parseGroups(groupsRaw);
 
   if (groups.length > 0) {
@@ -190,6 +199,28 @@ function getEmailFromPayload(data: unknown) {
   }
 
   return "";
+}
+
+// One "Name and surname" field, split like alps.foundation's signup: the first
+// word is the first name, the rest the last name (Infomaniak's standard fields).
+function getNameFromPayload(data: unknown) {
+  if (
+    typeof data === "object" &&
+    data !== null &&
+    "name" in data &&
+    typeof data.name === "string"
+  ) {
+    return data.name.trim().slice(0, 200);
+  }
+
+  return "";
+}
+
+function splitName(name: string): { firstname?: string; lastname?: string } {
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return {};
+  if (parts.length === 1) return { firstname: parts[0] };
+  return { firstname: parts[0], lastname: parts.slice(1).join(" ") };
 }
 
 function parseGroups(groupsRaw: string): Array<number | string> {
