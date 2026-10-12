@@ -10,7 +10,7 @@ const PHOTO_ALT =
 // The photo's width when it fills the window's height (keep in step with .thank-you-photo in app.css).
 const PHOTO_SIZES = "(min-aspect-ratio: 3/2) calc((100vh - 5rem) * 1.61), 100vw";
 
-// Start the letters anyway if the photo is slow to load.
+// Start the intro anyway if the photo is slow to load.
 const READY_FALLBACK_MS = 2500;
 
 const WORDS = ["THANK", "YOU"];
@@ -42,13 +42,13 @@ export default function Hero() {
   let letter = 0;
 
   return (
-    <section id="hero" className="thank-you-hero">
+    <section id="hero" className="thank-you-hero" data-ready={ready || undefined}>
       {/* The photo, blurred, behind the navbar and either side of the sharp one. */}
       <div className="thank-you-hero__backdrop" aria-hidden="true">
         <img src={withBase(`${PHOTO}-blur.webp`)} alt="" />
       </div>
 
-      <figure className="thank-you-photo" data-ready={ready || undefined}>
+      <figure className="thank-you-photo">
         <picture>
           <source type="image/avif" srcSet={srcSet("avif")} sizes={PHOTO_SIZES} />
           <source type="image/webp" srcSet={srcSet("webp")} sizes={PHOTO_SIZES} />
