@@ -94,14 +94,14 @@ export default function Partners() {
             href={CATERING_PARTNER.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block rounded-2xl bg-white p-5 sm:p-7 shadow-lg shadow-black/20 transition-transform duration-200 hover:scale-[1.02]"
+            className="inline-block rounded-xl bg-white p-3 sm:p-4 shadow-lg shadow-black/20 transition-transform duration-200 hover:scale-[1.02]"
           >
             <img
               src={CATERING_PARTNER.src}
               alt={CATERING_PARTNER.alt}
               width={800}
               height={687}
-              className="block w-[min(18rem,70vw)] sm:w-[22rem] md:w-[26rem] h-auto"
+              className="block w-[7.5rem] sm:w-[8.5rem] md:w-[9.5rem] h-auto"
               loading="lazy"
               decoding="async"
             />
