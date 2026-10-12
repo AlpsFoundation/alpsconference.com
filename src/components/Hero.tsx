@@ -82,7 +82,12 @@ export default function Hero() {
           </span>
         </h1>
 
-        <figcaption className="thank-you-photo__credit">Photo: Max Lüdicke</figcaption>
+        <figcaption className="thank-you-photo__credit">
+          Photo:{" "}
+          <a href="https://www.maxluedi.com" target="_blank" rel="noopener noreferrer">
+            Max Lüdicke
+          </a>
+        </figcaption>
       </figure>
     </section>
   );

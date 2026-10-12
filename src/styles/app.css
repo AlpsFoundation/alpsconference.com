@@ -250,13 +250,28 @@ main > section:not(:first-child) {
   box-shadow: 0 2rem 5rem -2rem rgba(3, 18, 32, 0.7);
 }
 
-/* Under the photo rather than on it, clear of the people in the front row. */
+/* On the photo, over the empty rows of seats in the bottom-right corner, below
+   the front row's faces at every size. */
 .thank-you-photo__credit {
-  padding: 0.4rem 1rem 0.5rem;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.75rem;
-  line-height: 1.3;
-  text-align: right;
+  position: absolute;
+  right: 1.2cqw;
+  bottom: 0.6cqw;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(10px, 0.85cqw, 14px);
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.thank-you-photo__credit a {
+  color: white;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.45);
+  text-underline-offset: 0.15em;
+  transition: text-decoration-color 200ms;
+}
+
+.thank-you-photo__credit a:hover {
+  text-decoration-color: white;
 }
 
 /* Placed in the photo's own coordinates (cqw, the photo's width), so it stays
