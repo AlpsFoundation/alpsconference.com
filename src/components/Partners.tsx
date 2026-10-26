@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { animate } from "animejs";
-import { CATERING_PARTNER, PARTNERS } from "../data/partners";
+import { CATERING_PARTNER, DECORATION_PARTNER, PARTNERS } from "../data/partners";
 
 export default function Partners() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -86,26 +86,49 @@ export default function Partners() {
           ))}
         </div>
 
-        <div data-fade-up className="opacity-0 mt-12 sm:mt-14 text-center">
-          <h3 className="text-xs sm:text-sm font-medium tracking-[0.12em] uppercase text-white/45 mb-4">
-            Our Amazing Catering Partner
-          </h3>
-          <a
-            href={CATERING_PARTNER.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block rounded-xl bg-white p-3 sm:p-4 shadow-lg shadow-black/20 transition-transform duration-200 hover:scale-[1.02]"
-          >
-            <img
-              src={CATERING_PARTNER.src}
-              alt={CATERING_PARTNER.alt}
-              width={800}
-              height={687}
-              className="block w-[7.5rem] sm:w-[8.5rem] md:w-[9.5rem] h-auto"
-              loading="lazy"
-              decoding="async"
-            />
-          </a>
+        <div data-fade-up className="opacity-0 mt-12 sm:mt-14 flex flex-wrap justify-center items-start gap-x-12 sm:gap-x-16 gap-y-10 text-center">
+          <div>
+            <h3 className="text-xs sm:text-sm font-medium tracking-[0.12em] uppercase text-white/45 mb-4">
+              Our Amazing Catering Partner
+            </h3>
+            <a
+              href={CATERING_PARTNER.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block rounded-xl bg-white p-3 sm:p-4 shadow-lg shadow-black/20 transition-transform duration-200 hover:scale-[1.02]"
+            >
+              <img
+                src={CATERING_PARTNER.src}
+                alt={CATERING_PARTNER.alt}
+                width={800}
+                height={687}
+                className="block w-[7.5rem] sm:w-[8.5rem] md:w-[9.5rem] h-auto"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+          </div>
+          <div>
+            <h3 className="text-xs sm:text-sm font-medium tracking-[0.12em] uppercase text-white/45 mb-4">
+              Our Amazing Decoration Partner
+            </h3>
+            <a
+              href={DECORATION_PARTNER.url}
+              target="_blank"
+              rel="noopener"
+              className="inline-block rounded-xl bg-white px-4 py-5 sm:px-5 sm:py-6 shadow-lg shadow-black/20 transition-transform duration-200 hover:scale-[1.02]"
+            >
+              <img
+                src={DECORATION_PARTNER.src}
+                alt={DECORATION_PARTNER.alt}
+                width={800}
+                height={208}
+                className="block w-[12rem] sm:w-[14rem] md:w-[15.5rem] h-auto"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+          </div>
         </div>
       </div>
     </section>
