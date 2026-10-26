@@ -41,3 +41,10 @@ export const CATERING_PARTNER = {
   alt: "Funky Kitchen – Kochen mit Herz und Liebe",
   url: "https://www.funkykitchen.ch/"
 };
+
+/** Shown beside the catering partner; the full-colour wordmark sits on a white card. */
+export const DECORATION_PARTNER = {
+  src: "/img/partners/greenfinity.png",
+  alt: "Greenfinity – moss walls and greenery",
+  url: "https://www.greenfinity.ch/"
+};
