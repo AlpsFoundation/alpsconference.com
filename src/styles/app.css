@@ -1375,3 +1375,12 @@ button.links-row:not(:disabled):hover {
 
 .links-past__summary::-webkit-details-marker { display: none; }
 .links-past[open] > .links-past__summary .links-acc__chevron { rotate: 180deg; }
+
+/* "This was ALPS 2026" photo strip: swipe or use the arrows; no scrollbar. */
+.recap-track {
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.recap-track::-webkit-scrollbar {
+  display: none;
+}
