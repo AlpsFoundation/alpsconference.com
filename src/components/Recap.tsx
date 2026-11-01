@@ -88,11 +88,19 @@ export default function Recap() {
             <a href="https://www.greenfinity.ch/" target="_blank" rel="noopener" className={linkClass}>
               Greenfinity
             </a>{" "}
-            brought the venue to life with its moss panels and the ALPS moss letters.
+            brought the venue to life with its moss panels and the ALPS moss letters, and our catering partner{" "}
+            <a href="https://www.funkykitchen.ch/" target="_blank" rel="noopener" className={linkClass}>
+              Funky Kitchen
+            </a>{" "}
+            kept everyone well fed.
           </p>
           <p data-fade-up className="opacity-0">
             A warm thank you to all our <a href="#partners" className={linkClass}>academic, professional and media partners</a>,
-            and to every supporter, speaker, volunteer and attendee who made ALPS 2026 what it was.
+            and to every supporter, speaker, volunteer and attendee who was part of it. See you next year!{" "}
+            <a href="#newsletter" className={linkClass}>
+              Sign up to stay tuned
+            </a>{" "}
+            for ALPS 2027.
           </p>
         </div>
       </div>
