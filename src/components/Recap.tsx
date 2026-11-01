@@ -124,20 +124,6 @@ export default function Recap() {
                   draggable={false}
                   className="block h-[22rem] sm:h-[28rem] w-auto max-w-[85vw] object-cover rounded-[1rem] border border-white/10"
                 />
-                <figcaption
-                  className="mt-2.5 text-sm text-white/55 leading-snug"
-                  style={{ width: 0, minWidth: "100%" }}
-                >
-                  {photo.caption}
-                  {photo.greenfinity && (
-                    <>
-                      , by our decoration partner{" "}
-                      <a href="https://www.greenfinity.ch/" target="_blank" rel="noopener" className={linkClass}>
-                        Greenfinity
-                      </a>
-                    </>
-                  )}
-                </figcaption>
               </figure>
             </li>
           ))}
