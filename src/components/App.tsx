@@ -2,6 +2,7 @@ import Navbar from "./Navbar";
 import Hero from "./Hero";
 import Experiences from "./Experiences";
 import About from "./About";
+import Recap from "./Recap";
 import Gallery from "./Gallery";
 import Program from "./Program";
 import Speakers from "./Speakers";
@@ -23,6 +24,7 @@ export default function App({ illustration = "image" }: { illustration?: FooterI
         <Hero />
         <Newsletter />
         <About />
+        <Recap />
         <Program />
         <Speakers />
         <Experiences />
