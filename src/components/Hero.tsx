@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Play } from "lucide-react";
 import { withBase } from "../lib/withBase";
+import { TALKS_2026_URL } from "../data/talks";
 
 // The 2026 group photo on the main stage (Saturday 10 October, by Max Lüdicke), shown whole at every size: as wide as
 // the page, or as wide as fits between the navbar and the bottom of the window.
@@ -8,7 +10,7 @@ const PHOTO_WIDTHS = [640, 1024, 1440, 2000, 2400];
 const PHOTO_ALT =
   "Group photo of the ALPS Conference 2026 speakers, attendees and crew on the stage of the Kultur & Kongresshaus Aarau, under the ALPS logo on the screen";
 // The photo's width when it fills the window's height (keep in step with .thank-you-photo in app.css).
-const PHOTO_SIZES = "(min-aspect-ratio: 3/2) calc((100vh - 5rem) * 1.61), 100vw";
+const PHOTO_SIZES = "(min-aspect-ratio: 3/2) calc((100vh - 10rem) * 1.61), 100vw";
 
 // Start the intro anyway if the photo is slow to load.
 const READY_FALLBACK_MS = 2500;
@@ -89,6 +91,15 @@ export default function Hero() {
           </a>
         </figcaption>
       </figure>
+
+      {/* Right under the photo, still inside the first screen (the photo leaves room for it, see --cta-height). */}
+      <div className="thank-you-cta">
+        <a href={TALKS_2026_URL} target="_blank" rel="noopener noreferrer" className="thank-you-cta__button">
+          <Play className="h-4 w-4" fill="currentColor" aria-hidden />
+          Watch the 2026 talks
+          <ArrowUpRight className="h-4 w-4 opacity-70" aria-hidden />
+        </a>
+      </div>
     </section>
   );
 }

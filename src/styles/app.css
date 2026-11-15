@@ -197,6 +197,7 @@ main > section:not(:first-child) {
    on the screen above the stage. */
 .thank-you-hero {
   --nav-height: 4rem;
+  --cta-height: 5rem;
   position: relative;
   overflow: hidden;
   padding-top: calc(var(--nav-height) + var(--site-banner-height));
@@ -232,7 +233,7 @@ main > section:not(:first-child) {
 /* As wide as the page, or as wide as fits below the navbar (keep in step with
    PHOTO_SIZES in Hero.tsx). */
 .thank-you-photo {
-  --photo-height: calc(100vh - var(--nav-height) - var(--site-banner-height));
+  --photo-height: calc(100vh - var(--nav-height) - var(--site-banner-height) - var(--cta-height));
   position: relative;
   width: min(100%, var(--photo-height) * 2400 / 1489);
   margin: 0 auto;
@@ -240,7 +241,43 @@ main > section:not(:first-child) {
 }
 
 @supports (height: 100svh) {
-  .thank-you-photo { --photo-height: calc(100svh - var(--nav-height) - var(--site-banner-height)); }
+  .thank-you-photo { --photo-height: calc(100svh - var(--nav-height) - var(--site-banner-height) - var(--cta-height)); }
+}
+
+/* "Watch the 2026 talks" under the photo; the photo shrinks by --cta-height so both fit the first screen. */
+.thank-you-cta {
+  position: relative;
+  display: flex;
+  height: var(--cta-height);
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1rem;
+}
+
+.thank-you-cta__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  background: linear-gradient(100deg, var(--color-accent) 0%, #b9a3dd 52%, var(--color-support-light) 100%);
+  color: var(--color-neutral-dark);
+  font-size: 1rem;
+  font-weight: 640;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 0.8rem 2.2rem -0.8rem rgba(3, 18, 32, 0.8);
+  transition: transform 200ms, box-shadow 200ms;
+}
+
+.thank-you-cta__button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1rem 2.6rem -0.8rem rgba(3, 18, 32, 0.9);
+}
+
+.thank-you-cta__button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 3px;
 }
 
 .thank-you-photo img {
@@ -325,6 +362,14 @@ main > section:not(:first-child) {
 
   .thank-you-hero[data-ready] .thank-you-photo__credit {
     animation: thank-you-fade 1s ease-out 2s both;
+  }
+
+  .thank-you-cta {
+    opacity: 0;
+  }
+
+  .thank-you-hero[data-ready] .thank-you-cta {
+    animation: thank-you-fade 0.9s ease-out 1.4s both;
   }
 
   .thank-you-hero[data-ready] .thank-you-letter {
