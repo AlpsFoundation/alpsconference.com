@@ -44,14 +44,17 @@ export default function About() {
         </div>
 
         <div className="grid gap-7 lg:grid-cols-2 lg:gap-4 lg:items-start">
+          {/* A vertical (9:16) video: as wide as the column allows, at most 24rem, and never taller than the window
+              below the navbar, so it stays whole while pinned. */}
           <div
             data-fade-up
-            className="w-full opacity-0 rounded-[1.25rem] border border-white/10 overflow-hidden aspect-[4/3] lg:sticky lg:top-24"
+            className="mx-auto opacity-0 rounded-[1.25rem] border border-white/10 overflow-hidden aspect-[9/16] lg:sticky lg:top-24"
+            style={{ width: "min(100%, 24rem, calc((100svh - 8rem) * 9 / 16))" }}
           >
             <iframe
               className="w-full h-full"
-              src="https://www.youtube-nocookie.com/embed/_3iQxlvqZog?iv_load_policy=3&playsinline=1&rel=0&modestbranding=1"
-              title="ALPS Conference 2026 — you're invited"
+              src="https://www.youtube-nocookie.com/embed/Ud8yOZgAjDg?iv_load_policy=3&playsinline=1&rel=0&modestbranding=1"
+              title="Time Will Tell, a poem from the closing session — ALPS Conference 2026"
               loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
