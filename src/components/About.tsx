@@ -44,12 +44,10 @@ export default function About() {
         </div>
 
         <div className="grid gap-7 lg:grid-cols-2 lg:gap-4 lg:items-start">
-          {/* A vertical (9:16) video: as wide as the column allows, at most 24rem, and never taller than the window
-              below the navbar, so it stays whole while pinned. */}
+          {/* A horizontal (16:9) video: the full column width. */}
           <div
             data-fade-up
-            className="mx-auto opacity-0 rounded-[1.25rem] border border-white/10 overflow-hidden aspect-[9/16] lg:sticky lg:top-24"
-            style={{ width: "min(100%, 24rem, calc((100svh - 8rem) * 9 / 16))" }}
+            className="w-full opacity-0 rounded-[1.25rem] border border-white/10 overflow-hidden aspect-video lg:sticky lg:top-24"
           >
             <iframe
               className="w-full h-full"
